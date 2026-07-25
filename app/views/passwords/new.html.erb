@@ -1,0 +1,33 @@
+<% content_for :title, "ลืมรหัสผ่าน — UTCC AI Fundamental" %>
+
+<div class="brand-field grid min-h-[calc(100vh_-_var(--spacing-header))] place-items-center px-4 py-8">
+  <div class="w-full max-w-lg rounded-box bg-surface p-8 shadow-2xl">
+    <div class="mb-8 text-center">
+      <h1 class="text-36 leading-tight font-bold text-balance text-brand-deep">ลืมรหัสผ่าน</h1>
+      <p class="mt-2 text-18 text-muted">กรอกอีเมลของคุณ เราจะส่งลิงก์ตั้งรหัสผ่านใหม่ไปให้</p>
+    </div>
+
+    <%= form_with url: passwords_path, class: "flex flex-col gap-4" do |form| %>
+      <div class="flex flex-col gap-1">
+        <%= form.label :email_address, "อีเมล", class: "text-18 font-medium text-ink-2" %>
+        <%= form.email_field :email_address, required: true, autofocus: true,
+              autocomplete: "username", placeholder: "you@utcc.ac.th",
+              value: params[:email_address],
+              class: "w-full rounded-md border border-hairline bg-surface px-3.5 py-2.5 text-18 transition duration-300
+                      placeholder:text-muted-2 focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none
+                      aria-[invalid=true]:border-brand-alert" %>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <%= form.submit "ส่งลิงก์ตั้งรหัสผ่านใหม่",
+              class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18
+                      leading-tight font-normal whitespace-nowrap uppercase text-surface transition duration-300
+                      hover:bg-brand-deep active:scale-97" %>
+      </div>
+    <% end %>
+
+    <p class="mt-4 border-t border-hairline pt-4 text-center text-18 text-muted">
+      <%= link_to "กลับไปหน้าเข้าสู่ระบบ", new_session_path, class: "font-medium text-brand hover:underline" %>
+    </p>
+  </div>
+</div>

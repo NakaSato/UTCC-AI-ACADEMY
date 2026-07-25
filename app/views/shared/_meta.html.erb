@@ -1,0 +1,56 @@
+<%# SEO / social metadata, ported from eng.utcc.ac.th — see docs/design-system.md.
+    Pages override per-page values with content_for :title / :description / :meta_image. %>
+<% page_title       = content_for(:title).presence || "UTCC AI Fundamental — พื้นที่เรียนรู้ AI สำหรับนักศึกษา" %>
+<% page_description = content_for(:description).presence ||
+                      "พื้นที่เรียนรู้และแบ่งปันความรู้ด้าน AI สำหรับนักศึกษามหาวิทยาลัยหอการค้าไทย " \
+                      "รวมหัวข้อพื้นฐาน เส้นทางการเรียนแบบเป็นระดับ ผลงานจากเพื่อนนักศึกษา และกิจกรรมที่เปิดให้เข้าร่วม" %>
+<% page_image       = content_for(:meta_image).presence || "#{request.base_url}/icon.png" %>
+<% canonical_url    = "#{request.base_url}#{request.path}" %>
+
+<title><%= page_title %></title>
+<meta name="title" content="<%= page_title %>">
+<meta name="description" content="<%= page_description %>">
+<meta name="keywords" content="AI, ปัญญาประดิษฐ์, machine learning, prompt engineering, utcc, มหาวิทยาลัยหอการค้าไทย, คณะวิศวกรรมศาสตร์">
+<meta name="author" content="University of the Thai Chamber of Commerce">
+
+<link rel="canonical" href="<%= canonical_url %>">
+
+<%# Open Graph / Facebook %>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UTCC AI Fundamental">
+<meta property="og:locale" content="th_TH">
+<meta property="og:url" content="<%= canonical_url %>">
+<meta property="og:title" content="<%= page_title %>">
+<meta property="og:description" content="<%= page_description %>">
+<meta property="og:image" content="<%= page_image %>">
+
+<%# Twitter %>
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="<%= canonical_url %>">
+<meta property="twitter:title" content="<%= page_title %>">
+<meta property="twitter:description" content="<%= page_description %>">
+<meta property="twitter:image" content="<%= page_image %>">
+
+<%= tag.script type: "application/ld+json" do %>
+  <%= raw JSON.pretty_generate({
+        "@context" => "https://schema.org",
+        "@type" => "EducationalOrganization",
+        "name" => "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย",
+        "alternateName" => "School of Engineering, University of the Thai Chamber of Commerce",
+        "url" => request.base_url,
+        "sameAs" => [ "https://eng.utcc.ac.th/", "https://www.facebook.com/eng.utcc/" ],
+        "address" => {
+          "@type" => "PostalAddress",
+          "streetAddress" => "อาคาร 19 ชั้น 3, 126/1 ซอยวิภาวดีรังสิต 2 แขวงรัชดาภิเษก เขตดินแดง",
+          "addressLocality" => "กรุงเทพมหานคร",
+          "postalCode" => "10400",
+          "addressCountry" => "TH"
+        },
+        "contactPoint" => {
+          "@type" => "ContactPoint",
+          "telephone" => "+66-2-697-6705",
+          "contactType" => "Customer Service"
+        },
+        "description" => page_description
+      }) %>
+<% end %>

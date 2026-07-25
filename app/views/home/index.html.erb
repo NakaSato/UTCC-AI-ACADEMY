@@ -1,0 +1,172 @@
+<% content_for :title, "UTCC AI Fundamental — เรียนรู้ AI ไปด้วยกัน" %>
+
+<section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-surface">
+  <div class="flex max-w-7xl flex-col items-center gap-4 p-4">
+    <p class="text-18 tracking-[0.18em] uppercase text-on-brand">UTCC AI Fundamental</p>
+
+    <%# The UTCC ENG lockup is a white logo on transparency — it sits directly on
+        the maroon field, so it needs no plate or scrim of its own. %>
+    <h1 class="mx-auto w-full max-w-[40rem]">
+      <%= image_tag "hero-eng-utcc.webp",
+            alt: "UTCC ENG — School of Engineering คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย",
+            width: 1650, height: 650, fetchpriority: "high", class: "h-auto w-full" %>
+      <span class="sr-only">UTCC AI Fundamental — เรียนรู้ AI ไปด้วยกัน</span>
+    </h1>
+
+    <p class="text-36 leading-tight font-bold lg:text-54">เรียนรู้ AI ไปด้วยกัน</p>
+
+    <p class="max-w-[60ch] text-20 font-light opacity-90">
+      พื้นที่สำหรับนักศึกษา UTCC ที่อยากเริ่มต้นกับเทคโนโลยี AI
+      ตั้งแต่ยังไม่มีพื้นฐาน ไปจนถึงการลงมือทำโปรเจกต์จริง และแบ่งปันสิ่งที่เรียนรู้กับเพื่อน ๆ
+    </p>
+
+    <div class="mt-4 flex flex-wrap justify-center gap-4">
+      <a href="#learn"
+         class="inline-flex items-center gap-2 rounded-full bg-surface px-6 py-2.5 text-18 leading-tight font-normal
+                whitespace-nowrap uppercase text-brand-deep shadow-md transition duration-300
+                hover:bg-brand-tint hover:shadow-lg active:scale-97">เริ่มเรียนรู้</a>
+      <%# On the maroon field an outline button takes the light-on-dark variant. %>
+      <a href="#community"
+         class="inline-flex items-center gap-2 rounded-full border border-surface px-6 py-2.5 text-18 leading-tight
+                font-normal whitespace-nowrap uppercase text-surface transition duration-300
+                hover:bg-surface hover:text-brand-deep active:scale-97">ดูผลงานเพื่อน ๆ</a>
+    </div>
+  </div>
+</section>
+
+<main id="main">
+  <section class="py-16 lg:py-24" id="learn">
+    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+        <div>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">เรียนรู้ AI</h2>
+          <p class="max-w-[65ch] text-20 text-muted">
+            หัวข้อพื้นฐานที่แนะนำให้เริ่ม อ่านจบแล้วลงมือทำต่อได้ทันที
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% @topics.each do |topic| %>
+          <a href="#learn"
+             class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
+                    hover:-translate-y-0.5 hover:shadow-lg">
+            <span class="text-36 leading-none" aria-hidden="true"><%= topic[:icon] %></span>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= topic[:title] %></h3>
+            <p class="text-18 text-muted"><%= topic[:blurb] %></p>
+          </a>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-surface-2 py-16 lg:py-24" id="tracks" data-controller="tabs">
+    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+        <div>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">เส้นทางการเรียน</h2>
+          <p class="max-w-[65ch] text-20 text-muted">เลือกจุดเริ่มต้นที่ตรงกับพื้นฐานของคุณ</p>
+        </div>
+        <div class="flex flex-wrap gap-2" role="tablist" aria-label="กรองตามระดับ">
+          <% [["ทั้งหมด", "all"], ["เริ่มต้น", "beginner"], ["ระดับกลาง", "intermediate"], ["ขั้นสูง", "advanced"]].each_with_index do |(label, level), i| %>
+            <button type="button" role="tab"
+                    class="rounded-full border border-hairline px-4 py-1.5 text-18 text-muted transition duration-300
+                           hover:border-brand hover:text-brand
+                           aria-selected:border-brand aria-selected:bg-brand aria-selected:text-surface"
+                    data-tabs-target="tab" data-level="<%= level %>"
+                    data-action="tabs#select"
+                    aria-selected="<%= i.zero? %>"><%= label %></button>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% @tracks.each do |track| %>
+          <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
+                          hover:-translate-y-0.5 hover:shadow-lg"
+                   data-tabs-target="item" data-level="<%= track[:level] %>">
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center rounded-full border border-brand px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track[:badge] %></span>
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track[:weeks] %></span>
+            </div>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= track[:title] %></h3>
+            <p class="text-18 text-muted"><%= track[:blurb] %></p>
+            <div class="mt-auto pt-2">
+              <a href="#tracks"
+                 class="inline-flex items-center gap-2 rounded-full border border-brand px-6 py-2.5 text-18
+                        leading-tight font-normal whitespace-nowrap uppercase text-brand transition duration-300
+                        hover:bg-brand hover:text-surface active:scale-97">ดูเนื้อหา</a>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 lg:py-24" id="community">
+    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+        <div>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">ชุมชนนักศึกษา</h2>
+          <p class="max-w-[65ch] text-20 text-muted">
+            สิ่งที่เพื่อน ๆ กำลังลองทำ ไม่ต้องรอให้โปรเจกต์เสร็จสมบูรณ์ก็แชร์ได้
+          </p>
+        </div>
+        <a href="#community"
+           class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight font-normal
+                  whitespace-nowrap uppercase text-surface transition duration-300
+                  hover:bg-brand-deep active:scale-97">แชร์ผลงานของคุณ</a>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% @shares.each do |share| %>
+          <a href="#community"
+             class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
+                    hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="aspect-video w-full rounded-md bg-linear-to-br from-surface-3 to-surface-2"></div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= share[:tag] %></span>
+            </div>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= share[:title] %></h3>
+            <p class="text-18 text-muted-2"><%= share[:author] %> · <%= share[:date] %></p>
+          </a>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-surface-2 py-16 lg:py-24" id="events">
+    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">กิจกรรมและเวิร์กชอป</h2>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% @events.each do |event| %>
+          <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md">
+            <span class="inline-flex w-fit items-center rounded-full bg-brand px-3 py-0.5 text-18 font-medium text-surface"><%= event[:when] %></span>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= event[:title] %></h3>
+            <p class="text-18 text-muted-2"><%= event[:where] %></p>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 lg:py-24" id="faq">
+    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">คำถามที่พบบ่อย</h2>
+      </div>
+      <% @faqs.each do |faq| %>
+        <details class="group border-b border-hairline">
+          <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 py-4 text-24 font-medium
+                          text-brand-deep after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
+                          after:border-b-2 after:border-current after:transition-transform after:duration-300
+                          after:content-[''] group-open:after:rotate-[-135deg]"><%= faq[:q] %></summary>
+          <div class="pb-4 text-18 text-muted"><%= faq[:a] %></div>
+        </details>
+      <% end %>
+    </div>
+  </section>
+</main>
