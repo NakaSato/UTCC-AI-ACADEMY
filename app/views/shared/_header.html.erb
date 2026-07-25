@@ -1,58 +1,77 @@
-<header class="relative z-20 w-full bg-brand pb-2 shadow-md"
+<%# The marketing header, shown only to signed-out visitors — the layout swaps
+    in shared/_app_header once there is a session. It sits on the same ink
+    field as the app chrome so the two headers read as one product.
+
+    Sticky rather than fixed-on-scroll: the nav is the only way into the
+    landing page's sections, so it stays reachable the whole way down. The
+    pinned class is now purely the scrolled *look* (a shadow lifting the bar
+    off the content), which is why it no longer moves the header out of flow. %>
+<header class="sticky top-0 z-40 w-full bg-chrome"
         data-controller="header"
-        data-header-pinned-class="fixed top-0 right-0 left-0"
+        data-header-pinned-class="shadow-lg"
         data-action="keydown@window->header#closeOnEscape">
-  <nav class="mx-auto flex min-h-header w-full max-w-page items-center gap-4 px-4 xl:px-8" aria-label="หลัก">
-    <div class="flex-none">
-      <%= link_to root_path, class: "flex items-center gap-2 text-24 font-bold tracking-[0.01em] text-surface" do %>
-        UTCC
-        <small class="block text-18 font-light opacity-80">AI Fundamental</small>
-      <% end %>
-    </div>
+  <nav class="mx-auto flex min-h-header w-full max-w-page items-center gap-4 px-4 xl:px-8"
+       aria-label="<%= t("landing.nav_label") %>">
+    <%# The shield carries the brand; the wordmark next to it is the accessible
+        name, so the image itself is decorative. Same lockup as the app chrome. %>
+    <%= link_to root_path, class: "flex flex-none items-center gap-3", title: t("landing.home") do %>
+      <%# Sized to the wordmark stack beside it (20 + 11.5 + 10 plus its gaps),
+          so the shield and the three lines share a baseline block. %>
+      <%= image_tag "utcc-eng-shield.svg", alt: "", aria: { hidden: true },
+                    width: 48, height: 48, loading: "eager",
+                    class: "block h-12 w-auto" %>
+      <span class="flex flex-col justify-center border-l border-chrome-line pl-3 leading-none">
+        <span class="text-20 font-bold tracking-[0.02em] text-surface"><%= t("landing.brand_name") %></span>
+        <span class="mt-1 text-11-5 font-light tracking-[0.14em] text-on-chrome uppercase">
+          <%= t("chrome.brand_line") %>
+        </span>
+        <span class="mt-0.5 text-10 font-medium tracking-[0.06em] text-on-chrome-dim">
+          <%= t("chrome.brand_sub") %>
+        </span>
+      </span>
+    <% end %>
 
     <div class="hidden flex-1 justify-center lg:flex">
-      <div>
+      <div class="flex items-center">
         <%# Animated underline: grows from the left on hover, retracts to the right.
-            The left/right swap is what makes enter and exit animate oppositely. %>
+            The left/right swap is what makes enter and exit animate oppositely.
+            `data-active` is set by the header controller's scroll spy and holds
+            the underline open for whichever section is on screen. %>
         <% nav_links.each do |label, href| %>
           <a href="<%= href %>"
-             class="relative mx-2 inline-block py-1 text-18 text-on-brand transition-colors duration-300 hover:text-surface
+             data-header-target="navLink"
+             data-active="false"
+             class="relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-surface
                     after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
-                    after:bg-on-brand after:transition-[width] after:duration-300 after:content-['']
-                    hover:after:right-auto hover:after:left-0 hover:after:w-full"><%= label %></a>
+                    after:bg-on-chrome after:transition-[width] after:duration-300 after:content-['']
+                    hover:after:right-auto hover:after:left-0 hover:after:w-full
+                    data-[active=true]:text-surface data-[active=true]:after:right-auto
+                    data-[active=true]:after:left-0 data-[active=true]:after:w-full
+                    data-[active=true]:after:bg-brand"><%= label %></a>
         <% end %>
       </div>
     </div>
 
     <div class="ml-auto flex flex-none items-center gap-2">
-      <%# Mobile-first: the account block only appears from lg up, where the burger hides. %>
-      <% if authenticated? %>
-        <div class="hidden items-center gap-2 lg:flex">
-          <span class="grid size-9 flex-none place-items-center rounded-full bg-surface text-18 font-bold text-brand-deep"
-                aria-hidden="true"><%= Current.user.initials %></span>
-          <span class="text-18 text-surface"><%= Current.user.name %></span>
-          <%= button_to "ออกจากระบบ", session_path, method: :delete,
-                class: "text-18 text-on-brand transition-colors duration-300 hover:text-surface hover:underline",
-                form: { class: "inline" } %>
-        </div>
-      <% else %>
-        <div class="hidden items-center gap-2 lg:flex">
-          <%= link_to "เข้าสู่ระบบ", new_session_path,
-                class: "relative mx-2 inline-block py-1 text-18 text-on-brand transition-colors duration-300 hover:text-surface
-                        after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
-                        after:bg-on-brand after:transition-[width] after:duration-300 after:content-['']
-                        hover:after:right-auto hover:after:left-0 hover:after:w-full" %>
-          <%# Cream pill with a deep-maroon label — the only button that reads correctly on the maroon bar. %>
-          <%= link_to "สมัครสมาชิก", new_registration_path,
-                class: "inline-flex items-center gap-2 rounded-full bg-surface px-6 py-2.5 text-18 leading-tight
-                        font-normal whitespace-nowrap uppercase text-brand-deep shadow-md transition duration-300
-                        hover:bg-brand-tint hover:shadow-lg active:scale-97" %>
-        </div>
-      <% end %>
+      <div class="hidden items-center gap-2 lg:flex">
+        <%= link_to t("landing.sign_in"), login_path,
+              class: "relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-surface
+                      after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
+                      after:bg-on-chrome after:transition-[width] after:duration-300 after:content-['']
+                      hover:after:right-auto hover:after:left-0 hover:after:w-full" %>
+        <%# Crimson pill on the ink bar — the primary action, matching the app's
+            primary button everywhere else. %>
+        <%= link_to t("landing.sign_up"), register_path,
+              class: "inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight
+                      font-normal whitespace-nowrap text-surface shadow-md transition duration-300
+                      hover:bg-brand-deep hover:shadow-lg active:scale-97" %>
+      </div>
 
       <button type="button"
               class="inline-flex rounded-full p-2 text-surface transition duration-300 hover:bg-surface/12 lg:hidden"
-              data-action="header#toggle" aria-label="เปิดเมนู">
+              data-action="header#toggle" aria-label="<%= t("landing.menu_open") %>"
+              aria-controls="landing-menu" aria-expanded="false"
+              data-header-target="toggle">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" aria-hidden="true">
           <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>
@@ -66,13 +85,18 @@
     <div class="absolute inset-0 bg-ink/70 opacity-0 transition-opacity duration-300 group-data-[open=true]:opacity-100"
          data-action="click->header#close"></div>
 
-    <div class="absolute top-0 right-0 h-full w-[min(20rem,85vw)] translate-x-full overflow-y-auto bg-brand p-4
+    <div id="landing-menu"
+         class="absolute top-0 right-0 h-full w-[min(20rem,85vw)] translate-x-full overflow-y-auto bg-chrome p-4
                 shadow-2xl transition-transform duration-300 group-data-[open=true]:translate-x-0"
-         role="dialog" aria-modal="true" aria-label="เมนู">
-      <div class="mb-4 flex items-center justify-between text-surface">
-        <span>เมนู</span>
+         role="dialog" aria-modal="true" aria-label="<%= t("landing.menu_label") %>">
+      <div class="mb-4 flex items-center justify-between gap-4 text-surface">
+        <span class="flex items-center gap-2">
+          <%= image_tag "utcc-eng-shield.svg", alt: "", aria: { hidden: true },
+                        width: 28, height: 28, class: "block h-7 w-auto" %>
+          <span class="text-16 font-medium"><%= t("landing.menu_label") %></span>
+        </span>
         <button type="button" class="inline-flex rounded-full p-2 transition duration-300 hover:bg-surface/12"
-                data-action="header#close" aria-label="ปิดเมนู">
+                data-action="header#close" aria-label="<%= t("landing.menu_close") %>">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
@@ -83,30 +107,25 @@
       <div class="flex flex-col gap-2">
         <% nav_links.each do |label, href| %>
           <a href="<%= href %>"
-             class="border-b border-surface/20 py-2 text-on-brand transition-colors duration-300 hover:text-surface"
+             data-header-target="navLink"
+             data-active="false"
+             class="border-b border-chrome-line py-2 text-on-chrome transition-colors duration-300 hover:text-surface
+                    data-[active=true]:border-brand data-[active=true]:text-surface"
              data-action="header#close"><%= label %></a>
         <% end %>
       </div>
 
       <div class="mt-4 flex flex-col gap-2 text-surface">
-        <% if authenticated? %>
-          <p><%= Current.user.name %></p>
-          <%= button_to "ออกจากระบบ", session_path, method: :delete,
-                class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-surface px-6 py-2.5
-                        text-18 leading-tight font-normal whitespace-nowrap uppercase text-brand-deep shadow-md
-                        transition duration-300 hover:bg-brand-tint hover:shadow-lg active:scale-97" %>
-        <% else %>
-          <%# The drawer sits on the maroon field, so the default maroon-on-maroon
-              outline button would be invisible here — it takes the light-on-dark variant. %>
-          <%= link_to "เข้าสู่ระบบ", new_session_path,
-                class: "inline-flex w-full items-center justify-center gap-2 rounded-full border border-surface
-                        px-6 py-2.5 text-18 leading-tight font-normal whitespace-nowrap uppercase text-surface
-                        transition duration-300 hover:bg-surface hover:text-brand-deep active:scale-97" %>
-          <%= link_to "สมัครสมาชิก", new_registration_path,
-                class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-surface px-6 py-2.5
-                        text-18 leading-tight font-normal whitespace-nowrap uppercase text-brand-deep shadow-md
-                        transition duration-300 hover:bg-brand-tint hover:shadow-lg active:scale-97" %>
-        <% end %>
+        <%# The drawer sits on the ink field, so an outline button takes the
+            light-on-dark variant to stay visible. %>
+        <%= link_to t("landing.sign_in"), login_path,
+              class: "inline-flex w-full items-center justify-center gap-2 rounded-full border border-surface
+                      px-6 py-2.5 text-18 leading-tight font-normal whitespace-nowrap text-surface
+                      transition duration-300 hover:bg-surface hover:text-chrome active:scale-97" %>
+        <%= link_to t("landing.sign_up"), register_path,
+              class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5
+                      text-18 leading-tight font-normal whitespace-nowrap text-surface shadow-md
+                      transition duration-300 hover:bg-brand-deep hover:shadow-lg active:scale-97" %>
       </div>
     </div>
   </div>

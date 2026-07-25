@@ -1,0 +1,39 @@
+<%# Sign in and sign up are one screen: both panels ship with the page and the
+    segmented control only toggles which is visible, so switching costs no
+    request. `active` (:login or :register) is the panel the server routed to;
+    from there the panels controller keeps the address bar and title in step. %>
+<% panels = {
+     login: {
+       partial: "sessions/form",
+       path: login_path,
+       title: "#{t("auth.login.title")} — UTCC AI Academy"
+     },
+     register: {
+       partial: "registrations/form",
+       path: register_path,
+       title: "#{t("auth.register.title")} — UTCC AI Academy"
+     }
+   } %>
+
+<div data-controller="panels" data-panel="<%= active %>">
+  <div role="tablist" class="mb-7.5 flex rounded-[12px] bg-surface-2 p-1">
+    <% panels.each do |panel, screen| %>
+      <%= tag.button t("auth.tabs.#{panel}"), type: "button", role: "tab",
+            id: "auth-tab-#{panel}",
+            aria: { selected: active == panel, controls: "auth-panel-#{panel}" },
+            data: { panel:, path: screen[:path], title: screen[:title],
+                    panels_target: "tab", action: "panels#select" },
+            class: "flex-1 cursor-pointer rounded-[9px] py-2.75 text-center text-14-5 font-medium text-muted
+                    transition-colors hover:text-ink aria-selected:bg-surface aria-selected:font-semibold
+                    aria-selected:text-ink" %>
+    <% end %>
+  </div>
+
+  <% panels.each do |panel, screen| %>
+    <%= tag.section role: "tabpanel", id: "auth-panel-#{panel}", hidden: active != panel,
+          aria: { labelledby: "auth-tab-#{panel}" },
+          data: { panel:, focus: true, panels_target: "panel" } do %>
+      <%= render screen[:partial], autofocus: active == panel %>
+    <% end %>
+  <% end %>
+</div>

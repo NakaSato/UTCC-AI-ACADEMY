@@ -1,57 +1,18 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="<%= I18n.locale %>">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-
-    <%= render "shared/meta" %>
-
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="UTCC AI Fundamental">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#8C1C36">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Thai display face used by the design system — see docs/design-system.md %>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;700&display=swap">
-
-    <%# The Tailwind build from app/assets/tailwind/application.css %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <%= render "shared/head" %>
   </head>
 
-  <body class="bg-surface text-20 leading-body text-ink antialiased">
+  <body class="bg-canvas font-sans text-16 leading-body text-ink antialiased">
     <a href="#main"
-       class="absolute -top-full left-4 z-50 rounded-md bg-surface px-4 py-2 text-brand-deep shadow-lg transition-[top] duration-300 focus:top-2">
-      ข้ามไปยังเนื้อหาหลัก
+       class="absolute -top-full left-4 z-50 rounded-field bg-surface px-4 py-2 text-brand-deep shadow-lg transition-[top] duration-300 focus:top-2">
+      <%= t("chrome.skip_to_content") %>
     </a>
 
-    <%= render "shared/header" %>
+    <%= authenticated? ? render("shared/app_header") : render("shared/header") %>
 
-    <% if flash.any? %>
-      <div class="sticky top-0 z-25 flex flex-col gap-2 px-4 pt-2">
-        <% flash.each do |type, message| %>
-          <div role="status"
-               class="mx-auto w-full max-w-page rounded-md border-l-4 bg-surface px-4 py-2 text-18 shadow-md
-                      <%= type == "alert" ? "border-brand-alert text-brand-accent" : "border-brand text-brand-deep" %>">
-            <%= message %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+    <%= render "shared/flashes" %>
 
     <%= yield %>
 

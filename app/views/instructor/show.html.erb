@@ -1,0 +1,84 @@
+<% content_for :title, "#{t("instructor.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-7.5 flex flex-wrap items-end justify-between gap-6">
+    <div>
+      <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("instructor.title") %></h1>
+      <p class="text-16 text-muted"><%= t("instructor.subtitle") %></p>
+    </div>
+    <button type="button"
+            class="rounded-field bg-brand px-5.5 py-3 text-14-5 font-semibold whitespace-nowrap text-white
+                   transition-colors hover:bg-brand-deep">
+      <%= t("instructor.export_csv") %>
+    </button>
+  </div>
+
+  <div class="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <% @stats.each do |stat| %>
+      <div class="rounded-[16px] border border-hairline bg-surface px-6 py-5.5">
+        <div class="mb-2 text-12-5 font-medium text-muted-2"><%= stat[:label] %></div>
+        <div class="text-30 leading-none font-bold tracking-[-0.03em]"><%= stat[:value] %></div>
+        <div class="mt-1.75 text-12-5 text-muted-2"><%= stat[:note] %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[400px_minmax(0,1fr)]">
+    <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+      <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("instructor.hardest_title") %></h2>
+      <p class="mb-5 text-13 text-muted-2"><%= t("instructor.hardest_sub") %></p>
+
+      <%# Spelled out rather than interpolated so Tailwind's scanner sees them. %>
+      <% severity = { alarm: "bg-brand", warn: "bg-brand-alert", notice: "bg-gold" } %>
+
+      <div class="flex flex-col gap-3.75">
+        <% @hard_topics.each do |topic| %>
+          <div>
+            <div class="mb-1.5 flex justify-between gap-3 text-13-5">
+              <span class="text-ink-2"><%= topic[:name] %></span>
+              <span class="font-semibold text-muted-2"><%= topic[:percent] %>%</span>
+            </div>
+            <div class="h-1.75 overflow-hidden rounded-full bg-surface-2">
+              <div class="h-full rounded-full <%= severity[topic[:severity]] %>"
+                   style="width: <%= topic[:percent] %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <div class="px-6 pt-5.5 pb-4">
+        <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("instructor.roster_title") %></h2>
+      </div>
+
+      <div class="grid grid-cols-[minmax(0,1fr)_80px] gap-2 border-y border-surface-3 bg-surface-4 px-4 py-3 text-12
+                  font-semibold tracking-[0.05em] text-muted-2 uppercase
+                  sm:grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] sm:px-6">
+        <span class="hidden sm:block"><%= t("instructor.th_id") %></span>
+        <span><%= t("instructor.th_name") %></span>
+        <span class="text-right"><%= t("instructor.th_progress") %></span>
+        <span class="hidden text-right sm:block"><%= t("instructor.th_projects") %></span>
+        <span class="hidden text-right sm:block"><%= t("instructor.th_seen") %></span>
+      </div>
+
+      <% @roster.each do |student| %>
+        <div class="grid grid-cols-[minmax(0,1fr)_80px] items-center gap-2 border-b border-surface-5 px-4 py-3.5
+                    sm:grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] sm:px-6">
+          <span class="hidden font-mono text-12-5 text-muted sm:block"><%= student.id %></span>
+          <span class="truncate text-14-5"><%= student.name %></span>
+          <span class="text-right text-14 font-semibold
+                       <%= class_names(
+                             "text-success" => student.on_track?,
+                             "text-brand" => student.behind?,
+                             "text-ink-2" => !student.on_track? && !student.behind?
+                           ) %>">
+            <%= student.percent %>%
+          </span>
+          <span class="hidden text-right text-14 text-muted sm:block"><%= student.projects_text %></span>
+          <span class="hidden text-right text-13-5 text-muted-2 sm:block"><%= student.seen_text %></span>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,56 @@
+<%# The one tab backed by real records. Roles persist; nothing else here does. %>
+<section class="overflow-hidden rounded-card border border-hairline bg-surface">
+  <div class="px-6 pt-5.5 pb-4">
+    <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("admin.roster_title") %></h2>
+  </div>
+
+  <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-y border-surface-3 bg-surface-4 px-4 py-3 text-12
+              font-semibold tracking-[0.05em] text-muted-2 uppercase
+              sm:grid-cols-[136px_minmax(0,1fr)_112px_240px] sm:px-6">
+    <span class="hidden sm:block"><%= t("admin.th_id") %></span>
+    <span><%= t("admin.th_name") %></span>
+    <span class="hidden sm:block"><%= t("admin.th_role") %></span>
+    <span class="text-right"><%= t("admin.th_change") %></span>
+  </div>
+
+  <% @users.each do |user| %>
+    <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-surface-5 px-4 py-3.5
+                sm:grid-cols-[136px_minmax(0,1fr)_112px_240px] sm:px-6">
+      <span class="hidden font-mono text-12-5 text-muted sm:block"><%= user.student_id %></span>
+
+      <span class="truncate text-14-5">
+        <%= user.name %>
+        <span class="ml-1 text-12-5 text-muted-2 sm:hidden"><%= user.student_id %></span>
+      </span>
+
+      <span class="hidden sm:block">
+        <span class="rounded-full px-2.75 py-1 text-12-5 font-semibold
+                     <%= class_names(
+                           "bg-brand-tint text-brand-deep" => user.admin?,
+                           "bg-gold-tint text-gold-ink" => user.instructor?,
+                           "bg-surface-2 text-ink-4" => user.student?
+                         ) %>">
+          <%= t("admin.roles.#{user.role}") %>
+        </span>
+      </span>
+
+      <%# An admin cannot change their own role, so their row offers no control
+          rather than a button the action would refuse. %>
+      <% if user == Current.user %>
+        <span class="text-right text-13-5 text-muted-2"><%= t("admin.role_self") %></span>
+      <% else %>
+        <%= form_with url: admin_user_path(user), method: :patch,
+              class: "flex justify-end gap-2" do %>
+          <%= select_tag :role,
+                options_for_select(User::ROLES.map { [ t("admin.roles.#{it}"), it ] }, user.role),
+                "aria-label": t("admin.role_for", name: user.name),
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                        transition-colors outline-none focus:border-brand" %>
+          <%= submit_tag t("admin.save"),
+                class: "rounded-field bg-brand px-4 py-2 text-14 font-semibold whitespace-nowrap text-white
+                        transition-colors hover:bg-brand-deep" %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</section>

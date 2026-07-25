@@ -1,0 +1,52 @@
+<%# The sign-in panel. Rendered by shared/_auth_switch on both /login and
+    /register, so `autofocus` is true only on the panel the page
+    opened on — two autofocused fields in one document fight each other. %>
+<h1 class="mb-2 text-28 leading-[1.2] font-bold tracking-[-0.025em]"><%= t("auth.login.title") %></h1>
+<p class="mb-7 text-15 leading-[1.6] text-balance text-muted"><%= t("auth.login.subtitle") %></p>
+
+<%= form_with url: login_path do |form| %>
+  <div class="mb-5.5 flex flex-col gap-4">
+    <label class="flex flex-col gap-1.75">
+      <%# The controller turns the ID into <id>@utcc.ac.th before authenticating. %>
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.student_id") %></span>
+      <%# 13 digits, matching User::STUDENT_ID_FORMAT. maxlength stops the typo
+          at the keyboard; the model is still the authority. %>
+      <%= form.text_field :student_id, required: true, autofocus: autofocus,
+            autocomplete: "username", placeholder: "2X1071730XXXX",
+            inputmode: "numeric", pattern: "[0-9]{13}", maxlength: 13,
+            spellcheck: false, autocapitalize: "off",
+            title: t("auth.fields.student_id_hint"),
+            value: params[:student_id],
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+    </label>
+
+    <label class="flex flex-col gap-1.75">
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.password") %></span>
+      <%= form.password_field :password, required: true, maxlength: 72,
+            autocomplete: "current-password", placeholder: "••••••••",
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+    </label>
+  </div>
+
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <%# Checked by default, and real: clearing it drops the session cookie back
+        to a browser-session cookie. See the Authentication concern. %>
+    <label class="flex items-center gap-2.5 text-14 text-ink-4">
+      <%= check_box_tag :remember_me, "1", true,
+            class: "size-4.5 rounded-[5px] border-[1.5px] border-hairline-3 accent-brand" %>
+      <span><%= t("auth.remember") %></span>
+    </label>
+    <%= link_to t("auth.forgot_link"), forgot_password_path,
+          class: "text-14 font-medium text-brand hover:text-brand-deep" %>
+  </div>
+
+  <%= form.submit t("auth.login.submit"),
+        class: "mb-4 w-full cursor-pointer rounded-[12px] bg-brand py-3.5 text-15-5 font-semibold text-white
+                transition-colors hover:bg-brand-deep" %>
+<% end %>
+
+<%= render "shared/auth_sso" %>
+
+<p class="mt-6.5 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("auth.login.help") %></p>

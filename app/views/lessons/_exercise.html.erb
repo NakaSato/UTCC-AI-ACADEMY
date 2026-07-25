@@ -1,0 +1,62 @@
+<%# Graded in the browser so the feedback is instant, as the design intends.
+    See LessonContent for why the answer key is not a secret here. %>
+<div class="rounded-card border border-hairline bg-surface p-7 sm:p-10 lg:px-11"
+     data-controller="quiz"
+     data-quiz-correct-index-value="<%= LessonContent::CORRECT_OPTION %>">
+  <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+    <%= t("lesson.quiz.eyebrow") %>
+  </div>
+  <h1 class="mb-6.5 max-w-[60ch] text-22 leading-[1.35] font-bold tracking-[-0.02em] text-balance sm:text-27">
+    <%= t("lesson.quiz.question") %>
+  </h1>
+
+  <div class="mb-7 flex flex-col gap-2.75" role="radiogroup">
+    <% LessonContent.options.each_with_index do |option, index| %>
+      <button type="button" role="radio" aria-checked="false"
+              data-quiz-target="option" data-action="quiz#pick" data-index="<%= index %>" data-state=""
+              class="group flex items-center gap-3.5 rounded-[13px] border-[1.5px] border-hairline bg-surface
+                     px-5 py-4.25 text-left text-15-5 text-ink-2 transition-colors
+                     data-[state=picked]:border-brand data-[state=picked]:bg-brand-tint data-[state=picked]:text-ink
+                     data-[state=correct]:border-success data-[state=correct]:bg-success-tint data-[state=correct]:text-success-ink
+                     data-[state=wrong]:border-brand-alert data-[state=wrong]:bg-danger-tint">
+        <span class="grid size-6.5 flex-none place-items-center rounded-lg bg-surface-2 text-12-5 font-semibold
+                     text-muted-2
+                     group-data-[state=picked]:bg-brand group-data-[state=picked]:text-white
+                     group-data-[state=correct]:bg-success group-data-[state=correct]:text-white
+                     group-data-[state=wrong]:bg-brand-alert group-data-[state=wrong]:text-white">
+          <%= option[:key] %>
+        </span>
+        <span><%= option[:text] %></span>
+      </button>
+    <% end %>
+  </div>
+
+  <div class="group mb-5.5 hidden rounded-[13px] border border-success-line bg-success-tint px-5 py-4.5
+              data-[state=wrong]:border-danger-line data-[state=wrong]:bg-danger-tint"
+       data-quiz-target="feedback" data-state="" role="status">
+    <div class="mb-1.25 text-14-5 font-bold text-success-deep group-data-[state=wrong]:text-brand-accent"
+         data-quiz-target="feedbackTitle"></div>
+    <div class="text-14-5 leading-[1.6] text-ink-4" data-quiz-target="feedbackBody"></div>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <button type="button" disabled
+            data-quiz-target="check" data-action="quiz#check"
+            class="rounded-field bg-brand px-7 py-3.25 text-15 font-semibold text-white transition-colors
+                   hover:bg-brand-deep disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-muted-3">
+      <%= t("lesson.quiz.check") %>
+    </button>
+
+    <%= link_to t("lesson.quiz.to_code"), lesson_path(step: :code),
+          data: { quiz_target: "next", panel: :code, action: "panels#select" },
+          class: "hidden rounded-field border-[1.5px] border-brand px-6.5 py-2.75 text-15 font-semibold text-brand
+                  transition-colors hover:bg-brand-tint" %>
+  </div>
+
+  <%# The strings the controller writes into the feedback panel. %>
+  <template data-quiz-target="copy"
+            data-correct-title="<%= t("lesson.quiz.correct_title") %>"
+            data-correct-body="<%= t("lesson.quiz.correct_body") %>"
+            data-wrong-title="<%= t("lesson.quiz.wrong_title") %>"
+            data-wrong-body="<%= t("lesson.quiz.wrong_body") %>"></template>
+</div>

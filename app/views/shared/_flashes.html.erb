@@ -1,0 +1,11 @@
+<% if flash.any? %>
+  <div class="flex flex-col gap-2 px-4 pt-4 sm:px-8">
+    <% flash.each do |type, message| %>
+      <div role="status"
+           class="mx-auto w-full max-w-page rounded-field border-l-4 bg-surface px-4 py-3 text-14-5 shadow-card
+                  <%= type == "alert" ? "border-brand-alert text-brand-accent" : "border-brand text-brand-deep" %>">
+        <%= message %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,63 @@
+<%#
+  The global loading skeleton — an indeterminate bar pinned to the top of the
+  viewport over a placeholder of the split screens (My Learning, Progress).
+  Purely decorative, so the whole thing is aria-hidden and the only thing a
+  screen reader gets is the live-region label.
+
+  Row widths and the stagger are the design's, not derived from anything:
+  five rows at 78/92/64/86/71% coming in 90ms apart.
+%>
+<% rows = [ 78, 92, 64, 86, 71 ] %>
+
+<div role="status" aria-live="polite">
+  <span class="sr-only"><%= t("chrome.loading") %></span>
+
+  <div aria-hidden="true" class="fixed inset-x-0 top-0 z-60 h-0.75 overflow-hidden bg-surface-3">
+    <div class="h-full w-[30%] animate-top-bar bg-brand"></div>
+  </div>
+
+  <main aria-hidden="true" class="mx-auto max-w-page animate-fade px-4 pt-12 pb-20 sm:px-8">
+    <div class="mb-3.5 h-10 w-full max-w-[380px] animate-shimmer rounded-[10px] skeleton"></div>
+    <div class="mb-9.5 h-4.5 w-full max-w-[240px] animate-shimmer rounded-lg skeleton"></div>
+
+    <div class="grid grid-cols-1 items-start gap-6 nav:grid-cols-[minmax(0,1fr)_380px]">
+      <div class="flex flex-col gap-6">
+        <div class="rounded-panel border border-hairline bg-surface px-8.5 py-7.5">
+          <div class="flex flex-col gap-3.5">
+            <% rows.each_with_index do |width, index| %>
+              <div class="h-4 animate-shimmer rounded-lg skeleton"
+                   style="width: <%= width %>%; animation-delay: <%= index * 90 %>ms"></div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4.5 sm:grid-cols-3">
+          <% 3.times do |index| %>
+            <div class="flex flex-col gap-3 rounded-box border border-hairline bg-surface p-6">
+              <div class="h-3.5 w-[45%] animate-shimmer rounded-[7px] skeleton"
+                   style="animation-delay: <%= index * 110 %>ms"></div>
+              <div class="h-5 w-[88%] animate-shimmer rounded-lg skeleton"
+                   style="animation-delay: <%= index * 110 %>ms"></div>
+              <div class="mt-3.5 h-2 w-full rounded-full bg-surface-3"></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="flex flex-col items-center gap-3.5 rounded-panel bg-chrome px-7.5 py-8.5">
+          <div class="size-33 animate-shimmer rounded-full skeleton-on-chrome"></div>
+          <div class="h-4 w-[62%] animate-shimmer rounded-lg skeleton-on-chrome"></div>
+          <div class="h-3 w-[44%] rounded-[7px] bg-chrome-2"></div>
+        </div>
+
+        <div class="flex flex-col gap-3 rounded-panel border border-hairline bg-surface px-7 py-6.5">
+          <% rows.each_with_index do |width, index| %>
+            <div class="h-3.5 animate-shimmer rounded-[7px] skeleton"
+                 style="width: <%= width %>%; animation-delay: <%= index * 90 %>ms"></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

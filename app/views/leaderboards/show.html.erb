@@ -1,0 +1,62 @@
+<% content_for :title, "#{t("leaderboard.title")} — UTCC AI Academy" %>
+
+<%# The three ranges are the same placeholder board today, so the tabs have no
+    panels to swap — they mark themselves, keep the URL, and replay the rows'
+    entrance so the switch reads as a refresh rather than a dead click. Each
+    range becomes a real panel once the board is per-period data. %>
+<main id="main" class="mx-auto max-w-narrow px-4 pt-11 pb-20 sm:px-8"
+      data-controller="panels" data-panel="<%= @tab %>">
+  <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("leaderboard.title") %></h1>
+  <p class="mb-7 text-16 text-muted"><%= t("leaderboard.subtitle") %></p>
+
+  <nav role="tablist" class="mb-6 flex flex-wrap gap-2" aria-label="<%= t("leaderboard.title") %>">
+    <% Leaderboard.tab_labels.each do |tab, label| %>
+      <%= link_to label, leaderboard_path(tab: tab),
+            role: "tab", aria: { selected: @tab == tab, controls: "leaderboard-board" },
+            data: { panel: tab, path: leaderboard_path(tab: tab),
+                    panels_target: "tab", action: "panels#select" },
+            class: "rounded-full border-[1.5px] border-hairline bg-surface px-4.5 py-2.25 text-14 font-medium
+                    text-ink-2 transition-colors hover:border-muted-3 aria-selected:border-brand
+                    aria-selected:bg-brand-tint aria-selected:text-brand-deep" %>
+    <% end %>
+  </nav>
+
+  <div id="leaderboard-board" role="tabpanel"
+       class="overflow-hidden rounded-card border border-hairline bg-surface">
+    <div class="grid grid-cols-[48px_minmax(0,1fr)_80px] gap-2 border-b border-surface-3 px-4 py-3.75 text-12
+                font-semibold tracking-[0.05em] text-muted-2 uppercase sm:grid-cols-[64px_minmax(0,1fr)_110px_110px_110px] sm:px-6">
+      <span><%= t("leaderboard.th_rank") %></span>
+      <span><%= t("leaderboard.th_student") %></span>
+      <span class="text-right">XP</span>
+      <span class="hidden text-right sm:block"><%= t("leaderboard.th_topics") %></span>
+      <span class="hidden text-right sm:block"><%= t("leaderboard.th_streak") %></span>
+    </div>
+
+    <% @entries.each_with_index do |entry, index| %>
+      <div style="animation-delay: <%= index * 45 %>ms"
+           data-panels-target="replay" data-in="true"
+           class="grid data-[in=true]:animate-row-in grid-cols-[48px_minmax(0,1fr)_80px] items-center gap-2 border-b
+                  border-surface-5 px-4 py-3.75 sm:grid-cols-[64px_minmax(0,1fr)_110px_110px_110px] sm:px-6
+                  <%= "bg-brand-tint" if entry.you? %>">
+        <span class="text-15 font-bold <%= entry.podium? ? "text-brand" : "text-muted-3" %>">
+          <%= entry.rank %>
+        </span>
+
+        <div class="flex min-w-0 items-center gap-3">
+          <span class="grid size-8 flex-none place-items-center rounded-[9px] text-11-5 font-semibold
+                       <%= entry.you? ? "bg-brand text-white" : "bg-surface-2 text-muted-2" %>">
+            <%= entry.initials %>
+          </span>
+          <div class="min-w-0">
+            <div class="truncate text-14-5 <%= entry.you? ? "font-bold" : "font-medium" %>"><%= entry.name %></div>
+            <div class="text-12 text-muted-2"><%= entry.section_text %></div>
+          </div>
+        </div>
+
+        <span class="text-right text-14-5 font-semibold"><%= entry.xp %></span>
+        <span class="hidden text-right text-14 text-muted sm:block"><%= entry.topics %></span>
+        <span class="hidden text-right text-14 text-muted sm:block"><%= entry.streak_text %></span>
+      </div>
+    <% end %>
+  </div>
+</main>

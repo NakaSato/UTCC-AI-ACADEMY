@@ -1,0 +1,48 @@
+<%# The ink half of the auth split: brand, the pitch, and the disclaimer the
+    language toggle sits beside. %>
+<div class="flex flex-col justify-between gap-12 bg-chrome px-8 py-12 sm:px-12 lg:px-16 lg:py-14">
+  <div class="flex items-center gap-4">
+    <%= image_tag "utcc-eng-shield.svg", alt: "UTCC",
+                  width: 54, height: 54, class: "block h-[54px] w-auto", loading: "eager" %>
+    <div class="flex flex-col gap-[3px] border-l border-chrome-line pl-4 leading-[1.1]">
+      <span class="text-17 font-semibold tracking-[-0.01em] text-white">UTCC</span>
+      <span class="text-10-5 font-medium tracking-[0.09em] text-on-chrome-muted uppercase">
+        <%= t("chrome.brand_line") %>
+      </span>
+      <span class="text-10 font-medium tracking-[0.05em] text-on-chrome-dim">
+        <%= t("chrome.brand_sub") %>
+      </span>
+    </div>
+  </div>
+
+  <div class="max-w-[460px]">
+    <h1 class="mb-4 text-32 leading-[1.18] font-bold tracking-[-0.03em] text-balance text-canvas lg:text-40">
+      <%= t("auth.hero_title") %>
+    </h1>
+    <p class="mb-8 text-16-5 leading-[1.65] text-balance text-on-chrome-soft">
+      <%= t("auth.hero_body") %>
+    </p>
+
+    <ul class="flex flex-col gap-3.5">
+      <% t("auth.points").each do |point| %>
+        <li class="flex items-center gap-3.5">
+          <span aria-hidden="true"
+                class="grid size-[22px] flex-none place-items-center rounded-full bg-brand text-11 text-white">✓</span>
+          <span class="text-15 text-on-chrome"><%= point %></span>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <%# The site is a student project, so it says so before anyone signs in. %>
+    <p class="max-w-[46ch] border-l-2 border-brand pl-3 text-12-5 leading-[1.65] text-balance text-on-chrome-dim">
+      <%= t("auth.disclaimer") %>
+    </p>
+
+    <div class="flex flex-wrap items-center gap-3.5">
+      <%= render "shared/language_toggle", dark: true %>
+      <span class="text-12-5 text-on-chrome-dim"><%= t("auth.footer") %></span>
+    </div>
+  </div>
+</div>

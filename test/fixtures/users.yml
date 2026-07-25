@@ -1,7 +1,10 @@
 <% password_digest = BCrypt::Password.create("password") %>
 
+# student_id is the sign-in identifier. email_address is optional — sign-up does
+# not collect one — so `two` deliberately has none.
 one:
   name: นักศึกษา หนึ่ง
+  student_id: "2011071730901"
   email_address: one@example.com
   password_digest: <%= password_digest %>
   faculty: วิศวกรรมศาสตร์
@@ -9,5 +12,25 @@ one:
 
 two:
   name: นักศึกษา สอง
-  email_address: two@example.com
+  student_id: "2011071730902"
   password_digest: <%= password_digest %>
+
+student:
+  name: นักศึกษา สาม
+  student_id: "2011071730001"
+  password_digest: <%= password_digest %>
+  faculty: วิศวกรรมศาสตร์
+  study_year: 2
+
+# The three above carry no role and so take the column default, "student".
+instructor:
+  name: อาจารย์ หนึ่ง
+  student_id: "2011071730991"
+  password_digest: <%= password_digest %>
+  role: instructor
+
+admin:
+  name: ผู้ดูแล หนึ่ง
+  student_id: "2011071730992"
+  password_digest: <%= password_digest %>
+  role: admin

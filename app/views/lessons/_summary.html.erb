@@ -1,0 +1,25 @@
+<div class="rounded-card border border-hairline bg-surface px-7 py-12 text-center sm:px-11 sm:py-14">
+  <div aria-hidden="true"
+       class="mx-auto mb-5.5 grid size-[62px] place-items-center rounded-card bg-brand text-26 text-white">✓</div>
+
+  <h1 class="mb-2.5 text-26 font-bold tracking-[-0.025em] sm:text-30"><%= t("lesson.done.title") %></h1>
+  <p class="mx-auto mb-7.5 max-w-[52ch] text-16 leading-[1.6] text-muted"><%= t("lesson.done.subtitle") %></p>
+
+  <div class="mb-8 flex flex-wrap justify-center gap-3.5">
+    <% LessonContent.rewards.each do |reward| %>
+      <div class="rounded-[14px] border border-hairline bg-canvas px-6.5 py-4.5">
+        <div class="mb-0.5 text-22 font-bold text-brand"><%= reward[:value] %></div>
+        <div class="text-12-5 text-muted-2"><%= reward[:label] %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap justify-center gap-3">
+    <%= link_to t("lesson.done.next_topic"), lesson_path(step: :theory),
+          class: "rounded-field bg-brand px-6.5 py-3.25 text-15 font-semibold text-white transition-colors
+                  hover:bg-brand-deep" %>
+    <%= link_to t("lesson.done.see_progress"), progress_path,
+          class: "rounded-field border-[1.5px] border-hairline-2 px-6 py-2.75 text-15 font-medium text-ink-4
+                  transition-colors hover:border-muted-3" %>
+  </div>
+</div>

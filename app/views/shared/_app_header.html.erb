@@ -1,0 +1,66 @@
+<%# The signed-in chrome: brand, primary nav, language, gamification
+    counters, notifications and the account menu, over the gamification strip. %>
+<header class="sticky top-0 z-40 bg-chrome">
+  <div class="mx-auto flex h-header max-w-page items-center gap-4 px-4 sm:px-8 xl:gap-6">
+    <%# The shield is the accessible name for the link; the two-line lockup
+        beside it repeats it visually, so it is decorative and drops out below
+        `sm` where the nav needs the room. The footer and the auth hero carry
+        the taller three-line version — this rail only has 64px to work in. %>
+    <%= link_to root_path, class: "flex flex-none items-center gap-3 pr-1", title: "UTCC" do %>
+      <%= image_tag "utcc-eng-shield.svg", alt: "UTCC",
+                    width: 34, height: 34, class: "block h-[34px] w-auto", loading: "eager" %>
+      <span aria-hidden="true"
+            class="hidden flex-col gap-[3px] border-l border-chrome-line pl-3 leading-none whitespace-nowrap sm:flex">
+        <span class="text-10-5 font-bold tracking-[0.11em] text-on-chrome uppercase">
+          <%= t("chrome.brand_line") %>
+        </span>
+        <span class="text-9-5 font-medium tracking-[0.06em] text-on-chrome-dim">
+          <%= t("chrome.brand_sub") %>
+        </span>
+      </span>
+    <% end %>
+
+    <%# The nav scrolls horizontally rather than wrapping when it is tight, and
+        below `nav` it gives way to the burger menu at the end of the rail. %>
+    <nav class="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto nav:flex"
+         aria-label="<%= t("chrome.nav_label") %>">
+      <% app_nav_items.each do |label, path| %>
+        <% current = nav_current?(path) %>
+        <%= link_to label, path,
+              "aria-current": ("page" if current),
+              class: class_names(
+                "flex-none rounded-[9px] px-2.5 py-2 text-13 font-medium tracking-[-0.01em] whitespace-nowrap transition-colors",
+                "bg-chrome-3 text-white" => current,
+                "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !current
+              ) %>
+      <% end %>
+    </nav>
+
+    <%# `ml-auto` rather than the nav's `flex-1`: the nav is hidden below `nav`,
+        and the rail still belongs against the right edge. %>
+    <div class="ml-auto flex flex-none items-center gap-2">
+      <%= render "shared/language_toggle" %>
+
+      <%= render "shared/app_notifications" %>
+      <%= render "shared/app_account_menu" %>
+      <%= render "shared/app_nav_menu" %>
+    </div>
+  </div>
+
+  <%# The gamification strip: hearts remaining, refill timer, and which
+      semester the counters belong to. %>
+  <div class="border-t border-chrome-line-2 bg-chrome-deep">
+    <div class="mx-auto flex max-w-page items-center gap-4 px-4 py-[9px] sm:px-8">
+      <span class="text-12-5 font-medium text-on-chrome">
+        <%= t("chrome.hearts_left", count: LearnerProfile::LIVES) %>
+      </span>
+      <div class="flex gap-1" aria-hidden="true">
+        <% LearnerProfile::MAX_LIVES.times do |index| %>
+          <span class="text-12 <%= index < LearnerProfile::LIVES ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
+        <% end %>
+      </div>
+      <span class="hidden text-12-5 text-on-chrome-dim sm:inline"><%= t("chrome.refill") %></span>
+      <span class="ml-auto hidden text-12-5 text-on-chrome-dim lg:inline"><%= t("chrome.semester") %></span>
+    </div>
+  </div>
+</header>

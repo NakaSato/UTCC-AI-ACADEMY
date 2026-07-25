@@ -1,68 +1,213 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — ported from eng.utcc.ac.th.
- * See docs/design-system.md for provenance of every value here.
+ * Design tokens — ported from the "UTCC AI Fundamental App UI" design
+ * (claude.ai/design project 7a17af7d). See docs/design-system.md for the
+ * provenance of every value here.
  *
  * This @theme block is the ONLY place a raw hex belongs. Everything else in the
- * app consumes it through generated utilities (bg-brand, text-muted, text-44…).
+ * app consumes it through generated utilities (bg-brand, text-muted, text-24…).
  */
 @theme {
-  /* ---- Brand ramp: light -> dark ------------------------------------- */
-  --color-brand-alert: #FF0038;  /* sparing use: alerts, "new" flags       */
-  --color-brand:       #8C1C36;  /* header bar, primary borders            */
-  --color-brand-accent:#851614;  /* text accent                            */
-  --color-brand-deep:  #622432;  /* CTA label, dark fills                  */
-  --color-brand-tint:  #FFF1F3;  /* hover plate on cream, error panel      */
-  --color-footer-top:  #4F0018;
-  --color-footer-btm:  #2D000E;
+  /* ---- Brand ramp: crimson on cream ---------------------------------- */
+  --color-brand:       #A81E32;  /* primary fills, active state, progress   */
+  --color-brand-deep:  #7F1526;  /* hover on brand fills, text on tint      */
+  --color-brand-tint:  #FDF6F6;  /* selected row, soft panel                */
+  --color-brand-line:  #F0DCDD;  /* hairline on a tint panel                */
+  --color-brand-soft:  #E79AA4;  /* the "learned" pill border               */
+  --color-brand-accent:#8F2130;  /* error text                              */
+  --color-brand-alert: #C4566A;  /* error border, wrong-answer state        */
 
-  /* Nav links sit on maroon: soft pink at rest, white on hover. */
-  --color-on-brand: #FFC9C9;
+  /* ---- Chrome: the near-black field the header and dark panels sit on -- */
+  --color-chrome:        #17120F;
+  --color-chrome-deep:   #0F0C0A;  /* the gamification strip, code console  */
+  --color-chrome-2:      #221B17;  /* control fill inside the header        */
+  --color-chrome-3:      #2B231E;  /* editor chrome, XP track               */
+  --color-chrome-hover:  #251E1A;  /* nav item hover                        */
+  --color-chrome-line:   #302722;  /* border on chrome-2 controls           */
+  --color-chrome-line-2: #241D19;  /* the strip's top hairline              */
+  --color-chrome-edge:   #4A3D36;  /* control border on hover/focus         */
+  --color-chrome-edge-2: #3A2F29;  /* muted button border in the editor     */
 
-  /* ---- Neutrals ------------------------------------------------------ */
-  --color-ink:       #0B0B0B;
-  --color-ink-2:     #1D1D1E;
-  --color-muted:     #696F6F;
-  --color-muted-2:   #86868B;
+  /* Text sitting on chrome, brightest to dimmest. */
+  --color-on-chrome-bright: #F2ECE7;
+  --color-on-chrome:        #CFC6BF;
+  --color-on-chrome-2:      #B6ACA5;
+  --color-on-chrome-soft:   #A29892;
+  --color-on-chrome-muted:  #8F857E;
+  --color-on-chrome-dim:    #6C625B;
 
-  --color-surface:   #FFFFFF;
-  --color-surface-2: #F1F5F9;  /* slate-100 */
-  --color-surface-3: #E2E8F0;  /* slate-200 */
-  --color-hairline:  #E5E7EB;
+  /* ---- Surfaces ------------------------------------------------------- */
+  --color-canvas:    #F7F4F1;  /* the page itself                          */
+  --color-surface:   #FFFFFF;  /* every card                               */
+  --color-surface-2: #F2EDE9;  /* segmented-control track, avatar plate    */
+  --color-surface-3: #EFEAE5;  /* progress-bar track, card divider         */
+  --color-surface-4: #FAF8F6;  /* table header, locked module badge        */
+  --color-surface-5: #F4F0EC;  /* list-row divider                         */
 
-  /* ---- Typography ---------------------------------------------------- */
-  /* DB Heavent is the licensed display face; Noto Sans Thai Looped is the
-     Google-hosted stand-in loaded in the layout. */
-  --font-sans: "DB Heavent Regular", "DB Heavent", "Noto Sans Thai Looped",
-               ui-sans-serif, system-ui, sans-serif;
+  --color-hairline:   #E7E1DB;  /* the default 1px card border             */
+  --color-hairline-2: #E0D9D2;  /* input + outline-button border           */
+  --color-hairline-3: #D6CEC7;  /* unchecked checkbox, locked badge clasp  */
 
-  /* Scale is named by intended px but valued in rem, exactly as upstream:
-     text-18 really is 1rem/16px. Kept faithful so classes port 1:1, which is
-     why these replace Tailwind's text-base/xl/2xl names rather than reuse them. */
-  --text-18: 1rem;
-  --text-20: 1.25rem;
-  --text-24: 1.5rem;
-  --text-30: 1.875rem;
-  --text-34: 2.125rem;
-  --text-36: 2.25rem;
-  --text-44: 2.75rem;
-  --text-54: 3.375rem;
-  --text-64: 4rem;
-  --text-80: 5rem;
+  /* ---- Text ----------------------------------------------------------- */
+  --color-ink:     #191512;  /* headings and primary body                  */
+  --color-ink-2:   #332D29;  /* long-form body                            */
+  --color-ink-3:   #2F2925;  /* list-row label                            */
+  --color-ink-4:   #4A423C;  /* secondary body, form labels               */
+  --color-muted:   #6F6660;  /* supporting copy                           */
+  --color-muted-2: #8B8179;  /* meta, captions, table cells               */
+  --color-muted-3: #B6ACA5;  /* disabled text, empty counters             */
+  --color-muted-4: #C9C1BA;  /* locked badge hint, completed topic dot    */
 
-  --leading-tight: 1.2;  /* overrides Tailwind's 1.25 */
+  /* ---- Accents -------------------------------------------------------- */
+  --color-gold:      #C99A2E;  /* gems, ratings, "in project" tag          */
+  --color-gold-tint: #F6E4B8;  /* certificate tag plate                    */
+  --color-gold-ink:  #6B4D0C;  /* text on gold-tint                        */
+  --color-gold-deep: #2C2007;  /* text on gold                             */
+
+  --color-success:        #4F8A5F;  /* correct answer border, passed check */
+  --color-success-deep:   #2F6640;  /* correct-answer heading              */
+  --color-success-tint:   #F2F8F3;
+  --color-success-line:   #CFE3D5;
+  --color-success-ink:    #1F3D27;
+  --color-success-bright: #8FD6A4;  /* passing console output              */
+
+  --color-danger-tint:   #FDF3F3;
+  --color-danger-line:   #F0D6D9;
+  --color-danger-bright: #F0A3AE;  /* failing console output               */
+  --color-danger-soft:   #F0B8C0;  /* outline button on chrome             */
+
+  /* Contribution heat ramp, coldest to hottest. */
+  --color-heat-0: #F2EDE9;
+  --color-heat-1: #F4D6DA;
+  --color-heat-2: #E79AA4;
+  --color-heat-3: #C4566A;
+  --color-heat-4: #A81E32;
+
+  /* Syntax colours for the static code samples. */
+  --color-code:         #E8E2DC;
+  --color-code-keyword: #C58CE0;
+  --color-code-number:  #E5B567;
+  --color-code-comment: #6C625B;
+
+  /* ---- Typography ----------------------------------------------------- */
+  --font-sans: "IBM Plex Sans Thai", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* The scale is literal: text-14 is 14px, expressed in rem so it still
+     responds to the user's root font size. Half steps keep the design's
+     fine-tuning and are spelled with a trailing -5 (text-13-5 = 13.5px),
+     because a dot is not usable in a Tailwind theme key. */
+  --text-9-5:  0.59375rem;
+  --text-10:   0.625rem;
+  --text-10-5: 0.65625rem;
+  --text-11:   0.6875rem;
+  --text-11-5: 0.71875rem;
+  --text-12:   0.75rem;
+  --text-12-5: 0.78125rem;
+  --text-13:   0.8125rem;
+  --text-13-5: 0.84375rem;
+  --text-14:   0.875rem;
+  --text-14-5: 0.90625rem;
+  --text-15:   0.9375rem;
+  --text-15-5: 0.96875rem;
+  --text-16:   1rem;
+  --text-16-5: 1.03125rem;
+  --text-17:   1.0625rem;
+  --text-18:   1.125rem;
+  --text-18-5: 1.15625rem;
+  --text-19:   1.1875rem;
+  --text-20:   1.25rem;
+  --text-21:   1.3125rem;
+  --text-22:   1.375rem;
+  --text-23:   1.4375rem;
+  --text-24:   1.5rem;
+  --text-26:   1.625rem;
+  --text-27:   1.6875rem;
+  --text-28:   1.75rem;
+  --text-30:   1.875rem;
+  --text-32:   2rem;
+  --text-34:   2.125rem;
+  --text-38:   2.375rem;
+  --text-40:   2.5rem;
+  --text-44:   2.75rem;   /* the admin console's two dark counter panels */
+  --text-46:   2.875rem;
+  /* Display sizes above the app UI's range, used only by the marketing
+     landing page a signed-out visitor sees. */
+  --text-54:   3.375rem;
+  --text-64:   4rem;
+  --text-80:   5rem;
+
+  --leading-tight: 1.2;
   --leading-body:  1.6;
 
   /* ---- Radius --------------------------------------------------------- */
-  /* radius-md already matches upstream's 0.375rem; only the box radius is new. */
-  --radius-box: 1rem;
+  --radius-field: 0.6875rem;  /* 11px — inputs and primary buttons         */
+  --radius-card:  1.125rem;   /* 18px — the standard content card          */
+  --radius-panel: 1.25rem;    /* 20px — the largest cards on My Learning   */
+  --radius-box:   1rem;       /* 16px — the landing page's panels          */
+
+  /* ---- Elevation ------------------------------------------------------ */
+  --shadow-card:       0 2px 8px rgba(25, 21, 18, 0.04);
+  --shadow-card-hover: 0 12px 32px rgba(25, 21, 18, 0.10);
+  --shadow-menu:       0 18px 44px rgba(15, 12, 10, 0.28);
+  --shadow-menu-dark:  0 18px 44px rgba(15, 12, 10, 0.45);  /* menus on chrome */
 
   /* ---- Layout --------------------------------------------------------- */
-  /* Upstream adds a non-standard 576px stop to the default Tailwind set. */
   --breakpoint-xs: 576px;
-  --container-page: 1536px;
-  --spacing-header: 4.5rem;
+  /* Below this the header's eight nav destinations no longer fit beside the
+     utility rail, and the nav collapses into the burger menu. */
+  --breakpoint-nav: 1180px;
+  --container-page:   1320px;  /* every app screen but the leaderboard     */
+  --container-narrow: 1000px;  /* the leaderboard                          */
+  --spacing-header: 4rem;      /* 64px                                     */
+
+  /* ---- Motion --------------------------------------------------------- */
+  /* Staggered entrances; each consumer sets its own animation-delay. */
+  --animate-row-in:  row-in 0.3s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  --animate-card-in: card-in 0.34s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  --animate-rise:    rise 0.42s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  --animate-pop:     pop 0.34s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  /* The progress fill wipes in from its left edge — pair with origin-left. */
+  --animate-bar:     bar 0.6s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  --animate-fade:    fade 0.2s both;
+  /* The two loading-skeleton loops: a shimmer sweeping every placeholder
+     block, and the indeterminate slider pinned to the top of the viewport. */
+  --animate-shimmer: shimmer 1.3s linear infinite;
+  --animate-top-bar: top-bar 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+
+  @keyframes row-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes bar {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+  @keyframes top-bar {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(320%); }
+  }
 }
 
 @layer base {
@@ -77,7 +222,7 @@
   [role="button"]:not(:disabled) { cursor: pointer; }
 
   :focus-visible {
-    outline: 3px solid var(--color-brand-alert);
+    outline: 2px solid var(--color-brand);
     outline-offset: 2px;
     border-radius: var(--radius-md);
   }
@@ -87,20 +232,69 @@
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
+      /* Without this the skeleton's infinite shimmer would restart every
+         0.01ms and repaint forever instead of settling. */
+      animation-iteration-count: 1 !important;
     }
   }
 }
 
-/* The maroon field behind the hero and the auth screens: a scrim over a
-   diagonal brand gradient. Expressed as a utility because the stacked
-   background-image would otherwise inline two raw hexes into the markup. */
+/* The landing page's hero field: an ink scrim over a diagonal crimson
+   gradient. Expressed as a utility because the stacked background-image would
+   otherwise inline raw colour stops into the markup. */
 @utility brand-field {
-  background-color: var(--color-brand-deep);
+  background-color: var(--color-chrome);
   background-image:
-    linear-gradient(--alpha(var(--color-ink) / 70%), --alpha(var(--color-ink) / 70%)),
-    linear-gradient(135deg, var(--color-brand), var(--color-footer-btm));
+    linear-gradient(--alpha(var(--color-chrome) / 72%), --alpha(var(--color-chrome) / 72%)),
+    linear-gradient(135deg, var(--color-brand), var(--color-chrome-deep));
   background-size: cover;
   background-position: center;
+}
+
+/* The knowledge map marks a partly-learned group with a half-filled square.
+   A two-stop gradient is the only way to express it, and it would otherwise
+   inline a raw hex into the markup. */
+@utility marker-partial {
+  background-image: linear-gradient(90deg, var(--color-brand) 50%, var(--color-surface) 50%);
+}
+
+/* The earned-badge hexagon: a gradient ring around a gradient fill. Both are
+   multi-stop, so neither survives as a plain utility. */
+@utility badge-ring {
+  background-image: linear-gradient(160deg, #D4405A, var(--color-brand) 55%, var(--color-brand-deep));
+}
+
+@utility badge-fill {
+  background-image: linear-gradient(160deg, #C22B44, #8F1A2B);
+}
+
+/* The hexagon silhouette shared by both badge sizes. */
+@utility clip-hex {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+/* The loading skeleton's placeholder blocks. A three-stop gradient twice the
+   width of the element is what the shimmer sweeps across, and neither the
+   stops nor the background-size survive as plain utilities. Two variants
+   because the skeleton spans both light cards and the chrome panel. */
+@utility skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface-3) 25%,
+    var(--color-canvas) 50%,
+    var(--color-surface-3) 75%
+  );
+  background-size: 200% 100%;
+}
+
+@utility skeleton-on-chrome {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-chrome-2) 25%,
+    var(--color-chrome-3) 50%,
+    var(--color-chrome-2) 75%
+  );
+  background-size: 200% 100%;
 }
 
 /* Native <details> arrow suppression — no utility covers the WebKit marker. */

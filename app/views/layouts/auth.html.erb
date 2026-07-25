@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%= render "shared/head" %>
+  </head>
+
+  <%# The auth screens carry no app chrome: the ink panel on the left is the
+      whole brand, and the form owns the right half. %>
+  <body class="bg-canvas font-sans text-16 leading-body text-ink antialiased">
+    <main id="main" class="grid min-h-screen lg:grid-cols-2">
+      <%= render "shared/auth_hero" %>
+
+      <div class="grid place-items-center px-6 py-14 sm:px-10 lg:px-16">
+        <div class="w-full max-w-[420px]">
+          <%= render "shared/flashes" %>
+          <%= yield %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

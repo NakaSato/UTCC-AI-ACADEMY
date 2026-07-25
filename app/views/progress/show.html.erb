@@ -1,0 +1,98 @@
+<% content_for :title, "#{t("chrome.nav.progress")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("progress.greeting") %></h1>
+  <p class="mb-8 text-16 text-muted"><%= t("progress.subtitle") %></p>
+
+  <div class="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <% @stats.each do |stat| %>
+      <div class="rounded-[16px] border border-hairline bg-surface px-6 py-5.5">
+        <div class="mb-2 text-12-5 font-medium text-muted-2"><%= stat[:label] %></div>
+        <div class="text-30 leading-none font-bold tracking-[-0.03em]"><%= stat[:value] %></div>
+        <div class="mt-1.75 text-12-5 font-medium text-brand"><%= stat[:delta] %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="flex flex-col gap-5">
+      <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+        <div class="mb-5 flex items-baseline justify-between gap-4">
+          <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("progress.activity_title") %></h2>
+          <span class="text-12-5 text-muted-2"><%= t("progress.activity_note") %></span>
+        </div>
+
+        <%# Spelled out rather than interpolated: Tailwind scans source text for
+            candidate classes, so `bg-heat-#{level}` would never be generated. %>
+        <% heat = %w[ bg-heat-0 bg-heat-1 bg-heat-2 bg-heat-3 bg-heat-4 ] %>
+        <div class="grid grid-cols-[repeat(28,minmax(0,1fr))] gap-[5px]" role="img"
+             aria-label="<%= t("progress.activity_title") %>">
+          <% @activity.each do |level| %>
+            <div class="aspect-square rounded-[4px] <%= heat[level] %>"></div>
+          <% end %>
+        </div>
+      </section>
+
+      <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+        <h2 class="mb-4.5 text-19 font-bold tracking-[-0.02em]"><%= t("progress.courses_in_progress") %></h2>
+
+        <div class="flex flex-col gap-4">
+          <% @enrolments.each do |enrolment| %>
+            <%= link_to course_path(enrolment.code),
+                  class: "flex flex-wrap items-center gap-4.5 rounded-[13px] p-3.5 transition-colors hover:bg-canvas" do %>
+              <span class="grid size-10.5 flex-none place-items-center rounded-xl bg-surface-2 font-mono text-11-5
+                           font-semibold text-muted">
+                <%= enrolment.code %>
+              </span>
+              <span class="min-w-[10rem] flex-1">
+                <span class="mb-1.75 block text-15-5 font-semibold"><%= enrolment.title %></span>
+                <span class="block h-1.5 overflow-hidden rounded-full bg-surface-3">
+                  <span class="block h-full rounded-full bg-brand" style="width: <%= enrolment.percent %>%"></span>
+                </span>
+              </span>
+              <span class="w-[150px] flex-none text-right">
+                <span class="block text-14 font-semibold"><%= enrolment.percent %>%</span>
+                <span class="block text-12-5 text-muted-2"><%= enrolment.next_up %></span>
+              </span>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex flex-col gap-5">
+      <section class="rounded-card bg-chrome px-6 py-6.5 text-on-chrome-bright sm:px-7">
+        <div class="mb-3.5 text-12-5 font-semibold tracking-[0.06em] text-on-chrome-muted uppercase">
+          <%= t("progress.xp_level") %>
+        </div>
+        <div class="mb-4 flex items-baseline gap-2.5">
+          <span class="text-38 font-bold tracking-[-0.03em]">Lv <%= LearnerProfile::XP_LEVEL %></span>
+          <span class="text-14 text-on-chrome-muted">
+            <%= number_with_delimiter(LearnerProfile::XP_CURRENT) %> /
+            <%= number_with_delimiter(LearnerProfile::XP_TARGET) %> XP
+          </span>
+        </div>
+        <div class="mb-3 h-2 overflow-hidden rounded-full bg-chrome-3">
+          <div class="h-full rounded-full bg-gold" style="width: <%= LearnerProfile.xp_percent %>%"></div>
+        </div>
+        <p class="text-13-5 leading-[1.6] text-on-chrome-2"><%= t("progress.xp_note") %></p>
+      </section>
+
+      <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+        <h2 class="mb-4.5 text-19 font-bold tracking-[-0.02em]"><%= t("progress.earned_badges") %></h2>
+
+        <ul class="grid grid-cols-3 gap-x-2 gap-y-5">
+          <% @badges.each do |badge| %>
+            <li class="flex flex-col items-center text-center">
+              <%= render "shared/badge_hex", award: badge, size: :small %>
+              <div class="text-11-5 leading-[1.35] font-medium
+                          <%= badge[:earned] ? "text-ink-2" : "text-muted-3" %>">
+                <%= badge[:name] %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>

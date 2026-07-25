@@ -1,0 +1,79 @@
+<%#
+  The proctoring bar, and the guard that covers the lesson when the learner
+  leaves the window. Staff are never monitored, so they get the same bar with
+  the controls inert — see Proctoring for what this does and does not do.
+
+  The controller lives on <main>, so the band and on/off state set there drive
+  the colours here through group-data variants.
+%>
+<div class="mb-5 flex flex-wrap items-center gap-4 rounded-[16px] border border-hairline bg-surface px-5 py-3.5">
+  <% if monitored %>
+    <button type="button" role="switch" aria-checked="true"
+            data-proctor-target="switch" data-action="proctor#toggle"
+            class="flex flex-none items-center gap-2.75">
+      <span aria-hidden="true"
+            class="relative h-5 w-8.5 rounded-full transition-colors
+                   group-data-[proctor=on]:bg-brand group-data-[proctor=off]:bg-hairline-3">
+        <span class="absolute top-0.5 size-4 rounded-full bg-white transition-[left]
+                     group-data-[proctor=on]:left-[17px] group-data-[proctor=off]:left-0.5"></span>
+      </span>
+      <span data-proctor-target="label"
+            class="rounded-full border px-3 py-1.25 text-13-5 font-semibold whitespace-nowrap
+                   group-data-[proctor=on]:border-brand-soft group-data-[proctor=on]:bg-brand-tint
+                   group-data-[proctor=on]:text-brand-deep group-data-[proctor=off]:border-hairline-2
+                   group-data-[proctor=off]:bg-surface-2 group-data-[proctor=off]:text-muted">
+        <%= t("lesson.proctor.label_on") %>
+      </span>
+    </button>
+    <span data-proctor-target="note" class="flex-1 text-13-5 text-balance text-muted">
+      <%= t("lesson.proctor.note_on") %>
+    </span>
+  <% else %>
+    <span class="flex-none rounded-full border border-hairline-2 bg-surface-2 px-3 py-1.25
+                 text-13-5 font-semibold whitespace-nowrap text-muted">
+      <%= t("lesson.proctor.label_exempt") %>
+    </span>
+    <span class="flex-1 text-13-5 text-balance text-muted"><%= t("lesson.proctor.note_exempt") %></span>
+  <% end %>
+
+  <div class="flex flex-none items-center gap-3">
+    <div class="h-1.75 w-23 overflow-hidden rounded-full bg-surface-2">
+      <div data-proctor-target="meter"
+           class="h-full rounded-full transition-[width] duration-300
+                  group-data-[band=clean]:bg-success group-data-[band=review]:bg-gold
+                  group-data-[band=risk]:bg-brand"
+           style="width: <%= Proctoring::START_SCORE %>%"></div>
+    </div>
+    <span data-proctor-target="score"
+          class="text-13-5 font-bold group-data-[band=clean]:text-success-deep
+                 group-data-[band=review]:text-gold group-data-[band=risk]:text-brand">
+      <%= Proctoring::START_SCORE %>
+    </span>
+    <span data-proctor-target="verdict" class="text-13 text-muted-2">
+      <%= t("lesson.proctor.verdict_clean") %>
+    </span>
+  </div>
+</div>
+
+<% if monitored %>
+  <%# Shown purely by the data attribute the controller sets on <main>, so with
+      no JS it never appears and the lesson stays readable. %>
+  <div class="fixed inset-0 z-90 hidden animate-fade place-items-center bg-chrome/72 p-8
+              group-data-[proctor-hidden=true]:grid">
+    <div class="max-w-[460px] animate-pop rounded-panel bg-surface px-10.5 py-9.5 text-center">
+      <span aria-hidden="true"
+            class="mx-auto mb-5 grid size-13.5 place-items-center rounded-2xl bg-brand text-22 text-white">!</span>
+      <h2 class="mb-2.5 text-22 leading-[1.3] font-bold tracking-[-0.02em]">
+        <%= t("lesson.proctor.guard_title") %>
+      </h2>
+      <p class="mb-6.5 text-15 leading-[1.65] text-balance text-ink-4">
+        <%= t("lesson.proctor.guard_body") %>
+      </p>
+      <button type="button" data-action="proctor#resume"
+              class="rounded-xl bg-brand px-7 py-3.25 text-15 font-semibold text-white
+                     transition-colors hover:bg-brand-deep">
+        <%= t("lesson.proctor.guard_btn") %>
+      </button>
+    </div>
+  </div>
+<% end %>

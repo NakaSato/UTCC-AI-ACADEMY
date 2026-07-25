@@ -1,0 +1,179 @@
+<% content_for :title, "#{t("chrome.nav.my_learning")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-10 pb-20 sm:px-8">
+  <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="flex flex-col gap-6">
+      <section class="rounded-panel border border-hairline bg-surface px-6 py-7 sm:px-8.5">
+        <div class="mb-4.5 flex flex-wrap items-center justify-between gap-5">
+          <span class="rounded-full bg-surface-2 px-3.25 py-1.5 text-12-5 font-semibold text-ink-4">
+            <%= t("my_learning.learning_now") %>
+          </span>
+          <span class="rounded-[10px] border border-hairline-2 px-3.75 py-1.75 text-13-5 font-medium text-ink-4">
+            <%= t("my_learning.cert_count") %>
+          </span>
+        </div>
+
+        <h1 class="mb-2 text-28 leading-[1.15] font-bold tracking-[-0.03em] sm:text-34">
+          <%= t("catalog.courses.AI1101.title") %>
+        </h1>
+        <%= link_to t("my_learning.course_link"), course_path("AI1101"),
+              class: "mb-6.5 inline-block border-b border-brand-line text-14-5 text-brand hover:text-brand-deep" %>
+
+        <div class="mb-7 flex flex-col gap-4">
+          <% [ [ t("my_learning.learned_topics"), LearnerProfile::LEARNED_TOPICS, LearnerProfile::LEARNED_TOTAL,
+                 LearnerProfile.learned_percent, "bg-brand" ],
+               [ t("my_learning.applied_topics"), LearnerProfile::APPLIED_TOPICS, LearnerProfile::APPLIED_TOTAL,
+                 LearnerProfile.applied_percent, "bg-gold" ] ].each do |label, done, total, percent, fill| %>
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="w-[150px] flex-none text-14-5 text-ink-4"><%= label %></span>
+              <span class="flex-none rounded-lg bg-brand-tint px-3 py-1 text-13-5 font-semibold text-brand-deep">
+                <%= done %> / <%= total %>
+              </span>
+              <span class="w-11 flex-none text-14 text-muted-2"><%= percent %>%</span>
+              <div class="h-2 min-w-[8rem] flex-1 overflow-hidden rounded-full bg-surface-3">
+                <div class="h-full rounded-full <%= fill %>" style="width: <%= percent %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-5 border-t border-surface-3 pt-5.5">
+          <span class="text-14-5 text-muted">
+            <%= t("my_learning.pick_project_before") %>
+            <%= link_to t("my_learning.pick_project_link"), knowledge_map_path(mode: :project),
+                  class: "text-brand hover:text-brand-deep" %>
+            <%= t("my_learning.pick_project_after") %>
+          </span>
+          <%= link_to t("my_learning.continue"), lesson_path,
+                class: "rounded-field bg-brand px-6.5 py-3 text-15 font-semibold whitespace-nowrap text-white
+                        transition-colors hover:bg-brand-deep" %>
+        </div>
+      </section>
+
+      <%# Both lists are in the page; the tabs swap which one shows, so moving
+          between in-progress and completed costs no request. %>
+      <section class="rounded-panel border border-hairline bg-surface px-6 pt-2 pb-7.5 sm:px-8.5"
+               data-controller="panels" data-panel="<%= @tab %>">
+        <nav role="tablist" class="mb-5.5 flex gap-7 border-b border-surface-3">
+          <% LearnerProfile::TABS.each do |tab| %>
+            <%= link_to t("my_learning.tabs.#{tab}"), my_learning_path(tab: tab),
+                  role: "tab", id: "enrollments-tab-#{tab}",
+                  aria: { selected: @tab == tab, controls: "enrollments-panel-#{tab}" },
+                  data: { panel: tab, path: my_learning_path(tab: tab),
+                          panels_target: "tab", action: "panels#select" },
+                  class: "-mb-px border-b-[2.5px] border-transparent px-0.5 pt-5 pb-4 text-15-5 font-medium
+                          text-muted transition-colors hover:text-ink aria-selected:border-brand
+                          aria-selected:font-semibold aria-selected:text-brand" %>
+          <% end %>
+        </nav>
+
+        <% @enrollments.each do |tab, enrollments| %>
+          <%# Without an `open` param the first course of each list is the open one. %>
+          <% open_code = @open_code || enrollments.first&.code %>
+          <%= tag.div role: "tabpanel", id: "enrollments-panel-#{tab}", hidden: @tab != tab,
+                aria: { labelledby: "enrollments-tab-#{tab}" },
+                data: { panel: tab, panels_target: "panel" },
+                class: "flex flex-col gap-1.5" do %>
+            <% enrollments.each do |enrollment| %>
+              <details class="group border-b border-surface-5 pb-1.5" <%= "open" if enrollment.code == open_code %>>
+                <summary class="marker-none flex cursor-pointer flex-wrap items-center gap-3 px-1 py-3.5">
+                  <span aria-hidden="true" class="w-3 text-10-5 text-muted-2">
+                    <span class="group-open:hidden">▸</span>
+                    <span class="hidden group-open:inline">▾</span>
+                  </span>
+                  <span class="text-17 font-semibold tracking-[-0.02em]"><%= enrollment.title %></span>
+                  <span class="rounded-full px-2.75 py-1 text-12 font-semibold whitespace-nowrap
+                               <%= enrollment.in_progress? ? "bg-brand-tint text-brand-deep" : "bg-success-tint text-success-deep" %>">
+                    <%= enrollment.badge %>
+                  </span>
+                  <span class="ml-auto font-mono text-12 text-muted-3"><%= enrollment.code %></span>
+                </summary>
+
+                <div class="px-1 pt-1 pb-4.5 sm:pl-7">
+                  <p class="mb-5 max-w-[62ch] text-14-5 leading-[1.65] text-balance text-muted">
+                    <%= enrollment.description %>
+                  </p>
+
+                  <div class="mb-5 flex flex-col gap-3">
+                    <div class="flex items-center gap-3.5">
+                      <span class="w-[150px] flex-none text-13-5 text-muted-2"><%= enrollment.learned_text %></span>
+                      <div class="h-1.75 flex-1 overflow-hidden rounded-full bg-surface-3">
+                        <div class="h-full rounded-full bg-brand" style="width: <%= enrollment.learned_percent %>%"></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3.5">
+                      <span class="w-[150px] flex-none text-13-5 text-muted-2"><%= enrollment.applied_text %></span>
+                      <div class="h-1.75 flex-1 overflow-hidden rounded-full bg-surface-3">
+                        <div class="h-full rounded-full bg-gold" style="width: <%= enrollment.applied_percent %>%"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center justify-between gap-4.5">
+                    <%= link_to t("my_learning.view_syllabus"), course_path(enrollment.code),
+                          class: "text-14 font-medium text-brand hover:text-brand-deep" %>
+                    <%= link_to t("my_learning.continue"), lesson_path,
+                          class: "rounded-[10px] border-[1.5px] border-brand px-5 py-2.25 text-14 font-semibold
+                                  whitespace-nowrap text-brand-deep transition-colors hover:bg-brand-tint" %>
+                  </div>
+                </div>
+              </details>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <div class="flex justify-end pt-5">
+          <%= link_to t("my_learning.explore_catalog"), root_path,
+                class: "text-14-5 font-medium text-brand hover:text-brand-deep" %>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <section class="rounded-panel bg-chrome px-7.5 py-8.5 text-center">
+        <div class="mx-auto mb-5 grid size-[132px] place-items-center rounded-full bg-brand text-40 font-bold
+                    tracking-[-0.02em] text-white">
+          <%= user_initials(Current.user) %>
+        </div>
+        <div class="mb-1 truncate text-19 font-semibold text-canvas"><%= Current.user.name %></div>
+        <%# Student ID: sign-up collects no email, so email_address is usually blank. %>
+        <div class="mb-5.5 truncate text-13 text-on-chrome-muted"><%= Current.user.student_id %></div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="rounded-xl border border-chrome-line bg-chrome-2 p-3.25">
+            <div class="text-19 font-bold text-canvas"><%= LearnerProfile::STREAK %></div>
+            <div class="mt-0.5 text-12 text-on-chrome-muted"><%= t("my_learning.streak_label") %></div>
+          </div>
+          <div class="rounded-xl border border-chrome-line bg-chrome-2 p-3.25">
+            <div class="text-19 font-bold text-canvas">
+              <%= LearnerProfile::LIVES %> / <%= LearnerProfile::MAX_LIVES %>
+            </div>
+            <div class="mt-0.5 text-12 text-on-chrome-muted"><%= t("chrome.hearts") %></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-panel border border-hairline bg-surface px-7 py-6.5">
+        <div class="mb-4.5 flex items-baseline justify-between">
+          <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("my_learning.badges_title") %></h2>
+          <span class="text-13 text-muted-2"><%= t("my_learning.badges_count") %></span>
+        </div>
+
+        <ul class="grid grid-cols-3 gap-x-2.5 gap-y-5.5">
+          <% @awards.each do |award| %>
+            <li class="flex flex-col items-center text-center">
+              <%= render "shared/badge_hex", award: award, size: :large %>
+              <div class="mb-0.75 text-13 leading-[1.3] font-semibold
+                          <%= award[:earned] ? "text-ink" : "text-muted-3" %>">
+                <%= award[:name] %>
+              </div>
+              <div class="text-11-5 leading-[1.35] <%= award[:earned] ? "text-muted-2" : "text-muted-4" %>">
+                <%= award[:hint] %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>

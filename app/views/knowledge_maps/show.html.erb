@@ -1,0 +1,181 @@
+<% content_for :title, "#{t("map.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-10 pb-20 sm:px-8">
+  <div class="mb-7 flex flex-col justify-between gap-6 lg:flex-row lg:items-start lg:gap-8">
+    <div>
+      <h1 class="mb-4 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("map.title") %></h1>
+
+      <div class="flex items-center gap-2.5">
+        <div class="flex rounded-[10px] bg-surface-2 p-0.75">
+          <% %w[ course project ].each do |mode| %>
+            <% current = @mode == mode %>
+            <%= link_to t("map.modes.#{mode}"), knowledge_map_path(mode: mode, topic: @selected.id),
+                  "aria-current": ("page" if current),
+                  class: class_names(
+                    "rounded-lg px-4 py-2 text-13-5 font-medium transition-colors",
+                    "bg-chrome text-white" => current,
+                    "text-muted-2 hover:text-ink" => !current
+                  ) %>
+          <% end %>
+        </div>
+
+        <button type="button" aria-label="<%= t("map.settings_label") %>"
+                class="size-9 rounded-[10px] border border-hairline bg-surface text-14 text-muted-2
+                       transition-colors hover:border-muted-3">⚙</button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 lg:items-end">
+      <div class="flex flex-wrap items-center gap-3 text-14-5 text-ink-4">
+        <span>
+          <%= t("map.topics_for_course") %>
+          <%= link_to t("map.course_ref"), course_path("AI1101"), class: "text-brand hover:text-brand-deep" %>
+        </span>
+        <span class="rounded-[9px] border border-hairline-2 bg-surface px-3.5 py-1.25 text-14 font-semibold">62</span>
+        <span class="text-muted"><%= t("map.need_to_learn") %></span>
+        <span class="rounded-[9px] border-[1.5px] border-brand bg-brand-tint px-3.5 py-1.25 text-14 font-semibold text-brand-deep">24</span>
+        <span class="text-muted"><%= t("map.learned_label") %></span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.25 text-13-5 text-muted">
+        <span class="rounded-full bg-gold px-2.25 py-0.75 text-11-5 font-semibold text-gold-deep">
+          <%= t("map.in_project") %>
+        </span>
+        <span><%= t("map.in_project_note") %></span>
+      </div>
+
+      <%= link_to knowledge_map_path(mode: @mode, topic: @selected.id, legend: ("1" unless @legend_open)),
+            class: "flex items-center gap-2 text-13-5 text-ink-4 hover:text-ink" do %>
+        <span><%= t("map.symbols") %></span>
+        <span aria-hidden="true" class="text-10-5 text-muted-2"><%= @legend_open ? "▴" : "▾" %></span>
+      <% end %>
+
+      <% if @legend_open %>
+        <div class="flex w-full max-w-[320px] flex-col gap-2.5 rounded-[14px] border border-hairline bg-surface px-4.5 py-4">
+          <% [ [ :not_started, "bg-surface border-muted-4", false ],
+               [ :partial,     "marker-partial border-brand", false ],
+               [ :complete,    "bg-brand border-brand", false ],
+               [ :leaf,        "bg-muted-2 border-muted-2", true ] ].each do |key, marker, leaf| %>
+            <div class="flex items-center gap-2.75 text-13-5 text-ink-4">
+              <span aria-hidden="true"
+                    class="block flex-none border-[1.5px] <%= marker %>
+                           <%= leaf ? "mx-[2.5px] size-[7px] rounded-full" : "size-3 rounded-[3px]" %>"></span>
+              <span><%= t("map.legend.#{key}") %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 items-start gap-7 lg:grid-cols-[380px_minmax(0,1fr)]">
+    <nav class="rounded-card border border-hairline bg-surface px-2.5 py-3.5" aria-label="<%= t("map.title") %>">
+      <% @rows.each_with_index do |row, index| %>
+        <% node = row.node %>
+        <% current = node.id == @selected.id %>
+        <%= link_to knowledge_map_path(mode: @mode, topic: node.id, legend: ("1" if @legend_open)),
+              "aria-current": ("page" if current),
+              style: "padding-left: #{14 + row.depth * 22}px; animation-delay: #{index * 22}ms",
+              class: class_names(
+                "flex w-full animate-row-in items-center gap-2.25 rounded-[10px] py-2.25 pr-3 text-14-5 leading-[1.4]",
+                "bg-brand-tint font-semibold text-brand-deep" => current,
+                "text-ink-2 hover:bg-canvas" => !current
+              ) do %>
+          <% if row.depth.positive? %>
+            <span aria-hidden="true"
+                  class="mt-[-8px] mr-[-3px] ml-[-13px] h-4 w-3 flex-none rounded-bl-[5px] border-b border-l border-hairline-2"></span>
+          <% end %>
+
+          <span aria-hidden="true"
+                class="w-3 flex-none text-10-5 <%= @open.include?(node.id) ? "text-ink-4" : "text-muted-3" %>">
+            <%= node.leaf? ? "" : @open.include?(node.id) ? "▾" : "▸" %>
+          </span>
+
+          <span aria-hidden="true"
+                class="block flex-none border-[1.5px]
+                       <%= if node.leaf?
+                             "mx-[2.5px] size-[7px] rounded-full bg-muted-2 border-muted-2"
+                           elsif node.fully_learned?
+                             "size-3 rounded-[3px] bg-brand border-brand"
+                           elsif node.partly_learned?
+                             "size-3 rounded-[3px] marker-partial border-brand"
+                           else
+                             "size-3 rounded-[3px] bg-surface border-muted-4"
+                           end %>"></span>
+
+          <span class="flex-1 text-balance"><%= node.name %></span>
+          <span class="flex-none text-12-5 text-muted-3"><%= node.count_text %></span>
+        <% end %>
+      <% end %>
+    </nav>
+
+    <div>
+      <nav class="mb-6 flex flex-wrap items-center gap-2.5 text-15" aria-label="<%= t("map.home_crumb") %>">
+        <%= link_to "⌂", root_path, "aria-label": t("map.home_crumb"), class: "text-14 text-brand" %>
+        <% @trail.each_with_index do |node, index| %>
+          <span aria-hidden="true" class="text-13 text-muted-3">→</span>
+          <%= link_to node.name, knowledge_map_path(mode: @mode, topic: node.id, legend: ("1" if @legend_open)),
+                class: class_names(
+                  "text-15",
+                  "font-semibold text-ink" => index == @trail.size - 1,
+                  "font-medium text-brand hover:text-brand-deep" => index < @trail.size - 1
+                ) %>
+        <% end %>
+      </nav>
+
+      <% if @selected.leaf? %>
+        <div class="mb-6 max-w-[520px] rounded-card border border-hairline bg-surface px-7 py-7.5 sm:px-8">
+          <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+            <%= t("map.single_topic") %>
+          </div>
+          <h2 class="mb-3 text-24 font-bold tracking-[-0.02em]"><%= @selected.name %></h2>
+          <p class="mb-5.5 text-15 leading-[1.65] text-ink-4"><%= t("map.leaf_desc") %></p>
+
+          <div class="flex flex-wrap gap-2.5">
+            <%= link_to t("map.start_topic"), lesson_path,
+                  class: "rounded-field bg-brand px-6 py-3 text-14-5 font-semibold text-white transition-colors
+                          hover:bg-brand-deep" %>
+            <button type="button"
+                    class="rounded-field border-[1.5px] border-hairline-2 px-5 py-2.5 text-14 font-medium text-ink-4
+                           transition-colors hover:border-muted-3">
+              <%= t("map.mark_known") %>
+            </button>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(268px,1fr))] gap-4.5">
+        <% @cards.each_with_index do |child, index| %>
+          <%= link_to knowledge_map_path(mode: @mode, topic: child.id, legend: ("1" if @legend_open)),
+                style: "animation-delay: #{index * 55}ms",
+                class: "relative animate-card-in rounded-[16px] border border-hairline bg-surface p-6 shadow-card
+                        transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover" do %>
+            <% if child.in_project? %>
+              <span class="absolute -top-2.5 left-5 rounded-full bg-gold px-2.25 py-0.75 text-11 font-semibold text-gold-deep">
+                <%= t("map.in_project") %>
+              </span>
+            <% end %>
+
+            <h3 class="mb-5.5 text-18-5 leading-[1.35] font-bold tracking-[-0.02em] text-balance">
+              <%= child.name %>
+            </h3>
+
+            <div class="flex items-center justify-between">
+              <span class="text-13-5 text-muted-2"><%= child.meta_text %></span>
+              <div class="flex gap-1.75">
+                <span class="min-w-8.5 rounded-lg border border-hairline-2 px-2.25 py-0.75 text-center text-13
+                             font-semibold <%= child.remaining.positive? ? "text-ink-2" : "text-muted-3" %>">
+                  <%= child.remaining %>
+                </span>
+                <span class="min-w-8.5 rounded-lg border px-2.25 py-0.75 text-center text-13 font-semibold
+                             <%= child.learned.positive? ? "border-brand-soft bg-brand-tint text-brand-deep" : "border-hairline bg-surface text-muted-3" %>">
+                  <%= child.learned %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</main>

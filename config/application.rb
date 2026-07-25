@@ -16,6 +16,13 @@ module UtccAiFundamental
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Thai-first: the UI ships in both languages, and Thai is what a student
+    # sees unless they ask otherwise. English backs Thai up so a key that only
+    # exists in en.yml renders rather than raising.
+    config.i18n.default_locale = :th
+    config.i18n.available_locales = %i[ th en ]
+    config.i18n.fallbacks = [ :en ]
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

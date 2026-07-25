@@ -1,0 +1,78 @@
+<%# The criteria tick live as you type; "Run & check" produces the console
+    output. Both run in the browser — see LessonContent. %>
+<div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-2"
+     data-controller="code-task"
+     data-code-task-patterns-value="<%= LessonContent.checks.map { it[:pattern] }.to_json %>"
+     data-code-task-starter-value="<%= LessonContent::STARTER_CODE %>">
+  <div class="rounded-card border border-hairline bg-surface p-7 sm:px-8">
+    <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+      <%= t("lesson.code.eyebrow") %>
+    </div>
+    <h1 class="mb-4 text-23 leading-[1.3] font-bold tracking-[-0.02em]"><%= t("lesson.code.title") %></h1>
+    <p class="mb-4 text-15 leading-[1.7] text-balance text-ink-2"><%= t("lesson.code.task") %></p>
+
+    <div class="rounded-xl bg-canvas px-5 py-4.5">
+      <div class="mb-2.5 text-12-5 font-semibold tracking-[0.05em] text-muted-2 uppercase">
+        <%= t("lesson.code.criteria") %>
+      </div>
+      <ul class="flex flex-col gap-2.25">
+        <% LessonContent.checks.each do |check| %>
+          <li class="group flex items-start gap-2.5 text-14" data-code-task-target="check" data-state="">
+            <span aria-hidden="true"
+                  class="text-13 leading-[1.5] text-muted-3 group-data-[state=ok]:text-success">
+              <span class="group-data-[state=ok]:hidden">○</span>
+              <span class="hidden group-data-[state=ok]:inline">✓</span>
+            </span>
+            <span class="text-ink-4"><%= check[:label] %></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-card border border-chrome-3 bg-chrome">
+    <div class="flex items-center gap-2.5 border-b border-chrome-3 px-4.5 py-3.25">
+      <span aria-hidden="true" class="size-2.25 rounded-full bg-brand"></span>
+      <span class="font-mono text-12-5 text-on-chrome-2">split_customers.py</span>
+      <span class="ml-auto font-mono text-11-5 text-on-chrome-dim">Python 3.12</span>
+    </div>
+
+    <label class="sr-only" for="lesson_code"><%= t("lesson.code.editor_label") %></label>
+    <textarea id="lesson_code" spellcheck="false" rows="10"
+              data-code-task-target="editor" data-action="input->code-task#evaluate"
+              class="w-full resize-none border-0 bg-chrome px-5.5 py-5 font-mono text-13-5 leading-[1.75]
+                     text-code outline-none"><%= LessonContent::STARTER_CODE %></textarea>
+
+    <div class="border-t border-chrome-3 px-4.5 py-4">
+      <div class="mb-3.5 flex flex-wrap items-center gap-2.5">
+        <button type="button" data-action="code-task#run"
+                class="rounded-[9px] bg-brand px-5.5 py-2.5 text-14 font-semibold text-white transition-colors
+                       hover:bg-brand-deep">
+          <%= t("lesson.code.run") %>
+        </button>
+        <button type="button" data-action="code-task#reset"
+                class="rounded-[9px] border border-chrome-edge-2 px-4 py-2.25 text-13-5 text-on-chrome-2
+                       transition-colors hover:text-white">
+          <%= t("lesson.code.reset") %>
+        </button>
+
+        <%= link_to t("lesson.code.finish"), lesson_path(step: :summary),
+              data: { code_task_target: "finish", panel: :summary, action: "panels#select" },
+              class: "ml-auto hidden rounded-[9px] border-[1.5px] border-brand px-4.5 py-2 text-14 font-semibold
+                      text-danger-soft" %>
+      </div>
+
+      <pre class="group min-h-[78px] rounded-[10px] bg-chrome-deep px-4 py-3.5 font-mono text-12-5 leading-[1.8]
+                  whitespace-pre-wrap text-on-chrome-dim
+                  data-[state=pass]:text-success-bright data-[state=pass]:whitespace-pre-wrap
+                  data-[state=fail]:text-danger-bright"
+           data-code-task-target="console" data-state="" role="status">$ python split_customers.py
+<%= t("lesson.code.console_idle") %></pre>
+    </div>
+  </div>
+
+  <template data-code-task-target="copy"
+            data-pass="<%= t("lesson.code.console_pass") %>"
+            data-fail="<%= t("lesson.code.console_fail") %>"
+            data-idle="<%= t("lesson.code.console_idle") %>"></template>
+</div>

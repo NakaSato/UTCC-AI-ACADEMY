@@ -1,0 +1,30 @@
+<%# The primary nav below the `nav` breakpoint, where the eight destinations no
+    longer fit beside the utility rail. A plain panel rather than a second
+    <nav>: only one of the two is ever visible, and duplicating the landmark
+    would give a screen reader two navigations to choose between. %>
+<div class="relative flex-none nav:hidden"
+     data-controller="dropdown"
+     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+  <button type="button"
+          aria-haspopup="true" aria-expanded="false" aria-label="<%= t("chrome.nav_toggle") %>"
+          data-dropdown-target="button" data-action="dropdown#toggle"
+          class="grid size-[38px] place-items-center rounded-[10px] border border-chrome-line bg-chrome-2
+                 text-15 text-on-chrome hover:border-chrome-edge hover:text-white">
+    <span aria-hidden="true">☰</span>
+  </button>
+
+  <div class="absolute top-[46px] right-0 z-50 hidden w-[240px] rounded-[14px] border border-chrome-line
+              bg-chrome p-1.5 shadow-menu-dark"
+       data-dropdown-target="panel">
+    <% app_nav_items.each do |label, path| %>
+      <% current = nav_current?(path) %>
+      <%= link_to label, path,
+            "aria-current": ("page" if current),
+            class: class_names(
+              "block rounded-[9px] px-3 py-[11px] text-14",
+              "bg-chrome-3 font-semibold text-white" => current,
+              "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !current
+            ) %>
+    <% end %>
+  </div>
+</div>

@@ -31,17 +31,20 @@ module Authentication
 
     def request_authentication
       session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
+      redirect_to login_path
     end
 
     def after_authentication_url
       session.delete(:return_to_after_authenticating) || root_url
     end
 
-    def start_new_session_for(user)
+    # `remember` backs the "remember me on this device" checkbox on the sign-in
+    # screen: without it the cookie lasts only as long as the browser session.
+    def start_new_session_for(user, remember: true)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
-        cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        jar = remember ? cookies.signed.permanent : cookies.signed
+        jar[:session_id] = { value: session.id, httponly: true, same_site: :lax }
       end
     end
 

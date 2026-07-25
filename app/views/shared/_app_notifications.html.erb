@@ -1,0 +1,34 @@
+<div class="relative flex-none"
+     data-controller="dropdown"
+     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+  <button type="button"
+          aria-haspopup="true" aria-expanded="false" aria-label="<%= t("chrome.notif_toggle") %>"
+          data-dropdown-target="button" data-action="dropdown#toggle"
+          class="relative grid size-[38px] place-items-center rounded-[10px] border border-chrome-line bg-chrome-2
+                 text-14 text-on-chrome hover:border-chrome-edge hover:text-white">
+    <span aria-hidden="true">◔</span>
+    <span aria-hidden="true"
+          class="absolute top-2 right-2 size-[7px] rounded-full border-[1.5px] border-chrome bg-brand"></span>
+  </button>
+
+  <div class="absolute top-[46px] right-0 z-50 hidden w-[320px] overflow-hidden rounded-[14px] border border-hairline bg-surface shadow-menu"
+       data-dropdown-target="panel">
+    <div class="flex items-center justify-between border-b border-surface-3 px-4 py-3.5">
+      <span class="text-14 font-bold text-ink"><%= t("chrome.notif_title") %></span>
+      <button type="button" data-action="dropdown#close" class="text-12-5 text-brand">
+        <%= t("chrome.notif_all") %>
+      </button>
+    </div>
+
+    <% LearnerProfile.notifications.each do |notification| %>
+      <div class="flex gap-3 border-b border-surface-5 px-4 py-3.5 <%= "bg-brand-tint" if notification[:unread] %>">
+        <span aria-hidden="true"
+              class="mt-1.5 size-[7px] flex-none rounded-full <%= notification[:unread] ? "bg-brand" : "bg-transparent" %>"></span>
+        <div>
+          <div class="text-13-5 leading-[1.45] text-ink"><%= notification[:title] %></div>
+          <div class="mt-0.5 text-11-5 text-muted-2"><%= notification[:when] %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

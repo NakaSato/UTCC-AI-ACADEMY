@@ -1,0 +1,43 @@
+<% content_for :title, "#{t("admin.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-6.5 flex flex-wrap items-end justify-between gap-6">
+    <div>
+      <div class="mb-3 flex items-center gap-2.5">
+        <span class="font-mono text-11 tracking-[0.12em] text-muted-2 uppercase"><%= t("admin.eyebrow") %></span>
+        <span class="rounded-full border border-danger-line bg-brand-tint px-2.25 py-0.75
+                     text-11 font-semibold tracking-[0.06em] text-brand-deep uppercase">
+          <%= t("admin.roles.admin") %>
+        </span>
+      </div>
+      <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("admin.title") %></h1>
+      <p class="text-16 text-muted"><%= t("admin.subtitle") %></p>
+    </div>
+  </div>
+
+  <%# Tabs are links, like every other tabbed screen — the URL is the state. %>
+  <nav class="mb-6.5 flex gap-0.5 overflow-x-auto border-b border-hairline"
+       aria-label="<%= t("admin.title") %>">
+    <% AdminConsole::TABS.each do |tab| %>
+      <% current = tab == @tab %>
+      <% badge = AdminConsole.badge_for(tab) %>
+      <%= link_to admin_path(tab: (tab unless tab == :users)),
+            "aria-current": ("page" if current),
+            class: class_names(
+              "-mb-px flex flex-none items-center gap-2 border-b-2 px-3.5 py-3 text-14 transition-colors",
+              "border-brand font-semibold text-ink" => current,
+              "border-transparent text-muted hover:text-ink" => !current
+            ) do %>
+        <span><%= t("admin.tabs.#{tab}") %></span>
+        <% if badge&.positive? %>
+          <span class="rounded-full px-1.75 py-0.5 text-11-5 font-semibold
+                       <%= current ? "bg-brand text-white" : "bg-surface-2 text-muted-2" %>">
+            <%= badge %>
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <%= render "admin/#{@tab}" %>
+</main>

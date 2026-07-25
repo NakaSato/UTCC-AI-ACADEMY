@@ -1,0 +1,22 @@
+<%# POST, not GET: Turbo prefetches links on hover, and a GET would switch
+    language just by pointing at the button. `dark` picks the header styling;
+    the auth screens pass the same value because they sit on chrome too. %>
+<% dark = local_assigns.fetch(:dark, true) %>
+
+<div class="flex flex-none gap-0 rounded-[10px] border p-[3px]
+            <%= dark ? "border-chrome-line bg-chrome-2" : "border-hairline-2 bg-surface-2" %>">
+  <% I18n.available_locales.each do |locale| %>
+    <% current = I18n.locale == locale %>
+    <%= button_to language_path(locale),
+          form_class: "contents",
+          "aria-current": ("true" if current),
+          class: class_names(
+            "rounded-[7px] px-2.5 py-[5px] text-12 font-semibold tracking-[0.03em] transition-colors",
+            "bg-brand text-white" => current,
+            "text-on-chrome-muted hover:text-on-chrome-bright" => !current && dark,
+            "text-muted hover:text-ink" => !current && !dark
+          ) do %>
+      <%= t("language_name", locale: locale) %>
+    <% end %>
+  <% end %>
+</div>

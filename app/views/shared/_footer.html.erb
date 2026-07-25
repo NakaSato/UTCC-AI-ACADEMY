@@ -1,80 +1,72 @@
-<footer class="text-center text-24 text-surface">
-  <div class="bg-footer-top py-16">
-    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
-      <%# Desktop: 4-column grid, links block spans 3 and splits into 3 columns.
-          Mobile: single column, and the link columns collapse into accordions. %>
-      <div class="grid grid-cols-1 gap-4 text-left lg:grid-cols-4">
-        <div class="lg:col-span-3">
-          <div class="hidden gap-4 lg:grid lg:grid-cols-3">
-            <% footer_columns.each do |title, links| %>
-              <div>
-                <div class="pb-4 text-30 font-normal"><%= title %></div>
-                <ul>
-                  <% links.each do |label, href| %>
-                    <li class="text-left text-20 font-light">
-                      <a href="<%= href %>"
-                         class="opacity-70 transition-opacity duration-300 hover:opacity-100"><%= label %></a>
-                    </li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-          </div>
+<%# Shared chrome: every screen ends on this footer, signed in or out, as the
+    design does — it sits on the same ink field as the header so the page
+    closes on the chrome it opened with. Only the link columns differ by
+    session; see ApplicationHelper#footer_columns.
 
-          <div class="lg:hidden">
-            <% footer_columns.each do |title, links| %>
-              <details class="group mb-2 border-b border-surface">
-                <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 py-4 text-30
-                                font-medium after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
-                                after:border-b-2 after:border-current after:transition-transform after:duration-300
-                                after:content-[''] group-open:after:rotate-[-135deg]"><%= title %></summary>
-                <div class="px-4 pb-4">
-                  <ul>
-                    <% links.each do |label, href| %>
-                      <li class="text-left text-20 font-light">
-                        <a href="<%= href %>"
-                           class="opacity-70 transition-opacity duration-300 hover:opacity-100"><%= label %></a>
-                      </li>
-                    <% end %>
-                  </ul>
-                </div>
-              </details>
-            <% end %>
-          </div>
+    Four columns on desktop: a wide brand block plus the three link columns
+    from `footer_columns`. Below lg the grid drops to two and the brand block
+    spans both, which keeps the link columns paired rather than stacked into a
+    long ribbon. %>
+<footer class="mt-10 bg-chrome">
+  <div class="mx-auto grid w-full max-w-page grid-cols-2 gap-x-7 gap-y-[34px] px-4 pt-10
+              lg:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))] lg:gap-10 lg:pt-[54px] xl:px-8">
+    <div class="col-span-2 lg:col-span-1">
+      <%# Same lockup as the header, one step smaller: the shield carries the
+          brand and the wordmark beside it is the accessible name, so the image
+          is decorative. %>
+      <div class="mb-[18px] flex items-center gap-3.5">
+        <%= image_tag "utcc-eng-shield.svg", alt: "", aria: { hidden: true },
+                      width: 40, height: 40, loading: "lazy",
+                      class: "block h-10 w-auto" %>
+        <span class="flex flex-col justify-center border-l border-chrome-line pl-3.5 leading-[1.15]">
+          <span class="text-15 font-semibold tracking-[-0.01em] text-surface">UTCC</span>
+          <span class="text-10 font-medium tracking-[0.11em] text-on-chrome-muted uppercase">
+            <%= t("chrome.brand_line") %>
+          </span>
+          <span class="mt-[3px] text-9-5 font-medium tracking-[0.06em] text-on-chrome-dim">
+            <%= t("chrome.brand_sub") %>
+          </span>
+        </span>
+      </div>
+
+      <p class="mb-4 max-w-[40ch] text-13-5 leading-[1.7] text-pretty text-on-chrome-muted">
+        <%= t("chrome.footer.tagline") %>
+      </p>
+      <%# The disclaimer is the one place the crimson shows on this field — a
+          rule rather than a fill, so it reads as an aside and not an action. %>
+      <p class="max-w-[42ch] border-l-2 border-brand pl-3 text-12-5 leading-[1.65] text-pretty text-on-chrome-dim">
+        <%= t("chrome.footer.by") %>
+      </p>
+    </div>
+
+    <% footer_columns.each do |column, links| %>
+      <div>
+        <div class="mb-4 text-11 font-semibold tracking-[0.11em] text-on-chrome-dim uppercase">
+          <%= t("chrome.footer.columns.#{column}.title") %>
         </div>
-
-        <div class="text-left text-20 font-light">
-          <h3 class="mb-4 text-30 font-normal">ติดต่อเรา</h3>
-          <p>คณะวิศวกรรมศาสตร์<br>มหาวิทยาลัยหอการค้าไทย</p>
-          <p>126/1 ถนนวิภาวดีรังสิต<br>ดินแดง กรุงเทพฯ 10400</p>
-          <div class="mt-4 flex gap-4">
-            <a href="#" aria-label="Facebook"
-               class="grid size-10 place-items-center rounded-full border border-surface/40 opacity-80 transition duration-300 hover:bg-surface/12 hover:opacity-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M13 22v-9h3l1-4h-4V7c0-1.1.3-1.8 1.9-1.8H17V1.8C16.4 1.7 15.2 1.6 14 1.6c-2.7 0-4.5 1.6-4.5 4.6V9H6v4h3.5v9H13z"/>
-              </svg>
+        <div class="flex flex-col items-start gap-[11px]">
+          <% links.each do |link, href| %>
+            <a href="<%= href %>"
+               class="text-left text-13-5 leading-[1.5] text-on-chrome transition-colors duration-150 hover:text-surface">
+              <%= t("chrome.footer.columns.#{column}.links.#{link}") %>
             </a>
-            <a href="#" aria-label="YouTube"
-               class="grid size-10 place-items-center rounded-full border border-surface/40 opacity-80 transition duration-300 hover:bg-surface/12 hover:opacity-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M23 12s0-3.6-.5-5.3a2.7 2.7 0 0 0-1.9-1.9C18.9 4.3 12 4.3 12 4.3s-6.9 0-8.6.5a2.7 2.7 0 0 0-1.9 1.9C1 8.4 1 12 1 12s0 3.6.5 5.3c.3 1 1 1.7 1.9 1.9 1.7.5 8.6.5 8.6.5s6.9 0 8.6-.5a2.7 2.7 0 0 0 1.9-1.9c.5-1.7.5-5.3.5-5.3zM9.8 15.3V8.7l5.7 3.3-5.7 3.3z"/>
-              </svg>
-            </a>
-            <a href="#" aria-label="Line"
-               class="grid size-10 place-items-center rounded-full border border-surface/40 opacity-80 transition duration-300 hover:bg-surface/12 hover:opacity-100">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2C6.5 2 2 5.7 2 10.2c0 4 3.6 7.4 8.4 8 .3.1.8.2.9.5.1.3.1.7 0 1l-.2.9c0 .3-.2 1 .9.6 1.1-.5 6-3.5 8.2-6 1.5-1.6 2.2-3.3 2.2-5C22 5.7 17.5 2 12 2z"/>
-              </svg>
-            </a>
-          </div>
+          <% end %>
         </div>
       </div>
-    </div>
+    <% end %>
   </div>
 
-  <div class="bg-footer-btm py-10 text-20">
-    <div class="mx-auto w-full max-w-page px-4 xl:px-8">
-      © <%= Time.current.year %> University of the Thai Chamber of Commerce
+  <div class="mx-auto mt-8 flex w-full max-w-page flex-col items-start gap-3.5 border-t border-chrome-line-2
+              px-4 pt-[22px] pb-[30px] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-6
+              lg:mt-11 xl:px-8">
+    <span class="text-12-5 text-on-chrome-dim"><%= t("chrome.footer.rights") %></span>
+    <div class="flex flex-wrap items-center gap-[22px]">
+      <a href="#" class="text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface">
+        <%= t("chrome.footer.pdpa") %>
+      </a>
+      <a href="#" class="text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface">
+        <%= t("chrome.footer.terms") %>
+      </a>
     </div>
   </div>
 </footer>
@@ -83,7 +75,7 @@
         class="invisible fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-brand
                text-surface opacity-0 shadow-lg transition duration-300
                data-[visible=true]:visible data-[visible=true]:opacity-100"
-        data-controller="to-top" data-action="to-top#scrollUp" aria-label="กลับขึ้นด้านบน">
+        data-controller="to-top" data-action="to-top#scrollUp" aria-label="<%= t("chrome.to_top") %>">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
        stroke-width="2" aria-hidden="true">
     <path d="M12 19V5M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/>

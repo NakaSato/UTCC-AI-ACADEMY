@@ -1,31 +1,819 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
+# English is the secondary locale and the fallback for anything th.yml misses.
+# Keys are shared 1:1 with th.yml — see that file for the structure.
 en:
-  hello: "Hello world"
+  language_name: "EN"
+
+  flash:
+    course_missing: "That course could not be found"
+    forbidden: "That screen is for teaching staff only"
+    role_changed: "%{name} is now %{role}"
+    role_self: "You cannot change your own role"
+    role_invalid: "That role does not exist"
+
+  chrome:
+    brand_line: "AI Academy"
+    brand_sub: "by Upperclassman"
+    notif_title: "Notifications"
+    notif_all: "Mark all read"
+    notif_toggle: "Open notifications"
+    user_toggle: "Open account menu"
+    nav_label: "Main"
+    nav_toggle: "Open main menu"
+    refill: "Refills in 4h 12m"
+    semester: "Semester 1 / 2026 · Section BA-2"
+    hearts: "Hearts"
+    hearts_left: "%{count} / 5 hearts left"
+    gems_earned: "Gems earned"
+    skip_to_content: "Skip to main content"
+    loading: "Loading"
+    nav:
+      catalog: "Catalog"
+      my_learning: "My Learning"
+      course: "Course"
+      lesson: "Lesson"
+      map: "Map"
+      progress: "Progress"
+      ranking: "Ranking"
+      instructor: "Instructor"
+      admin: "Admin"
+      sign_in: "Sign in"
+    menu:
+      profile: "My profile"
+      settings: "Learning settings"
+      transcript: "Transcript"
+      help: "Help centre"
+      logout: "Sign out"
+    notifications:
+      - title: "Your instructor commented on project 2"
+        when: "12 min ago"
+      - title: "New topic unlocked: Confusion matrix"
+        when: "2 hours ago"
+      - title: "2 topics left to hit your weekly goal"
+        when: "yesterday"
+    to_top: "Back to top"
+    footer:
+      tagline: "The University of the Thai Chamber of Commerce AI learning platform, open to every faculty."
+      by: "This site is built by upperclassmen to help juniors through AI Fundamental — it is not an official university website."
+      rights: "© 2026 UTCC Upperclassmen community"
+      pdpa: "Privacy notice (PDPA)"
+      terms: "Terms of use"
+      columns:
+        start:
+          title: "Start here"
+          links:
+            what_is_ai: "What is AI?"
+            tracks: "Learning tracks"
+            faq: "FAQ"
+        community:
+          title: "Community"
+          links:
+            showcase: "Student showcase"
+            share: "Share a project"
+            events: "Events and workshops"
+        learn:
+          title: "Learn"
+          links:
+            catalog: "All courses"
+            course: "Current course"
+            map: "Knowledge map"
+        track:
+          title: "Track"
+          links:
+            my_learning: "My learning"
+            progress: "Progress"
+            ranking: "Ranking"
+        university:
+          title: "University"
+          links:
+            engineering: "School of Engineering"
+            utcc: "UTCC"
+            admissions: "Apply to study"
+
+  levels:
+    beginner: "Beginner"
+    intermediate: "Intermediate"
+    advanced: "Advanced"
+
+  units:
+    credits: "%{count} credits"
+    projects: "%{count} projects"
+    hours: "%{count} hours"
+    minutes: "%{count} min"
+    days: "%{count} days"
+    topics: "%{count} topics"
+    learners: "%{count} learning now"
+    topics_learned: "%{done} / %{total} topics learned"
+    section: "Section %{name}"
+
+  catalog:
+    title: "What do you want to learn today?"
+    subtitle: "Pick a course that matches your interests and background — every course counts toward the UTCC AI Fundamental curriculum."
+    core_tag: "Core course"
+    cert_tag: "Certificate"
+    not_sure_title: "Not sure where to start?"
+    not_sure_desc: "Answer 5 questions and we will build a study plan around your background and major."
+    not_sure_btn: "Start assessment"
+    filters:
+      all: "All courses"
+      core: "Core"
+      popular: "Most popular"
+      ml: "Machine Learning"
+      genai: "Generative AI"
+      data: "Data"
+      ethics: "AI ethics"
+    courses:
+      AI1101:
+        title: "AI Fundamentals"
+        desc: "Understand how AI works, from data and machine learning through to running models in a real business."
+        instructor: "Asst. Prof. Chanakan"
+      AI1102:
+        title: "Python for AI"
+        desc: "Write Python that is ready for real data — from data structures and pandas to preparing a dataset."
+        instructor: "Mr. Thanakrit"
+      AI2201:
+        title: "Intro to Machine Learning"
+        desc: "Train and evaluate regression, classification and clustering models with scikit-learn on Thai business data."
+        instructor: "Asst. Prof. Chanakan"
+      AI2105:
+        title: "Prompt Engineering for Business"
+        desc: "Design prompts that hold up in marketing, customer service and document analysis — and measure them properly."
+        instructor: "Ms. Pimchanok"
+      AI2108:
+        title: "Data & Visualization"
+        desc: "Tell stories with the right chart: pick chart types, handle messy data and build dashboards."
+        instructor: "Mr. Thanakrit"
+      AI3301:
+        title: "Intro to Neural Networks"
+        desc: "From perceptron to CNN: understand backpropagation and train real models in PyTorch."
+        instructor: "Assoc. Prof. Athit"
+      AI2210:
+        title: "Generative AI for Marketing"
+        desc: "Use image and text models in campaign work, with the copyright and brand caveats that come with them."
+        instructor: "Ms. Pimchanok"
+      AI2402:
+        title: "AI Ethics and Governance"
+        desc: "Bias in data, privacy, PDPA, and how organisations govern their use of AI."
+        instructor: "Asst. Prof. Wannida"
+
+  course:
+    back_catalog: "← Back to catalog"
+    description: "AI1101 · Understand how AI works — from data and machine learning through to putting models to work in real business settings, with projects you build yourself."
+    syllabus: "Syllabus"
+    your_progress: "Your progress"
+    continue: "Continue: Supervised Learning"
+    download_syllabus: "Download syllabus (PDF)"
+    instructor_label: "Instructor"
+    instructor_initials: "CW"
+    instructor_name: "Asst. Prof. Dr. Chanakan Wiriyakul"
+    instructor_dept: "School of Science and Technology"
+    module_meta: "%{topics} topics · %{units} knowledge units"
+    stats:
+      topics: "Topics"
+      projects: "Projects"
+      total_time: "Total study time"
+      total_time_value: "42 hrs"
+      credits: "Credits"
+    meta:
+      code: "Course code"
+      prerequisites: "Prerequisites"
+      prerequisites_value: "None"
+      assessment: "Assessment"
+      assessment_value: "60% project"
+      language: "Language"
+      language_value: "Thai / English"
+    status:
+      done: "Completed"
+      now: "In progress"
+      locked: "Locked"
+    kind:
+      theory: "Theory"
+      exercise: "Exercise"
+      code: "Coding task"
+      mix: "Theory + code"
+      project: "Project"
+    modules:
+      - title: "Data and AI thinking"
+        desc: "Where the data in an AI system comes from, what makes it usable, and the questions to ask before any model is trained."
+        topics:
+          - "What AI is, and actually does"
+          - "Types of data"
+          - "Measuring data quality"
+      - title: "Machine learning basics"
+        desc: "The vocabulary the rest of the course assumes: how a model learns from examples, and how you tell a good one from a bad one."
+        topics:
+          - "How models learn"
+          - "Loss and metrics"
+          - "Supervised vs. Unsupervised"
+          - "Overfitting and regularization"
+      - title: "Your first model with scikit-learn"
+        desc: "The whole workflow end to end — load a dataset, split it, fit a model, and read the score you get back."
+        topics:
+          - "Prepare data with pandas"
+          - "Train, evaluate, tune"
+      - title: "Generative AI"
+        desc: "What a language model is actually doing when it answers, and how to get dependable work out of one."
+        topics:
+          - "How LLMs work"
+          - "Writing prompts that work"
+      - title: "Applying AI in business"
+        desc: "Choosing problems worth automating, sizing the benefit, and what a Thai business case looks like in practice."
+        topics:
+          - "Assessing the business case"
+          - "Thai business case study"
+      - title: "Ethics and PDPA"
+        desc: "Where AI systems harm people, and the duties the PDPA places on anyone handling Thai personal data."
+        topics:
+          - "Bias in data"
+          - "Data privacy"
+
+  lesson:
+    back_module: "← AI1101 · Module 2"
+    steps_label: "Lesson steps"
+    step_of: "Step %{current} of %{total} · %{name}"
+    steps:
+      theory: "Theory"
+      exercise: "Exercise"
+      code: "Coding task"
+      summary: "Summary"
+    proctor:
+      label_on: "Proctored mode on"
+      label_off: "Proctored mode off"
+      label_exempt: "Exempt · staff account"
+      note_on: "Tab switching, copy, paste and screen capture are monitored during the exercise."
+      note_off: "Integrity checks disabled — practice mode only."
+      note_exempt: "Staff accounts are never monitored — proctoring applies to student accounts only."
+      verdict_clean: "Clean"
+      verdict_review: "Review needed"
+      verdict_risk: "High risk"
+      guard_title: "You left the exercise window"
+      guard_body: "Content stays blurred until you return to this window. The event has been logged."
+      guard_btn: "Resume exercise"
+      events_title: "Integrity log"
+      events_empty: "No incidents recorded yet"
+      events:
+        menu: "Opened the context menu"
+        paste_small: "Pasted a short snippet"
+        copy: "Attempted to copy the question"
+        blur: "Switched away from the window"
+        print: "Attempted to print the page"
+        paste: "Pasted an unusually long block — possible AI tool"
+        capture: "Attempted a screen capture"
+    theory:
+      eyebrow: "Theory · 6 min"
+      heading: "Supervised vs. Unsupervised Learning"
+      p1: "Machine learning splits into two broad families based on the data you feed the model. The difference is whether that data carries labels or not."
+      p2: "In practice you always split data into a train set and a test set, so you can tell whether the model truly generalizes rather than memorizes."
+      sup_title: "Supervised Learning"
+      sup_desc: "Data comes with labels. The model learns from (input → output) pairs, then predicts values it has never seen."
+      sup_eg: "e.g. sales forecasting, spam filtering"
+      unsup_title: "Unsupervised Learning"
+      unsup_desc: "No labels. The model finds hidden structure or groups in the data by itself."
+      unsup_eg: "e.g. customer segmentation, dimensionality reduction"
+      code_comment: "# 80% train / 20% test"
+      to_quiz: "Take the exercise →"
+      open_link: "Open link →"
+      blocks:
+        - "Remember: the test set must never be seen during training, or your results will look better than they are."
+        - "n_{train} = \\lceil 0.8\\,N \\rceil, \\quad n_{test} = N - n_{train}"
+        - "scores = cross_val_score(model, X, y, cv=5)\nprint(scores.mean(), scores.std())"
+        - "scikit-learn docs · train_test_split"
+    quiz:
+      eyebrow: "Exercise · pick the right answer"
+      question: "An online shop has behavioural data on 50,000 customers with no predefined groups, and wants to segment them for marketing. What kind of problem is this?"
+      keys: [ "A", "B", "C", "D" ]
+      check: "Check answer"
+      to_code: "Go to coding task →"
+      correct_title: "Correct · +5 gems"
+      correct_body: "Correct — with no labels available this is a clustering problem, e.g. K-Means or hierarchical clustering."
+      wrong_title: "Try again · −1 heart"
+      wrong_body: "Not quite — this data has no labels, so it is not supervised learning. Consider that the model has to find the groups itself."
+    code:
+      eyebrow: "Coding task · Python"
+      title: "Split the data into train / test"
+      task: "Complete the code so the customer data is split 80% train / 20% test, with random_state=42 so the result is reproducible."
+      criteria: "Passing criteria"
+      run: "Run & check"
+      reset: "Reset"
+      finish: "Finish lesson →"
+      editor_label: "Python code for this task"
+      checks:
+        - "Import train_test_split from sklearn"
+        - "Set test_size = 0.2 (20% test)"
+        - "Set random_state = 42 for reproducibility"
+      console_idle: "  ready — press “Run & check”"
+      console_pass: "✓ all 3 criteria passed · +10 gems"
+      console_fail: "✗ not passing yet — did you replace ___ with 0.2 and 42?"
+    done:
+      title: "Topic complete"
+      subtitle: "Supervised vs. Unsupervised Learning · Module 2, topic 3 — your progress has been saved."
+      next_topic: "Next topic: Overfitting"
+      see_progress: "See progress"
+      rewards:
+        gems: "Gems"
+        streak: "Day streak"
+
+  my_learning:
+    learning_now: "Learning now"
+    cert_count: "Certificates: 1 / 4"
+    course_link: "AI1101 course description"
+    learned_topics: "Learned topics"
+    applied_topics: "Applied topics"
+    pick_project_before: "Select a"
+    pick_project_link: "final project"
+    pick_project_after: "to apply what you have learned"
+    continue: "Continue →"
+    view_syllabus: "View syllabus"
+    explore_catalog: "Explore the catalog →"
+    learned_count: "Learned %{done} / %{total}"
+    applied_count: "Applied %{done} / %{total}"
+    streak_label: "Day streak"
+    badges_title: "Badges"
+    badges_count: "5 of 8"
+    tabs:
+      progress: "In progress (3)"
+      done: "Completed (1)"
+    badge_state:
+      now: "In progress"
+      done: "Completed"
+    awards:
+      - name: "First Steps"
+        hint: "Complete 10 topics"
+      - name: "Model Builder"
+        hint: "Submit your first ML project"
+      - name: "7-Day Streak"
+        hint: "Study 7 days in a row"
+      - name: "Data Cleaner"
+        hint: "Clear every pandas task"
+      - name: "Deep Diver"
+        hint: "Finish a module in one day"
+      - name: "Helping Hand"
+        hint: "Answer 10 forum questions"
+      - name: "Persistent"
+        hint: "Pass a task after 3 failed tries"
+      - name: "Ethics Aware"
+        hint: "Finish the AI ethics module"
+
+  map:
+    title: "Knowledge map"
+    topics_for_course: "Topics for course"
+    course_ref: "AI1101 AI Fundamentals"
+    need_to_learn: "Need to learn"
+    learned_label: "Learned"
+    in_project: "In project"
+    in_project_note: "— covered by the final project"
+    symbols: "Map symbols"
+    single_topic: "Single topic"
+    leaf_desc: "Read the short theory, then clear the exercise and coding task to close this topic on the map."
+    start_topic: "Start this topic"
+    mark_known: "Mark as known"
+    settings_label: "Map settings"
+    home_crumb: "Back to catalog"
+    modes:
+      course: "For course"
+      project: "For project"
+    legend:
+      not_started: "Topic group — not started"
+      partial: "Topic group — partly learned"
+      complete: "Topic group — fully learned"
+      leaf: "Single topic you can study now"
+    nodes:
+      cs: "Computer & data science"
+      prog: "Programming foundations"
+      py: "Python basics"
+      py-var: "Variables and data types"
+      py-flow: "Control flow"
+      py-fn: "Functions and modules"
+      pd: "pandas and NumPy"
+      pd-df: "DataFrame basics"
+      pd-clean: "Data cleaning"
+      ml: "Machine Learning"
+      ml-prep: "Data preparation"
+      ml-split: "Train / test split"
+      ml-scale: "Feature scaling"
+      ml-enc: "Categorical encoding"
+      ml-sup: "Supervised models"
+      ml-lin: "Linear regression"
+      ml-tree: "Decision tree"
+      ml-eval: "Model evaluation"
+      ml-cm: "Confusion matrix"
+      ml-of: "Overfitting"
+      gen: "Generative AI"
+      gen-llm: "LLM basics"
+      gen-tok: "Tokenization"
+      gen-pp: "Prompt patterns"
+      gen-few: "Few-shot prompting"
+      eth: "AI ethics and governance"
+      eth-pdpa: "PDPA and privacy"
+
+  progress:
+    greeting: "Hello, Nathaporn"
+    subtitle: "You are on a 12-day streak — 2 more topics to hit this week’s goal."
+    activity_title: "Last 12 weeks"
+    activity_note: "each square = 1 day"
+    courses_in_progress: "Courses in progress"
+    xp_level: "XP level"
+    xp_note: "520 XP to go for the “Model Builder” badge"
+    earned_badges: "Badges earned"
+    stats:
+      - label: "Topics learned"
+        delta: "+6 this week"
+      - label: "Hours studied"
+        delta: "+3.2 this week"
+      - label: "Projects submitted"
+        delta: "next due 2 Aug"
+      - label: "Rank in section"
+        delta: "up 2 places"
+    enrolled:
+      AI1101: "Next: Overfitting"
+      AI1102: "Next: pandas join"
+      AI2105: "Next: Few-shot"
+    enrolled_short:
+      AI2105: "Prompt Engineering"
+
+  leaderboard:
+    title: "Leaderboard"
+    subtitle: "Section BA-2 · week 6 · resets every Monday 00:00"
+    th_rank: "Rank"
+    th_student: "Student"
+    th_topics: "Topics"
+    th_streak: "Streak"
+    tabs:
+      - "This week"
+      - "This semester"
+      - "All UTCC"
+    leaders:
+      - "Pannathorn S."
+      - "Yanisa K."
+      - "Kantaphat W."
+      - "Nathaporn J. (you)"
+      - "Supakorn T."
+      - "Pitchaya M."
+      - "Teerapat A."
+      - "Arisara C."
+
+  instructor:
+    title: "Instructor view · AI1101"
+    subtitle: "Section BA-2 · 48 students · semester 1/2026"
+    export_csv: "Export grades (CSV)"
+    hardest_title: "Topics students struggle with"
+    hardest_sub: "share failing on first attempt"
+    roster_title: "Student roster"
+    th_id: "ID"
+    th_name: "Name"
+    th_progress: "Progress"
+    th_projects: "Projects"
+    th_seen: "Last seen"
+    stats:
+      - label: "Average progress"
+        note: "week 6 target is 35%"
+      - label: "On-time submissions"
+        note: "39 of 48 students"
+      - label: "Inactive over 7 days"
+        note: "worth following up"
+      - label: "Average exercise score"
+        note: "out of 10"
+    hard_topics:
+      - "Overfitting and regularization"
+      - "Loss function"
+      - "Train / test split"
+      - "Types of data"
+      - "What AI is"
+    roster:
+      - "Pannathorn Suwannawet"
+      - "Yanisa Kittiwat"
+      - "Kantaphat Woraphong"
+      - "Nathaporn Jirawatanakul"
+      - "Supakorn Tantiwet"
+      - "Pitchaya Maneerat"
+      - "Teerapat Areekul"
+    seen:
+      today: "today"
+      yesterday: "yesterday"
+      days_ago: "%{count} days ago"
+
+  admin:
+    eyebrow: "Admin console"
+    tabs:
+      features: "Feature control"
+      overview: "System overview"
+      users: "Users & roles"
+      courses: "Courses"
+      queue: "Approvals"
+      audit: "Audit log"
+    features:
+      impact_title: "Features live"
+      impact_note: "toggles currently on across every student account"
+      off_title: "Switched off"
+      all_on: "Everything is on"
+      state:
+        on: "On for every student account"
+        off: "Hidden from student accounts"
+      options:
+        two: "2 columns"
+        three: "3 columns"
+        five: "5"
+        th: "ไทย"
+        en: "English"
+      groups:
+        - title: "Student learning experience"
+          sub: "applies to every student account immediately"
+          items:
+            - name: "Learning map"
+              scope: "Map tab"
+              desc: "Sequenced topic path with unlock rules"
+            - name: "Global search"
+              scope: "Top bar"
+              desc: "Search field for courses, topics and projects"
+            - name: "In-app notifications"
+              scope: "Top bar"
+              desc: "Deadline reminders and grading results"
+            - name: "Catalog density"
+              scope: "Catalog"
+              desc: "How many course cards sit per row"
+        - title: "Gamification & motivation"
+          sub: "switch the whole set off for a purely academic presentation"
+          items:
+            - name: "Gems & streaks"
+              scope: "Top bar · lesson"
+              desc: "Reward points and consecutive-day counter"
+            - name: "Hearts system"
+              scope: "Lessons & exercises"
+              desc: "Caps how many wrong attempts a round allows"
+            - name: "Hearts per round"
+              scope: "Lesson"
+              desc: "Starting allowance for each new lesson"
+            - name: "Leaderboard"
+              scope: "Ranking tab"
+              desc: "Ranks students against classmates and the university"
+        - title: "Academic integrity & language"
+          sub: "settings that shape exercises and assessments"
+          items:
+            - name: "Exercise proctoring"
+              scope: "Lesson"
+              desc: "Blurs on tab switch and logs copy/paste events"
+            - name: "Default student language"
+              scope: "All screens"
+              desc: "Students can still switch it from the top bar"
+    overview:
+      adopt_title: "Adoption by faculty"
+      adopt_sub: "share of accounts active in the last seven days"
+      activity_title: "Recent activity"
+      health_title: "Service health"
+      health_sub: "everything the console depends on"
+      state:
+        ok: "OK"
+        warn: "Watch"
+      stats:
+        - label: "Total accounts"
+          note: "+64 this week"
+        - label: "Active courses"
+          note: "4 faculties · 15 sections"
+        - label: "Instructors & TAs"
+          note: "3 access requests open"
+        - label: "Weekly active"
+          note: "up 4 pts week over week"
+      adoption:
+        - name: "Business"
+          meta: "412 accounts · 78% active"
+        - name: "Engineering"
+          meta: "268 accounts · 71% active"
+        - name: "Communication Arts"
+          meta: "186 accounts · 54% active"
+        - name: "Science & Technology"
+          meta: "141 accounts · 39% active"
+      activity:
+        - text: "Approved TA access for AI2101"
+          who: "Academic Services"
+          when: "11:02"
+        - text: "Imported 182 records from registrar"
+          who: "Automated job"
+          when: "10:40"
+        - text: "Published Prompt engineering v2"
+          who: "Asst. Prof. Warinthorn P."
+          when: "09:31"
+        - text: "Archived AI1180 for AY2025"
+          who: "Academic Services"
+          when: "yest."
+        - text: "Updated proctoring thresholds"
+          who: "System admin"
+          when: "2d"
+      health:
+        - label: "Registrar sync"
+          note: "last run 10:40 · 182 records"
+        - label: "Autograder queue"
+          note: "12 jobs queued · ~4 min lag"
+        - label: "UTCC SSO"
+          note: "healthy · 99.8% success"
+        - label: "Proctoring service"
+          note: "healthy · enabled on 9 courses"
+        - label: "Project storage"
+          note: "78% of 2 TB used"
+    courses:
+      th_code: "Code"
+      th_course: "Course"
+      th_owner: "Owner"
+      th_sections: "Sections"
+      th_students: "Students"
+      th_state: "State"
+      state:
+        live: "Live"
+        draft: "Draft"
+      rows:
+        - name: "AI Academy"
+          faculty: "All faculties · core"
+          owner: "Asst. Prof. Warinthorn"
+        - name: "Data Thinking for Business"
+          faculty: "Business"
+          owner: "Chanakan P."
+        - name: "Applied Machine Learning"
+          faculty: "Engineering"
+          owner: "Asst. Prof. Warinthorn"
+        - name: "Generative AI for Media"
+          faculty: "Comm. Arts"
+          owner: "Pawarisa T."
+        - name: "Applied NLP"
+          faculty: "Engineering"
+          owner: "Asst. Prof. Warinthorn"
+    queue:
+      pending: "Awaiting review"
+      sla_title: "Open requests"
+      sla_note: "items waiting on an administrator"
+      sla:
+        - label: "Median approval time"
+          value: "6 hours"
+        - label: "Older than 48h"
+          value: "1"
+        - label: "Approved this month"
+          value: "54"
+      rows:
+        - title: "TA role request · AI1101"
+          label: "Access"
+          meta: "Surapong Techawarakul · Engineering"
+          when: "2h ago"
+        - title: "New course · AI2204 Applied NLP"
+          label: "Course"
+          meta: "Asst. Prof. Warinthorn Phakdeesakul · 2 sections"
+          when: "yesterday"
+        - title: "Lesson content · Prompt engineering v2"
+          label: "Content"
+          meta: "12 pages edited · awaiting publish"
+          when: "2 days ago"
+        - title: "Roster import from registrar"
+          label: "Data"
+          meta: "182 records · 3 duplicates"
+          when: "3 days ago"
+    audit:
+      title: "Audit log"
+      sub: "last 48 hours"
+      levels:
+        info: "Info"
+        warn: "Watch"
+      rows:
+        - stamp: "26 Jul 11:02"
+          actor: "Academic Services"
+          event: "Granted TA role · AI2101 · T10233"
+        - stamp: "26 Jul 10:40"
+          actor: "Automated job"
+          event: "Roster import 182 records · 3 duplicates skipped"
+        - stamp: "26 Jul 09:31"
+          actor: "Asst. Prof. Warinthorn P."
+          event: "Published content · Prompt engineering v2"
+        - stamp: "26 Jul 09:12"
+          actor: "Proctoring service"
+          event: "Long-paste alert raised · 6512400633"
+        - stamp: "25 Jul 17:48"
+          actor: "System admin"
+          event: "Integrity threshold changed 85 → 80"
+        - stamp: "25 Jul 16:05"
+          actor: "Academic Services"
+          event: "Archived course AI1180 · AY2025"
+    title: "User management"
+    subtitle: "Grant the instructor view and the admin screen · UTCC AI Academy"
+    roster_title: "All accounts"
+    th_id: "Student ID"
+    th_name: "Name"
+    th_role: "Role"
+    th_change: "Change role"
+    save: "Save"
+    role_self: "Your own account"
+    role_for: "Role for %{name}"
+    roles:
+      student: "Student"
+      instructor: "Instructor"
+      admin: "Admin"
+
+  auth:
+    hero_title: "Start your AI journey at UTCC"
+    hero_body: "The University of the Thai Chamber of Commerce learning platform for every student enrolled in the AI Fundamental curriculum."
+    disclaimer: "This site is built by upperclassmen to help juniors through AI Fundamental — it is not an official university website."
+    footer: "© 2026 UTCC Upperclassmen community"
+    back: "← Back to sign in"
+    remember: "Remember me on this device"
+    forgot_link: "Forgot password?"
+    terms: "I accept the university terms of use and privacy policy (PDPA)."
+    terms_required: "Please accept the terms of use before creating an account."
+    or: "or"
+    sso: "Continue with UTCC SSO"
+    sso_unavailable: "UTCC SSO is not available yet — please sign in with your email and password."
+    points:
+      - "Theory, exercises and coding tasks in one place"
+      - "Topic-level progress tracking with a knowledge map"
+      - "Counts toward the UTCC AI Fundamental curriculum"
+    tabs:
+      login: "Sign in"
+      register: "Register"
+    login:
+      title: "Sign in"
+      subtitle: "Use the same student ID and password as the university registration system."
+      submit: "Sign in"
+      help: "Faculty and staff sign in with their staff account; the instructor view unlocks automatically."
+    register:
+      title: "Create your student account"
+      subtitle: "Register with your full name and student ID."
+      submit: "Create account"
+      help: "Already have an account? Use the “Sign in” tab above, or your university UTCC SSO account."
+    forgot:
+      title: "Forgot your password"
+      subtitle: "Enter your university email and we will send a reset link within 5 minutes."
+      submit: "Send reset link"
+      help: "No email? Check your spam folder, or contact the UTCC IT service desk on ext. 1234."
+      sent_title: "Reset link sent"
+      sent_body: "Check your @utcc.ac.th inbox — the reset link expires in 30 minutes."
+    reset:
+      title: "Set a new password"
+      subtitle: "Enter the new password you want to use."
+      submit: "Save password"
+      help: "A reset link works once. Saving signs you out on every device."
+    fields:
+      name: "Full name"
+      name_placeholder: "Nathaporn Jirawatanakul"
+      email: "University email"
+      email_hint: "Use your @utcc.ac.th address"
+      student_id: "Student ID"
+      student_id_hint: "13 digits, as printed on your student card"
+      password: "Password"
+      password_hint: "At least 8 characters, with letters and digits"
+      password_confirmation: "Confirm password"
+      new_password: "New password"
+      new_password_confirmation: "Confirm new password"
+    errors_title: "Please check the form again (%{count} problems)"
+
+  student:
+    name: "Nathaporn Jirawatanakul"
+    initials: "NJ"
+    meta: "6512400407 · Section BA-2"
+    student_id: "6512400407"
+
+  landing:
+    brand_name: "UTCC"
+    brand_alt: "School of Engineering, University of the Thai Chamber of Commerce"
+    home: "Back to home"
+    nav_label: "Main"
+    menu_label: "Menu"
+    menu_open: "Open menu"
+    menu_close: "Close menu"
+    sign_in: "Sign in"
+    sign_up: "Sign up"
+    nav:
+      learn: "Learn AI"
+      tracks: "Learning tracks"
+      community: "Community"
+      events: "Events"
+      faq: "FAQ"
+
+  # Kept 1:1 with th.yml, where these do the real work — Rails ships the English
+  # wording already, so the values here just restate it.
+  errors:
+    messages:
+      blank: "can't be blank"
+      taken: "has already been taken"
+      invalid: "is invalid"
+      confirmation: "doesn't match %{attribute}"
+      too_short: "is too short (minimum is %{count} characters)"
+      too_long: "is too long (maximum is %{count} characters)"
+
+  # One activerecord block only — sibling duplicate keys silently overwrite in YAML.
+  # Sign-up asks for the student ID, so messages on the derived address must name
+  # the field the student actually filled in.
+  activerecord:
+    attributes:
+      user:
+        email_address: "University email"
+        student_id: "Student ID"
+        name: "Full name"
+        password: "Password"
+        password_confirmation: "Confirm password"
+        role: "Role"
+    errors:
+      messages:
+        taken: "has already been taken"
+      models:
+        user:
+          attributes:
+            student_id:
+              invalid: "must be exactly 13 digits"
+            password:
+              missing_letter: "must contain at least one letter"
+              missing_digit: "must contain at least one digit"
+              too_common: "is too easy to guess — please pick another"
+              contains_student_id: "must not contain your student ID"

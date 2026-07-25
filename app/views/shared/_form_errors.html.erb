@@ -1,8 +1,7 @@
 <% if record.errors.any? %>
-  <div class="rounded-md border-l-4 border-brand-alert bg-brand-tint p-4 text-18 text-brand-accent" role="alert">
-    <p class="mb-1 font-bold">
-      กรุณาตรวจสอบข้อมูลอีกครั้ง (<%= record.errors.count %> รายการ)
-    </p>
+  <div role="alert"
+       class="mb-4 rounded-field border border-danger-line bg-danger-tint px-4 py-3.25 text-14 text-brand-accent">
+    <p class="mb-1 font-bold"><%= t("auth.errors_title", count: record.errors.count) %></p>
     <ul class="list-disc pl-5">
       <% record.errors.full_messages.each do |message| %>
         <li><%= message %></li>

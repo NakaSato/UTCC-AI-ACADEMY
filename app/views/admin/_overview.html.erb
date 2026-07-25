@@ -1,0 +1,89 @@
+<div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <% AdminConsole.stats.each_with_index do |stat, index| %>
+    <div class="animate-rise rounded-box border border-hairline bg-surface px-6 py-5.5"
+         style="animation-delay: <%= index * 45 %>ms">
+      <div class="mb-2 text-12-5 font-medium text-muted-2"><%= stat[:label] %></div>
+      <div class="text-30 leading-none font-bold tracking-[-0.03em]"><%= stat[:value] %></div>
+      <div class="mt-1.75 text-12-5 <%= class_names(
+                                          "text-success-deep" => stat[:tone] == :good,
+                                          "text-gold-ink" => stat[:tone] == :warn,
+                                          "text-muted-2" => stat[:tone] == :neutral
+                                        ) %>">
+        <%= stat[:note] %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 items-start gap-5 nav:grid-cols-[minmax(0,1fr)_380px]">
+  <div class="flex flex-col gap-5">
+    <section class="rounded-card border border-hairline bg-surface px-7 py-6.5">
+      <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("admin.overview.adopt_title") %></h2>
+      <p class="mb-5.5 text-13 text-muted-2"><%= t("admin.overview.adopt_sub") %></p>
+
+      <div class="flex flex-col gap-4">
+        <% AdminConsole.adoption.each do |row| %>
+          <div>
+            <div class="mb-1.5 flex justify-between gap-3 text-13-5">
+              <span class="text-ink-2"><%= row[:name] %></span>
+              <span class="text-muted-2"><%= row[:meta] %></span>
+            </div>
+            <div class="h-1.75 overflow-hidden rounded-full bg-surface-2">
+              <%# The bar cools as the number drops — it is derived, not stored. %>
+              <div class="h-full origin-left animate-bar rounded-full
+                          <%= class_names(
+                                "bg-brand" => row[:percent] >= 70,
+                                "bg-heat-3" => row[:percent].between?(50, 69),
+                                "bg-gold" => row[:percent] < 50
+                              ) %>"
+                   style="width: <%= row[:percent] %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <div class="px-6.5 pt-5.5 pb-3.5">
+        <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("admin.overview.activity_title") %></h2>
+      </div>
+      <% AdminConsole.activity.each do |row| %>
+        <div class="flex items-center gap-3.5 border-t border-surface-5 px-6.5 py-3.5">
+          <span aria-hidden="true"
+                class="grid size-8 flex-none place-items-center rounded-[9px] text-11-5 font-semibold
+                       <%= row[:alert] ? "bg-brand-tint text-brand-deep" : "bg-surface-2 text-muted-2" %>">
+            <%= row[:who].first(2) %>
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="text-14 text-ink"><%= row[:text] %></div>
+            <div class="mt-0.5 text-12 text-muted-2"><%= row[:who] %></div>
+          </div>
+          <span class="flex-none font-mono text-11-5 text-muted-3"><%= row[:when_text] %></span>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <section class="rounded-card border border-hairline bg-surface px-7 py-6.5">
+    <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("admin.overview.health_title") %></h2>
+    <p class="mb-5 text-13 text-muted-2"><%= t("admin.overview.health_sub") %></p>
+
+    <div class="flex flex-col">
+      <% AdminConsole.health.each do |row| %>
+        <% ok = row[:state] == :ok %>
+        <div class="flex items-center gap-2.75 border-b border-surface-5 py-2.75">
+          <span aria-hidden="true"
+                class="size-2 flex-none rounded-full <%= ok ? "bg-success" : "bg-gold" %>"></span>
+          <div class="min-w-0 flex-1">
+            <div class="text-14 text-ink"><%= row[:label] %></div>
+            <div class="mt-0.5 text-12 text-muted-2"><%= row[:note] %></div>
+          </div>
+          <span class="flex-none text-11-5 font-semibold tracking-[0.04em] uppercase
+                       <%= ok ? "text-success" : "text-gold" %>">
+            <%= t("admin.overview.state.#{row[:state]}") %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</div>

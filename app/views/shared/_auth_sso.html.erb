@@ -1,0 +1,15 @@
+<%# The design shows UTCC SSO as a second way in. There is no SSO integration
+    behind it yet, so the button is present but explicitly disabled rather than
+    pretending to work. Wire it up and drop the `disabled` when SSO lands. %>
+<div class="mt-2 mb-4.5 flex items-center gap-3.5">
+  <span class="h-px flex-1 bg-hairline"></span>
+  <span class="text-12-5 text-muted-3"><%= t("auth.or") %></span>
+  <span class="h-px flex-1 bg-hairline"></span>
+</div>
+
+<button type="button" disabled title="<%= t("auth.sso_unavailable") %>"
+        class="flex w-full cursor-not-allowed items-center justify-center gap-2.5 rounded-[12px] border-[1.5px]
+               border-hairline-2 bg-surface py-3.25 text-14-5 font-medium text-ink-2 opacity-60">
+  <%= image_tag "utcc-eng-shield.svg", alt: "", width: 20, height: 20, class: "block h-5 w-auto" %>
+  <span><%= t("auth.sso") %></span>
+</button>

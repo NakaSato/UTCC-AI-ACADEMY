@@ -1,0 +1,54 @@
+<div class="grid grid-cols-1 items-start gap-5 nav:grid-cols-[minmax(0,1fr)_320px]">
+  <div class="flex flex-col gap-3.5">
+    <% AdminConsole.queue.each_with_index do |item, index| %>
+      <div class="flex animate-card-in flex-wrap items-center gap-5 rounded-box border border-hairline-2
+                  bg-surface px-6 py-5"
+           style="animation-delay: <%= index * 55 %>ms">
+        <div class="min-w-0 flex-1">
+          <div class="mb-1.75 flex items-center gap-2.25">
+            <span class="rounded-full px-2.25 py-0.75 text-11-5 font-semibold tracking-[0.04em] uppercase
+                         <%= class_names(
+                               "bg-brand-tint text-brand-deep" => item.kind == :access,
+                               "bg-success-tint text-success-deep" => item.kind == :course,
+                               "bg-gold-tint text-gold-ink" => item.kind == :content,
+                               "bg-surface-2 text-muted" => item.kind == :data
+                             ) %>">
+              <%= item.label %>
+            </span>
+            <span class="font-mono text-11-5 text-muted-3"><%= item.when_text %></span>
+          </div>
+          <div class="mb-1 text-16 font-semibold tracking-[-0.01em]"><%= item.title %></div>
+          <div class="text-13-5 text-muted"><%= item.meta %></div>
+        </div>
+
+        <%# Approve/reject need somewhere to record a decision, so the design's
+            two buttons are one disabled state until that exists. %>
+        <span class="flex-none rounded-[10px] border border-hairline bg-surface-4 px-4.5 py-2.5
+                     text-13-5 font-medium text-muted-2">
+          <%= t("admin.queue.pending") %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+
+  <aside class="rounded-card bg-chrome px-7 py-6.5">
+    <div class="mb-4 text-12 font-semibold tracking-[0.1em] text-on-chrome-muted uppercase">
+      <%= t("admin.queue.sla_title") %>
+    </div>
+    <div class="text-44 leading-none font-bold tracking-[-0.03em] text-canvas">
+      <%= AdminConsole.pending_count %>
+    </div>
+    <p class="mt-2 text-13-5 text-on-chrome-soft"><%= t("admin.queue.sla_note") %></p>
+
+    <div class="my-5.5 h-px bg-chrome-line"></div>
+
+    <dl class="flex flex-col gap-3.25">
+      <% t("admin.queue.sla").each do |row| %>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-13-5 text-on-chrome"><%= row[:label] %></dt>
+          <dd class="text-14 font-semibold text-canvas"><%= row[:value] %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </aside>
+</div>

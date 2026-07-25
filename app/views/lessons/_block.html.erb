@@ -1,0 +1,60 @@
+<%#
+  One free-form theory block. The design has seven types; which one renders is
+  the block's `type`, and every type reads its prose from the same `value`.
+
+  The equation type renders its LaTeX source in monospace. The design upgrades
+  that to typeset maths with KaTeX and falls back to exactly this when KaTeX is
+  unavailable — which it is here, since the app vendors no CSS or fonts beyond
+  Tailwind. Wiring KaTeX up means vendoring katex.min.css and its font files
+  into app/assets; the markup below is already the fallback branch it expects.
+%>
+<% case block.type %>
+<% when :heading %>
+  <h2 class="text-22 leading-[1.3] font-bold tracking-[-0.02em]"><%= block.value %></h2>
+
+<% when :text %>
+  <p class="max-w-[66ch] text-16-5 leading-[1.75] text-balance text-ink-2"><%= block.value %></p>
+
+<% when :callout %>
+  <div class="rounded-xl border border-brand-line border-l-[3px] border-l-brand bg-brand-tint
+              px-5.5 py-4.5 text-15-5 leading-[1.7] text-balance text-ink-4">
+    <%= block.value %>
+  </div>
+
+<% when :equation %>
+  <div class="overflow-x-auto rounded-xl border border-surface-3 bg-surface-4 px-6 py-5 text-center">
+    <span class="font-mono text-14 text-ink-4"><%= block.value %></span>
+  </div>
+
+<% when :code %>
+  <div class="overflow-hidden rounded-xl bg-chrome">
+    <div class="flex items-center gap-2.25 border-b border-chrome-3 px-4 py-2.5">
+      <span aria-hidden="true" class="size-2 flex-none rounded-full bg-brand"></span>
+      <span class="font-mono text-11-5 text-on-chrome-2"><%= block.extra %></span>
+    </div>
+    <pre class="overflow-x-auto px-4.5 py-4 font-mono text-13 leading-[1.75] text-code"><%= block.value %></pre>
+  </div>
+
+<% when :link %>
+  <%= link_to block.extra, target: "_blank", rel: "noopener",
+        class: "flex items-center justify-between gap-4 rounded-xl border border-hairline bg-surface
+                px-5 py-3.75 transition-colors hover:border-brand" do %>
+    <span class="min-w-0">
+      <span class="block text-15 font-semibold text-ink"><%= block.value %></span>
+      <span class="mt-0.75 block truncate font-mono text-11-5 text-muted-2"><%= block.extra %></span>
+    </span>
+    <span class="flex-none text-13 font-semibold text-brand"><%= t("lesson.theory.open_link") %></span>
+  <% end %>
+
+<% when :image %>
+  <% if block.image? %>
+    <figure>
+      <%# A background-image plate rather than an <img>: the design crops to a
+          fixed band, and the caption below already names the picture. %>
+      <div role="img" aria-label="<%= block.value %>"
+           class="h-70 w-full rounded-xl border border-hairline bg-surface-2 bg-cover bg-center"
+           style="background-image: url(<%= block.extra %>)"></div>
+      <figcaption class="mt-2 text-12-5 text-muted-2"><%= block.value %></figcaption>
+    </figure>
+  <% end %>
+<% end %>

@@ -1,16 +1,14 @@
-<% content_for :title, "UTCC AI Fundamental — เรียนรู้ AI ไปด้วยกัน" %>
+<% content_for :title, "UTCC AI Academy — เรียนรู้ AI ไปด้วยกัน" %>
 
 <section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-surface">
   <div class="flex max-w-7xl flex-col items-center gap-4 p-4">
-    <p class="text-18 tracking-[0.18em] uppercase text-on-brand">UTCC AI Fundamental</p>
-
     <%# The UTCC ENG lockup is a white logo on transparency — it sits directly on
         the maroon field, so it needs no plate or scrim of its own. %>
     <h1 class="mx-auto w-full max-w-[40rem]">
       <%= image_tag "hero-eng-utcc.webp",
             alt: "UTCC ENG — School of Engineering คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย",
             width: 1650, height: 650, fetchpriority: "high", class: "h-auto w-full" %>
-      <span class="sr-only">UTCC AI Fundamental — เรียนรู้ AI ไปด้วยกัน</span>
+      <span class="sr-only">UTCC AI Academy — เรียนรู้ AI ไปด้วยกัน</span>
     </h1>
 
     <p class="text-36 leading-tight font-bold lg:text-54">เรียนรู้ AI ไปด้วยกัน</p>
@@ -31,29 +29,48 @@
                 font-normal whitespace-nowrap uppercase text-surface transition duration-300
                 hover:bg-surface hover:text-brand-deep active:scale-97">ดูผลงานเพื่อน ๆ</a>
     </div>
+
+    <%# Student-run project — say so on the hero so no one mistakes it for a
+        university property. Repeated in the footer. %>
+    <p class="mt-2 max-w-[60ch] text-16 font-light text-on-brand opacity-80">
+      เว็บไซต์นี้จัดทำโดยรุ่นพี่เพื่อช่วยรุ่นน้องผ่านวิชา AI Fundamental — ไม่ใช่เว็บไซต์ทางการของมหาวิทยาลัย
+    </p>
   </div>
 </section>
 
 <main id="main">
   <section class="py-16 lg:py-24" id="learn">
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
-      <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+      <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
         <div>
+          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand">หัวข้อแนะนำ</p>
           <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">เรียนรู้ AI</h2>
-          <p class="max-w-[65ch] text-20 text-muted">
+          <p class="max-w-[65ch] text-20 leading-body text-muted">
             หัวข้อพื้นฐานที่แนะนำให้เริ่ม อ่านจบแล้วลงมือทำต่อได้ทันที
           </p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <% @topics.each do |topic| %>
+        <% @topics.each_with_index do |topic, i| %>
+          <%# The whole card is the link; the arrow row is decoration, so it is
+              hidden from the accessible name the title and blurb already give. %>
           <a href="#learn"
-             class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
-                    hover:-translate-y-0.5 hover:shadow-lg">
-            <span class="text-36 leading-none" aria-hidden="true"><%= topic[:icon] %></span>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= topic[:title] %></h3>
-            <p class="text-18 text-muted"><%= topic[:blurb] %></p>
+             class="group animate-card-in flex h-full flex-col gap-3 rounded-box border border-hairline bg-surface
+                    p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-brand-line
+                    hover:shadow-card-hover"
+             style="animation-delay: <%= i * 60 %>ms">
+            <h3 class="text-24 leading-tight font-bold text-balance text-brand-deep transition-colors duration-300
+                       group-hover:text-brand"><%= topic[:title] %></h3>
+
+            <p class="text-17 leading-body text-muted"><%= topic[:blurb] %></p>
+
+            <span class="mt-auto inline-flex items-center gap-2 pt-3 text-16 font-medium text-brand"
+                  aria-hidden="true">
+              อ่านหัวข้อนี้
+              <span class="size-[0.5em] -rotate-45 border-t-2 border-r-2 border-current transition-transform
+                           duration-300 group-hover:translate-x-1"></span>
+            </span>
           </a>
         <% end %>
       </div>

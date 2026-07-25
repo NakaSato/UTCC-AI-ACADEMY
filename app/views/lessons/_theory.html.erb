@@ -1,0 +1,54 @@
+<div class="rounded-card border border-hairline bg-surface p-7 sm:p-10 lg:px-11">
+  <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+    <%= t("lesson.theory.eyebrow") %>
+  </div>
+  <h1 class="mb-5.5 text-26 leading-[1.2] font-bold tracking-[-0.025em] sm:text-32">
+    <%= t("lesson.theory.heading") %>
+  </h1>
+
+  <p class="mb-4.5 max-w-[66ch] text-16-5 leading-[1.75] text-balance text-ink-2">
+    <%= t("lesson.theory.p1") %>
+  </p>
+
+  <div class="my-6.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="rounded-[14px] border border-brand-line bg-brand-tint p-5.5">
+      <div class="mb-2 text-15 font-bold"><%= t("lesson.theory.sup_title") %></div>
+      <p class="mb-3 text-14-5 leading-[1.65] text-ink-4"><%= t("lesson.theory.sup_desc") %></p>
+      <div class="font-mono text-12-5 text-brand-deep"><%= t("lesson.theory.sup_eg") %></div>
+    </div>
+
+    <div class="rounded-[14px] border border-hairline bg-canvas p-5.5">
+      <div class="mb-2 text-15 font-bold"><%= t("lesson.theory.unsup_title") %></div>
+      <p class="mb-3 text-14-5 leading-[1.65] text-ink-4"><%= t("lesson.theory.unsup_desc") %></p>
+      <div class="font-mono text-12-5 text-muted"><%= t("lesson.theory.unsup_eg") %></div>
+    </div>
+  </div>
+
+  <p class="mb-6.5 max-w-[66ch] text-16-5 leading-[1.75] text-balance text-ink-2">
+    <%= t("lesson.theory.p2") %>
+  </p>
+
+  <div class="mb-7.5 overflow-x-auto rounded-[14px] bg-chrome px-6 py-5.5 font-mono text-13-5 leading-[1.8] text-code">
+    <div class="whitespace-nowrap">
+      <span class="text-code-keyword">from</span> sklearn.model_selection
+      <span class="text-code-keyword">import</span> train_test_split
+    </div>
+    <div class="text-code-comment"><%= t("lesson.theory.code_comment") %></div>
+    <div class="whitespace-nowrap">
+      X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="text-code-number">0.2</span>)
+    </div>
+  </div>
+
+  <%# Free-form blocks an instructor adds after the fixed introduction. %>
+  <div class="mb-7.5 flex flex-col gap-4.5">
+    <% LessonContent.blocks.each do |block| %>
+      <%= render "lessons/block", block: block %>
+    <% end %>
+  </div>
+
+  <%# A real link, upgraded to a panel switch by the lesson's panels controller. %>
+  <%= link_to t("lesson.theory.to_quiz"), lesson_path(step: :exercise),
+        data: { panel: :exercise, action: "panels#select" },
+        class: "inline-block rounded-field bg-brand px-7 py-3.25 text-15 font-semibold text-white
+                transition-colors hover:bg-brand-deep" %>
+</div>

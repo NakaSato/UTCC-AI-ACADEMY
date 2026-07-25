@@ -1,0 +1,26 @@
+<%# The hexagonal award medal. `size` is :large (My Learning) or :small
+    (the dashboard). An unearned badge keeps its silhouette but loses the
+    gradient and grows a padlock clasp. %>
+<% large = size == :large %>
+
+<div aria-hidden="true" class="relative <%= large ? "mb-3 h-[92px] w-[84px]" : "mb-2.5 h-[73px] w-[66px]" %>">
+  <div class="clip-hex absolute inset-0 <%= award[:earned] ? "badge-ring" : "bg-hairline" %>"></div>
+  <div class="clip-hex absolute <%= large ? "inset-[2.5px]" : "inset-[2px]" %>
+              <%= award[:earned] ? "badge-fill" : "bg-canvas" %>"></div>
+  <div class="absolute inset-0 grid place-items-center leading-none text-white <%= large ? "text-26" : "text-21" %>">
+    <%= award[:glyph] %>
+  </div>
+
+  <% unless award[:earned] %>
+    <div class="absolute left-1/2 -translate-x-1/2 rounded-t-[4px] rounded-b-[2px] border-2 border-b-0
+                border-hairline-3
+                <%= large ? "-top-1 h-3 w-[15px]" : "-top-0.75 h-2.5 w-[13px]" %>"></div>
+  <% end %>
+
+  <% if large && award[:tier] %>
+    <div class="absolute -bottom-0.5 left-1/2 min-w-6 -translate-x-1/2 rounded-md bg-brand px-1.75 py-0.5
+                text-11-5 leading-[1.4] font-bold text-white">
+      <%= award[:tier] %>
+    </div>
+  <% end %>
+</div>

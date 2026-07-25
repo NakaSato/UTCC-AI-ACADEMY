@@ -1,0 +1,126 @@
+<% content_for :title, "#{t("lesson.theory.heading")} — UTCC AI Academy" %>
+
+<%# All four steps ship with the page and the sidebar swaps which one shows, so
+    walking the lesson costs no request. The step tabs are the source of truth
+    for the URL and the progress bar; the "next step" button inside each panel
+    only names the step it moves to. %>
+<% monitored = Current.user.student? %>
+
+<main id="main" class="group mx-auto max-w-page px-4 pt-7 pb-20 sm:px-8"
+      data-controller="rewards panels<%= " proctor" if monitored %>" data-panel="<%= @step %>"
+      data-proctor="on" data-band="clean" data-proctor-hidden="false"
+      data-action="quiz:reward->rewards#add code-task:reward->rewards#add"
+      <% if monitored %>
+        data-proctor-score-value="<%= Proctoring::START_SCORE %>"
+        data-proctor-paste-limit-value="<%= Proctoring::PASTE_LIMIT %>"
+        data-proctor-max-events-value="<%= Proctoring::MAX_EVENTS %>"
+        data-proctor-bands-value="<%= Proctoring::BANDS.to_json %>"
+        data-proctor-events-value="<%= Proctoring.event_copy.index_by { it[:kind] }.to_json %>"
+        data-proctor-copy-value="<%= t("lesson.proctor").except(:events).to_json %>"
+      <% end %>>
+  <div class="mb-5.5 flex items-center gap-4">
+    <%= link_to t("lesson.back_module"), course_path("AI1101"),
+          class: "flex-none text-13-5 whitespace-nowrap text-muted hover:text-ink" %>
+    <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-hairline">
+      <div class="h-full rounded-full bg-brand transition-[width] duration-300"
+           data-panels-target="progress" style="width: <%= LessonContent.percent_for(@step) %>%"></div>
+    </div>
+    <%# One label per step, swapped with the panels rather than rewritten. %>
+    <% LessonContent::STEPS.each do |step| %>
+      <%= tag.span LessonContent.step_label(step),
+            hidden: step != @step,
+            data: { panel: step, panels_target: "panel" },
+            class: "flex-none text-13 font-medium whitespace-nowrap text-muted-2" %>
+    <% end %>
+  </div>
+
+  <%= render "lessons/proctor", monitored: monitored %>
+
+  <div class="grid grid-cols-1 items-start gap-7 transition-[filter] duration-200
+              group-data-[proctor-hidden=true]:blur-[14px] lg:grid-cols-[232px_minmax(0,1fr)]">
+    <aside class="rounded-card border border-hairline bg-surface p-5">
+      <div class="mb-4 text-12 font-semibold tracking-[0.06em] text-muted-2 uppercase">
+        <%= t("lesson.steps_label") %>
+      </div>
+
+      <nav role="tablist" aria-orientation="vertical" class="flex flex-col gap-1">
+        <% LessonContent::STEPS.each_with_index do |step, index| %>
+          <% state = step == @step ? :current : index < LessonContent::STEPS.index(@step) ? :done : :todo %>
+          <%= link_to lesson_path(step: step),
+                role: "tab", id: "lesson-tab-#{step}",
+                aria: { selected: step == @step, controls: "lesson-panel-#{step}" },
+                data: { panel: step, path: lesson_path(step: step), index:, state:,
+                        percent: LessonContent.percent_for(step),
+                        panels_target: "tab", action: "panels#select" },
+                class: "group flex items-center gap-2.75 rounded-[10px] px-2.75 py-2.5 text-14
+                        data-[state=current]:bg-brand-tint data-[state=current]:font-semibold
+                        data-[state=current]:text-brand-deep data-[state=done]:text-muted-2
+                        data-[state=todo]:text-ink-4 data-[state=todo]:hover:bg-canvas" do %>
+            <span class="grid size-5 flex-none place-items-center rounded-full text-11 text-muted-2
+                         group-data-[state=current]:bg-brand group-data-[state=current]:text-white
+                         group-data-[state=done]:bg-hairline-2 group-data-[state=todo]:bg-surface-2">
+              <span class="hidden group-data-[state=done]:inline">✓</span>
+              <span class="group-data-[state=done]:hidden"><%= index + 1 %></span>
+            </span>
+            <span><%= t("lesson.steps.#{step}") %></span>
+          <% end %>
+        <% end %>
+      </nav>
+
+      <div class="mt-5 flex flex-col gap-2.25 border-t border-surface-3 pt-4.5">
+        <div class="flex justify-between text-13">
+          <span class="text-muted-2"><%= t("chrome.hearts") %></span>
+          <span class="font-semibold"><%= LearnerProfile::LIVES %> / <%= LearnerProfile::MAX_LIVES %></span>
+        </div>
+        <div class="flex justify-between text-13">
+          <span class="text-muted-2"><%= t("chrome.gems_earned") %></span>
+          <span class="font-semibold text-brand" data-rewards-target="total">+0</span>
+        </div>
+      </div>
+
+      <% if monitored %>
+        <%# Hidden with the switch rather than removed, so turning proctoring
+            back on does not have to rebuild the panel. %>
+        <div class="mt-5 border-t border-surface-3 pt-4.5 group-data-[proctor=off]:hidden">
+          <div class="mb-3 text-12 font-semibold tracking-[0.06em] text-muted-2 uppercase">
+            <%= t("lesson.proctor.events_title") %>
+          </div>
+
+          <p data-proctor-target="empty" class="text-12-5 leading-[1.5] text-muted-3">
+            <%= t("lesson.proctor.events_empty") %>
+          </p>
+
+          <div data-proctor-target="log" class="flex flex-col gap-2.5" aria-live="polite"></div>
+
+          <%# Cloned per incident by the proctor controller, so the row's markup
+              stays here rather than in a JS string. %>
+          <template data-proctor-target="row">
+            <%# A named group: the row carries data-weight, and <main> is also a
+                group, so an unnamed variant would resolve to the wrong one. %>
+            <div class="group/event flex animate-row-in items-start gap-2.25">
+              <span aria-hidden="true"
+                    class="mt-1.5 size-1.25 flex-none rounded-full
+                           group-data-[weight=high]/event:bg-brand
+                           group-data-[weight=medium]/event:bg-gold
+                           group-data-[weight=low]/event:bg-muted-2"></span>
+              <div class="flex-1">
+                <div data-slot="text" class="text-12-5 leading-[1.4] text-ink-4"></div>
+                <div data-slot="meta" class="mt-0.5 font-mono text-11-5 text-muted-3"></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      <% end %>
+    </aside>
+
+    <div>
+      <% LessonContent::STEPS.each do |step| %>
+        <%= tag.div role: "tabpanel", id: "lesson-panel-#{step}", hidden: step != @step,
+              aria: { labelledby: "lesson-tab-#{step}" },
+              data: { panel: step, panels_target: "panel" } do %>
+          <%= render "lessons/#{step}" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</main>

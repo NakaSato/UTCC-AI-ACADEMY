@@ -1,0 +1,137 @@
+<% content_for :title, "#{@course.title} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <%= link_to t("course.back_catalog"), root_path,
+        class: "mb-5.5 inline-block text-13-5 text-muted hover:text-ink" %>
+
+  <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div>
+      <div class="mb-3.5 flex gap-2">
+        <% if @course.core %>
+          <span class="rounded-full bg-brand px-2.5 py-1 text-11 font-semibold text-white">
+            <%= t("catalog.core_tag") %>
+          </span>
+        <% end %>
+        <% if @course.certificate %>
+          <span class="rounded-full bg-gold-tint px-2.5 py-1 text-11 font-semibold text-gold-ink">
+            <%= t("catalog.cert_tag") %>
+          </span>
+        <% end %>
+      </div>
+
+      <h1 class="mb-2.5 text-30 leading-[1.12] font-bold tracking-[-0.03em] text-balance sm:text-40">
+        <%= @course.title %>
+      </h1>
+      <p class="mb-6.5 max-w-[640px] text-16 leading-[1.6] text-balance text-muted">
+        <%= @course.code == "AI1101" ? t("course.description") : "#{@course.code} · #{@course.description}" %>
+      </p>
+
+      <div class="mb-8.5 grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+        <% Syllabus.stats.each do |stat| %>
+          <div class="rounded-[14px] border border-hairline bg-surface px-4.5 py-4">
+            <div class="mb-0.5 text-22 font-bold tracking-[-0.02em]"><%= stat[:value] %></div>
+            <div class="text-12-5 text-muted-2"><%= stat[:label] %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <h2 class="mb-4 text-22 font-bold tracking-[-0.02em]"><%= t("course.syllabus") %></h2>
+
+      <div class="flex flex-col gap-3">
+        <% @modules.each_with_index do |mod, index| %>
+          <details class="group animate-rise overflow-hidden rounded-[16px] border border-hairline bg-surface"
+                   style="animation-delay: <%= index * 55 %>ms"
+                   <%= "open" if mod.number == @open_module %>>
+            <summary class="marker-none flex cursor-pointer items-center gap-4 px-5.5 py-4.5">
+              <span class="grid size-8.5 flex-none place-items-center rounded-[10px] text-13 font-bold
+                           <%= class_names(
+                                 "bg-surface-2 text-muted-2" => mod.done?,
+                                 "bg-brand text-white" => mod.current?,
+                                 "bg-surface-4 text-muted-3" => mod.locked?
+                               ) %>">
+                <%= mod.number %>
+              </span>
+
+              <span class="flex-1">
+                <span class="block text-16 font-semibold tracking-[-0.01em]"><%= mod.title %></span>
+                <span class="mt-0.5 block text-12-5 text-muted-2"><%= mod.meta_text %></span>
+              </span>
+
+              <span class="hidden text-12-5 font-medium sm:inline <%= mod.current? ? "text-brand" : "text-muted-2" %>">
+                <%= mod.status_name %>
+              </span>
+              <span aria-hidden="true" class="text-11 text-muted-3 group-open:hidden">▼</span>
+              <span aria-hidden="true" class="hidden text-11 text-muted-3 group-open:inline">▲</span>
+            </summary>
+
+            <div class="border-t border-surface-3 px-5.5 pt-1.5 pb-3.5">
+              <% if mod.desc? %>
+                <p class="mx-2 mt-2.5 mb-1.5 text-13-5 leading-[1.6] text-balance text-muted"><%= mod.desc %></p>
+              <% end %>
+
+              <% mod.topics.each do |topic| %>
+                <%= link_to lesson_path,
+                      class: "flex items-center gap-3.5 rounded-[10px] px-2 py-3 transition-colors hover:bg-canvas" do %>
+                  <span aria-hidden="true"
+                        class="text-12 <%= class_names(
+                                             "text-muted-4" => mod.done?,
+                                             "text-brand" => mod.current?,
+                                             "text-hairline-2" => mod.locked?
+                                           ) %>">●</span>
+                  <span class="flex-1 text-14-5 text-ink-3"><%= topic.name %></span>
+                  <span class="hidden text-12-5 text-muted-2 sm:inline"><%= topic.kind_name %></span>
+                  <span class="w-[70px] text-right text-12-5 text-muted-3"><%= topic.duration_text %></span>
+                <% end %>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    </div>
+
+    <aside class="flex flex-col gap-4 lg:sticky lg:top-[7.5rem]">
+      <div class="rounded-card border border-hairline bg-surface p-6">
+        <div class="mb-2 flex items-baseline justify-between">
+          <span class="text-14 font-semibold"><%= t("course.your_progress") %></span>
+          <span class="text-14 font-bold text-brand"><%= Syllabus::PERCENT_COMPLETE %>%</span>
+        </div>
+        <div class="mb-4.5 h-2 overflow-hidden rounded-full bg-surface-3">
+          <div class="h-full rounded-full bg-brand" style="width: <%= Syllabus::PERCENT_COMPLETE %>%"></div>
+        </div>
+
+        <%= link_to t("course.continue"), lesson_path,
+              class: "mb-2.5 block rounded-field bg-brand py-3.25 text-center text-15 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+        <button type="button"
+                class="w-full rounded-field border-[1.5px] border-hairline-2 py-2.75 text-14 font-medium text-ink-4
+                       transition-colors hover:border-muted-3">
+          <%= t("course.download_syllabus") %>
+        </button>
+      </div>
+
+      <div class="rounded-card border border-hairline bg-surface p-6">
+        <div class="mb-3.5 text-13 font-semibold tracking-[0.06em] text-muted-2 uppercase">
+          <%= t("course.instructor_label") %>
+        </div>
+        <div class="mb-4.5 flex items-center gap-3.25">
+          <span class="grid size-11 place-items-center rounded-xl bg-surface-3 text-13 font-semibold text-muted">
+            <%= t("course.instructor_initials") %>
+          </span>
+          <div>
+            <div class="text-15 font-semibold"><%= t("course.instructor_name") %></div>
+            <div class="text-12-5 text-muted-2"><%= t("course.instructor_dept") %></div>
+          </div>
+        </div>
+
+        <dl class="flex flex-col gap-2.5 border-t border-surface-3 pt-4">
+          <% Syllabus.meta.each do |key, value| %>
+            <div class="flex justify-between gap-3 text-13-5">
+              <dt class="text-muted-2"><%= key %></dt>
+              <dd class="text-right font-medium"><%= value %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>

@@ -1,0 +1,101 @@
+<% content_for :title, "#{t("catalog.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-12 pb-20 sm:px-8">
+  <h1 class="mb-3.5 animate-rise text-32 leading-[1.1] font-bold tracking-[-0.03em] text-balance sm:text-38 lg:text-46">
+    <%= t("catalog.title") %>
+  </h1>
+  <p class="mb-8 max-w-[640px] animate-rise text-16-5 text-balance text-muted"
+     style="animation-delay: 60ms"><%= t("catalog.subtitle") %></p>
+
+  <nav class="mb-9 flex flex-wrap gap-2.5" aria-label="<%= t("catalog.filters.all") %>">
+    <% CourseCatalog::FILTERS.each_with_index do |filter, index| %>
+      <% current = @filter == filter %>
+      <%= link_to root_path(filter: (filter unless filter == :all)),
+            "aria-current": ("page" if current),
+            style: "animation-delay: #{index * 40}ms",
+            class: class_names(
+              "flex animate-pop items-center gap-2.25 rounded-full border-[1.5px] px-4 py-2.5 text-14 font-medium transition-colors",
+              "border-brand bg-brand-tint text-brand-deep" => current,
+              "border-hairline bg-surface text-ink-2 hover:border-muted-3" => !current
+            ) do %>
+        <span><%= t("catalog.filters.#{filter}") %></span>
+        <span class="rounded-full px-1.75 py-px text-12 font-semibold
+                     <%= current ? "bg-brand text-white" : "bg-surface-2 text-muted-2" %>">
+          <%= @filter_counts[filter] %>
+        </span>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-x-5 gap-y-7.5 md:grid-cols-2 xl:grid-cols-3">
+    <% @courses.each_with_index do |course, index| %>
+      <%= link_to course_path(course.code),
+            style: "animation-delay: #{120 + index * 60}ms",
+            class: "relative flex animate-rise flex-col rounded-card border border-hairline bg-surface
+                    px-6.5 pt-6.5 pb-5.5 transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover" do %>
+        <div class="absolute -top-2.75 left-6 flex gap-2">
+          <% if course.core %>
+            <span class="rounded-full bg-brand px-2.5 py-1 text-11 font-semibold text-white">
+              <%= t("catalog.core_tag") %>
+            </span>
+          <% end %>
+          <% if course.certificate %>
+            <span class="rounded-full bg-gold-tint px-2.5 py-1 text-11 font-semibold text-gold-ink">
+              <%= t("catalog.cert_tag") %>
+            </span>
+          <% end %>
+        </div>
+
+        <div class="mb-3 flex items-start gap-3.5">
+          <div class="flex-1">
+            <h2 class="mb-0.75 text-20 leading-[1.25] font-bold tracking-[-0.02em] text-balance">
+              <%= course.title %>
+            </h2>
+            <p class="text-13 font-medium text-muted-2"><%= course.code_line %></p>
+          </div>
+          <div class="flex flex-none items-center gap-1.25">
+            <span aria-hidden="true" class="text-14 text-gold">★</span>
+            <span class="text-15 font-semibold"><%= course.rating %></span>
+          </div>
+        </div>
+
+        <div class="mb-3.5 flex flex-wrap gap-1.5 text-12 text-muted">
+          <span class="rounded-[7px] bg-canvas px-2.25 py-1"><%= course.projects_text %></span>
+          <span class="rounded-[7px] bg-canvas px-2.25 py-1"><%= course.hours_text %></span>
+          <span class="rounded-[7px] bg-canvas px-2.25 py-1"><%= course.level_name %></span>
+        </div>
+
+        <p class="mb-5 flex-1 text-14-5 leading-[1.6] text-balance text-ink-4"><%= course.description %></p>
+
+        <% if course.started? %>
+          <div class="mb-4.5">
+            <div class="mb-1.75 flex items-baseline justify-between gap-2.5">
+              <span class="text-12-5 text-muted"><%= course.progress_text %></span>
+              <span class="text-13 font-bold text-brand"><%= course.percent %>%</span>
+            </div>
+            <div class="h-1.5 overflow-hidden rounded-full bg-surface-3">
+              <div class="h-full origin-left animate-bar rounded-full bg-brand"
+                   style="width: <%= course.percent %>%"></div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="flex items-center gap-2.5 border-t border-surface-3 pt-3.75">
+          <span aria-hidden="true"
+                class="grid size-6.5 flex-none place-items-center rounded-lg bg-surface-2
+                       text-10-5 font-semibold text-muted-2"><%= course.instructor_initials %></span>
+          <span class="min-w-0 flex-1 truncate text-12-5 text-muted"><%= course.instructor %></span>
+          <span class="flex-none text-12 text-muted-3"><%= course.learners_text %></span>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="flex flex-col justify-center rounded-card border-[1.5px] border-brand bg-brand-tint p-6.5">
+      <h2 class="mb-2.5 text-20 font-bold tracking-[-0.02em]"><%= t("catalog.not_sure_title") %></h2>
+      <p class="mb-5 text-14-5 leading-[1.6] text-ink-4"><%= t("catalog.not_sure_desc") %></p>
+      <%= link_to t("catalog.not_sure_btn"), course_path("AI1101"),
+            class: "self-start rounded-[10px] bg-brand px-5.5 py-2.75 text-14 font-semibold text-white
+                    transition-colors hover:bg-brand-deep" %>
+    </div>
+  </div>
+</main>

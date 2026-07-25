@@ -1,0 +1,40 @@
+<%# The publish switch is inert for the same reason the feature flags are: a
+    course has no record to write "hidden" to yet. %>
+<div class="overflow-x-auto rounded-card border border-hairline bg-surface">
+  <div class="min-w-[800px]">
+    <div class="grid grid-cols-[104px_minmax(0,1fr)_150px_92px_96px_168px] border-b border-surface-3
+                bg-surface-4 px-6.5 py-3 text-12 font-semibold tracking-[0.05em] text-muted-2 uppercase">
+      <span><%= t("admin.courses.th_code") %></span>
+      <span><%= t("admin.courses.th_course") %></span>
+      <span><%= t("admin.courses.th_owner") %></span>
+      <span class="text-right"><%= t("admin.courses.th_sections") %></span>
+      <span class="text-right"><%= t("admin.courses.th_students") %></span>
+      <span class="text-right"><%= t("admin.courses.th_state") %></span>
+    </div>
+
+    <% AdminConsole.courses.each do |course| %>
+      <div class="grid grid-cols-[104px_minmax(0,1fr)_150px_92px_96px_168px] items-center
+                  border-b border-surface-5 px-6.5 py-3.75">
+        <span class="font-mono text-12-5 text-muted"><%= course.code %></span>
+        <div class="min-w-0">
+          <div class="text-14-5"><%= course.name %></div>
+          <div class="mt-0.5 text-12 text-muted-2"><%= course.faculty %></div>
+        </div>
+        <span class="text-13-5 text-muted"><%= course.owner %></span>
+        <span class="text-right text-14 text-ink-2"><%= course.sections %></span>
+        <span class="text-right text-14 text-ink-2"><%= course.students %></span>
+        <div class="flex items-center justify-end gap-2.5">
+          <span class="text-12-5 font-medium <%= course.draft? ? "text-gold-ink" : "text-success-deep" %>">
+            <%= course.state_name %>
+          </span>
+          <span aria-hidden="true"
+                class="relative h-6 w-10.5 flex-none rounded-full
+                       <%= course.draft? ? "bg-hairline-3" : "bg-brand" %>">
+            <span class="absolute top-0.75 size-4.5 rounded-full bg-white shadow-sm
+                         <%= course.draft? ? "left-0.75" : "left-[21px]" %>"></span>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

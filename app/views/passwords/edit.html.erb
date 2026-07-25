@@ -1,38 +1,34 @@
-<% content_for :title, "ตั้งรหัสผ่านใหม่ — UTCC AI Fundamental" %>
+<% content_for :title, "#{t("auth.reset.title")} — UTCC AI Academy" %>
 
-<div class="brand-field grid min-h-[calc(100vh_-_var(--spacing-header))] place-items-center px-4 py-8">
-  <div class="w-full max-w-lg rounded-box bg-surface p-8 shadow-2xl">
-    <div class="mb-8 text-center">
-      <h1 class="text-36 leading-tight font-bold text-balance text-brand-deep">ตั้งรหัสผ่านใหม่</h1>
-      <p class="mt-2 text-18 text-muted">กรอกรหัสผ่านใหม่ที่ต้องการใช้</p>
-    </div>
+<%= link_to t("auth.back"), login_path,
+      class: "mb-5.5 inline-block text-13-5 text-muted hover:text-ink" %>
 
-    <%= form_with url: password_path(params[:token]), method: :put, class: "flex flex-col gap-4" do |form| %>
-      <div class="flex flex-col gap-1">
-        <%= form.label :password, "รหัสผ่านใหม่", class: "text-18 font-medium text-ink-2" %>
-        <%= form.password_field :password, required: true, autofocus: true, maxlength: 72,
-              autocomplete: "new-password",
-              class: "w-full rounded-md border border-hairline bg-surface px-3.5 py-2.5 text-18 transition duration-300
-                      placeholder:text-muted-2 focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none
-                      aria-[invalid=true]:border-brand-alert" %>
-        <span class="text-18 text-muted-2">อย่างน้อย 8 ตัวอักษร</span>
-      </div>
+<h1 class="mb-2 text-28 leading-[1.2] font-bold tracking-[-0.025em]"><%= t("auth.reset.title") %></h1>
+<p class="mb-7 text-15 leading-[1.6] text-balance text-muted"><%= t("auth.reset.subtitle") %></p>
 
-      <div class="flex flex-col gap-1">
-        <%= form.label :password_confirmation, "ยืนยันรหัสผ่านใหม่", class: "text-18 font-medium text-ink-2" %>
-        <%= form.password_field :password_confirmation, required: true, maxlength: 72,
-              autocomplete: "new-password",
-              class: "w-full rounded-md border border-hairline bg-surface px-3.5 py-2.5 text-18 transition duration-300
-                      placeholder:text-muted-2 focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none
-                      aria-[invalid=true]:border-brand-alert" %>
-      </div>
+<%= form_with url: reset_password_path(params[:token]), method: :put do |form| %>
+  <div class="mb-5.5 flex flex-col gap-4">
+    <label class="flex flex-col gap-1.75">
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.new_password") %></span>
+      <%= form.password_field :password, required: true, autofocus: true, minlength: 8, maxlength: 72,
+            autocomplete: "new-password", placeholder: "••••••••",
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+      <span class="text-12-5 text-muted-2"><%= t("auth.fields.password_hint") %></span>
+    </label>
 
-      <div class="flex flex-col gap-2">
-        <%= form.submit "บันทึกรหัสผ่าน",
-              class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18
-                      leading-tight font-normal whitespace-nowrap uppercase text-surface transition duration-300
-                      hover:bg-brand-deep active:scale-97" %>
-      </div>
-    <% end %>
+    <label class="flex flex-col gap-1.75">
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.new_password_confirmation") %></span>
+      <%= form.password_field :password_confirmation, required: true, minlength: 8, maxlength: 72,
+            autocomplete: "new-password", placeholder: "••••••••",
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+    </label>
   </div>
-</div>
+
+  <%= form.submit t("auth.reset.submit"),
+        class: "mb-4 w-full cursor-pointer rounded-[12px] bg-brand py-3.5 text-15-5 font-semibold text-white
+                transition-colors hover:bg-brand-deep" %>
+<% end %>
+
+<p class="mt-6.5 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("auth.reset.help") %></p>
