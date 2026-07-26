@@ -63,6 +63,7 @@ bin/rails test test/models/user_test.rb:12 # run one test
 bin/ci                                     # the full pipeline: lint, security scans, tests (run locally — there is no CI service)
 bin/rubocop -a                             # autocorrect style
 bin/rails admin:create                     # create or promote an admin
+bin/rails instructor:create                # create or promote an instructor
 ```
 
 ## The screens
@@ -84,7 +85,7 @@ A password is 8–72 characters with at least one letter and one digit, is not o
 
 The landing page is public; everything else requires an account, because `ApplicationController` applies `require_authentication` globally — a new public action must opt out with `allow_unauthenticated_access`.
 
-`users.role` is `student`, `instructor` or `admin`, and admin is a superset of instructor. Sign-up always produces a student. `/instructor` needs staff, `/admin` needs admin, and `/admin` is the only place a role can be granted — so the **first** admin comes from `bin/rails admin:create`. An admin's home is `/admin`, not the catalog.
+`users.role` is `student`, `instructor` or `admin`, and admin is a superset of instructor. Sign-up always produces a student. `/instructor` needs staff, `/admin` needs admin, and `/admin` is the only place in the app a role can be granted — so the **first** admin comes from `bin/rails admin:create`. `bin/rails instructor:create` is its counterpart for teaching staff, useful when you would rather not sign in to grant one; it refuses to touch an admin, since admin already includes instructor and writing the role would be a demotion. An admin's home is `/admin`, not the catalog.
 
 No mail delivery is configured in development (`raise_delivery_errors = false`), so reset emails go nowhere. Preview the template at `/rails/mailers`, or grab the reset URL from `log/development.log`.
 
@@ -183,7 +184,7 @@ db/
   schema.rb                         users, sessions, topic_completions — that is all
   {queue,cache,cable}_schema.rb     the solid_* databases, kept separate on purpose
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
-lib/tasks/admin.rake                bin/rails admin:create
+lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
 docs/design-system.md               background on the earlier eng.utcc.ac.th port
 ```
 
@@ -392,6 +393,7 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `models/placeholder_content_test.rb` | derived values and the positional locale wiring, in **both** locales |
 | `models/learner_progress_test.rb`, `topic_completion_test.rb` | every counted figure, and what the table will and will not accept |
 | `tasks/admin_task_test.rb` | `admin:create`, including promotion of an existing account |
+| `tasks/instructor_task_test.rb` | `instructor:create`, including that it leaves an admin alone rather than demoting one |
 
 Assertions compare against `I18n.t(...)` rather than literal strings, and are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page — a copy change in a locale file should not break a test.
 
