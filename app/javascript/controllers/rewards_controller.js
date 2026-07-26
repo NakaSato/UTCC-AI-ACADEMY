@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 // what the student just earned. The progress screens read the record, not this.
 export default class extends Controller {
   static targets = ["total"]
-  static values = { url: String }
+  static values = { url: String, course: String, topic: String }
 
   connect() {
     this.earned = 0
@@ -29,7 +29,7 @@ export default class extends Controller {
     fetch(this.urlValue, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRF-Token": token },
-      body: JSON.stringify({ kind })
+      body: JSON.stringify({ kind, course: this.courseValue, topic: this.topicValue })
     }).catch(() => {
       // Offline, or the request was blocked. The next pass reports again.
     })

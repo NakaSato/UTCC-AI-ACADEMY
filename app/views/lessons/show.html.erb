@@ -11,6 +11,8 @@
       data-proctor="on" data-band="clean" data-proctor-hidden="false"
       data-action="quiz:reward->rewards#add code-task:reward->rewards#add"
       data-rewards-url-value="<%= complete_lesson_path %>"
+      data-rewards-course-value="<%= @course.code %>"
+      data-rewards-topic-value="<%= @topic_key %>"
       <% if monitored %>
         data-proctor-score-value="<%= Proctoring::START_SCORE %>"
         data-proctor-paste-limit-value="<%= Proctoring::PASTE_LIMIT %>"
@@ -20,7 +22,7 @@
         data-proctor-copy-value="<%= t("lesson.proctor").except(:events).to_json %>"
       <% end %>>
   <div class="mb-5.5 flex items-center gap-4">
-    <%= link_to t("lesson.back_module"), course_path("AI1101"),
+    <%= link_to t("lesson.back_module"), course_path(@course.code),
           class: "flex-none text-13-5 whitespace-nowrap text-muted hover:text-ink" %>
     <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-hairline">
       <div class="h-full rounded-full bg-brand transition-[width] duration-300"
@@ -47,10 +49,10 @@
       <nav role="tablist" aria-orientation="vertical" class="flex flex-col gap-1">
         <% LessonContent::STEPS.each_with_index do |step, index| %>
           <% state = step == @step ? :current : index < LessonContent::STEPS.index(@step) ? :done : :todo %>
-          <%= link_to lesson_path(step: step),
+          <%= link_to lesson_step_path(step),
                 role: "tab", id: "lesson-tab-#{step}",
                 aria: { selected: step == @step, controls: "lesson-panel-#{step}" },
-                data: { panel: step, path: lesson_path(step: step), index:, state:,
+                data: { panel: step, path: lesson_step_path(step), index:, state:,
                         percent: LessonContent.percent_for(step),
                         panels_target: "tab", action: "panels#select" },
                 class: "group flex items-center gap-2.75 rounded-[10px] px-2.75 py-2.5 text-14

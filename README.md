@@ -1,4 +1,6 @@
-# UTCC AI Fundamental
+<img src="app/assets/images/utcc-eng-shield.svg" alt="UTCC" width="88" height="88">
+
+# UTCC AI Academy by Upperclassman
 
 A learning platform for UTCC students getting started with AI — a course catalog, lessons that grade an exercise and a coding task as you go, and progress that follows you across the app. Thai-first interface with an English toggle.
 
@@ -16,6 +18,7 @@ Rails 8.1 · Ruby 3.4.10 · SQLite · Hotwire (importmap, no Node)
 - [Accounts and roles](#accounts-and-roles)
 - [Language](#language)
 - [Design](#design)
+- [How we work](#how-we-work)
 - [Technical overview](#technical-overview)
   - [Stack](#stack)
   - [Repository layout](#repository-layout)
@@ -378,9 +381,10 @@ The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb
 A learner's progress is genuinely recorded — `topic_completions` holds one row per learner per topic, and the catalog, My Learning and the dashboard all count off it. Everything else is placeholder:
 
 - **Courses, lessons and topics are not tables.** They are plain-Ruby modules of frozen constants in `app/models/`, which is why every course shares one syllabus and shows the same topic total.
+- **A lesson's *content* is the same whichever topic you open.** `/lesson?course=AI1101&topic=2-3` is a real position in the syllabus: it decides what gets recorded, which module unlocks next, and where "continue" goes. But the prose, the quiz and the coding task behind it are one placeholder set — writing sixteen of them is a content job, not a modelling one.
 - **Grading runs in the browser**, so the answer key is public and `POST /lesson/complete` trusts what it is told. A student can report a completion they did not earn — the same trust level as the answer key already being readable in the page. Server-side grading is the fix, and the completions table is the half of it that now exists.
 - **The leaderboard and the instructor report are still frozen constants**, as are hearts, awards, badges, notifications and the "projects submitted" dashboard tile. The leaderboard in particular needs a section concept that `users` does not have.
 - **`/admin` is the exception** — its Users tab is real records and the `role` column, and it is the only screen backed by the database rather than a module. Its other five tabs are placeholder.
 - The landing page's content is still hardcoded in `HomeController#index`.
 
-See `CLAUDE.md` for the conventions to follow when changing any of this.
+See `CLAUDE.md` for the conventions to follow when changing any of this, and `docs/process.md` for how the team works — sprints, roles, the four Scrum events, and what "done" means here.

@@ -5,6 +5,8 @@ en:
 
   flash:
     course_missing: "That course could not be found"
+    topic_missing: "That topic is not in the syllabus"
+    topic_locked: "Finish the modules before it to open that topic"
     forbidden: "That screen is for teaching staff only"
     role_changed: "%{name} is now %{role}"
     role_self: "You cannot change your own role"
@@ -306,7 +308,8 @@ en:
     done:
       title: "Topic complete"
       subtitle: "Supervised vs. Unsupervised Learning · Module 2, topic 3 — your progress has been saved."
-      next_topic: "Next topic: Overfitting"
+      next_topic: "Next topic →"
+      back_course: "Back to the course"
       see_progress: "See progress"
       rewards:
         gems: "Gems"

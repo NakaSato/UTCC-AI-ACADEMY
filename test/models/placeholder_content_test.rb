@@ -177,20 +177,62 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     end
   end
 
-  test "syllabus pairs each topic with its own kind and duration" do
+  test "syllabus pairs each topic with its own key, kind and duration" do
     modules = Syllabus.modules
 
     assert_equal Syllabus::ENTRIES.size, modules.size
     modules.each_with_index do |mod, index|
       assert_equal index + 1, mod.number
-      assert_equal Syllabus::ENTRIES[index][2].size, mod.topics.size
+      assert_equal Syllabus::ENTRIES[index][1].size, mod.topics.size
       assert mod.title.present?
-      mod.topics.each { assert it.name.present? }
+      mod.topics.each_with_index do |topic, position|
+        assert topic.name.present?
+        assert_equal Syllabus.topic_key(mod.number, position + 1), topic.key
+      end
     end
 
     supervised = modules[1].topics[2]
     assert_equal "Supervised vs. Unsupervised", supervised.name
     assert_equal I18n.t("course.kind.mix"), supervised.kind_name
+    assert_predicate supervised, :applied?
+  end
+
+  # Status is derived from what a learner has finished, so with nothing finished
+  # the first module is current and everything after it is locked.
+  test "module status follows progress rather than a written value" do
+    fresh = Syllabus.modules
+
+    assert_predicate fresh.first, :current?
+    assert fresh.drop(1).all?(&:locked?)
+    assert_not_predicate fresh.first.topics.first, :done?
+
+    done_first = Syllabus.modules(Syllabus.keys_in(1).to_set)
+    assert_predicate done_first[0], :done?
+    assert_predicate done_first[1], :current?
+    assert done_first[0].topics.all?(&:done?)
+
+    all_done = Syllabus.modules(Syllabus.topic_keys.to_set)
+    assert all_done.all?(&:done?)
+    assert_nil Syllabus.current_module_number(Syllabus.topic_keys.to_set)
+  end
+
+  test "a topic is unlocked only up to the module a learner has reached" do
+    none = Set.new
+
+    assert Syllabus.unlocked?(Syllabus.keys_in(1).last, none)
+    assert_not Syllabus.unlocked?(Syllabus.keys_in(2).first, none)
+    assert_not Syllabus.unlocked?("99-9", none), "a key outside the syllabus is never unlocked"
+
+    assert Syllabus.unlocked?(Syllabus.keys_in(2).first, Syllabus.keys_in(1).to_set)
+    assert Syllabus.unlocked?(Syllabus.topic_keys.last, Syllabus.topic_keys.to_set)
+  end
+
+  test "topic_after walks the syllabus in reading order and stops at the end" do
+    assert_equal Syllabus.topic_keys[1], Syllabus.topic_after(Syllabus.topic_keys.first)
+    # Across a module boundary, not just within one.
+    assert_equal Syllabus.keys_in(2).first, Syllabus.topic_after(Syllabus.keys_in(1).last)
+    assert_nil Syllabus.topic_after(Syllabus.topic_keys.last)
+    assert_nil Syllabus.topic_after("99-9")
   end
 
   test "lesson steps map to labels and progress" do

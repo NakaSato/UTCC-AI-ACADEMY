@@ -55,11 +55,34 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "details", count: Syllabus::ENTRIES.size
   end
 
-  test "the open module shows its description" do
+  # Without a `?module=` the open one is where the learner is: module 1 for an
+  # account that has finished nothing.
+  test "the open module is the one the learner is on" do
     get course_url("AI1101")
 
     assert_response :success
-    assert_select "details[open] p", text: Syllabus.modules[Syllabus::DEFAULT_OPEN - 1].desc
+    assert_select "details[open] p", text: Syllabus.modules.first.desc
+
+    complete_topics(users(:one), "AI1101", Syllabus.keys_in(1))
+    get course_url("AI1101")
+
+    assert_select "details[open] p", text: Syllabus.modules.second.desc
+  end
+
+  test "the syllabus links the topics a learner can open and not the locked ones" do
+    open_key, locked_key = Syllabus.keys_in(1).first, Syllabus.keys_in(3).first
+
+    get course_url("AI1101")
+
+    assert_response :success
+    assert_select "a[href=?]", lesson_path(course: "AI1101", topic: open_key)
+    assert_select "a[href=?]", lesson_path(course: "AI1101", topic: locked_key), count: 0
+
+    complete_topics(users(:one), "AI1101", [ open_key ])
+    get course_url("AI1101")
+
+    # Finished topics are still linked — going back over one is allowed.
+    assert_select "a[href=?]", lesson_path(course: "AI1101", topic: open_key)
   end
 
   test "an unknown course code redirects to the catalog" do
@@ -108,6 +131,54 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main[data-controller*=proctor]", count: 0
     assert_select "main", text: /#{I18n.t("lesson.proctor.label_exempt")}/
+  end
+
+  # A lesson is a position in a syllabus, and without a `?topic=` that position
+  # is wherever the learner left off.
+  test "the lesson opens on the next unfinished topic" do
+    get lesson_url
+    assert_response :success
+    assert_select "main[data-rewards-topic-value=?]", Syllabus.topic_keys.first
+
+    complete_topics(users(:one), "AI1101", Syllabus.topic_keys.first(2))
+    get lesson_url
+
+    assert_response :success
+    assert_select "main[data-rewards-topic-value=?]", Syllabus.topic_keys.third
+  end
+
+  test "the lesson opens the topic it is asked for, and its links keep it" do
+    key = Syllabus.keys_in(1).last
+    get lesson_url(topic: key, step: :exercise)
+
+    assert_response :success
+    assert_select "main[data-rewards-topic-value=?]", key
+    # Every step link carries the topic, or stepping through would jump forward.
+    assert_select "a[href=?]", lesson_path(course: "AI1101", topic: key, step: :code)
+  end
+
+  test "a locked topic is turned away and an unknown one is not found" do
+    get lesson_url(topic: Syllabus.keys_in(3).first)
+
+    assert_redirected_to course_path("AI1101")
+    assert_equal I18n.t("flash.topic_locked"), flash[:alert]
+
+    get lesson_url(topic: "99-9")
+
+    assert_redirected_to course_path("AI1101")
+    assert_equal I18n.t("flash.topic_missing"), flash[:alert]
+  end
+
+  test "the lesson can be about another course, and refuses one that does not exist" do
+    get lesson_url(course: "AI2402")
+
+    assert_response :success
+    assert_select "a[href=?]", course_path("AI2402")
+
+    get lesson_url(course: "NOPE")
+
+    assert_redirected_to root_path
+    assert_equal I18n.t("flash.course_missing"), flash[:alert]
   end
 
   test "an unknown lesson step falls back to the first one" do

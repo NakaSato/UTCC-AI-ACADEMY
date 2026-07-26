@@ -56,7 +56,7 @@
           <%= t("lesson.code.reset") %>
         </button>
 
-        <%= link_to t("lesson.code.finish"), lesson_path(step: :summary),
+        <%= link_to t("lesson.code.finish"), lesson_step_path(:summary),
               data: { code_task_target: "finish", panel: :summary, action: "panels#select" },
               class: "ml-auto hidden rounded-[9px] border-[1.5px] border-brand px-4.5 py-2 text-14 font-semibold
                       text-danger-soft" %>

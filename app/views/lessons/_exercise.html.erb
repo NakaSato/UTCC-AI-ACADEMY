@@ -47,7 +47,7 @@
       <%= t("lesson.quiz.check") %>
     </button>
 
-    <%= link_to t("lesson.quiz.to_code"), lesson_path(step: :code),
+    <%= link_to t("lesson.quiz.to_code"), lesson_step_path(:code),
           data: { quiz_target: "next", panel: :code, action: "panels#select" },
           class: "hidden rounded-field border-[1.5px] border-brand px-6.5 py-2.75 text-15 font-semibold text-brand
                   transition-colors hover:bg-brand-tint" %>

@@ -70,17 +70,27 @@
               <% end %>
 
               <% mod.topics.each do |topic| %>
-                <%= link_to lesson_path,
-                      class: "flex items-center gap-3.5 rounded-[10px] px-2 py-3 transition-colors hover:bg-canvas" do %>
+                <% row = capture do %>
                   <span aria-hidden="true"
                         class="text-12 <%= class_names(
-                                             "text-muted-4" => mod.done?,
-                                             "text-brand" => mod.current?,
+                                             "text-brand" => topic.done?,
+                                             "text-muted-4" => mod.done? && !topic.done?,
+                                             "text-brand-line" => mod.current? && !topic.done?,
                                              "text-hairline-2" => mod.locked?
-                                           ) %>">●</span>
-                  <span class="flex-1 text-14-5 text-ink-3"><%= topic.name %></span>
+                                           ) %>"><%= topic.done? ? "✓" : "●" %></span>
+                  <span class="flex-1 text-14-5 <%= topic.done? ? "text-muted-2" : "text-ink-3" %>"><%= topic.name %></span>
                   <span class="hidden text-12-5 text-muted-2 sm:inline"><%= topic.kind_name %></span>
                   <span class="w-[70px] text-right text-12-5 text-muted-3"><%= topic.duration_text %></span>
+                <% end %>
+
+                <%# A locked module's topics are not links: the lesson turns them
+                    away, so offering the click would only produce a flash. %>
+                <% if mod.locked? %>
+                  <div class="flex items-center gap-3.5 rounded-[10px] px-2 py-3"><%= row %></div>
+                <% else %>
+                  <%= link_to row, lesson_path(course: @course.code, topic: topic.key),
+                        class: "flex items-center gap-3.5 rounded-[10px] px-2 py-3 transition-colors
+                                hover:bg-canvas" %>
                 <% end %>
               <% end %>
             </div>
@@ -99,7 +109,7 @@
           <div class="h-full rounded-full bg-brand" style="width: <%= @course.percent %>%"></div>
         </div>
 
-        <%= link_to t("course.continue"), lesson_path,
+        <%= link_to t("course.continue"), lesson_path(course: @course.code),
               class: "mb-2.5 block rounded-field bg-brand py-3.25 text-center text-15 font-semibold text-white
                       transition-colors hover:bg-brand-deep" %>
         <button type="button"

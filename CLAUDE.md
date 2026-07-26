@@ -52,6 +52,99 @@ bin/importmap audit    # JS dependency CVEs
 
 There is no CI workflow in this repo — `bin/ci` is the whole pipeline, run locally.
 
+## Software system design
+
+A server-rendered monolith: one Puma process, one SQLite file, no API layer, no client-side router, no external service. Every screen is a full HTML response that Turbo Drive swaps in. Hold that shape — most of the decisions below only make sense because nothing is distributed.
+
+### Layers, and which way the arrows point
+
+```
+browser ──▶ routes ──▶ controller ──▶ ┌─ content module ─┐ ──▶ I18n (th/en)
+                          │           └─ Active Record ──┘
+                          └──▶ view ──▶ reader methods on the object it was handed
+```
+
+- **Views call reader methods and nothing else.** No queries, no `I18n.t` for content (they ask `course.title`, which does the lookup). A view that reaches past its assigned object is the smell that a module is missing a method.
+- **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`.
+- **`Data` objects are the presenters.** There is no presenter/serializer/service-object layer, and adding one would duplicate what `Data.define … do … end` already does.
+- **The dependency arrow runs from the persisted side to the placeholder side, not the other way.** `TopicCompletion` validates `course_code` against `CourseCatalog.codes` and `topic_key` against `Syllabus.topic_keys`. That inversion is the whole trick: a real table can reference a taxonomy that has no tables yet, and the strings stay honest until they do.
+- **`LearnerProgress` is the only bridge.** It is the one object that reads records and returns placeholder value objects (`CourseCatalog::Course` with the counts filled in). Keep it the only one — if a second class starts joining the two sides, the seam stops being replaceable.
+
+### Where state lives
+
+| State | Home | Survives |
+| --- | --- | --- |
+| Screen state — filter, lesson step, tab, selected map node | the **query string** | reload, bookmark, sharing |
+| Who you are | signed `httponly` cookie holding a `sessions` row id, `same_site: :lax` | permanent when "remember me", browser session otherwise |
+| Language | `session[:locale]` | the session |
+| Learning progress | `topic_completions` | forever |
+| Identity and role | `users` | forever |
+| Quiz answers, coding-task attempts, proctor score, the optimistic gem counter | **browser memory only** | nothing — reload resets them |
+
+The rule that follows: **nothing that must survive a reload may live only in JS**, and nothing that must be shareable may live only in the session. A new piece of screen state goes in the URL by default.
+
+### Request lifecycle of one signed-in screen
+
+1. Thruster → Puma → Rails.
+2. `require_authentication` resolves `Current.session` from the signed cookie, or stashes `return_to_after_authenticating` and redirects to `/login`.
+3. `allow_only` runs next where a controller declares it — after authentication, so signed-out lands on `/login` rather than the flash.
+4. `switch_locale` wraps the action in `I18n.with_locale`.
+5. The action validates its params against a whitelist and assigns from a module.
+6. The view renders; the `progress` helper loads the learner's completions **once** (memoised on the `User`) and every counter, bar and tile folds off that one array.
+7. Turbo Drive swaps the body on the next navigation; no JSON crosses the wire.
+
+### Trust boundaries
+
+The browser is untrusted, with one deliberate, documented exception.
+
+- **Lesson grading is on the client**, so the answer key and the passing regexes are public and `POST /lesson/complete` believes what it is told. Accepted for a teaching exercise; mitigated only by `rate_limit to: 30, within: 3.minutes` and by `TopicCompletion.record` being idempotent, so the worst case is a student marking their own topics done. Server-side grading is the fix and the table is the half of it that exists.
+- **Every param is whitelist-or-default.** `AdminConsole.tab_for` is the one where it is a security control rather than a nicety — the tab name is interpolated into a `render` path.
+- **`role` is never mass-assignable.** Sign-up permits four attributes and `:role` is not among them; the only grant is `AdminController#update`, behind `allow_only :admin`.
+- **No user enumeration on password reset** — `PasswordsController#create` redirects identically whether or not the address exists, and checks `present?` first so a blank submission cannot match the many accounts with a null email.
+- **Rate limits** on sign-in, sign-up, password reset (10/3min) and lesson completion (30/3min).
+- Password max length is 72 because that is bcrypt's ceiling — anything longer is silently ignored, so accepting it would be a lie.
+- Brakeman, bundler-audit and `importmap audit` are `bin/ci` steps, not optional extras.
+
+### Invariants
+
+Break one of these and something rots quietly rather than failing loudly:
+
+1. One `topic_completions` row per learner per topic, and `record` never moves a timestamp already set.
+2. Every row names a course and topic that exist — enforced by validation, not by convention.
+3. `th.yml` and `en.yml` stay 1:1 in structure, and every positionally-indexed array keeps the same length **and order** in both.
+4. At least one admin always exists — guaranteed solely by an admin being unable to change their own role.
+5. Sign-up only ever produces a student.
+6. `test/fixtures/topic_completions.yml` stays present and empty.
+7. Denominators come from `Syllabus`, so a course's stat tile and its progress bar can never disagree.
+8. Reader-method names are the public interface of a content module. Renaming one is a view change; keeping one is what makes the module replaceable.
+
+### Performance and scale
+
+Sized for a classroom, not a public site, and the design leans on that.
+
+- **The N+1 that isn't:** `LearnerProgress` issues one query for a learner's rows and folds them in Ruby for six different cuts. Adding a per-course query to a view would undo it.
+- **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the *entire* `topic_completions` table, run on every render that shows a rank. Correct and cheap at a few thousand rows; it is the first thing to cache or denormalise when it is not.
+- Nothing uses `Rails.cache` yet. `stale_when_importmap_changes` gives HTML responses an etag; Thruster handles asset caching and compression.
+- One writer: SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
+- The only enqueued work in the whole app is the password-reset email (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.
+
+### Evolving a placeholder into a real model
+
+`LearnerProgress` is the worked example; the recipe generalises:
+
+1. **Keep the reader names.** The views only ever call those, which is why they did not change when progress became real.
+2. Add the table and the migration; leave the module's public methods alone.
+3. Point the module's `all` (or `for(user)`) at the records. The `Data` object can stay — it makes a fine read model over a row.
+4. Move copy out of the locale files last, or not at all. Instructor-authored text wants columns; UI chrome wants locales.
+5. Turn the string validations in `TopicCompletion` into foreign keys once Course and Topic tables exist.
+6. Update `placeholder_content_test.rb` — it is the test that knows about the positional locale joins.
+
+Dependency order for the remaining work, because each unlocks the next: **Course/Topic tables** (they anchor the strings everything else references) → **submissions** (which is what makes server-side grading possible) → **sections/cohorts** (which the leaderboard and `InstructorReport` are both waiting on) → **projects, awards, notifications**.
+
+### What this design deliberately lacks
+
+No API layer, no service objects, no presenters, no form objects, no Redis, no Node, no client-side router, no state manager, no component CSS classes. Each absence is a decision, not an oversight. Reach for one only when a concrete problem in this codebase demands it — the app is small enough that the abstraction usually costs more than the duplication it removes.
+
 ## Placeholder content: the app's central pattern
 
 `app/models/` holds no Active Record classes for the learning material. It holds **modules of frozen constants plus `Data.define` value objects**: `CourseCatalog`, `Syllabus`, `LessonContent`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign.
@@ -65,7 +158,7 @@ The split is deliberate and consistent:
 - **Ruby holds numbers, taxonomy and shape** — course codes, percentages, the tree structure, which module is locked.
 - **`config/locales/{th,en}.yml` holds every word a human reads.** The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
 
-**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file, `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`, `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
+**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`, `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
 Replacing a placeholder with a real model means keeping the same reader methods; the views only ever call those. `LearnerProgress` is the worked example — see below.
 
@@ -80,7 +173,24 @@ A topic is named by strings, not foreign keys: `course_code` from `CourseCatalog
 - **`ApplicationController#progress` is a `helper_method`**, so any view can ask; `User#progress` memoises it per instance.
 - **`CourseCatalog.for(user)` / `LearnerProgress#courses`** return the ordinary `CourseCatalog::Course` values with `learned`, `applied` and `next_key` filled in, so the catalog, My Learning and the dashboard all render the same object and the views did not change when this landed.
 
-Recording happens from the browser: `rewards_controller.js` POSTs to `POST /lesson/complete` when `quiz` or `code_task` announces a pass (`kind: "learned"` and `"applied"` respectively). **That means a student can post a completion they did not earn** — the same trust level as the answer key already being public. Server-side grading is the fix, and this table was the missing half of it.
+Recording happens from the browser: `rewards_controller.js` POSTs to `POST /lesson/complete` when `quiz` or `code_task` announces a pass (`kind: "learned"` and `"applied"` respectively), sending the course and topic the lesson was about. **That means a student can post a completion they did not earn** — the same trust level as the answer key already being public. Server-side grading is the fix, and this table was the missing half of it.
+
+### A lesson is a position in a syllabus
+
+`/lesson?course=AI1101&topic=2-3&step=code`. Both params are optional and both resolve rather than raise:
+
+- **no `course`** → `LessonContent::DEFAULT_COURSE`;
+- **no `topic`** → the learner's first unfinished topic in that course (`course.next_key`), or the last one once they all are. "Continue" links across the app are therefore just `lesson_path(course:)`.
+
+The **prose, the quiz and the coding task are the same whichever topic is open** — writing sixteen of each is a content job, not a modelling one. Only the identity is real, and it is what the completion is filed under.
+
+**Links inside a lesson must use `lesson_step_path(step)`** (`ApplicationHelper`), not `lesson_path(step:)`. A bare `lesson_path` resolves to whatever topic the learner is next on, so stepping through a topic they went *back* to would silently jump forward.
+
+### Locking is a real gate
+
+`Syllabus` derives module status from what a learner has finished rather than storing it: **done** when every one of its topics is, **now** for the first that is not, **locked** after that. `Syllabus.unlocked?(key, done_keys)` is the one rule, and it is enforced in three places that must agree — the course page does not link a locked topic, `LessonsController#show` redirects to the course with `flash.topic_locked`, and `#complete` answers `403`. `#complete` checks it again on purpose: a POST does not have to come from that screen.
+
+A consequence worth knowing: **a brand-new account can only open module 1.** That is correct behaviour, not a bug in the seeds.
 
 Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_count` and `applied_topic_count` are counted off `ENTRIES`, and every course reuses the one placeholder syllabus. That is why every course shows the same total — and it is deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
 
@@ -98,7 +208,7 @@ Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_
 
 ```ruby
 resources :courses, only: :show, param: :code   # /courses/AI1101
-get  "lesson"          => "lessons#show"        # ?step=theory|exercise|code|summary
+get  "lesson"          => "lessons#show"        # ?course=AI1101&topic=2-3&step=theory|exercise|code|summary
 post "lesson/complete" => "lessons#complete"    # the browser reporting a passed step
 get "my-learning" => "my_learning#show"         # ?tab=progress|done
 get "map"         => "knowledge_maps#show"      # ?topic=<node id>&mode=course|project
@@ -146,7 +256,7 @@ Built on Rails 8's `bin/rails generate authentication` (cookie sessions in a `se
   - `/admin` (`AdminController`) is the **only** screen backed by real records rather than a placeholder module, and the only place a role is granted — sign-up always produces a student, and `RegistrationsController#user_params` never whitelists `role`. **Do not add `:role` to that list**; `test/controllers/registrations_controller_test.rb` fails if you do. An admin cannot change their own role; since only an admin reaches the action, that single rule is what guarantees at least one admin always survives.
   - **The first admin comes from `bin/rails admin:create`** (`lib/tasks/admin.rake`) — /admin cannot grant it, since opening /admin already requires the role, and `db/seeds.rb` is fenced to `Rails.env.local?`. The task prompts when attached to a terminal and reads `ADMIN_STUDENT_ID` / `ADMIN_NAME` / `ADMIN_PASSWORD` when not, so it also works over `kamal app exec`. An existing account with that student ID is promoted rather than duplicated.
 - `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a session cookie instead of a permanent one.
-- `User` validates a minimum password length of 8. A password shorter than 8 characters in a test will fail validation rather than the assertion you intended.
+- `User` validates a password of 8–72 characters (`PASSWORD_LENGTH`) that contains a letter and a digit, is not in `COMMON_PASSWORDS`, and does not contain the student's own ID. A weak password in a test will fail validation rather than the assertion you intended — `"password"` and `"12345678"` are both rejected now.
 - Sign-in, sign-up and password-reset `create` actions are all `rate_limit to: 10, within: 3.minutes`.
 - Routes are spelled out one line per verb rather than declared as REST resources, so the URL a student sees is the plain English word for the screen:
 
@@ -188,7 +298,7 @@ Assertions compare against `I18n.t(...)` rather than literal strings; a copy cha
 - The type scale is **literal**: `text-14` is 14px expressed in rem. Half steps carry the design's fine-tuning and are spelled with a trailing `-5` — `text-13-5` is 13.5px, because a dot is not usable in a Tailwind theme key. Use `text-16`/`text-24`/`text-46`, never `text-base`/`text-2xl`/`text-4xl`. `text-54`/`64`/`80` exist only for the marketing landing page.
 - Layout tokens: `max-w-page` (1320px, every app screen but the leaderboard), `max-w-narrow` (1000px, the leaderboard), `h-header` (64px). Radii are named by role — `rounded-field`, `rounded-card`, `rounded-panel`, `rounded-box`.
 - **State travels on `data-*` attributes and is read by Tailwind variants** (`data-[state=correct]:`, `data-[open=true]:`, `group-open:`, `aria-selected:`). Stimulus controllers set an attribute; they do not juggle class lists. Keep it that way when adding interaction.
-- Stimulus controllers: `header` (sticky + mobile drawer), `dropdown` (notifications, account menu), `tabs`, `to_top`, `quiz` and `code_task` (in-browser lesson grading), `rewards` (listens for `quiz`/`code_task` reward events), `proctor` (lesson integrity monitoring). Accordions are native `<details>` — no controller.
+- Stimulus controllers: `header` (sticky + mobile drawer), `dropdown` (notifications, account menu), `tabs` (segmented controls that navigate), `panels` (tabs whose panels are all already in the document — a show/hide that can optionally push a path and title), `to_top`, `quiz` and `code_task` (in-browser lesson grading), `rewards` (listens for `quiz`/`code_task` reward events), `proctor` (lesson integrity monitoring). Accordions are native `<details>` — no controller.
 - `proctor_controller` mounts only for `Current.user.student?` — staff get the same bar with the controls inert. Like the quiz and the coding task it runs entirely in the browser and persists nothing, so the integrity score resets on reload. `Proctoring` hands it the weights and `lesson.proctor.*` hands it the sentences; the log row is a `<template>` in the view, cloned per incident, so no markup lives in JS.
 - `header_controller` receives its pinned state as **several** utilities via `data-header-pinned-class`, so it uses `classList.add/remove(...this.pinnedClasses)` — `classList.toggle` accepts only one class and will silently break if you switch back to it.
 - Anything on the chrome field (header, hero, drawer, auth screens) needs a light-on-dark variant; a `border-brand text-brand` outline button renders invisibly there.

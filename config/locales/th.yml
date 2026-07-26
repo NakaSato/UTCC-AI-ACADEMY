@@ -6,6 +6,8 @@ th:
 
   flash:
     course_missing: "ไม่พบรายวิชาที่ต้องการ"
+    topic_missing: "ไม่มีหัวข้อนี้ในโครงสร้างเนื้อหา"
+    topic_locked: "เรียนบทก่อนหน้าให้จบก่อน จึงจะเปิดหัวข้อนี้ได้"
     forbidden: "หน้านี้สำหรับอาจารย์และเจ้าหน้าที่เท่านั้น"
     role_changed: "%{name} เป็น%{role}แล้ว"
     role_self: "เปลี่ยนสิทธิ์ของตนเองไม่ได้"
@@ -313,7 +315,8 @@ th:
     done:
       title: "เรียนจบหัวข้อนี้แล้ว"
       subtitle: "Supervised vs. Unsupervised Learning · โมดูล 2 หัวข้อที่ 3 บันทึกความก้าวหน้าเรียบร้อย"
-      next_topic: "หัวข้อถัดไป: Overfitting"
+      next_topic: "หัวข้อถัดไป →"
+      back_course: "กลับไปหน้ารายวิชา"
       see_progress: "ดูความก้าวหน้า"
       rewards:
         gems: "เพชร"

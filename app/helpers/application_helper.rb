@@ -34,6 +34,13 @@ module ApplicationHelper
     ]
   end
 
+  # Every link inside a lesson has to carry which lesson it is. A bare
+  # `lesson_path(step:)` resolves to whatever topic the learner is next on, so
+  # stepping through a topic they went back to would silently jump forward.
+  def lesson_step_path(step)
+    lesson_path(course: @course.code, topic: @topic_key, step:)
+  end
+
   # A nav item is current when the request is on its path — matching on path
   # only, so query strings (filters, tabs, steps) do not deselect it.
   def nav_current?(path)

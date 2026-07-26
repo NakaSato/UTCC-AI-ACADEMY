@@ -8,12 +8,15 @@
 module LessonContent
   STEPS = %i[ theory exercise code summary ].freeze
 
-  # There is one lesson, and this is the topic it teaches: AI1101, module 2,
-  # third topic. Completions are filed under it, so the lesson has an identity
-  # before courses and topics become tables. A `?course=&topic=` lesson route
-  # replaces these two constants, not the recording around them.
-  COURSE_CODE = "AI1101"
-  TOPIC_KEY = Syllabus.topic_key(2, 3)
+  # A lesson is a position in a syllabus: `?course=AI1101&topic=2-3`. The prose,
+  # the quiz and the coding task below are the same whichever topic is open —
+  # writing sixteen of each is a content job, not a modelling one — but the
+  # identity is real, so a completion is filed against the topic the student was
+  # actually on.
+  #
+  # Without a course the lesson is about the one every student starts on; without
+  # a topic it is about the next one they have not finished.
+  DEFAULT_COURSE = "AI1101"
 
   # How full the top progress bar is on each step.
   STEP_PERCENT = { theory: 12, exercise: 42, code: 74, summary: 100 }.freeze

@@ -47,7 +47,7 @@
   </div>
 
   <%# A real link, upgraded to a panel switch by the lesson's panels controller. %>
-  <%= link_to t("lesson.theory.to_quiz"), lesson_path(step: :exercise),
+  <%= link_to t("lesson.theory.to_quiz"), lesson_step_path(:exercise),
         data: { panel: :exercise, action: "panels#select" },
         class: "inline-block rounded-field bg-brand px-7 py-3.25 text-15 font-semibold text-white
                 transition-colors hover:bg-brand-deep" %>

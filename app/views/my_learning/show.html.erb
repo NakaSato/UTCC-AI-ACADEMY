@@ -46,7 +46,7 @@
                   class: "text-brand hover:text-brand-deep" %>
             <%= t("my_learning.pick_project_after") %>
           </span>
-          <%= link_to t("my_learning.continue"), lesson_path,
+          <%= link_to t("my_learning.continue"), lesson_path(course: "AI1101"),
                 class: "rounded-field bg-brand px-6.5 py-3 text-15 font-semibold whitespace-nowrap text-white
                         transition-colors hover:bg-brand-deep" %>
         </div>
@@ -117,7 +117,7 @@
                   <div class="flex flex-wrap items-center justify-between gap-4.5">
                     <%= link_to t("my_learning.view_syllabus"), course_path(enrollment.code),
                           class: "text-14 font-medium text-brand hover:text-brand-deep" %>
-                    <%= link_to t("my_learning.continue"), lesson_path,
+                    <%= link_to t("my_learning.continue"), lesson_path(course: enrollment.code),
                           class: "rounded-[10px] border-[1.5px] border-brand px-5 py-2.25 text-14 font-semibold
                                   whitespace-nowrap text-brand-deep transition-colors hover:bg-brand-tint" %>
                   </div>
