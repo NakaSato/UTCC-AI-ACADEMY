@@ -1,0 +1,4 @@
+# Deliberately empty, and must stay present — tests that need an audit entry
+# drive the admin action that would really cause one, which is also what keeps
+# the recorded list from drifting away from the controller. The file exists so
+# fixtures clear the table between runs.

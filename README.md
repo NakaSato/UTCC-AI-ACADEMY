@@ -215,7 +215,7 @@ Controllers below it are deliberately tiny: read a param, validate it against a 
 
 ## Data model
 
-Thirteen tables. That is the whole schema (`db/schema.rb`, version `2026_07_27_130000`):
+Fourteen tables. That is the whole schema (`db/schema.rb`, version `2026_07_27_140000`):
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -267,6 +267,12 @@ LandingText.for(key) || default(key).presence || LandingText.any(key).to_s
 ```
 
 The last step is what keeps an admin-made card visible on both pages instead of blank in one; the middle one comes first so a Thai-only rewrite never displaces the English the repo ships. `key` is the path under `landing.` — `"topics.prompting.title"` — and is checked against a whitelist `Landing` derives from the cards, so an override for a string the page does not render cannot be written.
+
+**`audit_events`** — `user_id` (the actor), `action`, `params` (json). Who did what on `/admin`.
+
+Every mutating action in `AdminController` calls `AuditEvent.record` on its success path, and the Audit tab reads those rows. The actor comes from `Current.user` rather than an argument, unlike `Notification.notify` — a notification is about somebody other than whoever is acting, and an audit entry never is. Like a notification, the row carries the action and its interpolations and never a sentence, so a line reads in whichever language it is *read* in; a stored role or landing group is a key translated on the way out, while a person's name is stored as written.
+
+The **level is derived, not stored** — `AuditEvent::WARN` names the entries worth a second look, so reclassifying one is a deploy rather than a backfill, and the `?level=` chips filter in SQL so the `RECENT` cap applies to what survives the filter. Two actions deliberately record nothing: reading a tab, and reordering a landing card — that changes neither what exists nor who can do what, and would bury the role grants. Nothing deletes or prunes a row; an audit log you can clear is not one.
 
 ## Progress: the one thing that is recorded
 
@@ -321,8 +327,10 @@ Replacing a placeholder with a real model means keeping the same reader methods 
 Built on Rails 8's `bin/rails generate authentication`, plus a hand-written `RegistrationsController` since the generator omits sign-up.
 
 - `Current.user` / `Current.session` (an `ActiveSupport::CurrentAttributes`) are how views read the signed-in user; `authenticated?` is the exposed helper, and the layouts branch on it.
-- `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a session cookie instead of a permanent one.
-- Sign-in, sign-up and password-reset `create` actions are each `rate_limit to: 10, within: 3.minutes`.
+- `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a browser-session cookie instead of a dated one.
+- **A session expires 30 days after it is created** (`Session::MAX_AGE`), and the cookie is dated to match. The cap is absolute rather than idle on purpose: an idle timeout means a database write on every authenticated request, and this app is a single Puma process over a single-writer SQLite file. Look sessions up through **`Session.live`** — both `Authentication#find_session_by_cookie` and `ApplicationCable::Connection` do, and an expiry enforced in only one of them would be no expiry at all. `Session.expired` is swept nightly by `clear_expired_sessions` in `config/recurring.yml`.
+- Sign-up and password-reset `create` are each `rate_limit to: 10, within: 3.minutes`. **Sign-in carries two limits**: one keyed on the IP (one machine working through a list of accounts) and one keyed on the posted `student_id` (one account guessed at from many addresses). `name:` is what lets two limits coexist on one action.
+- `config/initializers/filter_parameter_logging.rb` redacts `student_id`, `name`, `faculty` and `study_year` alongside passwords and email. `Parameters:` is logged at `info`, which is production's level, so anything missing from that list goes into log retention on every request that posts it — and the student ID is the credential.
 - `SessionsController#create` authenticates with `User.authenticate_by(params.permit(:student_id, :password))`.
 - `PasswordsController#create` checks `params[:email_address].present?` before looking up — without it, a blank submission would match `email_address IS NULL` and reach one of the many accounts with no address. It always redirects to the same confirmation, so the screen never reveals whether an address has an account.
 - `RegistrationsController#user_params` permits `:name, :student_id, :password, :password_confirmation`. **Do not add `:role`** — `test/controllers/registrations_controller_test.rb` fails if you do.
@@ -473,6 +481,7 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `models/instructor_report_test.rb`, `models/leaderboard_test.rb` | the Teaching console and the board, counted from a real section |
 | `models/awards_test.rb` | one test per award rule, and that a new account has earned nothing |
 | `models/landing_card_test.rb` | the landing taxonomy: generated slugs, a card's place, and that deleting one deletes its copy |
+| `models/audit_event_test.rb`, `controllers/admin_audit_test.rb` | the audit log: the actor is whoever is signed in, the level is derived rather than stored, and — driven through every endpoint — each admin action logs exactly once while a failed one logs nothing |
 | `models/landing_text_test.rb`, `controllers/admin_landing_test.rb` | the landing CMS: a copy row is only ever a departure from what ships, an unlisted key cannot be written, a card written in one language shows it in the other, and adding, reordering and deleting all reach the page a stranger reads |
 
 Assertions compare against `I18n.t(...)` rather than literal strings, and are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page — a copy change in a locale file should not break a test.
@@ -502,7 +511,7 @@ A learner's progress is genuinely recorded — `topic_completions` holds one row
 - **Grading runs on the server**, and every attempt is kept in `submissions`. The answer key and the passing patterns are not rendered, so a pass cannot be claimed by posting one. The quiz verdict does return the correct option so the page can mark it — after a graded, recorded attempt, not before.
 - **The leaderboard, the Teaching console, the award shelf and the projects tile are counted** — off `sections`, `enrollments`, `topic_completions` and `submissions`. An award is a derived rule, never stored; one ("Helping Hand") is honestly unearnable until a forum exists.
 - **Hearts and notifications are counted too, now.** A heart is derived rather than stored — `LearnerProgress#hearts` is five minus the failed attempts of the last four hours, with the refill time taken from when the oldest of those ages out. **Hearts gate nothing at zero**: whether an empty set should block an attempt is a pedagogy decision nobody has made, and the display does not sneak it in. Notifications have a table of their own.
-- **`/admin` is the exception** — it is the screen backed by the database rather than by a module. Its Users tab is real records and the `role` column, Sections manages cohorts and enrolments, Integrity reads the proctor's own `proctor_events`, and Landing is a small CMS over the marketing page; the rest are still placeholder.
+- **`/admin` is the exception** — it is the screen backed by the database rather than by a module. Its Users tab is real records and the `role` column, Sections manages cohorts and enrolments, Integrity reads the proctor's own `proctor_events`, Landing is a small CMS over the marketing page, and Audit is the console's record of itself; the rest are still placeholder.
 - **The landing page is the one thing an admin can genuinely author.** Its cards are `landing_cards` rows, so they can be added, reordered and deleted; its words are `landing.*` in both locale files with a `landing_texts` override in front, joined by key rather than by position. Those locales are the **default**, not the last word — for a card that ships, an empty box is the shipped copy; for a card an admin added there is no default, and the page falls back to whichever language was filled in.
 
 See `CLAUDE.md` for the conventions to follow when changing any of this, and `docs/process.md` for how the team works — sprints, roles, the four Scrum events, and what "done" means here.

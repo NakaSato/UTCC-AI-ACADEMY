@@ -138,8 +138,10 @@ module AdminConsole
 
   # ---- Audit log ------------------------------------------------------------
 
-  # info | warn, one per entry.
-  AUDIT_LEVELS = %i[ info info info warn warn info ].freeze
+  # The rows are NOT here any more — they are `audit_events`, written by the
+  # admin actions themselves. `LEVEL_FILTERS` stays, because the `?level=` chips
+  # are still a whitelist this module owns; `AuditEvent::WARN` decides which
+  # actions land in which.
 
   class << self
     def tab_for(param)
@@ -217,15 +219,6 @@ module AdminConsole
 
     def level_filter(param)
       LEVEL_FILTERS.include?(param.to_s.to_sym) ? param.to_s.to_sym : :all
-    end
-
-    def audit(level: :all)
-      copy = I18n.t("admin.audit.rows")
-      rows = AUDIT_LEVELS.each_with_index.map do |row_level, index|
-        { level: row_level, stamp: copy[index][:stamp], actor: copy[index][:actor], event: copy[index][:event] }
-      end
-
-      level == :all ? rows : rows.select { it[:level] == level }
     end
 
     # Only two tabs carry a badge; the rest would show a meaningless zero.

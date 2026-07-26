@@ -512,6 +512,22 @@ en:
     integrity_notice: "Exercise monitoring recorded an incident in %{course} — please talk to your instructor"
     integrity_escalated: "The integrity case for %{name} (%{course}) was escalated to you"
 
+  # One line per AuditEvent::ACTIONS entry. Keyed, not positional — and the
+  # sentence lives here rather than in the row so a line reads in whichever
+  # language it is being read in.
+  audit:
+    role_changed: "Set %{name} to %{role}"
+    section_created: "Created section %{label}"
+    section_updated: "Changed the instructor for %{label}"
+    enrolled: "Enrolled %{name} in %{label}"
+    unenrolled: "Removed %{name} from %{label}"
+    integrity_closed: "Closed the integrity case for %{name}"
+    integrity_notified: "Notified %{name} about %{course}"
+    integrity_escalated: "Escalated %{name} (%{course}) to %{to}"
+    landing_saved: "Edited the landing page · %{group}"
+    card_added: "Added “%{name}” to the landing page · %{group}"
+    card_removed: "Deleted “%{name}” from the landing page · %{group}"
+
   admin:
     eyebrow: "Admin console"
     tabs:
@@ -794,29 +810,11 @@ en:
           when: "3 days ago"
     audit:
       title: "Audit log"
-      sub: "last 48 hours"
+      sub: "the most recent actions taken here"
+      empty: "Nothing logged yet — every action taken on this console lands here."
       levels:
         info: "Info"
         warn: "Watch"
-      rows:
-        - stamp: "26 Jul 11:02"
-          actor: "Academic Services"
-          event: "Granted TA role · AI2101 · T10233"
-        - stamp: "26 Jul 10:40"
-          actor: "Automated job"
-          event: "Roster import 182 records · 3 duplicates skipped"
-        - stamp: "26 Jul 09:31"
-          actor: "Asst. Prof. Warinthorn P."
-          event: "Published content · Prompt engineering v2"
-        - stamp: "26 Jul 09:12"
-          actor: "Proctoring service"
-          event: "Long-paste alert raised · 6512400633"
-        - stamp: "25 Jul 17:48"
-          actor: "System admin"
-          event: "Integrity threshold changed 85 → 80"
-        - stamp: "25 Jul 16:05"
-          actor: "Academic Services"
-          event: "Archived course AI1180 · AY2025"
     title: "User management"
     subtitle: "Grant the instructor view and the admin screen · UTCC AI Academy"
     roster_title: "All accounts"

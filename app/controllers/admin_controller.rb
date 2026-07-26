@@ -22,7 +22,11 @@ class AdminController < ApplicationController
     # of screen state; an unknown one simply opens nothing.
     in :landing then @group = Landing.group_for(params[:group])&.key
     in :integrity then @cases = Proctoring.cases
-    in :audit then @level = AdminConsole.level_filter(params[:level])
+    in :audit
+      @level = AdminConsole.level_filter(params[:level])
+      # Filtered in SQL, so the cap is what survives the filter rather than what
+      # went into it.
+      @events = AuditEvent.at_level(@level).newest_first.includes(:user).limit(AuditEvent::RECENT)
     in :courses then @query = params[:q].to_s.strip
     else nil
     end
@@ -38,6 +42,7 @@ class AdminController < ApplicationController
                           instructor: find_staff(params[:instructor_id]))
 
     if section.save
+      AuditEvent.record("section_created", label: section.label)
       redirect_to admin_path(tab: :sections, section: section.id),
                   notice: t("flash.section_created", label: section.label)
     else
@@ -49,6 +54,9 @@ class AdminController < ApplicationController
     section = Section.find(params[:id])
 
     if section.update(instructor: find_staff(params[:instructor_id]))
+      # The label and no more: "unassigned" would have to be stored as a
+      # translated phrase, and who teaches a section is on the Sections tab.
+      AuditEvent.record("section_updated", label: section.label)
       redirect_to admin_path(tab: :sections, section: section.id),
                   notice: t("flash.section_updated", label: section.label)
     else
@@ -70,8 +78,13 @@ class AdminController < ApplicationController
     fresh = enrollment.new_record?
 
     if enrollment.persisted? || enrollment.save
-      # Only a new enrolment is news — re-submitting the form must not ping.
-      Notification.notify(student, "enrolled", label: section.label) if fresh
+      # Only a new enrolment is news — re-submitting the form must not ping, and
+      # must not log a second time either.
+      if fresh
+        Notification.notify(student, "enrolled", label: section.label)
+        AuditEvent.record("enrolled", name: student.name, label: section.label)
+      end
+
       redirect_to admin_path(tab: :sections, section: section.id),
                   notice: t("flash.enrolled", name: student.name, label: section.label)
     else
@@ -84,6 +97,7 @@ class AdminController < ApplicationController
     section = Section.find(params[:id])
     enrollment = section.enrollments.find_by!(user_id: params[:user_id])
     enrollment.destroy
+    AuditEvent.record("unenrolled", name: enrollment.user.name, label: section.label)
 
     redirect_to admin_path(tab: :sections, section: section.id),
                 notice: t("flash.unenrolled", name: enrollment.user.name, label: section.label)
@@ -117,6 +131,9 @@ class AdminController < ApplicationController
       group&.cards&.each { save_attributes(it.record) }
     end
 
+    # One entry per save, naming the group — not one per field, which would be
+    # a hundred lines for a page nobody rewrote a hundred strings of.
+    AuditEvent.record("landing_saved", group: group&.key.to_s)
     redirect_to landing_tab(group), notice: t("flash.landing_saved")
   rescue ActiveRecord::RecordInvalid => invalid
     redirect_to landing_tab(group), alert: invalid.record.errors.full_messages.to_sentence
@@ -141,6 +158,7 @@ class AdminController < ApplicationController
     if card.save
       Landing.forget_cards
       titles.each { |locale, title| LandingText.write("#{card.prefix}.title", locale, title) }
+      AuditEvent.record("card_added", group: group_of(collection)&.key, name: card.label)
       redirect_to landing_tab(group_of(collection)), notice: t("flash.card_added")
     else
       redirect_to landing_tab(group_of(collection)), alert: card.errors.full_messages.to_sentence
@@ -160,9 +178,12 @@ class AdminController < ApplicationController
   # Destroying a card takes its copy with it — see LandingCard's after_destroy.
   def destroy_card
     card = LandingCard.find(params[:id])
+    # Read before the destroy: afterwards the copy that named it is gone too.
+    name = card.label
     card.destroy
     Landing.forget_cards
     LandingText.forget
+    AuditEvent.record("card_removed", group: group_of(card.collection)&.key, name:)
 
     redirect_to landing_tab(group_of(card.collection)), notice: t("flash.card_removed")
   end
@@ -173,6 +194,7 @@ class AdminController < ApplicationController
     subject = case_subject or return
     user, course = subject
     Notification.notify(user, "integrity_notice", course: course.code)
+    AuditEvent.record("integrity_notified", name: user.name, course: course.code)
 
     redirect_to admin_path(tab: :integrity), notice: t("flash.case_notified", name: user.name)
   end
@@ -188,6 +210,7 @@ class AdminController < ApplicationController
       redirect_to admin_path(tab: :integrity), alert: t("flash.no_instructor", name: user.name)
     else
       Notification.notify(instructor, "integrity_escalated", name: user.name, course: course.code)
+      AuditEvent.record("integrity_escalated", name: user.name, to: instructor.name, course: course.code)
       redirect_to admin_path(tab: :integrity), notice: t("flash.case_escalated", name: instructor.name)
     end
   end
@@ -197,6 +220,7 @@ class AdminController < ApplicationController
   def close_case
     user = User.find(params[:user_id])
     ProctorEvent.unreviewed.where(user:).update_all(reviewed_at: Time.current, updated_at: Time.current)
+    AuditEvent.record("integrity_closed", name: user.name)
 
     redirect_to admin_path(tab: :integrity), notice: t("flash.integrity_closed", name: user.name)
   end
@@ -210,9 +234,11 @@ class AdminController < ApplicationController
     if user == Current.user
       redirect_to admin_path, alert: t("flash.role_self")
     elsif user.update(role: params[:role])
-      # The role key, not the sentence — the notification names the role in the
-      # reader's language when it is read, not the granter's when it was given.
+      # The role key, not the sentence — the notification and the audit line both
+      # name the role in the reader's language when they are read, not the
+      # granter's when it was given.
       Notification.notify(user, "role_changed", role: user.role)
+      AuditEvent.record("role_changed", name: user.name, role: user.role)
       redirect_to admin_path,
                   notice: t("flash.role_changed", name: user.name, role: t("admin.roles.#{user.role}"))
     else

@@ -159,20 +159,9 @@ module Landing
     # Copy that is a sentence rather than a phrase, and wants a textarea.
     def long?(key) = LONG_FIELDS.include?(field_name(key))
 
-    # How the editor names one card: by its own current title, which is what an
-    # admin would recognise it as. An FAQ has no title, so it is named by its
-    # question — and a card with copy in neither language has nothing to be
-    # called yet, so it says so with its slug.
-    def card_label(card)
-      %w[ title q ].each do |name|
-        next unless card.fields.any? { field_name(it) == name }
-
-        label = copy("#{card.prefix}.#{name}")
-        return label if label.present?
-      end
-
-      card.record.key
-    end
+    # How the editor names one card. The rule is the card's own — the audit log
+    # names a card the same way when it records one being deleted.
+    def card_label(card) = card.record.label
 
     private
       # `faq_title` is the odd one out — the FAQ section's heading sits at the

@@ -48,7 +48,6 @@ class PlaceholderContentTest < ActiveSupport::TestCase
           "admin.overview.health" => AdminConsole::HEALTH,
           "admin.courses.rows" => AdminConsole::COURSES,
           "admin.queue.rows" => AdminConsole::QUEUE_KINDS,
-          "admin.audit.rows" => AdminConsole::AUDIT_LEVELS,
           "admin.perms.rows" => AdminConsole::PERMS
         }.each do |key, rows|
           assert_equal rows.size, I18n.t(key).size, "#{key} in #{locale}"

@@ -43,6 +43,11 @@ class LandingCard < ApplicationRecord
   # The prefix every one of this card's copy keys starts with.
   def prefix = "#{PATHS.fetch(collection)}.#{key}"
 
+  # What the card is called right now — its own title, or its question where it
+  # has none, which is what an admin would recognise it by. A card whose copy
+  # nobody has written yet has only its slug to be called.
+  def label = %w[ title q ].filter_map { Landing.copy("#{prefix}.#{it}").presence }.first || key
+
   # A new card goes last. Nothing reorders on insert, so a save cannot shuffle
   # the page under an admin who was only adding to it.
   before_create do

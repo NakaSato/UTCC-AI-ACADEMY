@@ -519,6 +519,19 @@ th:
     integrity_notice: "มีการตรวจพบเหตุการณ์ระหว่างทำแบบฝึกหัดใน %{course} — โปรดติดต่ออาจารย์ผู้สอน"
     integrity_escalated: "เคสความซื่อสัตย์ของ %{name} (%{course}) ถูกส่งต่อถึงคุณ"
 
+  audit:
+    role_changed: "เปลี่ยนสิทธิ์ของ %{name} เป็น%{role}"
+    section_created: "สร้างหมู่เรียน %{label}"
+    section_updated: "เปลี่ยนอาจารย์ผู้สอนของ %{label}"
+    enrolled: "เพิ่ม %{name} เข้าหมู่ %{label}"
+    unenrolled: "นำ %{name} ออกจากหมู่ %{label}"
+    integrity_closed: "ปิดเคสความซื่อสัตย์ของ %{name}"
+    integrity_notified: "แจ้ง %{name} เรื่อง %{course}"
+    integrity_escalated: "ส่งต่อเคสของ %{name} (%{course}) ถึง %{to}"
+    landing_saved: "แก้ข้อความบนหน้าแรก · %{group}"
+    card_added: "เพิ่ม “%{name}” บนหน้าแรก · %{group}"
+    card_removed: "ลบ “%{name}” จากหน้าแรก · %{group}"
+
   admin:
     eyebrow: "คอนโซลผู้ดูแล"
     tabs:
@@ -801,29 +814,11 @@ th:
           when: "3 วันก่อน"
     audit:
       title: "บันทึกระบบ"
-      sub: "48 ชั่วโมงล่าสุด"
+      sub: "การกระทำล่าสุดในหน้าผู้ดูแล"
+      empty: "ยังไม่มีบันทึก — ทุกการกระทำในหน้าผู้ดูแลจะถูกบันทึกไว้ที่นี่"
       levels:
         info: "ข้อมูล"
         warn: "เฝ้าระวัง"
-      rows:
-        - stamp: "26 ก.ค. 11:02"
-          actor: "กองบริการการศึกษา"
-          event: "อนุมัติสิทธิ์ผู้ช่วยสอน · AI2101 · T10233"
-        - stamp: "26 ก.ค. 10:40"
-          actor: "ระบบอัตโนมัติ"
-          event: "นำเข้ารายชื่อ 182 รายการ · ซ้ำ 3 รายการถูกข้าม"
-        - stamp: "26 ก.ค. 09:31"
-          actor: "ผศ.ดร. วรินทร ภักดีสกุล"
-          event: "เผยแพร่เนื้อหา · Prompt engineering v2"
-        - stamp: "26 ก.ค. 09:12"
-          actor: "ระบบตรวจสอบการสอบ"
-          event: "แจ้งเตือนการวางข้อความยาว · 6512400633"
-        - stamp: "25 ก.ค. 17:48"
-          actor: "ผู้ดูแลระบบ"
-          event: "แก้ไขเกณฑ์คะแนนความซื่อสัตย์ 85 → 80"
-        - stamp: "25 ก.ค. 16:05"
-          actor: "กองบริการการศึกษา"
-          event: "ปิดรายวิชา AI1180 ปีการศึกษา 2568"
     title: "จัดการผู้ใช้"
     subtitle: "ให้สิทธิ์เข้ามุมอาจารย์และหน้าผู้ดูแล · UTCC AI Academy"
     roster_title: "บัญชีทั้งหมด"

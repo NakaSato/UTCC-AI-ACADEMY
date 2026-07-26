@@ -101,13 +101,18 @@ class AdminConsoleTabsTest < ActionDispatch::IntegrationTest
     assert_select "main", text: /#{users(:instructor).name}/
   end
 
+  # The rows are real now — see admin_audit_test.rb for what writes them. This
+  # is the chip, which is still a whitelist AdminConsole owns.
   test "the audit chips cut the log by level" do
     get admin_url(tab: :audit, level: :warn)
 
     assert_response :success
-    warn_rows = AdminConsole.audit(level: :warn)
-    assert_equal AdminConsole::AUDIT_LEVELS.count(:warn), warn_rows.size
-    assert_select "main", text: /#{Regexp.escape(warn_rows.first[:event])}/
+    assert_select "a[aria-current], a", text: I18n.t("admin.audit.levels.warn")
+
+    get admin_url(tab: :audit, level: "overlord")
+
+    assert_response :success
+    assert_select "main h2", text: I18n.t("admin.audit.title")
   end
 
   test "the courses search filters by code or name" do

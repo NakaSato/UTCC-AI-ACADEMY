@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
+  create_table "audit_events", force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.json "params", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["created_at"], name: "index_audit_events_on_created_at"
+    t.index ["user_id", "created_at"], name: "index_audit_events_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_audit_events_on_user_id"
+  end
+
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -177,6 +188,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
     t.index ["student_id"], name: "index_users_on_student_id", unique: true
   end
 
+  add_foreign_key "audit_events", "users"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
   add_foreign_key "notifications", "users"
