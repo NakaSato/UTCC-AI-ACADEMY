@@ -102,6 +102,39 @@ Crimson `#A81E32` on cream, IBM Plex Sans Thai, Tailwind v4 through `tailwindcss
 
 `docs/design-system.md` documents the **earlier** port from [eng.utcc.ac.th](https://eng.utcc.ac.th) (maroon, Noto Sans Thai Looped, daisyUI anatomy). The app UI has since moved on — treat that document as background on the reference site, not as a description of the current tokens.
 
+## How we work
+
+Scrum, on a **two-week sprint**. Scope is negotiable, the deadline is not, and a sprint ends with something that runs.
+
+```mermaid
+flowchart LR
+    PB["Product backlog<br/><i>ordered by the Product Owner</i>"]
+    SP["Sprint Planning<br/><i>4h · sets the sprint goal</i>"]
+    SB["Sprint backlog<br/><i>owned by the developers</i>"]
+
+    subgraph SPRINT["The sprint — two weeks"]
+        direction LR
+        DS["Daily Scrum<br/><i>15 min, every working day</i>"]
+        BUILD["Build"]
+        DOD{"Definition of done<br/>bin/ci green · test written<br/>th.yml + en.yml together<br/>invariants intact"}
+        DS --> BUILD --> DOD
+        DOD -- "not yet" --> DS
+    end
+
+    INC["Increment<br/><i>a running app, not slides</i>"]
+    SR["Sprint Review<br/><i>2h · demo to teachers and students</i>"]
+    RE["Sprint Retrospective<br/><i>90 min · 1–2 concrete improvements</i>"]
+
+    PB --> SP --> SB --> DS
+    DOD -- "done" --> INC --> SR --> RE
+    SR -. "feedback reshapes the backlog" .-> PB
+    RE -. "next sprint starts immediately" .-> SP
+```
+
+The backlog has a dependency order, and each item unlocks the next: **Course and Topic tables** → **submissions** (what makes server-side grading possible) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
+
+Full detail, including roles and the time-boxes, is in `docs/process.md`.
+
 ---
 
 # Technical overview
