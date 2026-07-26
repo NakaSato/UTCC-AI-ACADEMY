@@ -78,7 +78,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 - **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`. **`HomeController#landing` is the one exception** — see "The landing page is the exception to both rules" below before touching it.
 - **`Data` objects are the presenters.** There is no presenter/serializer/service-object layer, and adding one would duplicate what `Data.define … do … end` already does.
 - **The taxonomy is a table, and the modules read it.** `CourseCatalog` and `Syllabus` fold `courses`, `course_modules` and `topics` into the same `Data` objects they used to build from constants, so the views never learned the difference. `TopicCompletion` and `Submission` point at those rows with foreign keys, which is what the string validations became.
-- **`LearnerProgress` is the only bridge.** It is the one object that reads records and returns placeholder value objects (`CourseCatalog::Course` with the counts filled in). Keep it the only one — if a second class starts joining the two sides, the seam stops being replaceable.
+- **The bridges are few and named.** `LearnerProgress` (a learner's rows → every figure a learner screen shows), `InstructorReport` (a section's rows → the Teaching console) and `Leaderboard` (a scope's rows → ranked entries) are the only classes that read records and return value objects. Each folds one query set in Ruby. Keep the list this short — a new screen belongs behind one of them, not behind a fourth.
 
 ### Where state lives
 
@@ -89,6 +89,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 | Language | `session[:locale]` | the session |
 | Learning progress | `topic_completions` | forever |
 | Identity and role | `users` | forever |
+| Cohort membership — who is in which section, who teaches it | `sections`, `enrollments` | forever |
 | Quiz answers and coding-task attempts | `submissions` | forever — every attempt, passed or not |
 | Proctor score, the optimistic gem counter | **browser memory only** | nothing — reload resets them |
 
@@ -134,7 +135,7 @@ Break one of these and something rots quietly rather than failing loudly:
 Sized for a classroom, not a public site, and the design leans on that.
 
 - **The N+1 that isn't:** `LearnerProgress` issues one query for a learner's rows and folds them in Ruby for six different cuts. Adding a per-course query to a view would undo it.
-- **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the *entire* `topic_completions` table, run on every render that shows a rank. Correct and cheap at a few thousand rows; it is the first thing to cache or denormalise when it is not.
+- **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the *entire* `topic_completions` table, run on every render that shows a rank. Correct and cheap at a few thousand rows; it is the first thing to cache or denormalise when it is not. `Leaderboard`'s university tab does the same shape of work — every student's rows, folded per learner — so the two share that fate.
 - Nothing uses `Rails.cache` yet. `stale_when_importmap_changes` gives HTML responses an etag; Thruster handles asset caching and compression.
 - One writer: SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
 - The only enqueued work in the whole app is the password-reset email (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.
@@ -150,7 +151,7 @@ Sized for a classroom, not a public site, and the design leans on that.
 5. Turn the string validations in `TopicCompletion` into foreign keys once Course and Topic tables exist.
 6. Update `placeholder_content_test.rb` — it is the test that knows about the positional locale joins.
 
-Dependency order for the remaining work, because each unlocks the next: ~~Course/Topic tables~~ (done — `1aa05c2`) → ~~submissions~~ (done — `e898a9b`) → **sections/cohorts** (which the leaderboard and `InstructorReport` are both waiting on) → **projects, awards, notifications**.
+The dependency order is complete: ~~Course/Topic tables~~ (`1aa05c2`) → ~~submissions~~ (`e898a9b`) → ~~sections/cohorts~~ (`d2c3ca1`, `cf58c60`) → ~~projects and awards~~ (`20803ed`). What is still placeholder is listed under "Progress" below, each item with the reason it still is.
 
 ### What this design deliberately lacks
 
@@ -158,13 +159,13 @@ No API layer, no service objects, no presenters, no form objects, no Redis, no N
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds **modules plus `Data.define` value objects** in front of the records: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign.
+`app/models/` holds **modules plus `Data.define` value objects** in front of the records: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `LearnerProfile`, `KnowledgeMap`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign. (`Leaderboard` and `InstructorReport` have left this list: they are ordinary classes over the tables now, the same shape as `LearnerProgress`.)
 
 `CourseCatalog` and `Syllabus` are no longer frozen constants: they read `courses`, `course_modules` and `topics` and hand back the same `Data` objects they always did, which is why no view changed when the tables landed. The rest still are.
 
 `AdminConsole` is the one with a real neighbour: the console's **Users** tab is genuinely persisted (the `role` column, `AdminController#update`), while its other five tabs are placeholder like everything else. Do not fold the roster into the module.
 
-`LearnerProfile` used to hold a learner's whole state and now holds only what nothing records yet — hearts, awards, badges, notifications. Its counted half moved to `LearnerProgress`, which is an ordinary class over `topic_completions`.
+`LearnerProfile` has shrunk twice and now holds only what nothing records yet — hearts and notifications. The counting moved to `LearnerProgress` when `topic_completions` landed, and the award shelf followed once `submissions` gave its rules something to check: an award is a **derived rule**, one per medal, never stored.
 
 The split is deliberate and consistent:
 
@@ -180,7 +181,7 @@ The split is deliberate and consistent:
 
 Both are the same debt as the rest of the placeholder content, just parked one layer higher. Moving that copy into locale files (and the arrays into a module, if it earns one) is the fix; until then do not read the "no copy in controllers" and "no words outside locales" rules as describing this file.
 
-**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`, `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
+**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `LearnerProgress::AWARDS[i]` with `my_learning.awards[i]` (rule and glyph on one side, name and hint on the other), `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
 Replacing a placeholder with a real model means keeping the same reader methods; the views only ever call those. `LearnerProgress` is the worked example — see below.
 
@@ -224,7 +225,7 @@ A consequence worth knowing: **a brand-new account can only open module 1.** Tha
 
 Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_count` and `applied_topic_count` are counted off `ENTRIES`, and every course reuses the one placeholder syllabus. That is why every course shows the same total — and it is deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
 
-**Still placeholder, and waiting on something to record them:** hearts/lives, the award shelf and badge row (`LearnerProfile`), notifications, the "projects submitted" dashboard tile, the whole `Leaderboard` (it needs a section concept that `users` does not have) and `InstructorReport`.
+**Still placeholder, and what each is waiting for:** hearts/lives (no wrong answer costs a life), notifications (no deadline, grade or approval exists to notify about), the instructor's average exercise score (a submission is passed or not — nothing scores one out of ten), and the lesson's prose, quiz and coding task being the same for every topic (a content job). The leaderboard, the Teaching console, the award shelf and the projects tile are **counted now**, off `sections`, `enrollments`, `topic_completions` and `submissions`.
 
 ## Internationalisation
 

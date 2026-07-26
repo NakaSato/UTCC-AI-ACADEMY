@@ -132,7 +132,7 @@ flowchart LR
     RE -. "next sprint starts immediately" .-> SP
 ```
 
-The backlog has a dependency order, and each item unlocks the next: ~~Course and Topic tables~~ (done) → ~~submissions~~ (done — grading is on the server now) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
+The backlog's dependency order is complete: ~~Course and Topic tables~~ → ~~submissions~~ → ~~sections/cohorts~~ → ~~projects and awards~~. What is still placeholder — hearts, notifications, per-topic lesson content — is listed under "What is real, and what is not". A good sprint goal takes one placeholder surface and makes it real — a vertical slice that demos at the review.
 
 Full detail, including roles and the time-boxes, is in `docs/process.md`.
 
@@ -209,7 +209,7 @@ Controllers below it are deliberately tiny: read a param, validate it against a 
 
 ## Data model
 
-Seven tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093003`):
+Nine tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093004`):
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -265,7 +265,9 @@ Denominators come from `Syllabus.topic_count` / `applied_topic_count`, not from 
 
 Recording is a consequence of grading. `quiz` and `code_task` POST what the student did to `POST /lesson/submit`; `LessonsController#submit` whitelists the kind, checks the topic is unlocked, grades it in `LessonContent`, files a `submissions` row and writes the completion **only on a pass** — `quiz` fills the learned half, `code` the applied one. It answers with the verdict the page renders, and is rate-limited to 30 in 3 minutes.
 
-**`submissions`** — `user_id`, `course_id`, `topic_id`, `kind` (`quiz` | `code`), `answer`, `passed`. One row per **attempt**, where a completion is one row per outcome. Failures are kept deliberately: they are what the instructor report's "share failing on first attempt" will be counted from.
+**`submissions`** — `user_id`, `course_id`, `topic_id`, `kind` (`quiz` | `code`), `answer`, `passed`. One row per **attempt**, where a completion is one row per outcome. Failures are kept deliberately: they are what the instructor report's "share failing on first attempt" is counted from.
+
+**`sections`** — `course_id`, `instructor_id` (nullable: a section can be timetabled before anyone is assigned to teach it), `code`, `term`. The term is stored as the registrar writes it — `"1/2569"`, Buddhist year — and `Section#term_text` converts for English readers; data carries no locale. **`enrollments`** — a join and nothing more: how a student is doing already lives in `topic_completions` and `submissions`, and a copy here would be free to disagree with it.
 
 ## Placeholder content: the app's central pattern
 
@@ -286,7 +288,7 @@ Course = Data.define(:code, :credits, :rating, :projects, :hours, :level, :core,
 end
 ```
 
-⚠️ **Several joins between Ruby and the locale files are positional, not keyed.** `Syllabus::ENTRIES[i]` lines up with `course.modules[i]`; likewise `InstructorReport::HARD_TOPIC_PERCENTS`, `LearnerProfile::AWARDS`, `Leaderboard::FIGURES`, `LearnerProgress#dashboard_stats`, `LessonContent::BLOCKS`, and every `AdminConsole` array with its `admin.*` counterpart. Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
+⚠️ **Several joins between Ruby and the locale files are positional, not keyed.** `Syllabus::ENTRIES[i]` lines up with `course.modules[i]`; likewise `LearnerProgress::AWARDS`, `LearnerProgress#dashboard_stats`, `LessonContent::BLOCKS`, and every `AdminConsole` array with its `admin.*` counterpart. Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
 Replacing a placeholder with a real model means keeping the same reader methods — the views only ever call those.
 
@@ -406,6 +408,8 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `models/learner_progress_test.rb`, `topic_completion_test.rb` | every counted figure, and what the table will and will not accept |
 | `tasks/admin_task_test.rb` | `admin:create`, including promotion of an existing account |
 | `tasks/instructor_task_test.rb` | `instructor:create`, including that it leaves an admin alone rather than demoting one |
+| `models/instructor_report_test.rb`, `models/leaderboard_test.rb` | the Teaching console and the board, counted from a real section |
+| `models/awards_test.rb` | one test per award rule, and that a new account has earned nothing |
 
 Assertions compare against `I18n.t(...)` rather than literal strings, and are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page — a copy change in a locale file should not break a test.
 
@@ -425,14 +429,14 @@ The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb
 
 ## What is real, and what is not
 
-**Users, sessions, the course taxonomy and progress are persisted; the learning material is not.**
+**Users, sessions, the course taxonomy, sections, progress and submitted work are persisted; the lesson content is not.**
 
 A learner's progress is genuinely recorded — `topic_completions` holds one row per learner per topic, and the catalog, My Learning and the dashboard all count off it. Everything else is placeholder:
 
-- **Courses, lessons and topics are not tables.** They are plain-Ruby modules of frozen constants in `app/models/`, which is why every course shares one syllabus and shows the same topic total.
+- **The learning material is copy, not records.** Courses, modules and topics are rows now, but every word a human reads — titles, prose, topic names — lives in the locale files, and every course still shares the one syllabus, which is why they all show the same topic total.
 - **A lesson's *content* is the same whichever topic you open.** `/lesson?course=AI1101&topic=2-3` is a real position in the syllabus: it decides what gets recorded, which module unlocks next, and where "continue" goes. But the prose, the quiz and the coding task behind it are one placeholder set — writing sixteen of them is a content job, not a modelling one.
 - **Grading runs on the server**, and every attempt is kept in `submissions`. The answer key and the passing patterns are not rendered, so a pass cannot be claimed by posting one. The quiz verdict does return the correct option so the page can mark it — after a graded, recorded attempt, not before.
-- **The leaderboard and the instructor report are still frozen constants**, as are hearts, awards, badges, notifications and the "projects submitted" dashboard tile. The leaderboard in particular needs a section concept that `users` does not have.
+- **The leaderboard, the Teaching console, the award shelf and the projects tile are counted** — off `sections`, `enrollments`, `topic_completions` and `submissions`. An award is a derived rule, never stored; one ("Helping Hand") is honestly unearnable until a forum exists. Hearts and notifications are still placeholder, because nothing records a lost life or an event worth notifying about.
 - **`/admin` is the exception** — its Users tab is real records and the `role` column, and it is the only screen backed by the database rather than a module. Its other five tabs are placeholder.
 - The landing page's content is still hardcoded in `HomeController#index`.
 
