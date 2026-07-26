@@ -16,11 +16,12 @@
           <%= t("instructor.subtitle", section: @section.code, count: @report.size, term: @section.term_text) %>
         </p>
       </div>
-      <button type="button"
-              class="rounded-field bg-brand px-5.5 py-3 text-14-5 font-semibold whitespace-nowrap text-white
-                     transition-colors hover:bg-brand-deep">
-        <%= t("instructor.export_csv") %>
-      </button>
+      <%# A real download since the roster became real rows — see
+          InstructorController#grades. data-turbo false: Turbo intercepting a
+          file response would swap the body with CSV. %>
+      <%= link_to t("instructor.export_csv"), instructor_grades_path, data: { turbo: false },
+            class: "rounded-field bg-brand px-5.5 py-3 text-14-5 font-semibold whitespace-nowrap text-white
+                    transition-colors hover:bg-brand-deep" %>
     </div>
 
     <div class="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">

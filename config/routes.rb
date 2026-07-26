@@ -51,6 +51,9 @@ Rails.application.routes.draw do
   get "progress", to: "progress#show", as: :progress
   get "leaderboard", to: "leaderboards#show", as: :leaderboard
   get "instructor", to: "instructor#show", as: :instructor
+  # The Teaching console's one download: the roster as CSV. A plain-word URL
+  # like every other, and the same staff gate as the screen.
+  get "instructor/grades", to: "instructor#grades", as: :instructor_grades
 
   # /instructor needs the instructor or admin role, /admin the admin role — see
   # the Authorization concern and each controller's `allow_only`.

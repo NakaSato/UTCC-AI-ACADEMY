@@ -90,6 +90,26 @@ class InstructorReport
     copy
   end
 
+  # ---- Export ---------------------------------------------------------------
+
+  # The roster as CSV: the same columns the screen shows, headed by the same
+  # locale strings, so the file reads in whichever language the console was in.
+  # Hand-rolled rather than require "csv" — Ruby 3.4 moved that to a bundled
+  # gem Bundler does not load, and six quoted columns do not earn a dependency.
+  # The BOM is for Excel, which otherwise guesses Thai names into mojibake.
+  def grades_csv
+    headers = %w[ th_id th_name th_progress th_projects th_seen ].map { I18n.t("instructor.#{it}") }
+    rows = roster.map { [ it.id, it.name, "#{it.percent}%", it.projects_text, it.seen_text ] }
+
+    "\uFEFF" + ([ headers ] + rows).map { |row| row.map { csv_field(it) }.join(",") }.join("\n")
+  end
+
+  # "grades-AI1101-BA-2-1-2569.csv" — the term's slash would otherwise nest the
+  # filename into a directory.
+  def grades_filename
+    [ "grades", section.course.code, section.code, section.term.tr("/", "-") ].join("-") + ".csv"
+  end
+
   # ---- The topics students get wrong ----------------------------------------
 
   # Share of learners whose **first** attempt at a topic failed. Counted off
@@ -157,6 +177,11 @@ class InstructorReport
     end
 
     def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round
+
+    def csv_field(value)
+      text = value.to_s
+      text.match?(/[",\n]/) ? '"' + text.gsub('"', '""') + '"' : text
+    end
 
     def severity_for(percent)
       return :alarm if percent >= ALARM_THRESHOLD
