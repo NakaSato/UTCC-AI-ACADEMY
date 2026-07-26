@@ -74,7 +74,7 @@ module ApplicationHelper
 
   def app_user_menu
     [
-      [ t("chrome.menu.profile"),    my_learning_path ],
+      [ t("chrome.menu.profile"),    profile_path ],
       [ t("chrome.menu.transcript"), progress_path ],
       [ t("chrome.menu.settings"),   my_learning_path ],
       [ t("chrome.menu.help"),       root_path ]

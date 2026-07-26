@@ -1,5 +1,10 @@
 class RegistrationsController < ApplicationController
-  layout "auth", only: :new
+  # `only:` filters by **action**, not by template, and #create renders :new when
+  # validation fails. Without `create` in this list that re-render came back on
+  # layouts/application — marketing header, no hero, full-bleed fields — which is
+  # the one screen a student is guaranteed to see when they get sign-up wrong.
+  # The other two auth controllers redirect on failure, so only this one needs it.
+  layout "auth", only: %i[ new create ]
 
   allow_unauthenticated_access
   rate_limit to: 10, within: 3.minutes, only: :create,

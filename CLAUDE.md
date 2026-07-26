@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A learning platform for UTCC students getting started with AI. Rails 8.1, Ruby 3.4.10, module `UtccAiFundamental`.
 
-`/` is **two different pages**: a marketing landing page for signed-out visitors, and the course catalog for a signed-in student (`HomeController#index` branches on `authenticated?` and renders `home/catalog` or `home/index`). An **admin is redirected to `/admin`** — the admin screen is their index, so the logo and the first nav slot both lead there and the catalog is not part of their app. Behind the login there are eight screens — catalog, course, lesson, my learning, knowledge map, progress, leaderboard, instructor.
+`/` is **two different pages**: a marketing landing page for signed-out visitors, and the course catalog for a signed-in student (`HomeController#index` branches on `authenticated?` and renders `home/catalog` or `home/index`). An **admin is redirected to `/admin`** — the admin screen is their index, so the logo and the first nav slot both lead there and the catalog is not part of their app. Behind the login there are nine screens — catalog, course, lesson, my learning, profile, knowledge map, progress, leaderboard, instructor.
 
 **Users, sessions, the course taxonomy, progress and submitted work are persisted; the learning material is not.** `courses`, `course_modules` and `topics` carry identity, taxonomy and numbers; `topic_completions` carries what a learner finished and `submissions` what they sent to get there. Everything a human *reads* — titles, prose, topic names — is still copy in the locale files, reached through the placeholder modules in `app/models/` (see below). See "Progress" and "Grading" below for what is real and what is not.
 
@@ -16,7 +16,7 @@ Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in 
 
 ## Other docs, and which one wins
 
-- **`README.md`** is written for a human joining the project, and its second half ("Technical overview" onward) covers the same ground as this file — stack, layout, request path, data model, auth, routing, tests. **The two must not drift.** An architectural change here needs the matching README section updated in the same commit; that is where the eight screens and the setup path are explained for a person who has never run the app.
+- **`README.md`** is written for a human joining the project, and its second half ("Technical overview" onward) covers the same ground as this file — stack, layout, request path, data model, auth, routing, tests. **The two must not drift.** An architectural change here needs the matching README section updated in the same commit; that is where the nine screens and the setup path are explained for a person who has never run the app.
 - **`docs/process.md`** — the team's Scrum process: two-week sprints, the four events, and a definition of done that points back at the invariants in this file. Read it before proposing what to build next; it also fixes the dependency order of the remaining work.
 - **`docs/design-system.md`** — background on the reference site, **not** the current tokens. See "Design system" below; the CSS wins.
 - **`.claude/skills/`** — four project skills (`explore-codebase`, `debug-issue`, `refactor-safely`, `review-changes`) that drive the code-review-graph MCP tools. Prefer them over hand-rolling a search.
@@ -111,7 +111,8 @@ The browser is untrusted, with one deliberate, documented exception.
 
 - **Lesson grading is on the server.** `LessonContent::CORRECT_OPTION` and `CHECKS` are read by `grade_quiz` / `grade_code` and never rendered into the page, and `POST /lesson/submit` decides the verdict — a claimed pass is not a pass. Still rate-limited at 30 in 3 minutes, and `TopicCompletion.record` is still idempotent. The one thing that does come back is `correct_index`, so the page can mark the right option after a **graded, recorded** attempt; guessing works but leaves the failed `submissions` row that makes it visible.
 - **Every param is whitelist-or-default.** `AdminConsole.tab_for` is the one where it is a security control rather than a nicety — the tab name is interpolated into a `render` path.
-- **`role` is never mass-assignable.** Sign-up permits four attributes and `:role` is not among them; the only grant is `AdminController#update`, behind `allow_only :admin`.
+- **`role` is never mass-assignable.** Sign-up permits four attributes and `:role` is not among them; **`ProfilesController#profile_params` permits four and omits it too**, along with `:student_id`. The only grant is `AdminController#update`, behind `allow_only :admin`. Both whitelists have a test that fails if a role posted through the form sticks.
+- **`/profile` edits `Current.user` and takes no id.** The path carries nothing to tamper with, so there is no object to authorize — which is why it needs no `allow_only`.
 - **No user enumeration on password reset** — `PasswordsController#create` redirects identically whether or not the address exists, and checks `present?` first so a blank submission cannot match the many accounts with a null email.
 - **Rate limits** on sign-in, sign-up, password reset (10/3min) and lesson completion (30/3min).
 - Password max length is 72 because that is bcrypt's ceiling — anything longer is silently ignored, so accepting it would be a lie.
@@ -243,6 +244,8 @@ resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?course=AI1101&topic=2-3&step=theory|exercise|code|summary
 post "lesson/submit"   => "lessons#submit"      # an answer sent to be graded; replaced lesson/complete
 get "my-learning" => "my_learning#show"         # ?tab=progress|done
+get   "profile"   => "profiles#edit"            # profile_path — the account's own details
+patch "profile"   => "profiles#update"          # the only place an email address is ever set
 get "map"         => "knowledge_maps#show"      # ?topic=<node id>&mode=course|project
 get "progress"    => "progress#show"
 get "leaderboard" => "leaderboards#show"        # ?tab=week|semester|university
@@ -262,7 +265,8 @@ Screen state lives in the **query string**, not in client-side JS — filter chi
 Two layouts:
 
 - `layouts/application` — renders `shared/_app_header` (dark app chrome: nav, language toggle, gems/streak counters, notifications, account menu) when signed in, `shared/_header` (marketing) when not. `shared/_footer` closes **every** screen either way; only its first two link columns branch on the session (`ApplicationHelper#footer_columns` — landing anchors signed out, app routes signed in, since `#learn` would scroll nowhere on `/progress`). Its copy lives under `chrome.footer.*`, not `landing.*`, because it is shared chrome.
-- `layouts/auth` — used by `SessionsController#new`, `RegistrationsController#new`, `PasswordsController#new/edit` via `layout "auth", only: …`. No app chrome; a split screen with `shared/_auth_hero` on the left.
+- `layouts/auth` — used by `SessionsController#new`, `RegistrationsController#new/create`, `PasswordsController#new/edit` via `layout "auth", only: …`. No app chrome; a split screen with `shared/_auth_hero` on the left.
+  - **`only:` filters by action, not by template**, so an action that re-renders someone else's template needs to be named too. `RegistrationsController#create` renders `:new` when validation fails and was missing from the list — the rejected sign-up came back on `layouts/application`, marketing header and all. Sign-in and password reset redirect on failure, which is why only registration was affected. Add `create` to the list of any auth action that grows a re-render.
 
 `shared/_head` is shared by both layouts — the layouts differ only in what wraps `<body>`.
 
@@ -310,6 +314,8 @@ Built on Rails 8's `bin/rails generate authentication` (cookie sessions in a `se
   - **The first admin comes from `bin/rails admin:create`** (`lib/tasks/roles.rake`) — /admin cannot grant it, since opening /admin already requires the role, and `db/seeds.rb` is fenced to `Rails.env.local?`. The task prompts when attached to a terminal and reads `ADMIN_STUDENT_ID` / `ADMIN_NAME` / `ADMIN_PASSWORD` when not, so it also works over `kamal app exec`. An existing account with that student ID is promoted rather than duplicated.
   - **`bin/rails instructor:create`** sits beside it in the same file and behaves identically, reading `INSTRUCTOR_STUDENT_ID` / `INSTRUCTOR_NAME` / `INSTRUCTOR_PASSWORD`. Both go through `RoleTask.grant`, which takes the predicate that counts as already holding the role. For admin that is `admin?`; for instructor it is **`staff?`, not `instructor?`** — admin is a superset, so writing the role onto an admin would demote them, and demoting the only admin is the one way around invariant 4. An admin is therefore reported and left alone.
 - `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a session cookie instead of a permanent one.
+- **A student signs in with a 13-digit student ID, and most accounts have no email at all.** Sign-up does not ask for one; `/profile` ("Edit info", `ProfilesController`) is the only place an account ever gets one, and the same screen is the only place `name`, `faculty` and `study_year` can be changed after sign-up. This is load-bearing rather than cosmetic: `PasswordsController#create` finds a user **by email and by nothing else**, so an account that has never opened that screen cannot recover a forgotten password. The account menu's "My profile" and the card on My Learning both link there.
+- **A blank email must normalise to `nil`, not `""`.** The column is uniquely indexed and its uniqueness validation is `allow_blank`, so two accounts each storing `""` would raise `RecordNotUnique` from the database with nothing catching it first. `User`'s `normalizes :email_address` ends in `.presence` for exactly that reason, and `:faculty` does the same.
 - `User` validates a password of 8–72 characters (`PASSWORD_LENGTH`) that contains a letter and a digit, is not in `COMMON_PASSWORDS`, and does not contain the student's own ID. A weak password in a test will fail validation rather than the assertion you intended — `"password"` and `"12345678"` are both rejected now.
 - Sign-in, sign-up and password-reset `create` actions are all `rate_limit to: 10, within: 3.minutes`.
 - Routes are spelled out one line per verb rather than declared as REST resources, so the URL a student sees is the plain English word for the screen:
@@ -338,6 +344,7 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 - **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That is three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant`) and these. `taxonomy_test.rb` asserts the shape all three have to produce.
 - `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s. `locale_negotiation_test.rb` covers the rest of the rule: which of `?lang=`, the session and `Accept-Language` wins, and that `?lang=` never persists.
 - The three that nothing on screen would catch — `crawlers_test.rb` (robots.txt, the sitemap and llms.txt agreeing about what is public), `indexing_test.rb` (canonicals, the hreflang set, and which pages ask not to be indexed) and `structured_data_test.rb` (the JSON-LD each page publishes, in both locales).
+- `test/controllers/profiles_controller_test.rb` — the account's own details: that an address saved there is the one password reset then finds, that clearing a field stores `NULL` rather than `""`, and that a posted `student_id` or `role` is dropped.
 - The auth and role suites: `admin_test.rb` (the roster and the one place a role is granted), `user_test.rb` (the password rules and the `role` enum), `sessions_`/`registrations_`/`passwords_controller_test.rb`, `auth_switch_test.rb`, `legacy_auth_routes_test.rb` (the `redirect()`s above still resolve), `footer_test.rb` (the columns branch on the session), `test/tasks/admin_task_test.rb` (`admin:create` promotes rather than duplicates) and `test/tasks/instructor_task_test.rb` (`instructor:create` leaves an admin alone rather than demoting one).
 
 Assertions compare against `I18n.t(...)` rather than literal strings; a copy change in the locale file should not break a test.

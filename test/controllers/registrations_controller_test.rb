@@ -72,6 +72,81 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?][aria-invalid=true]", "user[student_id]"
   end
 
+  # Signing up with an ID that already exists is the everyday one-error case. The
+  # heading is a fixed sentence — it counts nothing, so there is no plural to get
+  # wrong — and the list underneath is what says how many and which.
+  test "the summary heads a list of exactly the errors there are" do
+    assert_no_difference "User.count" do
+      post register_url, params: { terms: "1", user: {
+        name: "นักศึกษาใหม่",
+        student_id: users(:one).student_id,
+        password: "secret-password1",
+        password_confirmation: "secret-password1"
+      } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "div[role=alert] li", count: 1
+    # The heading carries the "!" glyph ahead of the sentence, so match inside it.
+    assert_select "div[role=alert] p", /#{Regexp.escape(I18n.t("auth.errors_title"))}/
+
+    I18n.with_locale(:en) do
+      assert_equal "Please try again", I18n.t("auth.errors_title")
+    end
+  end
+
+  # `layout "auth", only:` filters by action, and #create renders the :new
+  # template. Leave `create` off that list and a failed sign-up comes back on
+  # layouts/application: marketing header, no hero, and a form running the full
+  # width of the window.
+  test "a rejected sign-up comes back on the auth layout" do
+    post register_url, params: { terms: "1", user: {
+      name: "นักศึกษาใหม่",
+      student_id: users(:one).student_id,
+      password: "secret-password1",
+      password_confirmation: "secret-password1"
+    } }
+
+    assert_response :unprocessable_entity
+    assert_select "h1", text: I18n.t("auth.hero_title"), count: 1
+    assert_select "meta[name=robots][content=?]", "noindex, nofollow"
+    # The marketing header belongs to the other layout and must not appear.
+    assert_select "header nav", count: 0
+  end
+
+  # Each message links to the field it is about, so fixing a long form is a click
+  # rather than a hunt. The anchor has to be the id the form helper actually
+  # rendered, or the link goes nowhere.
+  test "an error message links to the field it belongs to" do
+    post register_url, params: { terms: "1", user: {
+      name: "",
+      student_id: users(:one).student_id,
+      password: "secret-password1",
+      password_confirmation: "secret-password1"
+    } }
+
+    assert_response :unprocessable_entity
+    assert_select "div[role=alert] a[href=?]", "#user_name"
+    assert_select "div[role=alert] a[href=?]", "#user_student_id"
+    assert_select "input#user_name"
+    assert_select "input#user_student_id"
+  end
+
+  # An error on :base belongs to no field, so it stays text rather than becoming
+  # a link that scrolls to nothing.
+  test "an error with no field is not rendered as a link" do
+    post register_url, params: { user: {
+      name: "นักศึกษาใหม่",
+      student_id: "2011071730013",
+      password: "secret-password1",
+      password_confirmation: "secret-password1"
+    } }
+
+    assert_response :unprocessable_entity
+    assert_select "div[role=alert] li", text: I18n.t("auth.terms_required")
+    assert_select "div[role=alert] a", count: 0
+  end
+
   test "rejects a blank student ID" do
     assert_no_difference "User.count" do
       post register_url, params: { terms: "1", user: {

@@ -18,7 +18,14 @@ class User < ApplicationRecord
   enum :role, ROLES.index_by(&:itself), default: "student", validate: true
 
   normalizes :student_id, with: ->(id) { id.strip.downcase }
-  normalizes :email_address, with: ->(e) { e.strip.downcase }
+  # `presence` matters as much as the downcasing: the column carries a unique
+  # index and most accounts have no address, so a cleared field has to come back
+  # as NULL. Stored as "" it would collide with every other account that cleared
+  # it — and `allow_blank` on the uniqueness validation means nothing would
+  # catch it before the index did. Same for faculty, which is free text a
+  # student can empty out on the profile screen.
+  normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
+  normalizes :faculty, with: ->(f) { f.strip.presence }
 
   validates :name, presence: true, length: { maximum: 60 }
   # The student ID is what sign-in authenticates on, so it is the required

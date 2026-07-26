@@ -842,11 +842,9 @@ en:
       password_confirmation: "Confirm password"
       new_password: "New password"
       new_password_confirmation: "Confirm new password"
-    # Pluralised because a form with one bad field is the common case, and
-    # "(1 problems)" is the first thing a student reads when they get it wrong.
-    errors_title:
-      one: "Please check the form again (%{count} problem)"
-      other: "Please check the form again (%{count} problems)"
+    # No count in the sentence, so no plural forms to keep in step — the list
+    # underneath is what says how many and which.
+    errors_title: "Please try again"
 
   student:
     name: "Nathaporn Jirawatanakul"

@@ -68,7 +68,9 @@ bin/rails instructor:create                # create or promote an instructor
 
 ## The screens
 
-`/` is two different pages: a marketing landing page for a signed-out visitor, and the course catalog once you sign in. Behind the login there are eight screens — catalog, course, lesson, my learning, knowledge map, progress, leaderboard, instructor — plus `/admin`.
+`/` is two different pages: a marketing landing page for a signed-out visitor, and the course catalog once you sign in. Behind the login there are nine screens — catalog, course, lesson, my learning, profile, knowledge map, progress, leaderboard, instructor — plus `/admin`.
+
+`/profile` ("Edit info") is the account's own details, reached from the avatar menu and from the card on My Learning. It is the only screen where a student changes their own record, and the only place an account acquires an **email address** — sign-up asks for a name, a student ID and a password and nothing else. That matters more than it looks: password reset finds a user by email and by nothing else, so until a student fills this in there is no way to recover their account. Their student ID is shown but not editable, and `role` is not on the form for the same reason it is not on sign-up.
 
 Screen state lives in the query string rather than in client-side JS: filter chips, lesson steps, tabs and the selected node on the knowledge map are all plain links, so any view of a screen is a URL you can share.
 
@@ -334,6 +336,8 @@ resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?step=theory|exercise|code|summary
 post "lesson/submit"   => "lessons#submit"
 get   "my-learning"    => "my_learning#show"    # ?tab=progress|done
+get   "profile"        => "profiles#edit"       # the account's own details
+patch "profile"        => "profiles#update"     # the only place an email is set
 get   "map"            => "knowledge_maps#show" # ?topic=<node id>&mode=course|project
 get   "progress"       => "progress#show"
 get   "leaderboard"    => "leaderboards#show"   # ?tab=week|semester|university
@@ -366,7 +370,7 @@ Pages also publish JSON-LD: the school on every page from `shared/_meta`, and on
 Two layouts, sharing `shared/_head`:
 
 - **`layouts/application`** — renders `shared/_app_header` (dark chrome: nav, language toggle, gems and streak counters, notifications, account menu) when signed in, `shared/_header` (marketing) when not. `shared/_footer` closes **every** screen either way; only its first two link columns branch on the session (`ApplicationHelper#footer_columns` — landing anchors signed out, app routes signed in, since `#learn` would scroll nowhere on `/progress`). Its copy lives under `chrome.footer.*`, not `landing.*`, because it is shared chrome.
-- **`layouts/auth`** — used by `SessionsController#new`, `RegistrationsController#new` and `PasswordsController#new/edit` via `layout "auth", only: …`. No app chrome; a split screen with `shared/_auth_hero` on the left.
+- **`layouts/auth`** — used by `SessionsController#new`, `RegistrationsController#new/create` and `PasswordsController#new/edit` via `layout "auth", only: …`. No app chrome; a split screen with `shared/_auth_hero` on the left. Note that `only:` matches the **action**, not the template: `#create` is in the list because it re-renders `:new` when sign-up fails.
 
 ## Frontend
 

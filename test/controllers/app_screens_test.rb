@@ -334,7 +334,7 @@ class AppScreensTest < ActionDispatch::IntegrationTest
   test "every app screen requires a session" do
     sign_out
 
-    [ course_url("AI1101"), lesson_url, my_learning_url, knowledge_map_url,
+    [ course_url("AI1101"), lesson_url, my_learning_url, profile_url, knowledge_map_url,
       progress_url, leaderboard_url, instructor_url, admin_url ].each do |url|
       get url
       assert_redirected_to root_path, "#{url} should require authentication"

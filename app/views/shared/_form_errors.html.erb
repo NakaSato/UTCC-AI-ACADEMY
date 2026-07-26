@@ -1,10 +1,38 @@
+<%# The summary a form shows when it comes back. Two things earn their keep here
+    beyond listing the messages:
+
+    - Each message is a **link to the field it is about**. `form.text_field :name`
+      renders id="user_name", which is what `field_id` rebuilds, and navigating
+      to a fragment focuses the target when it is focusable — so a student fixes
+      the problem by clicking it rather than by re-reading the form. An error on
+      :base (the terms checkbox) belongs to no field and stays plain text.
+    - `tabindex="-1"` makes the panel itself focusable, so those links have
+      somewhere to send a keyboard user back to. `role=alert` is what announces
+      the panel when it appears.
+
+    The heading counts nothing — the list is what says how many and which — so
+    auth.errors_title takes no interpolation and needs no plural forms. %>
 <% if record.errors.any? %>
-  <div role="alert"
-       class="mb-4 rounded-field border border-danger-line bg-danger-tint px-4 py-3.25 text-14 text-brand-accent">
-    <p class="mb-1 font-bold"><%= t("auth.errors_title", count: record.errors.count) %></p>
-    <ul class="list-disc pl-5">
-      <% record.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+  <div role="alert" tabindex="-1"
+       class="mb-5 rounded-field border border-danger-line border-l-[3px] border-l-brand-alert bg-danger-tint
+              px-4 py-3.5 text-14 leading-[1.55] text-brand-accent">
+    <p class="flex items-center gap-2.5 font-bold">
+      <span aria-hidden="true"
+            class="grid size-5 flex-none place-items-center rounded-full bg-brand-alert text-12 font-bold text-white">!</span>
+      <%= t("auth.errors_title") %>
+    </p>
+
+    <ul class="mt-2 flex list-disc flex-col gap-1.5 pl-11 marker:text-brand-alert">
+      <% record.errors.each do |error| %>
+        <li>
+          <% if error.attribute == :base %>
+            <%= error.full_message %>
+          <% else %>
+            <%= link_to error.full_message, "##{field_id(record, error.attribute)}",
+                  class: "underline decoration-brand-alert underline-offset-[3px]
+                          transition-colors hover:text-brand-deep hover:decoration-brand-deep" %>
+          <% end %>
+        </li>
       <% end %>
     </ul>
   </div>
