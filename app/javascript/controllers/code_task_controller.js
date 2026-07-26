@@ -33,7 +33,7 @@ export default class extends Controller {
       : `$ python split_customers.py\nSyntaxError: invalid syntax\n\n${copy.fail}`
 
     this.finishTarget.classList.toggle("hidden", !passed)
-    if (passed) this.dispatch("reward", { detail: { gems: this.gemsValue } })
+    if (passed) this.dispatch("reward", { detail: { gems: this.gemsValue, kind: "applied" } })
   }
 
   reset() {

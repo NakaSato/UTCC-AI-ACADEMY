@@ -1,8 +1,8 @@
 class ProgressController < ApplicationController
   def show
-    @stats = LearnerProfile.dashboard_stats
-    @activity = LearnerProfile.activity
-    @enrolments = LearnerProfile.enrolments
+    @stats = progress.dashboard_stats
+    @activity = progress.activity
+    @enrolments = progress.courses_for(:progress)
     @badges = LearnerProfile.dashboard_badges
   end
 end

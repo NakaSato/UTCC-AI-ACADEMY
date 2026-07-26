@@ -93,10 +93,10 @@
       <div class="rounded-card border border-hairline bg-surface p-6">
         <div class="mb-2 flex items-baseline justify-between">
           <span class="text-14 font-semibold"><%= t("course.your_progress") %></span>
-          <span class="text-14 font-bold text-brand"><%= Syllabus::PERCENT_COMPLETE %>%</span>
+          <span class="text-14 font-bold text-brand"><%= @course.percent %>%</span>
         </div>
         <div class="mb-4.5 h-2 overflow-hidden rounded-full bg-surface-3">
-          <div class="h-full rounded-full bg-brand" style="width: <%= Syllabus::PERCENT_COMPLETE %>%"></div>
+          <div class="h-full rounded-full bg-brand" style="width: <%= @course.percent %>%"></div>
         </div>
 
         <%= link_to t("course.continue"), lesson_path,

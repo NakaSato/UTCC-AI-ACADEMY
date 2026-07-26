@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   def show
-    @course = CourseCatalog.find(params[:code])
+    @course = CourseCatalog.find(params[:code], user: Current.user)
     return redirect_to root_path, alert: t("flash.course_missing") unless @course
 
     # Only AI1101 has a syllabus written out; every other course reuses it as

@@ -7,6 +7,10 @@ require "test_helper"
 class AppScreensTest < ActionDispatch::IntegrationTest
   setup { sign_in_as users(:one) }
 
+  def complete_topics(user, code, keys)
+    keys.each { TopicCompletion.record(user:, course_code: code, topic_key: it, kind: :learned) }
+  end
+
   test "root shows the catalog to a signed-in student" do
     get root_url
 
@@ -51,6 +55,13 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "details", count: Syllabus::ENTRIES.size
   end
 
+  test "the open module shows its description" do
+    get course_url("AI1101")
+
+    assert_response :success
+    assert_select "details[open] p", text: Syllabus.modules[Syllabus::DEFAULT_OPEN - 1].desc
+  end
+
   test "an unknown course code redirects to the catalog" do
     get course_url("NOPE")
 
@@ -72,6 +83,33 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Grading and proctoring both run in the browser, so the server's whole job
+  # here is to hand the controller its copy and its weights.
+  test "the theory step renders every free-form block" do
+    get lesson_url
+
+    assert_response :success
+    LessonContent.blocks.each do |block|
+      assert_select "[data-panel=theory]", text: /#{Regexp.escape(block.value.lines.first.strip)}/
+    end
+    assert_select "a[href=?]", LessonContent.blocks.find { it.type == :link }.extra
+  end
+
+  test "a student gets the proctor controller and staff get the exempt notice" do
+    get lesson_url
+
+    assert_response :success
+    assert_select "main[data-controller*=proctor]", 1
+    assert_select "main", text: /#{I18n.t("lesson.proctor.label_on")}/
+
+    sign_in_as users(:instructor)
+    get lesson_url
+
+    assert_response :success
+    assert_select "main[data-controller*=proctor]", count: 0
+    assert_select "main", text: /#{I18n.t("lesson.proctor.label_exempt")}/
+  end
+
   test "an unknown lesson step falls back to the first one" do
     get lesson_url(step: "nonsense")
 
@@ -80,9 +118,23 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "[role=tabpanel][data-panel=theory]:not([hidden])", 1
   end
 
+  test "my learning is empty until something has been finished" do
+    get my_learning_url
+
+    assert_response :success
+    assert_select "[data-panel=progress]", text: /#{I18n.t("my_learning.empty.progress")}/
+    assert_select "[data-panel=done]", text: /#{I18n.t("my_learning.empty.done")}/
+    assert_select "[data-panel=progress] summary", count: 0
+  end
+
   test "my learning switches between in-progress and completed" do
     in_progress = "[data-panel=progress] summary"
     completed = "[data-panel=done] summary"
+
+    # One topic of AI1101 finished, every topic of AI2402 — one course in each
+    # list.
+    complete_topics(users(:one), "AI1101", Syllabus.topic_keys.first(1))
+    complete_topics(users(:one), "AI2402", Syllabus.topic_keys)
 
     get my_learning_url
 
@@ -120,7 +172,7 @@ class AppScreensTest < ActionDispatch::IntegrationTest
 
   test "progress and leaderboard screens render" do
     {
-      progress_url => I18n.t("progress.greeting"),
+      progress_url => I18n.t("progress.greeting", name: users(:one).first_name),
       leaderboard_url => I18n.t("leaderboard.title")
     }.each do |url, heading|
       get url
@@ -178,7 +230,19 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     # Once in the nav rail, once in the burger drawer.
     assert_select "header a[href=?]", instructor_path, count: 2
     assert_select "header a[href=?]", admin_path, count: 2
-    # The admin entry takes the catalog's slot rather than sitting beside it.
+  end
+
+  # An admin's nav is the two staff screens and nothing else: `/` only bounces
+  # them back to /admin, so the catalog and the learner screens are not theirs.
+  test "the admin nav drops the learner screens" do
+    sign_in_as users(:admin)
+    get admin_url
+
+    assert_response :success
+    [ my_learning_path, course_path("AI1101"), lesson_path,
+      knowledge_map_path, progress_path, leaderboard_path ].each do |path|
+      assert_select "header nav a[href=?]", path, count: 0
+    end
     assert_select "header a", text: I18n.t("chrome.nav.catalog"), count: 0
   end
 

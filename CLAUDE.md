@@ -8,7 +8,7 @@ A learning platform for UTCC students getting started with AI. Rails 8.1, Ruby 3
 
 `/` is **two different pages**: a marketing landing page for signed-out visitors, and the course catalog for a signed-in student (`HomeController#index` branches on `authenticated?` and renders `home/catalog` or `home/index`). An **admin is redirected to `/admin`** — the admin screen is their index, so the logo and the first nav slot both lead there and the catalog is not part of their app. Behind the login there are eight screens — catalog, course, lesson, my learning, knowledge map, progress, leaderboard, instructor.
 
-**Nothing is persisted except users and sessions.** There are no Course/Lesson/Topic tables. Every screen is driven by plain-Ruby placeholder modules in `app/models/` (see below), so the whole app UI is real markup over fake data.
+**Users, sessions and topic completions are persisted; nothing else is.** There are still no Course/Lesson/Topic tables — every screen's *content* comes from plain-Ruby placeholder modules in `app/models/` (see below) — but a learner's **progress is real**, counted off `topic_completions`. See "Progress" below for what that covers and what it does not.
 
 Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in the header.
 
@@ -54,16 +54,37 @@ There is no CI workflow in this repo — `bin/ci` is the whole pipeline, run loc
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds no Active Record classes for the learning material. It holds **modules of frozen constants plus `Data.define` value objects**: `CourseCatalog`, `Syllabus`, `LessonContent`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`. Controllers are three or four lines each — read params, ask a module, assign.
+`app/models/` holds no Active Record classes for the learning material. It holds **modules of frozen constants plus `Data.define` value objects**: `CourseCatalog`, `Syllabus`, `LessonContent`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign.
+
+`AdminConsole` is the one with a real neighbour: the console's **Users** tab is genuinely persisted (the `role` column, `AdminController#update`), while its other five tabs are placeholder like everything else. Do not fold the roster into the module.
+
+`LearnerProfile` used to hold a learner's whole state and now holds only what nothing records yet — hearts, awards, badges, notifications. Its counted half moved to `LearnerProgress`, which is an ordinary class over `topic_completions`.
 
 The split is deliberate and consistent:
 
 - **Ruby holds numbers, taxonomy and shape** — course codes, percentages, the tree structure, which module is locked.
 - **`config/locales/{th,en}.yml` holds every word a human reads.** The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
 
-**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file, `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`. Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
+**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file, `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`, `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
-Replacing a placeholder with a real model means keeping the same reader methods; the views only ever call those.
+Replacing a placeholder with a real model means keeping the same reader methods; the views only ever call those. `LearnerProgress` is the worked example — see below.
+
+## Progress: the one thing that is recorded
+
+`topic_completions` is the only table about learning. **One row per learner per topic**, carrying `learned_at` and a nullable `applied_at` — learning a topic and applying it are one row, because a topic cannot be applied without first being learned, and the UI shows them as two bars over the same list.
+
+A topic is named by strings, not foreign keys: `course_code` from `CourseCatalog` and a `"<module>-<position>"` `topic_key` from `Syllabus`. Both are validated against those modules in `TopicCompletion`, so a row can never name a course or topic that does not exist. That is the whole reason this works without Course/Topic tables.
+
+- **`TopicCompletion.record` is idempotent** — it is a `find_or_initialize_by` that never moves a timestamp already set. The exercise and the coding task each report a pass on every run; re-running the lesson writes no second row and inflates no count.
+- **`LearnerProgress` is where completions become figures.** XP and gems per topic, how long a level is, what counts as a streak day — all display conventions, all in that class rather than in the table. It loads a learner's rows once and folds them in Ruby (the date arithmetic wants `Time.zone`, and the screens ask for six different cuts of the same rows).
+- **`ApplicationController#progress` is a `helper_method`**, so any view can ask; `User#progress` memoises it per instance.
+- **`CourseCatalog.for(user)` / `LearnerProgress#courses`** return the ordinary `CourseCatalog::Course` values with `learned`, `applied` and `next_key` filled in, so the catalog, My Learning and the dashboard all render the same object and the views did not change when this landed.
+
+Recording happens from the browser: `rewards_controller.js` POSTs to `POST /lesson/complete` when `quiz` or `code_task` announces a pass (`kind: "learned"` and `"applied"` respectively). **That means a student can post a completion they did not earn** — the same trust level as the answer key already being public. Server-side grading is the fix, and this table was the missing half of it.
+
+Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_count` and `applied_topic_count` are counted off `ENTRIES`, and every course reuses the one placeholder syllabus. That is why every course shows the same total — and it is deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
+
+**Still placeholder, and waiting on something to record them:** hearts/lives, the award shelf and badge row (`LearnerProfile`), notifications, the "projects submitted" dashboard tile, the whole `Leaderboard` (it needs a section concept that `users` does not have) and `InstructorReport`.
 
 ## Internationalisation
 
@@ -77,16 +98,18 @@ Replacing a placeholder with a real model means keeping the same reader methods;
 
 ```ruby
 resources :courses, only: :show, param: :code   # /courses/AI1101
-get "lesson"      => "lessons#show"             # ?step=theory|exercise|code|summary
+get  "lesson"          => "lessons#show"        # ?step=theory|exercise|code|summary
+post "lesson/complete" => "lessons#complete"    # the browser reporting a passed step
 get "my-learning" => "my_learning#show"         # ?tab=progress|done
 get "map"         => "knowledge_maps#show"      # ?topic=<node id>&mode=course|project
 get "progress"    => "progress#show"
 get "leaderboard" => "leaderboards#show"        # ?tab=week|semester|university
 get "instructor"  => "instructor#show"
+get "admin"       => "admin#show"               # ?tab=features|overview|users|courses|queue|audit
 root "home#index"                               # catalog signed in, /admin for an admin, landing when not
 ```
 
-Screen state lives in the **query string**, not in client-side JS — filter chips, lesson steps, tabs and the map's selected node are all links. Controllers validate the param and fall back to a default rather than raising (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`). The knowledge map derives which groups are expanded from the path to the selected node, so the URL alone determines the tree's state.
+Screen state lives in the **query string**, not in client-side JS — filter chips, lesson steps, tabs and the map's selected node are all links. Controllers validate the param and fall back to a default rather than raising (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold. The knowledge map derives which groups are expanded from the path to the selected node, so the URL alone determines the tree's state.
 
 Two layouts:
 
@@ -119,7 +142,7 @@ Built on Rails 8's `bin/rails generate authentication` (cookie sessions in a `se
 - **Authorization is a separate concern from authentication.** `users.role` is a string column defaulting to `"student"`, declared on `User` as `enum :role, ROLES.index_by(&:itself), default: "student", validate: true`. `validate: true` is deliberate: the admin form posts a role from params, and without it an unknown value raises `ArgumentError` instead of failing validation.
   - **admin is a superset of instructor.** `User#staff?` is `instructor? || admin?`, so a staff-wide gate needs no second rule for admins.
   - `Authorization` (`app/controllers/concerns/authorization.rb`) is included in `ApplicationController` **after** `Authentication`, so `require_authentication` runs first and a signed-out visitor still lands on `/login` rather than the catalog. Its `allow_only` macro mirrors `allow_unauthenticated_access` — it names who is let in, and any `User` predicate works: `allow_only :staff` on `InstructorController`, `allow_only :admin` on `AdminController`. Denial is a redirect to `root_path` with `flash[:alert]`, matching `CoursesController#show`'s handling of an unknown course code.
-  - **`ApplicationHelper#app_nav_items` is built from the role** — the instructor entry is appended only for the roles that can open it, so a gate that is missing shows up as a link nobody can use. For an admin the **admin entry replaces the catalog entry** in the first slot, since `/` only redirects them back to `/admin`. The desktop rail and the burger drawer both read that one list.
+  - **`ApplicationHelper#app_nav_items` is built from the role** — the instructor entry is appended only for the roles that can open it, so a gate that is missing shows up as a link nobody can use. An admin gets a **different list entirely** (`admin_nav_items`: admin, then instructor) rather than the learner nav with staff entries bolted on — `/` only redirects them back to `/admin`, so the catalog, the AI1101 shortcuts and the learner screens are not part of their app. The desktop rail and the burger drawer both read that one list.
   - `/admin` (`AdminController`) is the **only** screen backed by real records rather than a placeholder module, and the only place a role is granted — sign-up always produces a student, and `RegistrationsController#user_params` never whitelists `role`. **Do not add `:role` to that list**; `test/controllers/registrations_controller_test.rb` fails if you do. An admin cannot change their own role; since only an admin reaches the action, that single rule is what guarantees at least one admin always survives.
   - **The first admin comes from `bin/rails admin:create`** (`lib/tasks/admin.rake`) — /admin cannot grant it, since opening /admin already requires the role, and `db/seeds.rb` is fenced to `Rails.env.local?`. The task prompts when attached to a terminal and reads `ADMIN_STUDENT_ID` / `ADMIN_NAME` / `ADMIN_PASSWORD` when not, so it also works over `kamal app exec`. An existing account with that student ID is promoted rather than duplicated.
 - `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a session cookie instead of a permanent one.
@@ -145,6 +168,9 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 
 - `test/controllers/app_screens_test.rb` — every signed-in screen: it renders, bad params fall back, and every route redirects to login when signed out. Assertions are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page.
 - `test/models/placeholder_content_test.rb` — derived values and locale wiring for the placeholder modules, checked in both locales.
+- `test/models/learner_progress_test.rb` and `topic_completion_test.rb` — every counted figure, and what the table will and will not accept.
+- `test/controllers/lesson_completion_test.rb` — the browser-to-record seam, and that a completion then shows up on the screens that count it.
+- **`test/fixtures/topic_completions.yml` is deliberately empty and must stay present.** Tests that need progress record it themselves; the file exists so fixtures clear the table, because `bin/ci` seeds completions into the test database and those rows would otherwise outlive the users they point at.
 - `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s.
 
 Assertions compare against `I18n.t(...)` rather than literal strings; a copy change in the locale file should not break a test.
@@ -156,13 +182,14 @@ Assertions compare against `I18n.t(...)` rather than literal strings; a copy cha
 `docs/design-system.md` documents the **earlier** port from <https://eng.utcc.ac.th> (maroon `#8C1C36`, Noto Sans Thai Looped, daisyUI component anatomy). The app UI has since moved to a different system — crimson `#A81E32` on cream, IBM Plex Sans Thai — so treat that document as background on the reference site, not as a description of the current tokens. The CSS wins where they disagree.
 
 - **Tailwind v4, no daisyUI, no Node.** There are **no component CSS classes** — no `.btn`, no `.card`. If a recipe repeats, repeat the utilities.
-- **`app/assets/tailwind/application.css` is the whole stylesheet.** There is no `app/assets/stylesheets/` directory. It is `@import "tailwindcss"`, one `@theme` block (tokens), one `@layer base` block (page defaults, focus ring, reduced motion), and a small set of `@utility` escape hatches — `brand-field`, `marker-partial`, `badge-ring`, `badge-fill`, `clip-hex`, `marker-none`. Every one exists because a multi-stop gradient or a clip-path cannot be expressed as a utility without inlining a raw colour into the markup. Adding another needs that same justification.
+- **`app/assets/tailwind/application.css` is the whole stylesheet.** There is no `app/assets/stylesheets/` directory. It is `@import "tailwindcss"`, one `@theme` block (tokens), one `@layer base` block (page defaults, focus ring, reduced motion), and a small set of `@utility` escape hatches — `brand-field`, `marker-partial`, `badge-ring`, `badge-fill`, `clip-hex`, `marker-none`, `skeleton`, `skeleton-on-chrome`. Every one exists because a multi-stop gradient or a clip-path cannot be expressed as a utility without inlining a raw colour into the markup. Adding another needs that same justification.
 - **Never hardcode a hex anywhere else.** The `@theme` block is the only place one belongs. (The lone exception is the `theme-color` meta tag in `shared/_head`, which mirrors `--color-chrome`.)
 - The palette is grouped by role, and the names say where a colour goes: `brand-*` (crimson ramp), `chrome-*` (the near-black header field), `on-chrome-*` (text sitting on it, brightest to dimmest), `surface-*`/`canvas`/`hairline-*` (light surfaces), `ink-*`/`muted-*` (text), plus `gold`, `success`, `danger`, `heat-0…4` (the contribution grid) and `code-*` (static syntax colouring).
 - The type scale is **literal**: `text-14` is 14px expressed in rem. Half steps carry the design's fine-tuning and are spelled with a trailing `-5` — `text-13-5` is 13.5px, because a dot is not usable in a Tailwind theme key. Use `text-16`/`text-24`/`text-46`, never `text-base`/`text-2xl`/`text-4xl`. `text-54`/`64`/`80` exist only for the marketing landing page.
 - Layout tokens: `max-w-page` (1320px, every app screen but the leaderboard), `max-w-narrow` (1000px, the leaderboard), `h-header` (64px). Radii are named by role — `rounded-field`, `rounded-card`, `rounded-panel`, `rounded-box`.
 - **State travels on `data-*` attributes and is read by Tailwind variants** (`data-[state=correct]:`, `data-[open=true]:`, `group-open:`, `aria-selected:`). Stimulus controllers set an attribute; they do not juggle class lists. Keep it that way when adding interaction.
-- Stimulus controllers: `header` (sticky + mobile drawer), `dropdown` (notifications, account menu), `tabs`, `to_top`, `quiz` and `code_task` (in-browser lesson grading), `rewards` (listens for `quiz`/`code_task` reward events). Accordions are native `<details>` — no controller.
+- Stimulus controllers: `header` (sticky + mobile drawer), `dropdown` (notifications, account menu), `tabs`, `to_top`, `quiz` and `code_task` (in-browser lesson grading), `rewards` (listens for `quiz`/`code_task` reward events), `proctor` (lesson integrity monitoring). Accordions are native `<details>` — no controller.
+- `proctor_controller` mounts only for `Current.user.student?` — staff get the same bar with the controls inert. Like the quiz and the coding task it runs entirely in the browser and persists nothing, so the integrity score resets on reload. `Proctoring` hands it the weights and `lesson.proctor.*` hands it the sentences; the log row is a `<template>` in the view, cloned per incident, so no markup lives in JS.
 - `header_controller` receives its pinned state as **several** utilities via `data-header-pinned-class`, so it uses `classList.add/remove(...this.pinnedClasses)` — `classList.toggle` accepts only one class and will silently break if you switch back to it.
 - Anything on the chrome field (header, hero, drawer, auth screens) needs a light-on-dark variant; a `border-brand text-brand` outline button renders invisibly there.
 

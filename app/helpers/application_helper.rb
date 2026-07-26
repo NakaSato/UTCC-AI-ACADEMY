@@ -5,7 +5,13 @@ module ApplicationHelper
   # The instructor and admin entries are role-gated, matching the `allow_only`
   # on each controller: a student is never shown a door they cannot open. Both
   # the desktop nav and the burger drawer read this one list.
+  #
+  # An admin gets a nav of its own rather than the learning nav with two extra
+  # entries: `/` only redirects them back to /admin, so the catalog, the course
+  # shortcuts and the learner screens are not part of their app.
   def app_nav_items
+    return admin_nav_items if Current.user&.admin?
+
     items = [
       [ t("chrome.nav.catalog"),     root_path ],
       [ t("chrome.nav.my_learning"), my_learning_path ],
@@ -17,11 +23,15 @@ module ApplicationHelper
     ]
 
     items << [ t("chrome.nav.instructor"), instructor_path ] if Current.user&.staff?
-
-    # `/` redirects an admin to /admin, so a catalog link would only bounce them
-    # back here. The admin screen is their index and takes the same first slot.
-    items[0] = [ t("chrome.nav.admin"), admin_path ] if Current.user&.admin?
     items
+  end
+
+  # The two staff screens, admin first — it is the admin's index.
+  def admin_nav_items
+    [
+      [ t("chrome.nav.admin"),      admin_path ],
+      [ t("chrome.nav.instructor"), instructor_path ]
+    ]
   end
 
   # A nav item is current when the request is on its path — matching on path

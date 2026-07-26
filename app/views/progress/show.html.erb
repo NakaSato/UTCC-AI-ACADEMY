@@ -1,8 +1,10 @@
 <% content_for :title, "#{t("chrome.nav.progress")} — UTCC AI Academy" %>
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
-  <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("progress.greeting") %></h1>
-  <p class="mb-8 text-16 text-muted"><%= t("progress.subtitle") %></p>
+  <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("progress.greeting", name: Current.user.first_name) %></h1>
+  <p class="mb-8 text-16 text-muted">
+    <%= progress.streak.positive? ? t("progress.subtitle", count: progress.streak) : t("progress.subtitle_none") %>
+  </p>
 
   <div class="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
     <% @stats.each do |stat| %>
@@ -37,6 +39,9 @@
         <h2 class="mb-4.5 text-19 font-bold tracking-[-0.02em]"><%= t("progress.courses_in_progress") %></h2>
 
         <div class="flex flex-col gap-4">
+          <% if @enrolments.empty? %>
+            <p class="text-14 text-muted-2"><%= t("progress.no_courses") %></p>
+          <% end %>
           <% @enrolments.each do |enrolment| %>
             <%= link_to course_path(enrolment.code),
                   class: "flex flex-wrap items-center gap-4.5 rounded-[13px] p-3.5 transition-colors hover:bg-canvas" do %>
@@ -45,7 +50,7 @@
                 <%= enrolment.code %>
               </span>
               <span class="min-w-[10rem] flex-1">
-                <span class="mb-1.75 block text-15-5 font-semibold"><%= enrolment.title %></span>
+                <span class="mb-1.75 block text-15-5 font-semibold"><%= enrolment.short_title %></span>
                 <span class="block h-1.5 overflow-hidden rounded-full bg-surface-3">
                   <span class="block h-full rounded-full bg-brand" style="width: <%= enrolment.percent %>%"></span>
                 </span>
@@ -66,16 +71,18 @@
           <%= t("progress.xp_level") %>
         </div>
         <div class="mb-4 flex items-baseline gap-2.5">
-          <span class="text-38 font-bold tracking-[-0.03em]">Lv <%= LearnerProfile::XP_LEVEL %></span>
+          <span class="text-38 font-bold tracking-[-0.03em]">Lv <%= progress.level %></span>
           <span class="text-14 text-on-chrome-muted">
-            <%= number_with_delimiter(LearnerProfile::XP_CURRENT) %> /
-            <%= number_with_delimiter(LearnerProfile::XP_TARGET) %> XP
+            <%= number_with_delimiter(progress.xp) %> /
+            <%= number_with_delimiter(progress.xp_target) %> XP
           </span>
         </div>
         <div class="mb-3 h-2 overflow-hidden rounded-full bg-chrome-3">
-          <div class="h-full rounded-full bg-gold" style="width: <%= LearnerProfile.xp_percent %>%"></div>
+          <div class="h-full rounded-full bg-gold" style="width: <%= progress.xp_percent %>%"></div>
         </div>
-        <p class="text-13-5 leading-[1.6] text-on-chrome-2"><%= t("progress.xp_note") %></p>
+        <p class="text-13-5 leading-[1.6] text-on-chrome-2">
+          <%= t("progress.xp_note", count: progress.xp_to_next) %>
+        </p>
       </section>
 
       <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">

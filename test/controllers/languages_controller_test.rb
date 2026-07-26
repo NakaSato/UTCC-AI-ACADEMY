@@ -17,7 +17,7 @@ class LanguagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: I18n.t("catalog.title", locale: :en)
 
     get progress_url
-    assert_select "h1", text: I18n.t("progress.greeting", locale: :en)
+    assert_select "h1", text: I18n.t("progress.greeting", name: users(:one).first_name, locale: :en)
   end
 
   test "switching back to Thai restores the default" do

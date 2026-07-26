@@ -11,7 +11,13 @@ class ApplicationController < ActionController::Base
 
   around_action :switch_locale
 
+  # The header's gem and streak counters sit on every signed-in screen, so this
+  # is a helper rather than something each controller has to assign.
+  helper_method :progress
+
   private
+    def progress = Current.user&.progress || LearnerProgress.new(nil)
+
     # The language toggle in the header writes session[:locale]; every request
     # reads it back here. Falls back to Thai, the default locale.
     def switch_locale(&)

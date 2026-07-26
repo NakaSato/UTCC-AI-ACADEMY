@@ -330,8 +330,11 @@ en:
     badges_title: "Badges"
     badges_count: "5 of 8"
     tabs:
-      progress: "In progress (3)"
-      done: "Completed (1)"
+      progress: "In progress (%{count})"
+      done: "Completed (%{count})"
+    empty:
+      progress: "No course in flight. Finish a topic and it appears here."
+      done: "Nothing completed yet — a course lands here once every topic is done."
     badge_state:
       now: "In progress"
       done: "Completed"
@@ -406,27 +409,32 @@ en:
       eth-pdpa: "PDPA and privacy"
 
   progress:
-    greeting: "Hello, Nathaporn"
-    subtitle: "You are on a 12-day streak — 2 more topics to hit this week’s goal."
+    greeting: "Hello, %{name}"
+    subtitle: "You are on a %{count}-day streak — keep it going."
+    subtitle_none: "Finish a topic today to start a streak."
     activity_title: "Last 12 weeks"
     activity_note: "each square = 1 day"
     courses_in_progress: "Courses in progress"
+    no_courses: "Nothing started yet — open a course and finish your first topic."
+    next_up: "Next: %{topic}"
+    next_up_done: "Every topic finished"
     xp_level: "XP level"
-    xp_note: "520 XP to go for the “Model Builder” badge"
+    xp_note: "%{count} XP to go to the next level"
     earned_badges: "Badges earned"
+    # Only "projects submitted" still carries a written value: nothing records a
+    # project yet. The other three are counted — see LearnerProgress.
     stats:
       - label: "Topics learned"
-        delta: "+6 this week"
       - label: "Hours studied"
-        delta: "+3.2 this week"
       - label: "Projects submitted"
+        value: "5 / 9"
         delta: "next due 2 Aug"
       - label: "Rank in section"
-        delta: "up 2 places"
-    enrolled:
-      AI1101: "Next: Overfitting"
-      AI1102: "Next: pandas join"
-      AI2105: "Next: Few-shot"
+        delta: "among all students"
+    delta:
+      none: "nothing yet this week"
+      topics: "+%{count} this week"
+      hours: "+%{count} this week"
     enrolled_short:
       AI2105: "Prompt Engineering"
 

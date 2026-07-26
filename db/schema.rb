@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_051500) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_093000) do
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -18,6 +18,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_051500) do
     t.string "user_agent"
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "topic_completions", force: :cascade do |t|
+    t.datetime "applied_at"
+    t.string "course_code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "learned_at", null: false
+    t.string "topic_key", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "course_code", "topic_key"], name: "idx_on_user_id_course_code_topic_key_a90ae5db53", unique: true
+    t.index ["user_id", "learned_at"], name: "index_topic_completions_on_user_id_and_learned_at"
+    t.index ["user_id"], name: "index_topic_completions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -35,4 +48,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_051500) do
   end
 
   add_foreign_key "sessions", "users"
+  add_foreign_key "topic_completions", "users"
 end

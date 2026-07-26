@@ -50,7 +50,7 @@ export default class extends Controller {
 
     if (right) {
       this.nextTarget.classList.remove("hidden")
-      this.dispatch("reward", { detail: { gems: this.gemsValue } })
+      this.dispatch("reward", { detail: { gems: this.gemsValue, kind: "learned" } })
     }
   }
 }

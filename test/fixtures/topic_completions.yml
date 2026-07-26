@@ -1,0 +1,7 @@
+# Deliberately empty. Every test that needs progress records it, so a learner's
+# figures are always read back from the rows that test wrote.
+#
+# The file still has to exist: fixtures only clear the tables they cover, and
+# `bin/ci` seeds completions into the test database on every pass. Without this,
+# those rows outlive the users they point at and the next run fails loading
+# fixtures with a foreign key violation.

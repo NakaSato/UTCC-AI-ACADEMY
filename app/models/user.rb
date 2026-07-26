@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :topic_completions, dependent: :destroy
 
   # Sign-up never asks for a role — everyone starts a student, and an admin grants
   # the rest from /admin. `validate: true` keeps a role posted from that form a
@@ -49,6 +50,13 @@ class User < ApplicationRecord
   # The instructor dashboard is staff-wide: admin is a superset of instructor, so
   # a gate written against this predicate needs no second rule for admins.
   def staff? = instructor? || admin?
+
+  # Every progress figure the app shows, counted off this user's completions.
+  # Memoised per instance: one request asks it for six different cuts.
+  def progress = @progress ||= LearnerProgress.new(self)
+
+  # The greeting is on first-name terms; Thai names are written given name first.
+  def first_name = name.to_s.strip.split(/\s+/).first.to_s
 
   def display_affiliation
     [ faculty.presence, (study_year ? "ปีที่ #{study_year}" : nil) ].compact.join(" · ")

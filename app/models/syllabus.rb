@@ -36,13 +36,52 @@ module Syllabus
   # The module that is open when the course page first loads.
   DEFAULT_OPEN = 2
 
-  # Course-level figures for the four stat tiles and the sidebar table.
-  TOPIC_COUNT = 75
+  # Which kinds of topic count as "applied" rather than just learned: the ones
+  # where something is built. The My Learning bars are the split.
+  APPLIED_KINDS = %i[ exercise code project mix ].freeze
+
+  # Course-level figures for the four stat tiles and the sidebar table. The topic
+  # count is not among them: it is `topic_count`, counted off ENTRIES, so the
+  # number on the stat tile and the denominator under the progress bar cannot
+  # disagree.
   PROJECT_COUNT = 6
   CREDITS = 3
-  PERCENT_COMPLETE = 32
 
   class << self
+    # "<module number>-<position>" — what a TopicCompletion is filed under, since
+    # there is no Topic table to point at. Derived from ENTRIES rather than from
+    # the locale files, so a key never changes when copy does.
+    def topic_key(module_number, position) = "#{module_number}-#{position}"
+
+    def topic_keys
+      ENTRIES.each_with_index.flat_map do |(_status, _units, topics), index|
+        topics.each_index.map { topic_key(index + 1, it + 1) }
+      end
+    end
+
+    def applied_topic_keys
+      topic_keys.select { APPLIED_KINDS.include?(topic_entry(it).first) }
+    end
+
+    # How much there is to do. Every course reuses this one syllabus until real
+    # modules land, so these are the denominators under every progress bar —
+    # and the reason a course can be finished at all.
+    def topic_count = topic_keys.size
+    def applied_topic_count = applied_topic_keys.size
+
+    # The first topic a learner has not finished — what "next up" means on the
+    # dashboard. Nil once the syllabus is exhausted.
+    def next_topic_key(done_keys) = topic_keys.find { !done_keys.include?(it) }
+
+    # Time is not clocked anywhere, so the minutes budgeted for a topic here are
+    # what "hours studied" is counted from.
+    def topic_minutes(key) = topic_entry(key)&.last.to_i
+
+    def topic_name(key)
+      module_number, position = parse_key(key)
+      I18n.t("course.modules").dig(module_number - 1, :topics, position - 1).to_s
+    end
+
     def modules
       names = I18n.t("course.modules")
 
@@ -58,7 +97,7 @@ module Syllabus
 
     def stats
       [
-        { value: TOPIC_COUNT.to_s,                    label: I18n.t("course.stats.topics") },
+        { value: topic_count.to_s,                    label: I18n.t("course.stats.topics") },
         { value: PROJECT_COUNT.to_s,                  label: I18n.t("course.stats.projects") },
         { value: I18n.t("course.stats.total_time_value"), label: I18n.t("course.stats.total_time") },
         { value: CREDITS.to_s,                        label: I18n.t("course.stats.credits") }
@@ -73,5 +112,15 @@ module Syllabus
         [ I18n.t("course.meta.language"),      I18n.t("course.meta.language_value") ]
       ]
     end
+
+    private
+      def parse_key(key) = key.to_s.split("-", 2).map(&:to_i)
+
+      def topic_entry(key)
+        module_number, position = parse_key(key)
+        return nil unless module_number.positive? && position.positive?
+
+        ENTRIES.dig(module_number - 1, 2, position - 1)
+      end
   end
 end

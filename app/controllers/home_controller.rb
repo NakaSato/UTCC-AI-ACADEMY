@@ -15,7 +15,8 @@ class HomeController < ApplicationController
   private
     def render_catalog
       @filter = filter_param
-      @courses = CourseCatalog.all.select { |course| course.tagged?(@filter) }
+      # The learner's own counts, so a card's progress bar is their progress.
+      @courses = progress.courses.select { |course| course.tagged?(@filter) }
       @filter_counts = CourseCatalog.filter_counts
 
       render :catalog

@@ -33,6 +33,89 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     end
   end
 
+  # Every one of these joins a Ruby array to a locale array BY INDEX. A row
+  # added on one side and not the other shifts every label after it, silently,
+  # in one locale only — which is exactly what these lengths catch.
+  test "index-joined placeholder rows line up with their copy in both locales" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        {
+          "course.modules" => Syllabus::ENTRIES,
+          "lesson.theory.blocks" => LessonContent::BLOCKS,
+          "admin.features.groups" => AdminConsole::FLAG_GROUPS,
+          "admin.overview.stats" => AdminConsole::STATS,
+          "admin.overview.adoption" => AdminConsole::ADOPTION,
+          "admin.overview.health" => AdminConsole::HEALTH,
+          "admin.courses.rows" => AdminConsole::COURSES,
+          "admin.queue.rows" => AdminConsole::QUEUE_KINDS,
+          "admin.audit.rows" => AdminConsole::AUDIT_LEVELS
+        }.each do |key, rows|
+          assert_equal rows.size, I18n.t(key).size, "#{key} in #{locale}"
+        end
+
+        assert_equal(
+          AdminConsole::ACTIVITY_COUNT, I18n.t("admin.overview.activity").size, "activity in #{locale}"
+        )
+
+        # The groups nest, so their item counts have to agree row by row too.
+        AdminConsole::FLAG_GROUPS.each_with_index do |items, index|
+          assert_equal items.size, I18n.t("admin.features.groups")[index][:items].size,
+                       "feature group #{index} in #{locale}"
+        end
+      end
+    end
+  end
+
+  test "every placeholder flag and course row resolves its copy in both locales" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        AdminConsole.flags.each do |flag|
+          assert flag.name.present?, "#{flag.key} has no #{locale} name"
+          assert flag.desc.present?, "#{flag.key} has no #{locale} description"
+        end
+
+        AdminConsole.courses.each do |course|
+          assert course.name.present?, "#{course.code} has no #{locale} name"
+        end
+
+        LessonContent.blocks.each do |block|
+          assert block.value.present?, "block #{block.position} has no #{locale} copy"
+        end
+      end
+    end
+  end
+
+  test "a draft course is the one with no students" do
+    drafts = AdminConsole.courses.select(&:draft?)
+
+    assert_equal [ "AI2204" ], drafts.map(&:code)
+    assert(AdminConsole.courses.reject(&:draft?).all? { it.students.positive? })
+  end
+
+  test "the integrity band follows the score" do
+    assert_equal :clean, Proctoring.band_for(Proctoring::START_SCORE)
+    assert_equal :clean, Proctoring.band_for(85)
+    assert_equal :review, Proctoring.band_for(84)
+    assert_equal :review, Proctoring.band_for(60)
+    assert_equal :risk, Proctoring.band_for(59)
+    assert_equal :risk, Proctoring.band_for(0)
+  end
+
+  # The controller looks each incident up by kind, so a weight with no sentence
+  # behind it would log an event the sidebar could not name.
+  test "every proctoring weight has copy in both locales" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        assert_equal Proctoring::WEIGHTS.keys.sort, I18n.t("lesson.proctor.events").keys.sort
+
+        Proctoring.event_copy.each do |event|
+          assert event[:text].present?, "#{event[:kind]} has no #{locale} sentence"
+          assert event[:weight].positive?
+        end
+      end
+    end
+  end
+
   test "filter counts match the courses each filter actually selects" do
     counts = CourseCatalog.filter_counts
 
@@ -42,14 +125,22 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     end
   end
 
-  test "a started course reports progress and an unstarted one does not" do
-    started = CourseCatalog.find("AI1101")
-    unstarted = CourseCatalog.find("AI2201")
+  # The catalog on its own knows no learner, so every course reads as unstarted.
+  # Progress arrives through CourseCatalog.for — see LearnerProgressTest.
+  test "the catalog without a learner reports no progress" do
+    assert CourseCatalog.all.none?(&:started?)
+    assert CourseCatalog.all.all? { it.percent.zero? }
+    assert CourseCatalog.all.all? { it.topics.positive? },
+           "every course needs a topic count to be the denominator of a progress bar"
+  end
 
-    assert_predicate started, :started?
-    assert_equal 32, started.percent
-    assert_not_predicate unstarted, :started?
-    assert_equal 0, unstarted.percent
+  test "every course code is unique and every topic key resolves" do
+    assert_equal CourseCatalog.codes.uniq, CourseCatalog.codes
+
+    Syllabus.topic_keys.each do |key|
+      assert_operator Syllabus.topic_minutes(key), :>, 0, "#{key} has no duration"
+      assert_predicate Syllabus.topic_name(key), :present?, "#{key} has no name"
+    end
   end
 
   test "map rows only descend into open groups" do
@@ -122,20 +213,6 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     assert patterns.all? { it.match?(solution) }, "a correct solution should pass every criterion"
     assert_not patterns.all? { it.match?(LessonContent::STARTER_CODE) },
                "the starter code should not already pass"
-  end
-
-  test "the contribution grid is deterministic and in range" do
-    assert_equal LearnerProfile::ACTIVITY_DAYS, LearnerProfile.activity.size
-    assert_equal LearnerProfile.activity, LearnerProfile.activity
-    assert LearnerProfile.activity.all? { (0..4).cover?(it) }
-  end
-
-  test "enrollment percentages are derived, not hardcoded" do
-    enrollment = LearnerProfile.enrollments("progress").first
-
-    assert_equal "AI1101", enrollment.code
-    assert_equal 32, enrollment.learned_percent
-    assert_equal 13, enrollment.applied_percent
   end
 
   test "the leaderboard marks exactly one row as you" do

@@ -8,6 +8,13 @@
 module LessonContent
   STEPS = %i[ theory exercise code summary ].freeze
 
+  # There is one lesson, and this is the topic it teaches: AI1101, module 2,
+  # third topic. Completions are filed under it, so the lesson has an identity
+  # before courses and topics become tables. A `?course=&topic=` lesson route
+  # replaces these two constants, not the recording around them.
+  COURSE_CODE = "AI1101"
+  TOPIC_KEY = Syllabus.topic_key(2, 3)
+
   # How full the top progress bar is on each step.
   STEP_PERCENT = { theory: 12, exercise: 42, code: 74, summary: 100 }.freeze
 

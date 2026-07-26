@@ -14,6 +14,34 @@ class AdminTest < ActionDispatch::IntegrationTest
     assert_select "main form[action=?]", admin_user_path(users(:student))
   end
 
+  # The roster is one tab of six; the other five are placeholder content, so the
+  # only thing worth asserting about them is that each renders and that the tab
+  # param cannot be used to reach a partial that does not exist.
+  test "every console tab renders" do
+    AdminConsole::TABS.each do |tab|
+      get admin_url(tab:)
+
+      assert_response :success, "tab #{tab}"
+      assert_select "nav a[aria-current=page]", text: /#{Regexp.escape(I18n.t("admin.tabs.#{tab}"))}/
+    end
+  end
+
+  test "an unknown tab falls back to the roster" do
+    get admin_url(tab: "../../etc/passwd")
+
+    assert_response :success
+    assert_select "h2", text: I18n.t("admin.roster_title")
+  end
+
+  # Only the two tabs with something to count carry a badge; a zero would read
+  # as a problem rather than as nothing to do.
+  test "only the features and queue tabs carry a badge" do
+    assert_nil AdminConsole.badge_for(:users)
+    assert_nil AdminConsole.badge_for(:audit)
+    assert_equal AdminConsole.pending_count, AdminConsole.badge_for(:queue)
+    assert_equal AdminConsole.flags_off, AdminConsole.badge_for(:features)
+  end
+
   test "an admin promotes a student to instructor" do
     patch admin_user_url(users(:student)), params: { role: "instructor" }
 
