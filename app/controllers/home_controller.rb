@@ -10,7 +10,7 @@ class HomeController < ApplicationController
 
     # Signed out this falls through to `home/index`, the landing page — whose view
     # reads `Landing` directly and so needs no assigns, the same way the header
-    # reads `LearnerProfile`.
+    # reads `Landing` too.
     render_catalog if authenticated?
   end
 

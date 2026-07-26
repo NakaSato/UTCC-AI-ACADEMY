@@ -5,15 +5,32 @@ require "test_helper"
 # app_screens_test.rb, which asserts what a screen renders rather than what the
 # header wraps it in.
 class AppHeaderTest < ActionDispatch::IntegrationTest
-  HEARTS = -> { I18n.t("chrome.hearts_left", count: LearnerProfile::LIVES) }
+  HEARTS = -> { I18n.t("chrome.hearts_left", count: 5, max: 5) }
 
-  test "a student sees the hearts counter and the refill timer" do
+  test "a student at full hearts sees the counter and no refill timer" do
     sign_in_as users(:one)
     get root_url
 
     assert_response :success
     assert_includes response.body, HEARTS.call
-    assert_includes response.body, I18n.t("chrome.refill")
+    assert_not_includes response.body, I18n.t("chrome.refill", hours: 3, minutes: 59).split(" ").last,
+                        "a full set of hearts has nothing to count down to"
+  end
+
+  test "a fresh failure costs a heart and starts the countdown" do
+    student = users(:one)
+    # Mid-minute on purpose: the view ceils the remaining time, and a failure
+    # created "now" sits exactly on the 4h boundary.
+    at = 2.hours.ago + 45.seconds
+    Submission.create!(user: student, course: Course.find_by!(code: "AI1101"),
+                       topic: Topic.find_by!(key: "1-1"), kind: "quiz", answer: "3", passed: false,
+                       created_at: at, updated_at: at)
+
+    sign_in_as student
+    get root_url
+
+    assert_includes response.body, I18n.t("chrome.hearts_left", count: 4, max: 5)
+    assert_includes response.body, I18n.t("chrome.refill", hours: 2, minutes: 1)
   end
 
   # Hearts count lives nobody has on a staff screen, so staff are left out of
@@ -24,7 +41,6 @@ class AppHeaderTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_not_includes response.body, HEARTS.call
-    assert_not_includes response.body, I18n.t("chrome.refill")
     assert_includes response.body, I18n.t("chrome.semester")
   end
 

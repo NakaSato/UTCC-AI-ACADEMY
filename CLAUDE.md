@@ -160,13 +160,13 @@ No API layer, no service objects, no presenters, no form objects, no Redis, no N
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds **modules plus `Data.define` value objects** in front of the records: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `LearnerProfile`, `KnowledgeMap`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign. (`Leaderboard` and `InstructorReport` have left this list: they are ordinary classes over the tables now, the same shape as `LearnerProgress`.)
+`app/models/` holds **modules plus `Data.define` value objects** in front of the records: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `KnowledgeMap`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign. (`Leaderboard` and `InstructorReport` have left this list — ordinary classes over the tables now — and `LearnerProfile` is gone entirely; see below.)
 
 `CourseCatalog` and `Syllabus` are no longer frozen constants: they read `courses`, `course_modules` and `topics` and hand back the same `Data` objects they always did, which is why no view changed when the tables landed. The rest still are.
 
 `AdminConsole` is the one with a real neighbour: the console's **Users** tab is genuinely persisted (the `role` column, `AdminController#update`), while its other five tabs are placeholder like everything else. Do not fold the roster into the module.
 
-`LearnerProfile` has shrunk twice and now holds only what nothing records yet — hearts and notifications. The counting moved to `LearnerProgress` when `topic_completions` landed, and the award shelf followed once `submissions` gave its rules something to check: an award is a **derived rule**, one per medal, never stored.
+`LearnerProfile` is deleted — the worked example of a placeholder module finishing its life. The counting moved to `LearnerProgress` when `topic_completions` landed; the awards followed as **derived rules** once `submissions` existed; notifications left for their own table; and hearts became a derived display too — `LearnerProgress#hearts` is `5` minus the failed attempts of the last four hours, with the refill time derived from when the oldest counted failure ages out. **Hearts gate nothing at zero**: whether an empty set should block an attempt is a pedagogy decision nobody has made, and the display does not sneak it in.
 
 The split is deliberate and consistent:
 
@@ -175,7 +175,7 @@ The split is deliberate and consistent:
 
 ### The landing page
 
-`app/views/home/index.html.erb` used to be the exception to both rules above — two dozen lines of hardcoded Thai in the ERB and five arrays of it in a private `HomeController#landing`. It is not any more. `Landing` holds the taxonomy, `landing.*` in both locale files holds every word, and the view reads `Landing` directly rather than through assigns, the same way the header reads `LearnerProfile`. `HomeController#index` therefore assigns nothing when it renders it.
+`app/views/home/index.html.erb` used to be the exception to both rules above — two dozen lines of hardcoded Thai in the ERB and five arrays of it in a private `HomeController#landing`. It is not any more. `Landing` holds the taxonomy, `landing.*` in both locale files holds every word, and the view reads `Landing` directly rather than through assigns, the same way the header asks the `progress` helper. `HomeController#index` therefore assigns nothing when it renders it.
 
 **Its joins are by key, not by position** — unlike every module listed below. A card looks up its own copy by name, so adding one to `Landing::TOPICS` without writing its copy renders a missing translation instead of silently shifting the card after it.
 
@@ -225,7 +225,7 @@ A consequence worth knowing: **a brand-new account can only open module 1.** Tha
 
 Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_count` and `applied_topic_count` are counted off `ENTRIES`, and every course reuses the one placeholder syllabus. That is why every course shows the same total — and it is deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
 
-**Still placeholder, and what each is waiting for:** hearts/lives (no wrong answer costs a life), notifications (no deadline, grade or approval exists to notify about), the instructor's average exercise score (a submission is passed or not — nothing scores one out of ten), and the lesson's prose, quiz and coding task being the same for every topic (a content job). The leaderboard, the Teaching console, the award shelf and the projects tile are **counted now**, off `sections`, `enrollments`, `topic_completions` and `submissions`.
+**Still placeholder, and what each is waiting for:** the instructor's average exercise score (a submission is passed or not — nothing scores one out of ten), and the lesson's prose, quiz and coding task being the same for every topic (a content job). Everything else a learner sees is counted — the leaderboard, the Teaching console, awards, projects, hearts, notifications — off `sections`, `enrollments`, `topic_completions`, `submissions`, `proctor_events` and `notifications`.
 
 ## Internationalisation
 

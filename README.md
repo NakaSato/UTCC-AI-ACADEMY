@@ -138,7 +138,7 @@ flowchart LR
     RE -. "next sprint starts immediately" .-> SP
 ```
 
-The backlog's dependency order is complete: ~~Course and Topic tables~~ → ~~submissions~~ → ~~sections/cohorts~~ → ~~projects and awards~~. What is still placeholder — hearts, notifications, per-topic lesson content — is listed under "What is real, and what is not". A good sprint goal takes one placeholder surface and makes it real — a vertical slice that demos at the review.
+The backlog's dependency order is complete: ~~Course and Topic tables~~ → ~~submissions~~ → ~~sections/cohorts~~ → ~~projects and awards~~. What is still placeholder — per-topic lesson content, and the instructor's average score — is listed under "What is real, and what is not". A good sprint goal takes one placeholder surface and makes it real — a vertical slice that demos at the review.
 
 Full detail, including roles and the time-boxes, is in `docs/process.md`.
 
@@ -277,7 +277,7 @@ Recording is a consequence of grading. `quiz` and `code_task` POST what the stud
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds **two** Active Record classes (`User`, `TopicCompletion`, plus `Session`). Everything else is a module of frozen constants and `Data.define` value objects: `CourseCatalog`, `Syllabus`, `LessonContent`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`.
+`app/models/` holds the Active Record classes (`User`, `Session`, `Course`, `CourseModule`, `Topic`, `TopicCompletion`, `Submission`, `Section`, `Enrollment`, `ProctorEvent`, `Notification`) with modules and `Data.define` value objects in front of them: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `KnowledgeMap`, `Proctoring`, `AdminConsole` — plus the three bridges `LearnerProgress`, `InstructorReport` and `Leaderboard`.
 
 The split inside them is consistent:
 

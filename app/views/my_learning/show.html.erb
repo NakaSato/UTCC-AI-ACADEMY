@@ -57,7 +57,7 @@
       <section class="rounded-panel border border-hairline bg-surface px-6 pt-2 pb-7.5 sm:px-8.5"
                data-controller="panels" data-panel="<%= @tab %>">
         <nav role="tablist" class="mb-5.5 flex gap-7 border-b border-surface-3">
-          <% LearnerProfile::TABS.each do |tab| %>
+          <% MyLearningController::TABS.each do |tab| %>
             <%= link_to t("my_learning.tabs.#{tab}", count: @enrollments[tab].size), my_learning_path(tab: tab),
                   role: "tab", id: "enrollments-tab-#{tab}",
                   aria: { selected: @tab == tab, controls: "enrollments-panel-#{tab}" },
@@ -155,7 +155,7 @@
           </div>
           <div class="rounded-xl border border-chrome-line bg-chrome-2 p-3.25">
             <div class="text-19 font-bold text-canvas">
-              <%= LearnerProfile::LIVES %> / <%= LearnerProfile::MAX_LIVES %>
+              <%= progress.hearts %> / <%= progress.hearts_max %>
             </div>
             <div class="mt-0.5 text-12 text-on-chrome-muted"><%= t("chrome.hearts") %></div>
           </div>

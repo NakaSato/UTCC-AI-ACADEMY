@@ -1,7 +1,7 @@
 # Everything the app knows about one learner's progress, counted off
-# topic_completions. This is the first screen-facing object backed by real
-# records rather than by a frozen constant — LearnerProfile keeps only the parts
-# that still have nothing recording them (hearts, awards, notifications).
+# topic_completions and submissions. It was the first screen-facing object
+# backed by real records rather than a frozen constant, and it absorbed the
+# rest of LearnerProfile piece by piece until that module could go.
 #
 # The rules that turn completions into figures live here rather than in the
 # table: XP and gems per topic, how long a level is, what counts as a streak day.
@@ -151,6 +151,27 @@ class LearnerProgress
   def certificates_earned = courses.count { it.certificate && it.completed? }
   def certificates_total = courses.count(&:certificate)
 
+  # ---- Hearts -------------------------------------------------------------
+  # The counter is honest, not punitive: a failed attempt costs a heart for
+  # HEART_WINDOW and then it grows back, and NOTHING blocks at zero — whether an
+  # empty set of hearts should gate anything is a pedagogy decision nobody has
+  # made, and this display does not sneak it in. It replaces a constant 5/5
+  # beside a hardcoded refill timer, which was the counter as pure theatre.
+
+  HEARTS = 5
+  HEART_WINDOW = 4.hours
+
+  def hearts = [ HEARTS - recent_failures.size, 0 ].max
+  def hearts_max = HEARTS
+
+  # When the next heart grows back — the oldest counted failure ages out first.
+  # Nil at full.
+  def heart_refill_at
+    return nil if recent_failures.empty?
+
+    recent_failures.min_by(&:created_at).created_at + HEART_WINDOW
+  end
+
   # ---- Awards -------------------------------------------------------------
   # Derived, never stored — the same trick as Syllabus locking: each award is a
   # rule over the rows this class already holds, so earning one cannot drift
@@ -285,6 +306,10 @@ class LearnerProgress
     def final_module?
       last = Syllabus.entries.map(&:number).max
       started_courses.any? { |course| Syllabus.keys_in(last).all? { keys_for(course.code).include?(it) } }
+    end
+
+    def recent_failures
+      @recent_failures ||= own_submissions.select { !it.passed? && it.created_at > HEART_WINDOW.ago }
     end
 
     def own_submissions

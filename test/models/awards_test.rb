@@ -117,7 +117,38 @@ class AwardsTest < ActiveSupport::TestCase
     assert_equal 1, progress.certificates_earned
   end
 
+  test "hearts derive from recent failures, gate nothing, and grow back" do
+    assert_equal 5, progress.hearts
+
+    2.times { attempt_quiz(passed: false) }
+    assert_equal 3, progress.hearts
+
+    # A pass costs nothing, and an old failure has already grown back.
+    attempt_quiz(passed: true)
+    Submission.create!(user: @user, course: course_record, topic: topic_record,
+                       kind: "quiz", answer: "3", passed: false,
+                       created_at: 5.hours.ago, updated_at: 5.hours.ago)
+    assert_equal 3, progress.hearts
+
+    refill = progress.heart_refill_at
+    assert_in_delta 4.hours.from_now.to_f, refill.to_f, 60
+  end
+
+  test "hearts clamp at zero however badly it goes" do
+    8.times { attempt_quiz(passed: false) }
+
+    assert_equal 0, progress.hearts
+  end
+
   private
+    def course_record = Course.find_by!(code: "AI1101")
+    def topic_record = Topic.find_by!(key: Syllabus.topic_keys.first)
+
+    def attempt_quiz(passed:)
+      Submission.create!(user: @user, course: course_record, topic: topic_record,
+                         kind: "quiz", answer: passed ? "1" : "3", passed:)
+    end
+
     # A fresh instance per call: LearnerProgress memoises its rows, and these
     # tests write between reads.
     def progress = LearnerProgress.new(@user.reload)
