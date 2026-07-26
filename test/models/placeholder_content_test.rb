@@ -259,13 +259,4 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     assert_equal LessonContent::CHECKS.size, LessonContent.checks.size
     assert LessonContent.checks.all? { it.is_a?(String) && it.present? }
   end
-
-  test "the leaderboard marks exactly one row as you" do
-    entries = Leaderboard.entries
-
-    assert_equal Leaderboard::FIGURES.size, entries.size
-    assert_equal 1, entries.count(&:you?)
-    assert_equal 3, entries.count(&:podium?)
-    assert_equal (1..entries.size).to_a, entries.map(&:rank)
-  end
 end

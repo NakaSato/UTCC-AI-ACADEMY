@@ -108,12 +108,17 @@ class LearnerProgress
 
   # Consecutive days up to today. Yesterday still counts as the head of the run,
   # so a streak is not reported as broken until a whole day has been missed.
-  def streak
-    head = [ Date.current, Date.current - 1 ].find { active_dates.include?(it) }
+  def streak = self.class.streak_from(active_dates)
+
+  # The one streak rule, callable without a LearnerProgress: the leaderboard
+  # scores a whole section from one query and cannot afford an instance (and its
+  # query) per row.
+  def self.streak_from(dates, today: Date.current)
+    head = [ today, today - 1 ].find { dates.include?(it) }
     return 0 unless head
 
     day = head
-    day -= 1 while active_dates.include?(day - 1)
+    day -= 1 while dates.include?(day - 1)
     (head - day).to_i + 1
   end
 

@@ -446,7 +446,9 @@ en:
 
   leaderboard:
     title: "Leaderboard"
-    subtitle: "Section BA-2 · week 6 · resets every Monday 00:00"
+    subtitle: "Section %{section} · ranked by XP · the week resets Monday 00:00"
+    subtitle_none: "Ranked by XP · the week resets Monday 00:00"
+    empty: "No XP in this range yet — finish a topic to get on the board"
     th_rank: "Rank"
     th_student: "Student"
     th_topics: "Topics"
@@ -455,15 +457,6 @@ en:
       - "This week"
       - "This semester"
       - "All UTCC"
-    leaders:
-      - "Pannathorn S."
-      - "Yanisa K."
-      - "Kantaphat W."
-      - "Nathaporn J. (you)"
-      - "Supakorn T."
-      - "Pitchaya M."
-      - "Teerapat A."
-      - "Arisara C."
 
   instructor:
     title: "Instructor view · %{course}"

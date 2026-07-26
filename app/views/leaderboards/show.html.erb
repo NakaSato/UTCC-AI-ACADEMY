@@ -1,13 +1,14 @@
 <% content_for :title, "#{t("leaderboard.title")} — UTCC AI Academy" %>
 
-<%# The three ranges are the same placeholder board today, so the tabs have no
-    panels to swap — they mark themselves, keep the URL, and replay the rows'
-    entrance so the switch reads as a refresh rather than a dead click. Each
-    range becomes a real panel once the board is per-period data. %>
+<%# The ranges are real cuts of the data now, but they are still links that
+    reload the board — each tab is a URL, and the rows replay their entrance so
+    the switch reads as a refresh rather than a dead click. %>
 <main id="main" class="mx-auto max-w-narrow px-4 pt-11 pb-20 sm:px-8"
       data-controller="panels" data-panel="<%= @tab %>">
   <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("leaderboard.title") %></h1>
-  <p class="mb-7 text-16 text-muted"><%= t("leaderboard.subtitle") %></p>
+  <p class="mb-7 text-16 text-muted">
+    <%= @section ? t("leaderboard.subtitle", section: @section.code) : t("leaderboard.subtitle_none") %>
+  </p>
 
   <nav role="tablist" class="mb-6 flex flex-wrap gap-2" aria-label="<%= t("leaderboard.title") %>">
     <% Leaderboard.tab_labels.each do |tab, label| %>
@@ -31,6 +32,10 @@
       <span class="hidden text-right sm:block"><%= t("leaderboard.th_topics") %></span>
       <span class="hidden text-right sm:block"><%= t("leaderboard.th_streak") %></span>
     </div>
+
+    <% if @entries.empty? %>
+      <p class="px-6 py-8 text-14-5 text-muted"><%= t("leaderboard.empty") %></p>
+    <% end %>
 
     <% @entries.each_with_index do |entry, index| %>
       <div style="animation-delay: <%= index * 45 %>ms"
