@@ -50,12 +50,19 @@ Rails.application.routes.draw do
   # browser is reporting evidence against itself, which is why this is the one
   # post the lock does not guard.
   post "lesson/incident", to: "lessons#incident", as: :lesson_incident
+  # The bell's "mark all read" — one write, back to where you were.
+  post "notifications/read", to: "notifications#read_all", as: :read_notifications
   get "my-learning", to: "my_learning#show", as: :my_learning
   # The account's own details. One helper for both verbs, like the auth screens:
   # profile_path is the link and the form action. This is the only place an
   # account acquires an email address — sign-up does not ask for one.
   get "profile", to: "profiles#edit", as: :profile
   patch "profile", to: "profiles#update"
+  # Changing a password while signed in. Its own path because it is its own form
+  # with its own errors, sharing the screen rather than the action — and because
+  # the reset flow under /reset-password is the signed-*out* way in and answers a
+  # different question.
+  patch "profile/password", to: "profiles#update_password", as: :profile_password
   get "map", to: "knowledge_maps#show", as: :knowledge_map
   get "progress", to: "progress#show", as: :progress
   get "leaderboard", to: "leaderboards#show", as: :leaderboard
@@ -70,6 +77,10 @@ Rails.application.routes.draw do
   patch "admin/users/:id", to: "admin#update", as: :admin_user
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
+  # The other two case actions write a notification — to the student, and to
+  # the instructor of the student's section for that course.
+  post "admin/integrity/:user_id/notify", to: "admin#notify_case", as: :notify_integrity_case
+  post "admin/integrity/:user_id/escalate", to: "admin#escalate_case", as: :escalate_integrity_case
   # Section management: real records, admin only. Creating a section, pointing
   # an instructor at it, and putting students in it are the three writes a
   # deployment needs before anyone can use the cohort features.

@@ -1,6 +1,6 @@
 <%# Real cases: a learner's unreviewed proctor events, scored on the fly and
-    worst first — see Proctoring.cases. Close writes; Notify and Escalate wait
-    on notifications existing, and stay inert the way Export CSV once did. %>
+    worst first — see Proctoring.cases. All three actions write now: Close
+    stamps the events, Notify and Escalate each write a notification. %>
 <div class="mb-4.5">
   <h2 class="mb-1.25 text-21 font-bold tracking-[-0.02em]"><%= t("admin.integrity.title") %></h2>
   <p class="text-14 text-balance text-muted-2"><%= t("admin.integrity.sub") %></p>
@@ -57,16 +57,12 @@
         <%= button_to t("admin.integrity.actions.clear"), close_integrity_case_path(kase.user),
               class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
                       text-13-5 text-muted transition-colors hover:border-success hover:text-success" %>
-        <button type="button"
-                class="rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25 text-13-5
-                       text-muted transition-colors hover:border-brand hover:text-brand">
-          <%= t("admin.integrity.actions.notify") %>
-        </button>
-        <button type="button"
-                class="rounded-[10px] bg-brand px-4.5 py-2.5 text-13-5 font-semibold text-white
-                       transition-colors hover:bg-brand-deep">
-          <%= t("admin.integrity.actions.escalate") %>
-        </button>
+        <%= button_to t("admin.integrity.actions.notify"), notify_integrity_case_path(kase.user),
+              class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
+                      text-13-5 text-muted transition-colors hover:border-brand hover:text-brand" %>
+        <%= button_to t("admin.integrity.actions.escalate"), escalate_integrity_case_path(kase.user),
+              class: "cursor-pointer rounded-[10px] bg-brand px-4.5 py-2.5 text-13-5 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
       </div>
     </section>
   <% end %>

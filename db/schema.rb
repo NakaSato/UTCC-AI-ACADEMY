@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_104158) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_121151) do
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -46,6 +46,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_104158) do
     t.index ["section_id"], name: "index_enrollments_on_section_id"
     t.index ["user_id", "section_id"], name: "index_enrollments_on_user_id_and_section_id"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.json "params", default: {}, null: false
+    t.datetime "read_at"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "proctor_events", force: :cascade do |t|
@@ -145,6 +157,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_104158) do
 
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "notifications", "users"
   add_foreign_key "proctor_events", "courses"
   add_foreign_key "proctor_events", "topics"
   add_foreign_key "proctor_events", "users"

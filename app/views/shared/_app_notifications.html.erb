@@ -1,3 +1,10 @@
+<%# The bell. Real rows since notifications landed — each is a kind plus
+    interpolations, rendered in the reader's language at read time. The dot on
+    the bell is the unread count's existence, and "mark all read" is the one
+    write this menu has. %>
+<% notifications = Current.user.notifications.newest_first.limit(Notification::RECENT) %>
+<% unread = Current.user.notifications.unread.any? %>
+
 <div class="relative flex-none"
      data-controller="dropdown"
      data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
@@ -7,26 +14,35 @@
           class="relative grid size-[38px] place-items-center rounded-[10px] border border-chrome-line bg-chrome-2
                  text-14 text-on-chrome hover:border-chrome-edge hover:text-white">
     <span aria-hidden="true">◔</span>
-    <span aria-hidden="true"
-          class="absolute top-2 right-2 size-[7px] rounded-full border-[1.5px] border-chrome bg-brand"></span>
+    <% if unread %>
+      <span aria-hidden="true"
+            class="absolute top-2 right-2 size-[7px] rounded-full border-[1.5px] border-chrome bg-brand"></span>
+    <% end %>
   </button>
 
   <div class="absolute top-[46px] right-0 z-50 hidden w-[320px] overflow-hidden rounded-[14px] border border-hairline bg-surface shadow-menu"
        data-dropdown-target="panel">
     <div class="flex items-center justify-between border-b border-surface-3 px-4 py-3.5">
       <span class="text-14 font-bold text-ink"><%= t("chrome.notif_title") %></span>
-      <button type="button" data-action="dropdown#close" class="text-12-5 text-brand">
-        <%= t("chrome.notif_all") %>
-      </button>
+      <% if unread %>
+        <%= button_to t("chrome.notif_read_all"), read_notifications_path,
+              class: "cursor-pointer text-12-5 text-brand hover:text-brand-deep" %>
+      <% end %>
     </div>
 
-    <% LearnerProfile.notifications.each do |notification| %>
-      <div class="flex gap-3 border-b border-surface-5 px-4 py-3.5 <%= "bg-brand-tint" if notification[:unread] %>">
+    <% if notifications.empty? %>
+      <p class="px-4 py-6 text-13 text-balance text-muted-2"><%= t("chrome.notif_empty") %></p>
+    <% end %>
+
+    <% notifications.each do |notification| %>
+      <div class="flex gap-3 border-b border-surface-5 px-4 py-3.5 <%= "bg-brand-tint" if notification.unread? %>">
         <span aria-hidden="true"
-              class="mt-1.5 size-[7px] flex-none rounded-full <%= notification[:unread] ? "bg-brand" : "bg-transparent" %>"></span>
+              class="mt-1.5 size-[7px] flex-none rounded-full <%= notification.unread? ? "bg-brand" : "bg-transparent" %>"></span>
         <div>
-          <div class="text-13-5 leading-[1.45] text-ink"><%= notification[:title] %></div>
-          <div class="mt-0.5 text-11-5 text-muted-2"><%= notification[:when] %></div>
+          <div class="text-13-5 leading-[1.45] text-ink"><%= notification.text %></div>
+          <div class="mt-0.5 font-mono text-11 text-muted-2">
+            <%= notification.created_at.in_time_zone.strftime("%d/%m %H:%M") %>
+          </div>
         </div>
       </div>
     <% end %>

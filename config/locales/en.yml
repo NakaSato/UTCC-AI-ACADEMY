@@ -5,6 +5,10 @@ en:
 
   flash:
     integrity_closed: "Closed the case for %{name}"
+    case_notified: "Notified %{name}"
+    case_escalated: "Escalated to %{name}"
+    case_gone: "That case has already been closed"
+    no_instructor: "%{name} has no instructor for a section of this course"
     section_created: "Created section %{label}"
     section_updated: "Saved the instructor for %{label}"
     enrolled: "Enrolled %{name} in %{label}"
@@ -15,6 +19,8 @@ en:
     topic_locked: "Finish the modules before it to open that topic"
     sign_in_required: "Sign in to open that screen"
     profile_saved: "Your details have been saved"
+    password_changed: "Your password has been changed"
+    password_throttled: "Too many attempts — please try again later"
     forbidden: "That screen is for teaching staff only"
     role_changed: "%{name} is now %{role}"
     role_self: "You cannot change your own role"
@@ -24,7 +30,8 @@ en:
     brand_line: "AI Academy"
     brand_sub: "by Upperclassman"
     notif_title: "Notifications"
-    notif_all: "Mark all read"
+    notif_read_all: "Mark all read"
+    notif_empty: "Nothing yet — activity about your account will appear here"
     notif_toggle: "Open notifications"
     user_toggle: "Open account menu"
     nav_label: "Main"
@@ -53,13 +60,6 @@ en:
       transcript: "Transcript"
       help: "Help centre"
       logout: "Sign out"
-    notifications:
-      - title: "Your instructor commented on project 2"
-        when: "12 min ago"
-      - title: "New topic unlocked: Confusion matrix"
-        when: "2 hours ago"
-      - title: "2 topics left to hit your weekly goal"
-        when: "yesterday"
     to_top: "Back to top"
     footer:
       tagline: "The University of the Thai Chamber of Commerce AI learning platform, open to every faculty."
@@ -497,6 +497,12 @@ en:
       yesterday: "yesterday"
       days_ago: "%{count} days ago"
 
+  notifications:
+    enrolled: "You were enrolled in %{label}"
+    role_changed: "Your role is now %{role}"
+    integrity_notice: "Exercise monitoring recorded an incident in %{course} — please talk to your instructor"
+    integrity_escalated: "The integrity case for %{name} (%{course}) was escalated to you"
+
   admin:
     eyebrow: "Admin console"
     tabs:
@@ -779,7 +785,7 @@ en:
     subtitle: "Your name, contact address and faculty. Your student ID cannot be changed here."
     student_id_locked: "Issued by the university"
     email_hint: "Optional, but it is the only way to reset a forgotten password — registration does not ask for one."
-    password_note: "To change your password, sign out and use “Forgot password?”. That link is sent to the address above."
+    password_note: "Locked out rather than signed in? “Forgot password?” on the sign-in screen sends a link to the address above."
     submit: "Save changes"
     cancel: "Cancel"
     fields:
@@ -787,6 +793,12 @@ en:
       faculty_placeholder: "Engineering"
       study_year: "Year of study"
       study_year_blank: "Not specified"
+    password:
+      title: "Change your password"
+      subtitle: "Enter the password you use now, then the one you want instead."
+      current: "Current password"
+      submit: "Change password"
+      note: "Changing it signs you out everywhere else. This device stays signed in."
 
   auth:
     hero_title: "Start your AI journey at UTCC"
@@ -1168,6 +1180,7 @@ en:
         name: "Full name"
         password: "Password"
         password_confirmation: "Confirm password"
+        current_password: "Current password"
         role: "Role"
     errors:
       messages:
@@ -1177,6 +1190,8 @@ en:
           attributes:
             student_id:
               invalid: "must be exactly 13 digits"
+            current_password:
+              invalid: "is not the password you are signed in with"
             password:
               missing_letter: "must contain at least one letter"
               missing_digit: "must contain at least one digit"

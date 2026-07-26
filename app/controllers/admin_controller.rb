@@ -64,7 +64,11 @@ class AdminController < ApplicationController
     end
 
     enrollment = Enrollment.find_or_initialize_by(section:, user: student)
+    fresh = enrollment.new_record?
+
     if enrollment.persisted? || enrollment.save
+      # Only a new enrolment is news — re-submitting the form must not ping.
+      Notification.notify(student, "enrolled", label: section.label) if fresh
       redirect_to admin_path(tab: :sections, section: section.id),
                   notice: t("flash.enrolled", name: student.name, label: section.label)
     else
@@ -80,6 +84,31 @@ class AdminController < ApplicationController
 
     redirect_to admin_path(tab: :sections, section: section.id),
                 notice: t("flash.unenrolled", name: enrollment.user.name, label: section.label)
+  end
+
+  # "Notify student": the learner hears their case was flagged, in their own
+  # language when they read it.
+  def notify_case
+    subject = case_subject or return
+    user, course = subject
+    Notification.notify(user, "integrity_notice", course: course.code)
+
+    redirect_to admin_path(tab: :integrity), notice: t("flash.case_notified", name: user.name)
+  end
+
+  # "Escalate": the instructor of the student's section for that course hears.
+  # No section or no instructor is a flash, not a guess at someone else.
+  def escalate_case
+    subject = case_subject or return
+    user, course = subject
+    instructor = user.sections.find_by(course:)&.instructor
+
+    if instructor.nil?
+      redirect_to admin_path(tab: :integrity), alert: t("flash.no_instructor", name: user.name)
+    else
+      Notification.notify(instructor, "integrity_escalated", name: user.name, course: course.code)
+      redirect_to admin_path(tab: :integrity), notice: t("flash.case_escalated", name: instructor.name)
+    end
   end
 
   # Closing a case is stamping the learner's unreviewed events — there is no
@@ -100,6 +129,9 @@ class AdminController < ApplicationController
     if user == Current.user
       redirect_to admin_path, alert: t("flash.role_self")
     elsif user.update(role: params[:role])
+      # The role key, not the sentence — the notification names the role in the
+      # reader's language when it is read, not the granter's when it was given.
+      Notification.notify(user, "role_changed", role: user.role)
       redirect_to admin_path,
                   notice: t("flash.role_changed", name: user.name, role: t("admin.roles.#{user.role}"))
     else
@@ -112,6 +144,20 @@ class AdminController < ApplicationController
       # Selection is by lookup, so an unknown id falls back rather than raises.
       @selected = @sections.find { it.id == params[:section].to_i } || @sections.first
       @staff = User.where(role: %w[ instructor admin ]).order(:name)
+    end
+
+    # A case is a learner's unreviewed events; acting on one that closed under
+    # you is a flash, not a crash.
+    def case_subject
+      user = User.find(params[:user_id])
+      event = ProctorEvent.unreviewed.where(user:).newest_first.first
+
+      if event.nil?
+        redirect_to admin_path(tab: :integrity), alert: t("flash.case_gone")
+        return nil
+      end
+
+      [ user, event.course ]
     end
 
     # The instructor select posts an id; anything that is not a staff member's

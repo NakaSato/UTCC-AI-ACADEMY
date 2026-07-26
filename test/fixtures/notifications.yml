@@ -1,0 +1,3 @@
+# Deliberately empty, and must stay present — tests that need a notification
+# write one at the action that would really cause it; the file exists so
+# fixtures clear the table between runs.

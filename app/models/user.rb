@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :topic_completions, dependent: :destroy
   has_many :submissions, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments
