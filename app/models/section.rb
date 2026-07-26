@@ -19,6 +19,22 @@ class Section < ApplicationRecord
   # "AI1101 · BA-2" — how a section is named wherever both matter.
   def label = "#{course.code} · #{code}"
 
+  # The term as the registrar writes it — "1/2569", Buddhist year — is what the
+  # column stores, because that is what Thai staff will type. English readers
+  # get the same term in the Gregorian year; the split is display, not storage,
+  # so no date in the database carries a locale.
+  BUDDHIST_OFFSET = 543
+  # Above this a year can only be Buddhist — Gregorian stays below 2500 for
+  # centuries — so a term someone already typed in Gregorian passes through.
+  BUDDHIST_FLOOR = 2500
+
+  def term_text
+    return term unless I18n.locale == :en
+
+    number, year = term.split("/")
+    year.to_i >= BUDDHIST_FLOOR ? "#{number}/#{year.to_i - BUDDHIST_OFFSET}" : term
+  end
+
   # The section a staff member's Teaching console is about. An instructor with
   # several teaches the one they were given first; there is no picker yet, and
   # inventing one before the screen has somewhere to put it would be guessing.
