@@ -8,7 +8,7 @@ A learning platform for UTCC students getting started with AI. Rails 8.1, Ruby 3
 
 `/` is **two different pages**: a marketing landing page for signed-out visitors, and the course catalog for a signed-in student (`HomeController#index` branches on `authenticated?` and renders `home/catalog` or `home/index`). An **admin is redirected to `/admin`** — the admin screen is their index, so the logo and the first nav slot both lead there and the catalog is not part of their app. Behind the login there are eight screens — catalog, course, lesson, my learning, knowledge map, progress, leaderboard, instructor.
 
-**Users, sessions and topic completions are persisted; nothing else is.** There are still no Course/Lesson/Topic tables — every screen's *content* comes from plain-Ruby placeholder modules in `app/models/` (see below) — but a learner's **progress is real**, counted off `topic_completions`. See "Progress" below for what that covers and what it does not.
+**Users, sessions, the course taxonomy, progress and submitted work are persisted; the learning material is not.** `courses`, `course_modules` and `topics` carry identity, taxonomy and numbers; `topic_completions` carries what a learner finished and `submissions` what they sent to get there. Everything a human *reads* — titles, prose, topic names — is still copy in the locale files, reached through the placeholder modules in `app/models/` (see below). See "Progress" and "Grading" below for what is real and what is not.
 
 Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in the app header and on the auth screens — **not** on the marketing header, so a signed-out visitor to `/` has no way to switch (see the landing-page exception below).
 
@@ -77,7 +77,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 - **Views call reader methods and nothing else.** No queries, no `I18n.t` for content (they ask `course.title`, which does the lookup). A view that reaches past its assigned object is the smell that a module is missing a method.
 - **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`. **`HomeController#landing` is the one exception** — see "The landing page is the exception to both rules" below before touching it.
 - **`Data` objects are the presenters.** There is no presenter/serializer/service-object layer, and adding one would duplicate what `Data.define … do … end` already does.
-- **The dependency arrow runs from the persisted side to the placeholder side, not the other way.** `TopicCompletion` validates `course_code` against `CourseCatalog.codes` and `topic_key` against `Syllabus.topic_keys`. That inversion is the whole trick: a real table can reference a taxonomy that has no tables yet, and the strings stay honest until they do.
+- **The taxonomy is a table, and the modules read it.** `CourseCatalog` and `Syllabus` fold `courses`, `course_modules` and `topics` into the same `Data` objects they used to build from constants, so the views never learned the difference. `TopicCompletion` and `Submission` point at those rows with foreign keys, which is what the string validations became.
 - **`LearnerProgress` is the only bridge.** It is the one object that reads records and returns placeholder value objects (`CourseCatalog::Course` with the counts filled in). Keep it the only one — if a second class starts joining the two sides, the seam stops being replaceable.
 
 ### Where state lives
@@ -89,7 +89,8 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 | Language | `session[:locale]` | the session |
 | Learning progress | `topic_completions` | forever |
 | Identity and role | `users` | forever |
-| Quiz answers, coding-task attempts, proctor score, the optimistic gem counter | **browser memory only** | nothing — reload resets them |
+| Quiz answers and coding-task attempts | `submissions` | forever — every attempt, passed or not |
+| Proctor score, the optimistic gem counter | **browser memory only** | nothing — reload resets them |
 
 The rule that follows: **nothing that must survive a reload may live only in JS**, and nothing that must be shareable may live only in the session. A new piece of screen state goes in the URL by default.
 
@@ -107,7 +108,7 @@ The rule that follows: **nothing that must survive a reload may live only in JS*
 
 The browser is untrusted, with one deliberate, documented exception.
 
-- **Lesson grading is on the client**, so the answer key and the passing regexes are public and `POST /lesson/complete` believes what it is told. Accepted for a teaching exercise; mitigated only by `rate_limit to: 30, within: 3.minutes` and by `TopicCompletion.record` being idempotent, so the worst case is a student marking their own topics done. Server-side grading is the fix and the table is the half of it that exists.
+- **Lesson grading is on the server.** `LessonContent::CORRECT_OPTION` and `CHECKS` are read by `grade_quiz` / `grade_code` and never rendered into the page, and `POST /lesson/submit` decides the verdict — a claimed pass is not a pass. Still rate-limited at 30 in 3 minutes, and `TopicCompletion.record` is still idempotent. The one thing that does come back is `correct_index`, so the page can mark the right option after a **graded, recorded** attempt; guessing works but leaves the failed `submissions` row that makes it visible.
 - **Every param is whitelist-or-default.** `AdminConsole.tab_for` is the one where it is a security control rather than a nicety — the tab name is interpolated into a `render` path.
 - **`role` is never mass-assignable.** Sign-up permits four attributes and `:role` is not among them; the only grant is `AdminController#update`, behind `allow_only :admin`.
 - **No user enumeration on password reset** — `PasswordsController#create` redirects identically whether or not the address exists, and checks `present?` first so a blank submission cannot match the many accounts with a null email.
@@ -124,7 +125,7 @@ Break one of these and something rots quietly rather than failing loudly:
 3. `th.yml` and `en.yml` stay 1:1 in structure, and every positionally-indexed array keeps the same length **and order** in both.
 4. At least one admin always exists — guaranteed solely by an admin being unable to change their own role.
 5. Sign-up only ever produces a student.
-6. `test/fixtures/topic_completions.yml` stays present and empty.
+6. `test/fixtures/topic_completions.yml` and `submissions.yml` stay present and empty; `courses.yml`, `course_modules.yml` and `topics.yml` stay in step with the migration and the seeds.
 7. Denominators come from `Syllabus`, so a course's stat tile and its progress bar can never disagree.
 8. Reader-method names are the public interface of a content module. Renaming one is a view change; keeping one is what makes the module replaceable.
 
@@ -149,7 +150,7 @@ Sized for a classroom, not a public site, and the design leans on that.
 5. Turn the string validations in `TopicCompletion` into foreign keys once Course and Topic tables exist.
 6. Update `placeholder_content_test.rb` — it is the test that knows about the positional locale joins.
 
-Dependency order for the remaining work, because each unlocks the next: **Course/Topic tables** (they anchor the strings everything else references) → **submissions** (which is what makes server-side grading possible) → **sections/cohorts** (which the leaderboard and `InstructorReport` are both waiting on) → **projects, awards, notifications**.
+Dependency order for the remaining work, because each unlocks the next: ~~Course/Topic tables~~ (done — `1aa05c2`) → ~~submissions~~ (done — `e898a9b`) → **sections/cohorts** (which the leaderboard and `InstructorReport` are both waiting on) → **projects, awards, notifications**.
 
 ### What this design deliberately lacks
 
@@ -157,7 +158,9 @@ No API layer, no service objects, no presenters, no form objects, no Redis, no N
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds no Active Record classes for the learning material. It holds **modules of frozen constants plus `Data.define` value objects**: `CourseCatalog`, `Syllabus`, `LessonContent`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign.
+`app/models/` holds **modules plus `Data.define` value objects** in front of the records: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `LearnerProfile`, `KnowledgeMap`, `Leaderboard`, `InstructorReport`, `Proctoring`, `AdminConsole`. Controllers are three or four lines each — read params, ask a module, assign.
+
+`CourseCatalog` and `Syllabus` are no longer frozen constants: they read `courses`, `course_modules` and `topics` and hand back the same `Data` objects they always did, which is why no view changed when the tables landed. The rest still are.
 
 `AdminConsole` is the one with a real neighbour: the console's **Users** tab is genuinely persisted (the `role` column, `AdminController#update`), while its other five tabs are placeholder like everything else. Do not fold the roster into the module.
 
@@ -185,14 +188,22 @@ Replacing a placeholder with a real model means keeping the same reader methods;
 
 `topic_completions` is the only table about learning. **One row per learner per topic**, carrying `learned_at` and a nullable `applied_at` — learning a topic and applying it are one row, because a topic cannot be applied without first being learned, and the UI shows them as two bars over the same list.
 
-A topic is named by strings, not foreign keys: `course_code` from `CourseCatalog` and a `"<module>-<position>"` `topic_key` from `Syllabus`. Both are validated against those modules in `TopicCompletion`, so a row can never name a course or topic that does not exist. That is the whole reason this works without Course/Topic tables.
+A topic is named by **foreign keys** — `course_id` and `topic_id`. It used to be a pair of strings validated against the placeholder modules, because nothing else could enforce them; now the database does, so "every row names a course and topic that exist" is true by construction. The strings survive as association readers (`course_code`, `topic_key`): they are what the browser posts, what the URL carries and what `LearnerProgress` folds on. Completions load with `includes(:course, :topic)`.
 
 - **`TopicCompletion.record` is idempotent** — it is a `find_or_initialize_by` that never moves a timestamp already set. The exercise and the coding task each report a pass on every run; re-running the lesson writes no second row and inflates no count.
 - **`LearnerProgress` is where completions become figures.** XP and gems per topic, how long a level is, what counts as a streak day — all display conventions, all in that class rather than in the table. It loads a learner's rows once and folds them in Ruby (the date arithmetic wants `Time.zone`, and the screens ask for six different cuts of the same rows).
 - **`ApplicationController#progress` is a `helper_method`**, so any view can ask; `User#progress` memoises it per instance.
 - **`CourseCatalog.for(user)` / `LearnerProgress#courses`** return the ordinary `CourseCatalog::Course` values with `learned`, `applied` and `next_key` filled in, so the catalog, My Learning and the dashboard all render the same object and the views did not change when this landed.
 
-Recording happens from the browser: `rewards_controller.js` POSTs to `POST /lesson/complete` when `quiz` or `code_task` announces a pass (`kind: "learned"` and `"applied"` respectively), sending the course and topic the lesson was about. **That means a student can post a completion they did not earn** — the same trust level as the answer key already being public. Server-side grading is the fix, and this table was the missing half of it.
+Recording is a consequence of grading, not a report of it. `quiz` and `code_task` POST what the student did to `POST /lesson/submit`; the server grades it, writes a `submissions` row for the attempt, and writes the completion **only on a pass** — `quiz` fills the learned half, `code` the applied one. `rewards_controller.js` is a counter again and posts nothing.
+
+### Submissions: the attempt, as opposed to the outcome
+
+`submissions` holds one row per **attempt** — `user`, `course`, `topic`, `kind` (`quiz` | `code`), `answer` (the option index, or the source), `passed`. A completion is the outcome and there is exactly one per learner per topic; a submission is the trying and there are as many as it took.
+
+**Failures are kept on purpose.** They are what `InstructorReport`'s "share failing on first attempt" — still the fabricated figure on the Teaching console — will be counted from.
+
+Grading lives in `LessonContent`: `grade_quiz` compares against `CORRECT_OPTION`, `grade_code` matches `CHECKS` and rejects any leftover `___` however well the rest matches. Neither the key nor the patterns are rendered. The cost, accepted deliberately: the coding task's criteria no longer tick as you type — they light up when the run answers, because live ticking needs the patterns in the page.
 
 ### A lesson is a position in a syllabus
 
@@ -228,7 +239,7 @@ Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_
 ```ruby
 resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?course=AI1101&topic=2-3&step=theory|exercise|code|summary
-post "lesson/complete" => "lessons#complete"    # the browser reporting a passed step
+post "lesson/submit"   => "lessons#submit"      # an answer sent to be graded; replaced lesson/complete
 get "my-learning" => "my_learning#show"         # ?tab=progress|done
 get "map"         => "knowledge_maps#show"      # ?topic=<node id>&mode=course|project
 get "progress"    => "progress#show"
@@ -303,7 +314,8 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 - `test/models/placeholder_content_test.rb` — derived values and locale wiring for the placeholder modules, checked in both locales.
 - `test/models/learner_progress_test.rb` and `topic_completion_test.rb` — every counted figure, and what the table will and will not accept.
 - `test/controllers/lesson_completion_test.rb` — the browser-to-record seam, and that a completion then shows up on the screens that count it.
-- **`test/fixtures/topic_completions.yml` is deliberately empty and must stay present.** Tests that need progress record it themselves; the file exists so fixtures clear the table, because `bin/ci` seeds completions into the test database and those rows would otherwise outlive the users they point at.
+- **`test/fixtures/topic_completions.yml` and `submissions.yml` are deliberately empty and must stay present.** Tests that need progress or an attempt make one; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users and topics they point at.
+- **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That is three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant`) and these. `taxonomy_test.rb` asserts the shape all three have to produce.
 - `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s.
 - The auth and role suites: `admin_test.rb` (the roster and the one place a role is granted), `user_test.rb` (the password rules and the `role` enum), `sessions_`/`registrations_`/`passwords_controller_test.rb`, `auth_switch_test.rb`, `legacy_auth_routes_test.rb` (the `redirect()`s above still resolve), `footer_test.rb` (the columns branch on the session), `test/tasks/admin_task_test.rb` (`admin:create` promotes rather than duplicates) and `test/tasks/instructor_task_test.rb` (`instructor:create` leaves an admin alone rather than demoting one).
 
@@ -327,7 +339,7 @@ Assertions compare against `I18n.t(...)` rather than literal strings; a copy cha
 - `header_controller` receives its pinned state as **several** utilities via `data-header-pinned-class`, so it uses `classList.add/remove(...this.pinnedClasses)` — `classList.toggle` accepts only one class and will silently break if you switch back to it.
 - Anything on the chrome field (header, hero, drawer, auth screens) needs a light-on-dark variant; a `border-brand text-brand` outline button renders invisibly there.
 
-**Lesson grading runs in the browser**, so the answer key (`LessonContent::CORRECT_OPTION`) and the passing regexes (`LessonContent::CHECKS`, compiled to `RegExp` in `code_task_controller`) are public. That is intentional for a teaching exercise; real grading belongs on the server once submissions persist.
+**Lesson grading runs on the server** — `POST /lesson/submit`, graded in `LessonContent`, recorded in `submissions`. The `quiz` and `code_task` controllers send what the student did and render the verdict they get back; neither knows the answer key. They share the posting helper in `app/javascript/grading.js`, which is outside `controllers/` because `pin_all_from` would otherwise register it as a Stimulus controller.
 
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph

@@ -132,7 +132,7 @@ flowchart LR
     RE -. "next sprint starts immediately" .-> SP
 ```
 
-The backlog has a dependency order, and each item unlocks the next: ~~Course and Topic tables~~ (done) → **submissions** (what makes server-side grading possible) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
+The backlog has a dependency order, and each item unlocks the next: ~~Course and Topic tables~~ (done) → ~~submissions~~ (done — grading is on the server now) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
 
 Full detail, including roles and the time-boxes, is in `docs/process.md`.
 
@@ -209,7 +209,7 @@ Controllers below it are deliberately tiny: read a param, validate it against a 
 
 ## Data model
 
-Six tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093002`):
+Seven tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093003`):
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -263,7 +263,9 @@ What it derives: per-course counts, `courses` (the catalog with this learner's n
 
 Denominators come from `Syllabus.topic_count` / `applied_topic_count`, not from per-course numbers. Every course therefore shows the same total — deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
 
-Recording happens **from the browser**: `rewards_controller.js` POSTs to `POST /lesson/complete` when `quiz` or `code_task` announces a pass (`kind: "learned"` and `"applied"`). `LessonsController#complete` whitelists the kind, calls `TopicCompletion.record`, and returns `201` with no body — nothing on the lesson screen reads the new totals. It is rate-limited to 30 in 3 minutes.
+Recording is a consequence of grading. `quiz` and `code_task` POST what the student did to `POST /lesson/submit`; `LessonsController#submit` whitelists the kind, checks the topic is unlocked, grades it in `LessonContent`, files a `submissions` row and writes the completion **only on a pass** — `quiz` fills the learned half, `code` the applied one. It answers with the verdict the page renders, and is rate-limited to 30 in 3 minutes.
+
+**`submissions`** — `user_id`, `course_id`, `topic_id`, `kind` (`quiz` | `code`), `answer`, `passed`. One row per **attempt**, where a completion is one row per outcome. Failures are kept deliberately: they are what the instructor report's "share failing on first attempt" will be counted from.
 
 ## Placeholder content: the app's central pattern
 
@@ -326,7 +328,7 @@ post "language/:locale" => "languages#update", constraints: { locale: /th|en/ }
 
 resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?step=theory|exercise|code|summary
-post "lesson/complete" => "lessons#complete"
+post "lesson/submit"   => "lessons#submit"
 get   "my-learning"    => "my_learning#show"    # ?tab=progress|done
 get   "map"            => "knowledge_maps#show" # ?topic=<node id>&mode=course|project
 get   "progress"       => "progress#show"
@@ -368,7 +370,7 @@ Accordions are native `<details>` — no controller.
 
 `proctor_controller` mounts only for `Current.user.student?`; staff get the same bar with the controls inert. Like the quiz and the coding task it runs entirely in the browser and persists nothing, so the integrity score resets on reload. The log row is a `<template>` in the view, cloned per incident, so no markup lives in JS.
 
-**Lesson grading runs in the browser**, so the answer key (`LessonContent::CORRECT_OPTION`) and the passing regexes (`LessonContent::CHECKS`, compiled to `RegExp` in `code_task_controller`) are public. That is intentional for a teaching exercise; real grading belongs on the server once submissions persist.
+**Lesson grading runs on the server.** The `quiz` and `code_task` controllers send what the student did to `POST /lesson/submit` and render the verdict they get back; neither knows the answer key. They share the posting helper in `app/javascript/grading.js`, which sits outside `controllers/` because `pin_all_from` would otherwise register it as a Stimulus controller. The coding task's criteria light up when the run answers rather than as you type — live ticking would need the patterns in the page.
 
 ## Internationalisation
 
@@ -429,7 +431,7 @@ A learner's progress is genuinely recorded — `topic_completions` holds one row
 
 - **Courses, lessons and topics are not tables.** They are plain-Ruby modules of frozen constants in `app/models/`, which is why every course shares one syllabus and shows the same topic total.
 - **A lesson's *content* is the same whichever topic you open.** `/lesson?course=AI1101&topic=2-3` is a real position in the syllabus: it decides what gets recorded, which module unlocks next, and where "continue" goes. But the prose, the quiz and the coding task behind it are one placeholder set — writing sixteen of them is a content job, not a modelling one.
-- **Grading runs in the browser**, so the answer key is public and `POST /lesson/complete` trusts what it is told. A student can report a completion they did not earn — the same trust level as the answer key already being readable in the page. Server-side grading is the fix, and the completions table is the half of it that now exists.
+- **Grading runs on the server**, and every attempt is kept in `submissions`. The answer key and the passing patterns are not rendered, so a pass cannot be claimed by posting one. The quiz verdict does return the correct option so the page can mark it — after a graded, recorded attempt, not before.
 - **The leaderboard and the instructor report are still frozen constants**, as are hearts, awards, badges, notifications and the "projects submitted" dashboard tile. The leaderboard in particular needs a section concept that `users` does not have.
 - **`/admin` is the exception** — its Users tab is real records and the `role` column, and it is the only screen backed by the database rather than a module. Its other five tabs are placeholder.
 - The landing page's content is still hardcoded in `HomeController#index`.
