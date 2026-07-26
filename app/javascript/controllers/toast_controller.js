@@ -17,6 +17,20 @@ export default class extends Controller {
 
   connect() {
     this.timers = new Set()
+    this.clearChrome()
+  }
+
+  // The host is fixed, and what it has to clear differs by layout: the app
+  // header carries the hearts strip inside the same sticky element, the
+  // marketing one does not. The class sets a floor that clears the shorter of
+  // the two; this raises it to whatever is actually there, so neither layout
+  // has to be told and a change to the strip needs no second edit here.
+  clearChrome() {
+    const header = document.querySelector("header")
+    if (!header) return
+
+    const { bottom } = header.getBoundingClientRect()
+    if (bottom > 0) this.element.style.top = `${Math.round(bottom) + 12}px`
   }
 
   show({ detail: { message, kind = "info" } }) {

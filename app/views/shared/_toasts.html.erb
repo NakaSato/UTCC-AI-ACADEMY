@@ -12,8 +12,15 @@
 
     The row is a <template> cloned per message rather than markup built in JS,
     the same shape as the proctor log's row. %>
+<%# Below the sticky chrome, not over it: at top-4 a toast covered the header's
+    language toggle and account menu for as long as it was up. The value here
+    clears the marketing header — the same "header plus a gap" the base layer
+    uses for scroll-padding-top — and the controller raises it to the measured
+    height on a layout whose header is taller, which the app one is because the
+    hearts strip sits inside it. %>
 <div data-controller="toast" data-action="toast:show@window->toast#show"
-     class="pointer-events-none fixed top-4 right-4 left-4 z-50 sm:left-auto sm:w-[380px]">
+     class="pointer-events-none fixed top-[calc(var(--spacing-header)+var(--spacing)*3)] right-4 left-4 z-50
+            sm:left-auto sm:w-[380px]">
   <%# aria-live on the list rather than the row: the row does not exist yet when
       the screen reader starts watching, and announcing needs a stable host. %>
   <div data-toast-target="list" role="status" aria-live="polite"
