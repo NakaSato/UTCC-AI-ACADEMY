@@ -132,7 +132,7 @@ flowchart LR
     RE -. "next sprint starts immediately" .-> SP
 ```
 
-The backlog has a dependency order, and each item unlocks the next: **Course and Topic tables** → **submissions** (what makes server-side grading possible) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
+The backlog has a dependency order, and each item unlocks the next: ~~Course and Topic tables~~ (done) → **submissions** (what makes server-side grading possible) → **sections/cohorts** (what the leaderboard and instructor report wait on) → **projects, awards, notifications**. A good sprint goal takes one placeholder module and makes it real — a vertical slice that demos at the review.
 
 Full detail, including roles and the time-boxes, is in `docs/process.md`.
 
@@ -171,7 +171,7 @@ app/
     concerns/authorization.rb       the allow_only macro
   helpers/application_helper.rb     nav items per role, footer columns per session
   javascript/controllers/           Stimulus, auto-registered by filename
-  models/                           two Active Record classes; the rest are placeholder modules
+  models/                           six Active Record classes; the rest are placeholder modules
   views/
     layouts/application.html.erb    app chrome
     layouts/auth.html.erb           split-screen sign-in/sign-up/reset
@@ -181,7 +181,7 @@ config/
   locales/{th,en}.yml               every word a human reads
   routes.rb                         one line per verb, plain-English URLs
 db/
-  schema.rb                         users, sessions, topic_completions — that is all
+  schema.rb                         users, sessions, courses, course_modules, topics, topic_completions
   {queue,cache,cable}_schema.rb     the solid_* databases, kept separate on purpose
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
 lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
@@ -209,7 +209,7 @@ Controllers below it are deliberately tiny: read a param, validate it against a 
 
 ## Data model
 
-Three tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093000`):
+Six tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093002`):
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -221,16 +221,26 @@ enum :role, ROLES.index_by(&:itself), default: "student", validate: true
 
 **`sessions`** — `user_id`, `ip_address`, `user_agent`. Rails 8's generated authentication: the cookie holds a session id, so signing out is a row deletion.
 
-**`topic_completions`** — `user_id`, `course_code`, `topic_key`, `learned_at` (not null), `applied_at` (nullable). Unique index on `[user_id, course_code, topic_key]`, plus `[user_id, learned_at]` for the activity grid.
+**`courses`** — `code` (unique), `position` (unique, catalog order), `credits`, `rating`, `projects`, `hours`, `level`, `core`, `certificate`, `tags` (json), `learners`. Identity, taxonomy and numbers only; every word a human reads is still `catalog.courses.<code>.*` in the locale files.
 
-One row per learner per topic, carrying both timestamps, because a topic cannot be applied without first being learned and the UI shows them as two bars over the same list. A topic is named by **strings, not foreign keys** — `course_code` from `CourseCatalog` and a `"<module>-<position>"` `topic_key` from `Syllabus` — and both are validated against those modules:
+**`course_modules`** — `number` (unique), `units`. **`topics`** — `course_module_id`, `position`, `key` (unique), `kind`, `minutes`. Six modules, fifteen topics.
+
+A module belongs to **no course**: every course reuses the one shared syllabus, exactly as the constants did before them, so `course_modules.course_id` is the column to add on the day someone writes a second syllabus to put in it. No row carries a status — done / now / locked is derived from what a learner has finished, which is what makes finishing a topic really open the next module.
+
+`topics.key` is `"<module>-<position>"`. Derived from the two columns beside it, but stored and unique because it is the public identifier: it is what `/lesson?topic=2-3` carries.
+
+**`topic_completions`** — `user_id`, `course_id`, `topic_id`, `learned_at` (not null), `applied_at` (nullable). Unique index on `[user_id, course_id, topic_id]`, plus `[user_id, learned_at]` for the activity grid.
+
+One row per learner per topic, carrying both timestamps, because a topic cannot be applied without first being learned and the UI shows them as two bars over the same list. A topic used to be named by **strings** — validated against `CourseCatalog.codes` and `Syllabus.topic_keys`, since nothing else could enforce them. Those validations are foreign keys now, so the rule that a row can never name a course or topic that does not exist is true by construction.
+
+The strings did not go away, they moved:
 
 ```ruby
-validates :course_code, inclusion: { in: ->(_) { CourseCatalog.codes } }
-validates :topic_key,   inclusion: { in: ->(_) { Syllabus.topic_keys } }
+def course_code = course&.code
+def topic_key   = topic&.key
 ```
 
-That validation is the whole reason this works without Course and Topic tables: a row can never name a course or topic that does not exist.
+They are what the browser posts, what `LearnerProgress` folds on, and what the URL carries, so the app's vocabulary is unchanged. `LearnerProgress` loads completions with `includes(:course, :topic)` — three queries whatever the row count.
 
 `TopicCompletion.record` is **idempotent** — a `find_or_initialize_by` that never moves a timestamp already set, and that fills both stamps when the first report is an `applied` one. The exercise and the coding task each report a pass on every run; re-running the lesson writes no second row and inflates no count.
 
@@ -399,6 +409,8 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 
 **`test/fixtures/topic_completions.yml` is deliberately empty and must stay present.** Tests that need progress record it themselves; the file exists so fixtures clear the table, because `bin/ci` seeds completions into the test database and those rows would otherwise outlive the users they point at.
 
+**`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` asserts the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
+
 `bin/ci` is the whole pipeline — there is no CI service and no GitHub workflow:
 
 ```
@@ -411,7 +423,7 @@ The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb
 
 ## What is real, and what is not
 
-**Users, sessions and progress are persisted; the learning material is not.**
+**Users, sessions, the course taxonomy and progress are persisted; the learning material is not.**
 
 A learner's progress is genuinely recorded — `topic_completions` holds one row per learner per topic, and the catalog, My Learning and the dashboard all count off it. Everything else is placeholder:
 

@@ -5,20 +5,25 @@ require "test_helper"
 class LessonCompletionTest < ActionDispatch::IntegrationTest
   # The first topic of the first module: the only one a learner with no progress
   # is allowed to open.
-  TOPIC = { course: LessonContent::DEFAULT_COURSE, topic: Syllabus.topic_keys.first }.freeze
+  #
+  # A method, not a constant. The syllabus is a table now, and a constant in the
+  # class body is evaluated when the file loads — before fixtures are inserted,
+  # so `topic` would freeze as nil and every post here would come back 403 for a
+  # topic that does not exist.
+  def topic_params = { course: LessonContent::DEFAULT_COURSE, topic: Syllabus.topic_keys.first }
 
   setup { sign_in_as users(:one) }
 
   test "passing the exercise records the topic the lesson was about" do
     assert_difference -> { users(:one).topic_completions.count }, 1 do
-      post complete_lesson_url, params: { kind: "learned", **TOPIC }, as: :json
+      post complete_lesson_url, params: { kind: "learned", **topic_params }, as: :json
     end
 
     assert_response :created
 
     completion = users(:one).topic_completions.sole
-    assert_equal TOPIC[:course], completion.course_code
-    assert_equal TOPIC[:topic], completion.topic_key
+    assert_equal topic_params[:course], completion.course_code
+    assert_equal topic_params[:topic], completion.topic_key
     assert_not_predicate completion, :applied?
   end
 
@@ -26,7 +31,7 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
     locked = Syllabus.keys_in(3).first
 
     assert_no_difference -> { TopicCompletion.count } do
-      post complete_lesson_url, params: { kind: "learned", course: TOPIC[:course], topic: locked }, as: :json
+      post complete_lesson_url, params: { kind: "learned", course: topic_params[:course], topic: locked }, as: :json
     end
 
     assert_response :forbidden
@@ -34,7 +39,7 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
 
   test "a topic that is not in the syllabus is refused" do
     assert_no_difference -> { TopicCompletion.count } do
-      post complete_lesson_url, params: { kind: "learned", course: TOPIC[:course], topic: "99-9" }, as: :json
+      post complete_lesson_url, params: { kind: "learned", course: topic_params[:course], topic: "99-9" }, as: :json
     end
 
     assert_response :forbidden
@@ -42,34 +47,34 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
 
   test "finishing a module opens the next one" do
     Syllabus.keys_in(1).each do |key|
-      post complete_lesson_url, params: { kind: "learned", course: TOPIC[:course], topic: key }, as: :json
+      post complete_lesson_url, params: { kind: "learned", course: topic_params[:course], topic: key }, as: :json
     end
 
-    post complete_lesson_url, params: { kind: "learned", course: TOPIC[:course], topic: Syllabus.keys_in(2).first },
+    post complete_lesson_url, params: { kind: "learned", course: topic_params[:course], topic: Syllabus.keys_in(2).first },
          as: :json
 
     assert_response :created
   end
 
   test "passing the coding task marks the same topic applied" do
-    post complete_lesson_url, params: { kind: "learned", **TOPIC }, as: :json
+    post complete_lesson_url, params: { kind: "learned", **topic_params }, as: :json
 
     assert_no_difference -> { users(:one).topic_completions.count } do
-      post complete_lesson_url, params: { kind: "applied", **TOPIC }, as: :json
+      post complete_lesson_url, params: { kind: "applied", **topic_params }, as: :json
     end
 
     assert_predicate users(:one).topic_completions.sole, :applied?
   end
 
   test "reporting the same pass twice records it once" do
-    2.times { post complete_lesson_url, params: { kind: "learned", **TOPIC }, as: :json }
+    2.times { post complete_lesson_url, params: { kind: "learned", **topic_params }, as: :json }
 
     assert_equal 1, users(:one).topic_completions.count
   end
 
   test "a kind the lesson does not hand out is refused" do
     assert_no_difference -> { TopicCompletion.count } do
-      post complete_lesson_url, params: { kind: "cheated", **TOPIC }, as: :json
+      post complete_lesson_url, params: { kind: "cheated", **topic_params }, as: :json
     end
 
     assert_response :unprocessable_entity
@@ -77,14 +82,14 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
 
   test "recording requires a session" do
     sign_out
-    post complete_lesson_url, params: { kind: "learned", **TOPIC }, as: :json
+    post complete_lesson_url, params: { kind: "learned", **topic_params }, as: :json
 
     assert_redirected_to login_path
     assert_equal 0, TopicCompletion.count
   end
 
   test "the record shows up on the screens that count it" do
-    post complete_lesson_url, params: { kind: "applied", **TOPIC }, as: :json
+    post complete_lesson_url, params: { kind: "applied", **topic_params }, as: :json
 
     get my_learning_url
     assert_select "[data-panel=progress] summary",

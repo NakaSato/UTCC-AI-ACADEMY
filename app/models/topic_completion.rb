@@ -2,21 +2,26 @@
 # every figure on My Learning, Progress and the catalog's progress bars is
 # counted off this table.
 #
-# There are no Course or Topic tables yet, so a topic is named by the placeholder
-# taxonomy: a course code from CourseCatalog and a "<module>-<position>" key from
-# Syllabus. Validating against both is what keeps the strings honest until real
-# models land — a completion for a course that does not exist cannot be written.
+# A topic used to be named by strings — a course code and a "<module>-<position>"
+# key — validated against the placeholder taxonomy because nothing else could
+# enforce them. Now `courses` and `topics` exist, so those validations are
+# foreign keys and the rule that every row names a course and topic that exist is
+# true by construction rather than by inspection.
+#
+# `course_code` and `topic_key` survive as readers. They are what the browser
+# posts, what LearnerProgress folds on, and what the URL carries, so the strings
+# stay the app's vocabulary even though the columns are gone.
 class TopicCompletion < ApplicationRecord
   belongs_to :user
+  belongs_to :course
+  belongs_to :topic
 
   # Recorded from the browser, so both halves arrive as params — see
   # LessonsController#complete.
   KINDS = %i[ learned applied ].freeze
 
-  validates :course_code, presence: true, inclusion: { in: ->(_) { CourseCatalog.codes } }
-  validates :topic_key, presence: true, inclusion: { in: ->(_) { Syllabus.topic_keys } }
   validates :learned_at, presence: true
-  validates :topic_key, uniqueness: { scope: %i[ user_id course_code ] }
+  validates :topic_id, uniqueness: { scope: %i[ user_id course_id ] }
 
   scope :applied, -> { where.not(applied_at: nil) }
 
@@ -24,13 +29,21 @@ class TopicCompletion < ApplicationRecord
   # writes both stamps. Idempotent in both directions: re-running the exercise
   # does not move the original timestamp, and re-running the coding task does not
   # write a second row.
+  #
+  # Still takes the strings. An unknown code or key resolves to nil, which fails
+  # `belongs_to` and comes back unpersisted — the same answer the inclusion
+  # validations used to give, and what LessonsController checks for.
   def self.record(user:, course_code:, topic_key:, kind:, at: Time.current)
-    completion = find_or_initialize_by(user:, course_code:, topic_key:)
+    completion = find_or_initialize_by(user:, course: Course.find_by(code: course_code),
+                                       topic: Topic.find_by(key: topic_key))
     completion.learned_at ||= at
     completion.applied_at ||= at if kind.to_sym == :applied
     completion.save
     completion
   end
+
+  def course_code = course&.code
+  def topic_key = topic&.key
 
   def applied? = applied_at.present?
 

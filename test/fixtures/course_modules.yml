@@ -1,0 +1,26 @@
+# The one shared syllabus every course reuses. Mirrors the CreateCourses
+# migration; see courses.yml for why fixtures exist for reference data at all.
+
+module_1:
+  number: 1
+  units: 12
+
+module_2:
+  number: 2
+  units: 18
+
+module_3:
+  number: 3
+  units: 22
+
+module_4:
+  number: 4
+  units: 15
+
+module_5:
+  number: 5
+  units: 14
+
+module_6:
+  number: 6
+  units: 10

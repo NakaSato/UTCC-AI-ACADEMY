@@ -52,7 +52,7 @@ class AppScreensTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: I18n.t("catalog.courses.AI1101.title")
-    assert_select "details", count: Syllabus::ENTRIES.size
+    assert_select "details", count: Syllabus.entries.size
   end
 
   # Without a `?module=` the open one is where the learner is: module 1 for an

@@ -1,0 +1,111 @@
+# Fifteen topics across six modules — `Syllabus.topic_count` is counted off
+# these, so every denominator in the test suite comes from this file. Seven are
+# an applied kind (exercise, code, project, mix), which is `applied_topic_count`.
+#
+# The fixture name is the topic key with the dash spelled out, so `topic_1_3` is
+# "1-3" and a failure names the topic you can find in the locale file.
+
+topic_1_1:
+  course_module: module_1
+  position: 1
+  key: "1-1"
+  kind: theory
+  minutes: 8
+
+topic_1_2:
+  course_module: module_1
+  position: 2
+  key: "1-2"
+  kind: theory
+  minutes: 10
+
+topic_1_3:
+  course_module: module_1
+  position: 3
+  key: "1-3"
+  kind: exercise
+  minutes: 15
+
+topic_2_1:
+  course_module: module_2
+  position: 1
+  key: "2-1"
+  kind: theory
+  minutes: 9
+
+topic_2_2:
+  course_module: module_2
+  position: 2
+  key: "2-2"
+  kind: theory
+  minutes: 12
+
+topic_2_3:
+  course_module: module_2
+  position: 3
+  key: "2-3"
+  kind: mix
+  minutes: 14
+
+topic_2_4:
+  course_module: module_2
+  position: 4
+  key: "2-4"
+  kind: code
+  minutes: 20
+
+topic_3_1:
+  course_module: module_3
+  position: 1
+  key: "3-1"
+  kind: code
+  minutes: 18
+
+topic_3_2:
+  course_module: module_3
+  position: 2
+  key: "3-2"
+  kind: code
+  minutes: 24
+
+topic_4_1:
+  course_module: module_4
+  position: 1
+  key: "4-1"
+  kind: theory
+  minutes: 11
+
+topic_4_2:
+  course_module: module_4
+  position: 2
+  key: "4-2"
+  kind: exercise
+  minutes: 16
+
+topic_5_1:
+  course_module: module_5
+  position: 1
+  key: "5-1"
+  kind: theory
+  minutes: 12
+
+topic_5_2:
+  course_module: module_5
+  position: 2
+  key: "5-2"
+  kind: project
+  minutes: 40
+
+topic_6_1:
+  course_module: module_6
+  position: 1
+  key: "6-1"
+  kind: theory
+  minutes: 10
+
+topic_6_2:
+  course_module: module_6
+  position: 2
+  key: "6-2"
+  kind: theory
+  minutes: 12

@@ -8,16 +8,27 @@ class TopicCompletionTest < ActiveSupport::TestCase
     @key = Syllabus.topic_keys.first
   end
 
+  # The invariant has not changed — every row names a course and a topic that
+  # exist — but it is a foreign key now rather than an inclusion validation, so
+  # it is checked through `record`, which is what turns the strings into rows.
   test "a completion names a real course and a real topic" do
-    completion = TopicCompletion.new(user: @user, course_code: "AI1101", topic_key: @key, learned_at: Time.current)
-    assert_predicate completion, :valid?
+    assert_predicate TopicCompletion.record(user: @user, course_code: "AI1101", topic_key: @key,
+                                            kind: :learned), :persisted?
 
-    completion.course_code = "NOPE"
-    assert_not_predicate completion, :valid?
+    assert_not_predicate TopicCompletion.record(user: @user, course_code: "NOPE", topic_key: @key,
+                                                kind: :learned), :persisted?
 
-    completion.course_code = "AI1101"
-    completion.topic_key = "99-99"
-    assert_not_predicate completion, :valid?
+    assert_not_predicate TopicCompletion.record(user: @user, course_code: "AI1101", topic_key: "99-99",
+                                                kind: :learned), :persisted?
+  end
+
+  # The strings the browser posts and every counter reads are association
+  # readers now, so they have to keep answering.
+  test "a completion still answers to the course code and topic key" do
+    completion = TopicCompletion.record(user: @user, course_code: "AI1101", topic_key: @key, kind: :learned)
+
+    assert_equal "AI1101", completion.course_code
+    assert_equal @key, completion.topic_key
   end
 
   test "recording the same topic twice keeps one row and the first timestamp" do

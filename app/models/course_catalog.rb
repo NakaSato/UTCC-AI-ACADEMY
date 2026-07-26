@@ -1,6 +1,7 @@
-# Placeholder course data until real models land — see README "Next steps".
-# Everything a human reads lives in config/locales; only the numbers and the
-# taxonomy live here, so swapping in a Course model means replacing `all`.
+# The catalog, read off the `courses` table. Everything a human reads still lives
+# in config/locales, looked up by course code — the table carries identity,
+# taxonomy and numbers only, which is why `Course` below did not change when the
+# rows landed and why no view did either.
 module CourseCatalog
   # The order here is the order of the filter chips on the catalog.
   FILTERS = %i[ all core popular ml genai data ethics ].freeze
@@ -65,33 +66,29 @@ module CourseCatalog
     end
   end
 
-  ENTRIES = [
-    { code: "AI1101", credits: 3, rating: "4.8", projects: 6, hours: 42, level: :beginner,
-      core: true,  certificate: true,  tags: %i[core popular], learners: "1,240" },
-    { code: "AI1102", credits: 3, rating: "4.7", projects: 9, hours: 55, level: :beginner,
-      core: true,  certificate: true,  tags: %i[core popular], learners: "980" },
-    { code: "AI2201", credits: 3, rating: "4.6", projects: 8, hours: 60, level: :intermediate,
-      core: true,  certificate: true,  tags: %i[core ml], learners: "612" },
-    { code: "AI2105", credits: 2, rating: "4.9", projects: 5, hours: 24, level: :beginner,
-      core: false, certificate: true,  tags: %i[popular genai], learners: "1,510" },
-    { code: "AI2108", credits: 3, rating: "4.5", projects: 7, hours: 38, level: :intermediate,
-      core: false, certificate: false, tags: %i[data], learners: "445" },
-    { code: "AI3301", credits: 3, rating: "4.6", projects: 6, hours: 50, level: :advanced,
-      core: false, certificate: true,  tags: %i[ml], learners: "288" },
-    { code: "AI2210", credits: 2, rating: "4.8", projects: 4, hours: 20, level: :beginner,
-      core: false, certificate: false, tags: %i[popular genai], learners: "870" },
-    { code: "AI2402", credits: 2, rating: "4.4", projects: 3, hours: 18, level: :beginner,
-      core: false, certificate: false, tags: %i[ethics], learners: "520" }
-  ].freeze
-
   class << self
     # The catalog with nobody signed in: taxonomy only, every progress bar at
     # zero. `for` is the one that knows about a learner.
     def all
-      ENTRIES.map { |attrs| Course.new(**attrs, learned: 0, applied: 0, next_key: Syllabus.topic_keys.first) }
+      first_key = Syllabus.topic_keys.first
+
+      records.map { Course.new(**attributes_for(it), learned: 0, applied: 0, next_key: first_key) }
     end
 
-    def codes = ENTRIES.map { it[:code] }
+    # The rows behind the catalog, in catalog order. One query; `all` and `for`
+    # both fold off it rather than asking per course.
+    def records = ::Course.in_catalog_order.to_a
+
+    def codes = records.map(&:code)
+
+    # A row's columns, named the way the read model wants them. The one
+    # conversion is `tags`, which comes back from the json column as strings.
+    def attributes_for(record)
+      { code: record.code, credits: record.credits, rating: record.rating,
+        projects: record.projects, hours: record.hours, level: record.level.to_sym,
+        core: record.core, certificate: record.certificate,
+        tags: record.tags, learners: record.learners }
+    end
 
     # The same list with one learner's counts filled in. LearnerProgress owns the
     # fold, so the whole catalog costs the one query it makes.

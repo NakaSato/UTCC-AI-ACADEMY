@@ -1,0 +1,110 @@
+# The catalog taxonomy. These mirror the rows the CreateCourses migration writes,
+# because db:test:prepare loads the schema and a schema carries no data — without
+# these every catalog assertion would run against an empty table.
+#
+# Copy is NOT here. Titles, descriptions and instructor names still come from
+# `catalog.courses.<code>` in the locale files, keyed by the code below.
+
+ai1101:
+  code: AI1101
+  position: 1
+  credits: 3
+  rating: "4.8"
+  projects: 6
+  hours: 42
+  level: beginner
+  core: true
+  certificate: true
+  tags: <%= ['core', 'popular'].to_json %>
+  learners: "1,240"
+
+ai1102:
+  code: AI1102
+  position: 2
+  credits: 3
+  rating: "4.7"
+  projects: 9
+  hours: 55
+  level: beginner
+  core: true
+  certificate: true
+  tags: <%= ['core', 'popular'].to_json %>
+  learners: "980"
+
+ai2201:
+  code: AI2201
+  position: 3
+  credits: 3
+  rating: "4.6"
+  projects: 8
+  hours: 60
+  level: intermediate
+  core: true
+  certificate: true
+  tags: <%= ['core', 'ml'].to_json %>
+  learners: "612"
+
+ai2105:
+  code: AI2105
+  position: 4
+  credits: 2
+  rating: "4.9"
+  projects: 5
+  hours: 24
+  level: beginner
+  core: false
+  certificate: true
+  tags: <%= ['popular', 'genai'].to_json %>
+  learners: "1,510"
+
+ai2108:
+  code: AI2108
+  position: 5
+  credits: 3
+  rating: "4.5"
+  projects: 7
+  hours: 38
+  level: intermediate
+  core: false
+  certificate: false
+  tags: <%= ['data'].to_json %>
+  learners: "445"
+
+ai3301:
+  code: AI3301
+  position: 6
+  credits: 3
+  rating: "4.6"
+  projects: 6
+  hours: 50
+  level: advanced
+  core: false
+  certificate: true
+  tags: <%= ['ml'].to_json %>
+  learners: "288"
+
+ai2210:
+  code: AI2210
+  position: 7
+  credits: 2
+  rating: "4.8"
+  projects: 4
+  hours: 20
+  level: beginner
+  core: false
+  certificate: false
+  tags: <%= ['popular', 'genai'].to_json %>
+  learners: "870"
+
+ai2402:
+  code: AI2402
+  position: 8
+  credits: 2
+  rating: "4.4"
+  projects: 3
+  hours: 18
+  level: beginner
+  core: false
+  certificate: false
+  tags: <%= ['ethics'].to_json %>
+  learners: "520"

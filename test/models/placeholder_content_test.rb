@@ -40,7 +40,7 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     I18n.available_locales.each do |locale|
       I18n.with_locale(locale) do
         {
-          "course.modules" => Syllabus::ENTRIES,
+          "course.modules" => Syllabus.entries,
           "lesson.theory.blocks" => LessonContent::BLOCKS,
           "admin.features.groups" => AdminConsole::FLAG_GROUPS,
           "admin.overview.stats" => AdminConsole::STATS,
@@ -180,10 +180,10 @@ class PlaceholderContentTest < ActiveSupport::TestCase
   test "syllabus pairs each topic with its own key, kind and duration" do
     modules = Syllabus.modules
 
-    assert_equal Syllabus::ENTRIES.size, modules.size
+    assert_equal Syllabus.entries.size, modules.size
     modules.each_with_index do |mod, index|
       assert_equal index + 1, mod.number
-      assert_equal Syllabus::ENTRIES[index][1].size, mod.topics.size
+      assert_equal Syllabus.entries[index].topics.size, mod.topics.size
       assert mod.title.present?
       mod.topics.each_with_index do |topic, position|
         assert topic.name.present?

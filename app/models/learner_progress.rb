@@ -38,8 +38,11 @@ class LearnerProgress
 
   # ---- Raw material -------------------------------------------------------
 
+  # `course_code` and `topic_key` are readers on the association now that the
+  # taxonomy is a table, so the course and topic come along for the ride — three
+  # queries whatever the row count, rather than two per row.
   def completions
-    @completions ||= user ? user.topic_completions.to_a : []
+    @completions ||= user ? user.topic_completions.includes(:course, :topic).to_a : []
   end
 
   def any? = completions.any?

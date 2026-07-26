@@ -1,14 +1,18 @@
 # The module breakdown shown on the course page, and the list every lesson is a
-# position in. Titles and topic names come from `course.modules` in the locale
-# files, indexed positionally; the knowledge-unit count, topic kind and duration
-# live here.
+# position in. Backed by `course_modules` and `topics` since the taxonomy became
+# real; titles and topic names still come from `course.modules` in the locale
+# files, indexed positionally.
 #
 # **Status is derived, not written.** A module is done when every one of its
 # topics is, current when it is the first that is not, and locked after that —
 # so what the course page shows and what the lesson lets a student open are the
-# same rule, and finishing a topic really does open the next module.
+# same rule, and finishing a topic really does open the next module. That is why
+# no row carries a status column.
 module Syllabus
-  Topic = Data.define(:key, :name, :kind, :minutes, :done) do
+  # Read models over a row. Both dodge a name: `Module_` dodges Ruby's, `Topic_`
+  # dodges the record class this module reads from. The names never leave this
+  # file — views only ever call the readers.
+  Topic_ = Data.define(:key, :name, :kind, :minutes, :done) do
     def kind_name = I18n.t("course.kind.#{kind}")
     def duration_text = I18n.t("units.minutes", count: minutes)
     def done? = done
@@ -32,53 +36,49 @@ module Syllabus
     def meta_text = I18n.t("course.module_meta", topics: topics.size, units:)
   end
 
-  # knowledge units, [[kind, minutes], …] — one pair per topic, in the same
-  # order as the topic names in the locale file.
-  ENTRIES = [
-    [ 12, [ [ :theory, 8 ], [ :theory, 10 ], [ :exercise, 15 ] ] ],
-    [ 18, [ [ :theory, 9 ], [ :theory, 12 ], [ :mix, 14 ], [ :code, 20 ] ] ],
-    [ 22, [ [ :code, 18 ], [ :code, 24 ] ] ],
-    [ 15, [ [ :theory, 11 ], [ :exercise, 16 ] ] ],
-    [ 14, [ [ :theory, 12 ], [ :project, 40 ] ] ],
-    [ 10, [ [ :theory, 10 ], [ :theory, 12 ] ] ]
-  ].freeze
-
   # Which kinds of topic count as "applied" rather than just learned: the ones
-  # where something is built. The My Learning bars are the split.
-  APPLIED_KINDS = %i[ exercise code project mix ].freeze
+  # where something is built. The My Learning bars are the split. Defined on the
+  # record; kept here under the name the rest of the app already knew it by.
+  APPLIED_KINDS = ::Topic::APPLIED_KINDS.map(&:to_sym).freeze
 
   # Course-level figures for the four stat tiles and the sidebar table. The topic
-  # count is not among them: it is `topic_count`, counted off ENTRIES, so the
+  # count is not among them: it is `topic_count`, counted off the rows, so the
   # number on the stat tile and the denominator under the progress bar cannot
   # disagree.
   PROJECT_COUNT = 6
   CREDITS = 3
 
   class << self
-    # "<module number>-<position>" — what a TopicCompletion is filed under, since
-    # there is no Topic table to point at. Derived from ENTRIES rather than from
-    # the locale files, so a key never changes when copy does.
-    def topic_key(module_number, position) = "#{module_number}-#{position}"
+    # The whole syllabus in one query, folded in Ruby for the dozen different
+    # cuts the screens ask for — the same trick LearnerProgress plays with a
+    # learner's completions. Held on Current, so the cache lasts one request and
+    # not the life of the process; see the note there for why that distinction
+    # bites. `reload!` is for a caller that changes the taxonomy underneath, such
+    # as db/seeds.rb.
+    def entries = Current.syllabus ||= CourseModule.in_order.includes(:topics).to_a
+    def reload! = Current.syllabus = nil
 
-    def topic_keys
-      ENTRIES.each_with_index.flat_map do |(_units, topics), index|
-        topics.each_index.map { topic_key(index + 1, it + 1) }
-      end
-    end
+    def topics = entries.flat_map(&:topics)
+
+    def topic(key) = topics.find { it.key == key }
+
+    # "<module number>-<position>" — what a TopicCompletion is filed under.
+    # Derived from the row rather than the locale files, so a key never changes
+    # when copy does.
+    def topic_key(module_number, position) = ::Topic.key_for(module_number, position)
+
+    def topic_keys = topics.map(&:key)
 
     def keys_in(module_number)
-      topics = ENTRIES.dig(module_number - 1, 1) or return []
-      topics.each_index.map { topic_key(module_number, it + 1) }
+      entries.find { it.number == module_number }&.topics.to_a.map(&:key)
     end
 
-    def applied_topic_keys
-      topic_keys.select { APPLIED_KINDS.include?(topic_entry(it).first) }
-    end
+    def applied_topic_keys = topics.select(&:applied?).map(&:key)
 
-    # How much there is to do. Every course reuses this one syllabus until real
-    # modules land, so these are the denominators under every progress bar —
-    # and the reason a course can be finished at all.
-    def topic_count = topic_keys.size
+    # How much there is to do. Every course reuses this one syllabus until each
+    # has its own, so these are the denominators under every progress bar — and
+    # the reason a course can be finished at all.
+    def topic_count = topics.size
     def applied_topic_count = applied_topic_keys.size
 
     # The first topic a learner has not finished — what "next up" means on the
@@ -93,9 +93,9 @@ module Syllabus
       topic_keys[index + 1]
     end
 
-    # Time is not clocked anywhere, so the minutes budgeted for a topic here are
-    # what "hours studied" is counted from.
-    def topic_minutes(key) = topic_entry(key)&.last.to_i
+    # Time is not clocked anywhere, so the minutes budgeted for a topic are what
+    # "hours studied" is counted from.
+    def topic_minutes(key) = topic(key)&.minutes.to_i
 
     def topic_name(key)
       module_number, position = parse_key(key)
@@ -105,7 +105,7 @@ module Syllabus
     # The module a learner is on: the first with a topic still unfinished. Nil
     # once the whole syllabus is done, which reads as "every module complete".
     def current_module_number(done_keys)
-      (1..ENTRIES.size).find { |number| !keys_in(number).all? { done_keys.include?(it) } }
+      entries.map(&:number).find { |number| !keys_in(number).all? { done_keys.include?(it) } }
     end
 
     # What the lesson is allowed to open. Locked is a real gate rather than
@@ -122,15 +122,14 @@ module Syllabus
       names = I18n.t("course.modules")
       current = current_module_number(done_keys)
 
-      ENTRIES.each_with_index.map do |(units, topics), index|
-        number = index + 1
-
+      entries.map do |mod|
         Module_.new(
-          number:, units:, status: module_status(number, current),
-          topics: topics.each_with_index.map { |(kind, minutes), position|
-            key = topic_key(number, position + 1)
-            Topic.new(key:, name: names[index][:topics][position], kind:, minutes:,
-                      done: done_keys.include?(key))
+          number: mod.number, units: mod.units,
+          status: module_status(mod.number, current),
+          topics: mod.topics.map { |topic|
+            Topic_.new(key: topic.key, kind: topic.kind.to_sym, minutes: topic.minutes,
+                       name: names.dig(mod.number - 1, :topics, topic.position - 1).to_s,
+                       done: done_keys.include?(topic.key))
           }
         )
       end
@@ -162,12 +161,5 @@ module Syllabus
       end
 
       def parse_key(key) = key.to_s.split("-", 2).map(&:to_i)
-
-      def topic_entry(key)
-        module_number, position = parse_key(key)
-        return nil unless module_number.positive? && position.positive?
-
-        ENTRIES.dig(module_number - 1, 1, position - 1)
-      end
   end
 end

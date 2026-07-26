@@ -3,8 +3,67 @@
 #
 # Sign-in authenticates on student_id, and sign-up collects no email — these
 # accounts carry none either.
+
+# ---- The catalog taxonomy ---------------------------------------------------
+# Deliberately outside the fence below: these rows carry no credentials, and
+# `db:seed` should be able to put the catalog back in any environment.
 #
-# Shared password, so this is fenced to development and test.
+# This is one of three copies of the same taxonomy, and they must agree:
+#   db/migrate/…_create_courses.rb   writes them once, and is what production has
+#   db/seeds.rb                      this — restores them after db:seed:replant
+#                                    truncates every table, which bin/ci does
+#   test/fixtures/{courses,course_modules,topics}.yml   the suite's copy
+# taxonomy_test.rb asserts the shape the app depends on, so a row added to one
+# copy and not the others fails rather than quietly shortening a syllabus.
+courses = [
+  [ "AI1101", 3, "4.8", 6, 42, "beginner",     true,  true,  %w[ core popular ],  "1,240" ],
+  [ "AI1102", 3, "4.7", 9, 55, "beginner",     true,  true,  %w[ core popular ],  "980" ],
+  [ "AI2201", 3, "4.6", 8, 60, "intermediate", true,  true,  %w[ core ml ],       "612" ],
+  [ "AI2105", 2, "4.9", 5, 24, "beginner",     false, true,  %w[ popular genai ], "1,510" ],
+  [ "AI2108", 3, "4.5", 7, 38, "intermediate", false, false, %w[ data ],          "445" ],
+  [ "AI3301", 3, "4.6", 6, 50, "advanced",     false, true,  %w[ ml ],            "288" ],
+  [ "AI2210", 2, "4.8", 4, 20, "beginner",     false, false, %w[ popular genai ], "870" ],
+  [ "AI2402", 2, "4.4", 3, 18, "beginner",     false, false, %w[ ethics ],        "520" ]
+]
+
+courses.each_with_index do |(code, credits, rating, projects, hours, level, core, certificate, tags, learners), index|
+  Course.find_or_initialize_by(code:).update!(
+    position: index + 1, credits:, rating:, projects:, hours:, level:,
+    core:, certificate:, tags:, learners:
+  )
+end
+
+# knowledge units, then one [kind, minutes] pair per topic — in the order the
+# topic names appear under `course.modules` in the locale files, since a topic's
+# position is half of its key.
+modules = [
+  [ 12, [ [ "theory", 8 ],  [ "theory", 10 ], [ "exercise", 15 ] ] ],
+  [ 18, [ [ "theory", 9 ],  [ "theory", 12 ], [ "mix", 14 ], [ "code", 20 ] ] ],
+  [ 22, [ [ "code", 18 ],   [ "code", 24 ] ] ],
+  [ 15, [ [ "theory", 11 ], [ "exercise", 16 ] ] ],
+  [ 14, [ [ "theory", 12 ], [ "project", 40 ] ] ],
+  [ 10, [ [ "theory", 10 ], [ "theory", 12 ] ] ]
+]
+
+modules.each_with_index do |(units, topics), index|
+  number = index + 1
+  course_module = CourseModule.find_or_initialize_by(number:)
+  course_module.update!(units:)
+
+  topics.each_with_index do |(kind, minutes), position|
+    Topic.find_or_initialize_by(key: Topic.key_for(number, position + 1))
+         .update!(course_module:, position: position + 1, kind:, minutes:)
+  end
+end
+
+# The syllabus is memoised, and this process may have read it before the rows
+# above existed.
+Syllabus.reload!
+
+puts "Seeded #{Course.count} courses and #{Topic.count} topics across #{CourseModule.count} modules"
+
+# ---- Demo accounts ----------------------------------------------------------
+# Shared password, so this half is fenced to development and test.
 if Rails.env.local?
   # One account per role, so every gate can be walked through by hand. `role` is
   # left off the students: the column defaults to "student".
