@@ -138,13 +138,13 @@ class AppScreensTest < ActionDispatch::IntegrationTest
   test "the lesson opens on the next unfinished topic" do
     get lesson_url
     assert_response :success
-    assert_select "main[data-rewards-topic-value=?]", Syllabus.topic_keys.first
+    assert_select "main[data-lesson-topic=?]", Syllabus.topic_keys.first
 
     complete_topics(users(:one), "AI1101", Syllabus.topic_keys.first(2))
     get lesson_url
 
     assert_response :success
-    assert_select "main[data-rewards-topic-value=?]", Syllabus.topic_keys.third
+    assert_select "main[data-lesson-topic=?]", Syllabus.topic_keys.third
   end
 
   test "the lesson opens the topic it is asked for, and its links keep it" do
@@ -152,7 +152,7 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     get lesson_url(topic: key, step: :exercise)
 
     assert_response :success
-    assert_select "main[data-rewards-topic-value=?]", key
+    assert_select "main[data-lesson-topic=?]", key
     # Every step link carries the topic, or stepping through would jump forward.
     assert_select "a[href=?]", lesson_path(course: "AI1101", topic: key, step: :code)
   end

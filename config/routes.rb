@@ -30,9 +30,10 @@ Rails.application.routes.draw do
   # concern, which adds `before_action :require_authentication` globally.
   resources :courses, only: :show, param: :code
   get "lesson", to: "lessons#show", as: :lesson
-  # Where the browser reports a passed exercise or coding task — see
-  # LessonsController#complete.
-  post "lesson/complete", to: "lessons#complete", as: :complete_lesson
+  # Where the browser sends an exercise answer or a coding task to be graded —
+  # see LessonsController#submit. It replaced lesson/complete, which took the
+  # browser's word for a pass.
+  post "lesson/submit", to: "lessons#submit", as: :submit_lesson
   get "my-learning", to: "my_learning#show", as: :my_learning
   get "map", to: "knowledge_maps#show", as: :knowledge_map
   get "progress", to: "progress#show", as: :progress

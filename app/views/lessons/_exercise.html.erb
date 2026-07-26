@@ -1,8 +1,10 @@
-<%# Graded in the browser so the feedback is instant, as the design intends.
-    See LessonContent for why the answer key is not a secret here. %>
+<%# The answer goes to the server to be graded — see LessonsController#submit.
+    Nothing here carries the key. %>
 <div class="rounded-card border border-hairline bg-surface p-7 sm:p-10 lg:px-11"
      data-controller="quiz"
-     data-quiz-correct-index-value="<%= LessonContent::CORRECT_OPTION %>">
+     data-quiz-url-value="<%= submit_lesson_path %>"
+     data-quiz-course-value="<%= @course.code %>"
+     data-quiz-topic-value="<%= @topic_key %>">
   <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
     <%= t("lesson.quiz.eyebrow") %>
   </div>

@@ -2,7 +2,7 @@ class LessonsController < ApplicationController
   # The lesson's two graded steps report a pass at most once each, and a student
   # who redoes a topic writes no second row — but nothing stops a script from
   # hammering it either.
-  rate_limit to: 30, within: 3.minutes, only: :complete
+  rate_limit to: 30, within: 3.minutes, only: :submit
 
   before_action :set_course, only: :show
   before_action :set_topic, only: :show
@@ -11,31 +11,36 @@ class LessonsController < ApplicationController
     @step = LessonContent.step_for(params[:step])
   end
 
-  # The lesson grades itself in the browser and reports the result here — see
-  # rewards_controller.js. A determined student can therefore post a completion
-  # they did not earn, exactly as they can already read the answer key out of the
-  # page. Server-side grading fixes both, and this is where it would go.
+  # Where the exercise and the coding task send what the student did. The server
+  # grades it, files the attempt, and answers with the verdict the page renders —
+  # so the answer key never leaves this side and a pass cannot be had by posting
+  # one, which is what `complete` used to allow.
   #
-  # Answers as status rather than as a redirect: the caller is fetch(), not a
-  # form. The same lock the lesson screen enforces is checked again here, since
-  # a post does not have to come from that screen.
-  def complete
-    kind = params[:kind].to_s.to_sym
-    code, key = params[:course].to_s, params[:topic].to_s
+  # JSON rather than a redirect: the caller is fetch(), not a form. The lock the
+  # lesson screen enforces is checked again here, because a post does not have to
+  # come from that screen.
+  def submit
+    kind = params[:kind].to_s
+    return head :unprocessable_entity unless Submission::KINDS.include?(kind)
 
-    return head :unprocessable_entity unless TopicCompletion::KINDS.include?(kind)
-    return head :forbidden unless Syllabus.unlocked?(key, progress.keys_for(code))
+    course = Course.find_by(code: params[:course].to_s)
+    topic = Topic.find_by(key: params[:topic].to_s)
+    return head :unprocessable_entity unless course && topic
+    return head :forbidden unless Syllabus.unlocked?(topic.key, progress.keys_for(course.code))
 
-    completion = TopicCompletion.record(user: Current.user, course_code: code, topic_key: key, kind:)
-    return head :unprocessable_entity unless completion.persisted?
+    verdict = grade(kind, params[:answer])
+    Submission.record(user: Current.user, course:, topic:, kind:, answer: params[:answer], verdict:)
 
-    # Nothing on the lesson screen reads the new totals — the sidebar counter has
-    # already moved on its own, and the progress screens count the rows when they
-    # next render.
-    head :created
+    # The progress screens count the rows when they next render; nothing here
+    # reads back a total.
+    render json: verdict
   end
 
   private
+    def grade(kind, answer)
+      kind == "quiz" ? LessonContent.grade_quiz(answer) : LessonContent.grade_code(answer)
+    end
+
     def set_course
       @course = CourseCatalog.find(params[:course].presence || LessonContent::DEFAULT_COURSE, user: Current.user)
 

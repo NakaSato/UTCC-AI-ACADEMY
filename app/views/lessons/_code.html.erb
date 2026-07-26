@@ -1,8 +1,11 @@
-<%# The criteria tick live as you type; "Run & check" produces the console
-    output. Both run in the browser — see LessonContent. %>
+<%# "Run & check" sends the source to the server, which grades it and answers
+    with a result per criterion — see LessonsController#submit. The patterns stay
+    there, which is why the criteria light up on the run rather than as you type. %>
 <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-2"
      data-controller="code-task"
-     data-code-task-patterns-value="<%= LessonContent.checks.map { it[:pattern] }.to_json %>"
+     data-code-task-url-value="<%= submit_lesson_path %>"
+     data-code-task-course-value="<%= @course.code %>"
+     data-code-task-topic-value="<%= @topic_key %>"
      data-code-task-starter-value="<%= LessonContent::STARTER_CODE %>">
   <div class="rounded-card border border-hairline bg-surface p-7 sm:px-8">
     <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
@@ -16,14 +19,14 @@
         <%= t("lesson.code.criteria") %>
       </div>
       <ul class="flex flex-col gap-2.25">
-        <% LessonContent.checks.each do |check| %>
+        <% LessonContent.checks.each do |label| %>
           <li class="group flex items-start gap-2.5 text-14" data-code-task-target="check" data-state="">
             <span aria-hidden="true"
                   class="text-13 leading-[1.5] text-muted-3 group-data-[state=ok]:text-success">
               <span class="group-data-[state=ok]:hidden">○</span>
               <span class="hidden group-data-[state=ok]:inline">✓</span>
             </span>
-            <span class="text-ink-4"><%= check[:label] %></span>
+            <span class="text-ink-4"><%= label %></span>
           </li>
         <% end %>
       </ul>
@@ -39,7 +42,7 @@
 
     <label class="sr-only" for="lesson_code"><%= t("lesson.code.editor_label") %></label>
     <textarea id="lesson_code" spellcheck="false" rows="10"
-              data-code-task-target="editor" data-action="input->code-task#evaluate"
+              data-code-task-target="editor"
               class="w-full resize-none border-0 bg-chrome px-5.5 py-5 font-mono text-13-5 leading-[1.75]
                      text-code outline-none"><%= LessonContent::STARTER_CODE %></textarea>
 
@@ -74,5 +77,6 @@
   <template data-code-task-target="copy"
             data-pass="<%= t("lesson.code.console_pass") %>"
             data-fail="<%= t("lesson.code.console_fail") %>"
-            data-idle="<%= t("lesson.code.console_idle") %>"></template>
+            data-idle="<%= t("lesson.code.console_idle") %>"
+            data-running="<%= t("lesson.code.console_running") %>"></template>
 </div>

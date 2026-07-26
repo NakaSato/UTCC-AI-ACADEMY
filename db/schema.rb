@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_093002) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_093003) do
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -44,6 +44,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093002) do
     t.string "user_agent"
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "submissions", force: :cascade do |t|
+    t.text "answer", null: false
+    t.integer "course_id", null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.boolean "passed", default: false, null: false
+    t.integer "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["course_id"], name: "index_submissions_on_course_id"
+    t.index ["topic_id", "kind", "passed"], name: "index_submissions_on_topic_id_and_kind_and_passed"
+    t.index ["topic_id"], name: "index_submissions_on_topic_id"
+    t.index ["user_id", "topic_id", "kind"], name: "index_submissions_on_user_id_and_topic_id_and_kind"
+    t.index ["user_id"], name: "index_submissions_on_user_id"
   end
 
   create_table "topic_completions", force: :cascade do |t|
@@ -89,6 +105,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093002) do
   end
 
   add_foreign_key "sessions", "users"
+  add_foreign_key "submissions", "courses"
+  add_foreign_key "submissions", "topics"
+  add_foreign_key "submissions", "users"
   add_foreign_key "topic_completions", "courses"
   add_foreign_key "topic_completions", "topics"
   add_foreign_key "topic_completions", "users"

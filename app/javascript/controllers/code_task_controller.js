@@ -1,39 +1,49 @@
 import { Controller } from "@hotwired/stimulus"
+import { grade } from "grading"
 
-// The lesson's coding task. The criteria tick as you type; "Run & check"
-// prints the console output and unlocks the final step. The patterns come
-// from LessonContent so Ruby stays the single source of truth for grading.
+// The lesson's coding task. "Run & check" sends the source to the server, which
+// grades it against patterns that stay there, and answers with a verdict per
+// criterion plus the overall result.
+//
+// The criteria no longer tick as you type. Live ticking needs the patterns in
+// the page, which is exactly what moving grading to the server removed — so
+// they light up when the run answers instead.
 export default class extends Controller {
   static targets = ["editor", "check", "console", "finish", "copy"]
-  static values = {
-    patterns: Array,
-    starter: String,
-    gems: { type: Number, default: 10 }
-  }
+  static values = { url: String, course: String, topic: String, starter: String }
 
-  connect() {
-    this.regexes = this.patternsValue.map((source) => new RegExp(source))
-    this.evaluate()
-  }
-
-  // Live criteria feedback. Running is a separate, explicit step.
-  evaluate() {
-    this.results.forEach((passed, index) => {
-      this.checkTargets[index].dataset.state = passed ? "ok" : ""
-    })
-  }
-
-  run() {
-    const passed = this.results.every(Boolean) && !this.editorTarget.value.includes("___")
+  async run() {
     const copy = this.copyTarget.dataset
 
+    this.consoleTarget.dataset.state = ""
+    this.consoleTarget.textContent = `$ python split_customers.py\n${copy.running}`
+
+    const verdict = await grade({
+      url: this.urlValue, course: this.courseValue, topic: this.topicValue,
+      kind: "code", answer: this.editorTarget.value
+    })
+
+    if (!verdict) {
+      this.consoleTarget.textContent = `$ python split_customers.py\n${copy.idle}`
+      return
+    }
+
+    this.render(verdict)
+  }
+
+  render({ passed, checks, gems }) {
+    checks.forEach((ok, index) => {
+      if (this.checkTargets[index]) this.checkTargets[index].dataset.state = ok ? "ok" : ""
+    })
+
+    const copy = this.copyTarget.dataset
     this.consoleTarget.dataset.state = passed ? "pass" : "fail"
     this.consoleTarget.textContent = passed
       ? `$ python split_customers.py\n40000 10000\n\n${copy.pass}`
       : `$ python split_customers.py\nSyntaxError: invalid syntax\n\n${copy.fail}`
 
     this.finishTarget.classList.toggle("hidden", !passed)
-    if (passed) this.dispatch("reward", { detail: { gems: this.gemsValue, kind: "applied" } })
+    if (passed) this.dispatch("reward", { detail: { gems } })
   }
 
   reset() {
@@ -41,11 +51,6 @@ export default class extends Controller {
     this.consoleTarget.dataset.state = ""
     this.consoleTarget.textContent = `$ python split_customers.py\n${this.copyTarget.dataset.idle}`
     this.finishTarget.classList.add("hidden")
-    this.evaluate()
-  }
-
-  get results() {
-    const code = this.editorTarget.value
-    return this.regexes.map((regex) => regex.test(code))
+    this.checkTargets.forEach((check) => (check.dataset.state = ""))
   }
 }

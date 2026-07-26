@@ -1,10 +1,14 @@
 # The four-step lesson: theory, exercise, coding task, summary.
 #
-# The exercise and the coding task are graded in the browser (see the `quiz` and
-# `code_task` Stimulus controllers) so the design's instant feedback survives.
-# The answer key and the passing regexes are therefore public — which is fine
-# for a teaching exercise, and is what the design does. Real grading belongs on
-# the server once submissions are persisted.
+# **Grading is on the server.** `CORRECT_OPTION` and `CHECKS` are read by
+# `grade_quiz` and `grade_code` and never rendered into the page, so the answer
+# key and the passing regexes are no longer public and a pass cannot be claimed
+# by posting one. The browser sends what the student did and renders the verdict
+# it gets back — one round trip, so the design's instant feedback survives.
+#
+# The cost is that the coding task's criteria no longer tick as you type: they
+# light up when "Run & check" answers. Live ticking needs the patterns in the
+# page, which is the whole thing this moved to close.
 module LessonContent
   STEPS = %i[ theory exercise code summary ].freeze
 
@@ -22,6 +26,7 @@ module LessonContent
   STEP_PERCENT = { theory: 12, exercise: 42, code: 74, summary: 100 }.freeze
 
   # Index of the correct exercise option — "Unsupervised Learning — Clustering".
+  # Server-side only: nothing renders this, and `grade_quiz` is the only reader.
   CORRECT_OPTION = 1
 
   OPTIONS = [
@@ -41,12 +46,26 @@ module LessonContent
     print(len(X_train), len(X_test))
   PYTHON
 
-  # Each criterion is a source pattern the browser re-creates as a RegExp.
+  # Each criterion is a pattern the submitted source has to match. Server-side
+  # only, like the answer key — the page renders the labels beside them, never
+  # the patterns.
   CHECKS = [
-    'train_test_split\s*\(',
-    'test_size\s*=\s*0\.2',
-    'random_state\s*=\s*42'
+    /train_test_split\s*\(/,
+    /test_size\s*=\s*0\.2/,
+    /random_state\s*=\s*42/
   ].freeze
+
+  # The starter code ships with blanks in it. Leaving one in is a fail however
+  # well the rest matches, so a student cannot pass by pasting the criteria
+  # around an unfinished line.
+  BLANK = "___".freeze
+
+  # What each graded step is worth. Taken from LearnerProgress rather than
+  # written twice: these used to be a literal here and a Stimulus default in the
+  # page, kept in step by hand, and the counter the student watches has to agree
+  # with the XP the progress screens count.
+  QUIZ_GEMS = LearnerProgress::GEMS_PER_LEARNED
+  CODE_GEMS = LearnerProgress::GEMS_PER_APPLIED
 
   REWARD_GEMS = 15
   REWARD_XP = 120
@@ -100,9 +119,27 @@ module LessonContent
       OPTIONS.each_with_index.map { |text, index| { key: keys[index], text: } }
     end
 
-    def checks
-      labels = I18n.t("lesson.code.checks")
-      CHECKS.each_with_index.map { |pattern, index| { pattern:, label: labels[index] } }
+    # Labels only. The patterns behind them stay on this side of the wire.
+    def checks = I18n.t("lesson.code.checks")
+
+    # ---- Grading ------------------------------------------------------------
+    # Both answer with a plain hash, which is what the controller renders and
+    # what the Stimulus controllers read. `checks` is per-criterion so the coding
+    # task can light its list from the verdict rather than from a local guess.
+
+    # `correct_index` comes back so the page can mark the right option, which is
+    # what the design does once an answer is in. It is revealed in answer to a
+    # graded, recorded attempt rather than sitting in the page beforehand — a
+    # student can still learn it by guessing, but not without leaving a failed
+    # submission behind, which is the row the instructor report wants anyway.
+    def grade_quiz(answer)
+      { passed: answer.to_s == CORRECT_OPTION.to_s, gems: QUIZ_GEMS, correct_index: CORRECT_OPTION }
+    end
+
+    def grade_code(source)
+      results = CHECKS.map { source.to_s.match?(it) }
+
+      { passed: results.all? && source.to_s.exclude?(BLANK), checks: results, gems: CODE_GEMS }
     end
 
     def rewards

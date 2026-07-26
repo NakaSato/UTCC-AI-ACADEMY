@@ -302,6 +302,7 @@ en:
         - "Import train_test_split from sklearn"
         - "Set test_size = 0.2 (20% test)"
         - "Set random_state = 42 for reproducibility"
+      console_running: "  running…"
       console_idle: "  ready — press “Run & check”"
       console_pass: "✓ all 3 criteria passed · +10 gems"
       console_fail: "✗ not passing yet — did you replace ___ with 0.2 and 42?"

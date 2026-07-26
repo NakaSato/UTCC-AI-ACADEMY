@@ -10,9 +10,10 @@
       data-controller="rewards panels<%= " proctor" if monitored %>" data-panel="<%= @step %>"
       data-proctor="on" data-band="clean" data-proctor-hidden="false"
       data-action="quiz:reward->rewards#add code-task:reward->rewards#add"
-      data-rewards-url-value="<%= complete_lesson_path %>"
-      data-rewards-course-value="<%= @course.code %>"
-      data-rewards-topic-value="<%= @topic_key %>"
+      <%# Which position in the syllabus is open. Identity rather than a Stimulus
+          value — the graded steps carry their own, but they only exist on their
+          own step, and every step is about the same topic. %>
+      data-lesson-course="<%= @course.code %>" data-lesson-topic="<%= @topic_key %>"
       <% if monitored %>
         data-proctor-score-value="<%= Proctoring::START_SCORE %>"
         data-proctor-paste-limit-value="<%= Proctoring::PASTE_LIMIT %>"

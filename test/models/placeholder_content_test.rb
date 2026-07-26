@@ -250,11 +250,14 @@ class PlaceholderContentTest < ActiveSupport::TestCase
       X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     PYTHON
 
-    patterns = LessonContent.checks.map { Regexp.new(it[:pattern]) }
-
-    assert patterns.all? { it.match?(solution) }, "a correct solution should pass every criterion"
-    assert_not patterns.all? { it.match?(LessonContent::STARTER_CODE) },
+    assert LessonContent.grade_code(solution)[:passed], "a correct solution should pass"
+    assert_not LessonContent.grade_code(LessonContent::STARTER_CODE)[:passed],
                "the starter code should not already pass"
+
+    # One label per criterion, and the labels are all the page gets — the
+    # patterns behind them stay on the server.
+    assert_equal LessonContent::CHECKS.size, LessonContent.checks.size
+    assert LessonContent.checks.all? { it.is_a?(String) && it.present? }
   end
 
   test "the leaderboard marks exactly one row as you" do

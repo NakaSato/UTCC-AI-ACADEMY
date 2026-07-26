@@ -1,0 +1,4 @@
+# Deliberately empty, and must stay present — the same reason
+# topic_completions.yml is. Tests that need an attempt make one; the file exists
+# so fixtures clear the table, because bin/ci seeds against the test database and
+# rows left behind would outlive the users and topics they point at.

@@ -309,6 +309,7 @@ th:
         - "เรียก train_test_split จาก sklearn"
         - "กำหนด test_size = 0.2 (ทดสอบ 20%)"
         - "กำหนด random_state = 42 ให้ผลซ้ำได้"
+      console_running: "  กำลังรัน…"
       console_idle: "  พร้อมรัน — กดปุ่ม “รันและตรวจ”"
       console_pass: "✓ ผ่านทั้ง 3 เกณฑ์ · +10 เพชร"
       console_fail: "✗ ยังไม่ผ่าน — ตรวจว่าแทนค่า ___ ด้วย 0.2 และ 42 แล้วหรือยัง"
