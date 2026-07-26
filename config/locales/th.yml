@@ -109,7 +109,9 @@ th:
     projects: "%{count} โปรเจกต์"
     hours: "%{count} ชั่วโมง"
     minutes: "%{count} นาที"
-    days: "%{count} วัน"
+    days:
+      one: "%{count} วัน"
+      other: "%{count} วัน"
     weeks: "%{count} สัปดาห์"
     topics: "%{count} หัวข้อ"
     learners: "%{count} คนกำลังเรียน"

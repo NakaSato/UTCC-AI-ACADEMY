@@ -102,7 +102,9 @@ en:
     projects: "%{count} projects"
     hours: "%{count} hours"
     minutes: "%{count} min"
-    days: "%{count} days"
+    days:
+      one: "%{count} day"
+      other: "%{count} days"
     weeks: "%{count} weeks"
     topics: "%{count} topics"
     learners: "%{count} learning now"
