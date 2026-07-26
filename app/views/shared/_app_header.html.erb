@@ -48,19 +48,33 @@
   </div>
 
   <%# The gamification strip: hearts remaining, refill timer, and which
-      semester the counters belong to. %>
+      semester the counters belong to.
+
+      Hearts are a learner mechanic, so staff get the strip for its semester
+      context alone — a life counter reads as noise on /instructor, where the
+      lives it counts are nobody's. Same line the proctor takes: the bar is
+      mounted for `student?` and staff are left out of the mechanic. With the
+      counters gone the semester is the only thing left, so it stops hiding
+      itself on narrow screens. %>
   <div class="border-t border-chrome-line-2 bg-chrome-deep">
     <div class="mx-auto flex max-w-page items-center gap-4 px-4 py-[9px] sm:px-8">
-      <span class="text-12-5 font-medium text-on-chrome">
-        <%= t("chrome.hearts_left", count: LearnerProfile::LIVES) %>
+      <% if Current.user&.student? %>
+        <span class="text-12-5 font-medium text-on-chrome">
+          <%= t("chrome.hearts_left", count: LearnerProfile::LIVES) %>
+        </span>
+        <div class="flex gap-1" aria-hidden="true">
+          <% LearnerProfile::MAX_LIVES.times do |index| %>
+            <span class="text-12 <%= index < LearnerProfile::LIVES ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
+          <% end %>
+        </div>
+        <span class="hidden text-12-5 text-on-chrome-dim sm:inline"><%= t("chrome.refill") %></span>
+      <% end %>
+      <span class="<%= class_names(
+                         "ml-auto text-12-5 text-on-chrome-dim",
+                         "hidden lg:inline" => Current.user&.student?
+                       ) %>">
+        <%= t("chrome.semester") %>
       </span>
-      <div class="flex gap-1" aria-hidden="true">
-        <% LearnerProfile::MAX_LIVES.times do |index| %>
-          <span class="text-12 <%= index < LearnerProfile::LIVES ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
-        <% end %>
-      </div>
-      <span class="hidden text-12-5 text-on-chrome-dim sm:inline"><%= t("chrome.refill") %></span>
-      <span class="ml-auto hidden text-12-5 text-on-chrome-dim lg:inline"><%= t("chrome.semester") %></span>
     </div>
   </div>
 </header>
