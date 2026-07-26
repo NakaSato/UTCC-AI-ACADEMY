@@ -152,6 +152,22 @@ if Rails.env.local?
     end
   end
 
+  # A couple of integrity cases, so the admin tab has something real to show.
+  # Deterministic and idempotent: skip any learner who already has events.
+  course = Course.find_by!(code: "AI1101")
+  {
+    "2011071730006" => %w[ paste capture blur blur ],
+    "2011071730005" => %w[ blur paste_small ]
+  }.each do |student_id, kinds|
+    student = User.find_by!(student_id:)
+    next if ProctorEvent.exists?(user: student)
+
+    kinds.each_with_index do |kind, index|
+      ProctorEvent.create!(user: student, course:, topic: Topic.find_by!(key: "1-1"),
+                           kind:, occurred_at: (kinds.size - index).hours.ago)
+    end
+  end
+
   puts "Seeded 1 section (#{section.label}) with #{section.students.count} students " \
        "and #{Submission.count} submissions"
 

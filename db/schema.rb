@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_093004) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_104158) do
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -46,6 +46,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093004) do
     t.index ["section_id"], name: "index_enrollments_on_section_id"
     t.index ["user_id", "section_id"], name: "index_enrollments_on_user_id_and_section_id"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "proctor_events", force: :cascade do |t|
+    t.integer "course_id", null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.datetime "occurred_at", null: false
+    t.datetime "reviewed_at"
+    t.integer "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["course_id"], name: "index_proctor_events_on_course_id"
+    t.index ["topic_id"], name: "index_proctor_events_on_topic_id"
+    t.index ["user_id", "occurred_at"], name: "index_proctor_events_on_user_id_and_occurred_at"
+    t.index ["user_id", "reviewed_at"], name: "index_proctor_events_on_user_id_and_reviewed_at"
+    t.index ["user_id"], name: "index_proctor_events_on_user_id"
   end
 
   create_table "sections", force: :cascade do |t|
@@ -129,6 +145,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093004) do
 
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "proctor_events", "courses"
+  add_foreign_key "proctor_events", "topics"
+  add_foreign_key "proctor_events", "users"
   add_foreign_key "sections", "courses"
   add_foreign_key "sections", "users", column: "instructor_id"
   add_foreign_key "sessions", "users"

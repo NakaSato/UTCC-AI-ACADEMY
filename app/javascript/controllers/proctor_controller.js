@@ -5,13 +5,19 @@ import { Controller } from "@hotwired/stimulus"
 // wall of text, the context menu, print, screen capture — logs each one and
 // docks the integrity score.
 //
-// Nothing leaves the browser. See app/models/proctoring.rb for why.
+// The sidebar's score is still per-page, but each incident is reported to the
+// server and kept — the admin Integrity tab reads the record. Reporting is
+// fire-and-forget: the log has already drawn the row, and a dropped report
+// must not redraw it.
 //
 // Visual state travels on data attributes read by Tailwind variants, so this
 // controller only ever sets an attribute; it never juggles class lists.
 export default class extends Controller {
   static targets = ["switch", "label", "note", "score", "verdict", "meter", "log", "empty", "row"]
   static values = {
+    url: String,
+    course: String,
+    topic: String,
     on: { type: Boolean, default: true },
     score: { type: Number, default: 100 },
     pasteLimit: { type: Number, default: 120 },
@@ -102,6 +108,20 @@ export default class extends Controller {
     this.scoreValue = Math.max(0, this.scoreValue - entry.weight)
     this.events = [{ ...entry, kind, stamp: this.stamp() }, ...this.events].slice(0, this.maxEventsValue)
     this.render()
+    this.report(kind)
+  }
+
+  report(kind) {
+    if (!this.hasUrlValue) return
+    const token = document.querySelector("meta[name=csrf-token]")?.content
+
+    fetch(this.urlValue, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRF-Token": token },
+      body: JSON.stringify({ kind, course: this.courseValue, topic: this.topicValue })
+    }).catch(() => {
+      // Offline, or the request was blocked. The sidebar row is already drawn.
+    })
   }
 
   stamp() {

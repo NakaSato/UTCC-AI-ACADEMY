@@ -4,10 +4,12 @@ en:
   language_name: "EN"
 
   flash:
+    integrity_closed: "Closed the case for %{name}"
     course_missing: "That course could not be found"
     topic_missing: "That topic is not in the syllabus"
     topic_locked: "Finish the modules before it to open that topic"
     sign_in_required: "Sign in to open that screen"
+    profile_saved: "Your details have been saved"
     forbidden: "That screen is for teaching staff only"
     role_changed: "%{name} is now %{role}"
     role_self: "You cannot change your own role"
@@ -512,8 +514,10 @@ en:
     integrity:
       title: "Academic integrity cases"
       sub: "Incidents from exercise monitoring, most severe first"
+      where: "%{course} · module %{module}"
+      empty_title: "No open cases"
+      empty_body: "When exercise monitoring records an incident, the case appears here"
       evidence_title: "Evidence"
-      closed: "Case closed · nothing irregular found"
       actions:
         clear: "Close case"
         notify: "Notify student"
@@ -522,33 +526,6 @@ en:
         high: "High risk"
         medium: "Watch"
         low: "Low risk"
-      rows:
-        - name: "Surapong Techavorakul"
-          sid: "6512400633"
-          where: "AI1101 · module 2 · exercise"
-          evidence:
-            - text: "Pasted 480 characters during the exercise"
-              when: "11:02"
-            - text: "Switched tabs 6 times in 4 minutes"
-              when: "11:00"
-            - text: "Left fullscreen while timed"
-              when: "10:57"
-        - name: "Orawan Pongpan"
-          sid: "6512400512"
-          where: "AI1101 · module 3 · coding task"
-          evidence:
-            - text: "Switched tabs 4 times while running code"
-              when: "yesterday 15:41"
-            - text: "Copied the task text out of the page"
-              when: "yesterday 15:38"
-        - name: "Pakorn Wattanachai"
-          sid: "6512400226"
-          where: "AI1102 · module 1 · exercise"
-          evidence:
-            - text: "Switched tabs twice"
-              when: "2 days ago"
-            - text: "One short paste"
-              when: "2 days ago"
     perms:
       title: "Permissions by role"
       sub: "This table states the real gates in the app — change a gate and this table must change with it"
@@ -767,6 +744,23 @@ en:
       instructor: "Instructor"
       admin: "Admin"
 
+  # The account's own details. Field labels shared with the auth forms stay in
+  # auth.fields.* rather than being copied here — only what this screen adds is
+  # below.
+  profile:
+    title: "Edit info"
+    subtitle: "Your name, contact address and faculty. Your student ID cannot be changed here."
+    student_id_locked: "Issued by the university"
+    email_hint: "Optional, but it is the only way to reset a forgotten password — registration does not ask for one."
+    password_note: "To change your password, sign out and use “Forgot password?”. That link is sent to the address above."
+    submit: "Save changes"
+    cancel: "Cancel"
+    fields:
+      faculty: "Faculty"
+      faculty_placeholder: "Engineering"
+      study_year: "Year of study"
+      study_year_blank: "Not specified"
+
   auth:
     hero_title: "Start your AI journey at UTCC"
     hero_body: "The University of the Thai Chamber of Commerce learning platform for every student enrolled in the AI Fundamental curriculum."
@@ -821,7 +815,11 @@ en:
       password_confirmation: "Confirm password"
       new_password: "New password"
       new_password_confirmation: "Confirm new password"
-    errors_title: "Please check the form again (%{count} problems)"
+    # Pluralised because a form with one bad field is the common case, and
+    # "(1 problems)" is the first thing a student reads when they get it wrong.
+    errors_title:
+      one: "Please check the form again (%{count} problem)"
+      other: "Please check the form again (%{count} problems)"
 
   student:
     name: "Nathaporn Jirawatanakul"

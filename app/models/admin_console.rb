@@ -112,30 +112,6 @@ module AdminConsole
     def copy = I18n.t("admin.queue.rows")[position]
   end
 
-  # ---- Integrity cases ------------------------------------------------------
-
-  # severity, integrity score, open or closed, evidence count. The proctor
-  # persists nothing — its score dies with the page — so these are placeholder
-  # like the queue, and the evidence count must match the locale rows.
-  INTEGRITY = [
-    [ :high, 42, :open, 3 ],
-    [ :medium, 68, :open, 2 ],
-    [ :low, 81, :closed, 2 ]
-  ].freeze
-
-  IntegrityCase = Data.define(:severity, :score, :state, :position) do
-    def open? = state == :open
-    def name = copy[:name]
-    def sid = copy[:sid]
-    def where_text = copy[:where]
-    def evidence = copy[:evidence]
-    def severity_name = I18n.t("admin.integrity.severity.#{severity}")
-
-    private
-
-    def copy = I18n.t("admin.integrity.rows")[position]
-  end
-
   # ---- Permissions matrix ---------------------------------------------------
 
   # One row per capability, one flag per role in User::ROLES order. Every row is
@@ -228,14 +204,6 @@ module AdminConsole
 
     def pending_count = queue.size
 
-    def integrity_cases
-      INTEGRITY.each_with_index.map do |(severity, score, state), position|
-        IntegrityCase.new(severity:, score:, state:, position:)
-      end
-    end
-
-    def open_case_count = integrity_cases.count(&:open?)
-
     def perm_rows
       I18n.t("admin.perms.rows").zip(PERMS).map { |label, flags| { label:, flags: } }
     end
@@ -262,7 +230,7 @@ module AdminConsole
       case tab
       in :features  then flags_off
       in :queue     then pending_count
-      in :integrity then open_case_count
+      in :integrity then Proctoring.open_case_count
       else nil
       end
     end

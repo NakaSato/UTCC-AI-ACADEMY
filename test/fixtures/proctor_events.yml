@@ -1,0 +1,3 @@
+# Deliberately empty, and must stay present — the same reason submissions.yml
+# is. Tests that need an incident record one; the file exists so fixtures clear
+# the table between runs.

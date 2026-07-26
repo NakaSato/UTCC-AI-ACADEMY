@@ -17,18 +17,56 @@ class AdminConsoleTabsTest < ActionDispatch::IntegrationTest
     assert_select "main", text: /#{I18n.t("admin.head.note")}/
   end
 
-  test "the integrity tab renders every case, most severe first" do
+  test "the integrity tab shows a learner's unreviewed events as a case" do
+    student = users(:one)
+    make_events(student, %w[ paste capture blur ])   # 100 - 15 - 20 - 8 = 57 → risk
+
     get admin_url(tab: :integrity)
 
     assert_response :success
-    assert_select "main section", count: AdminConsole::INTEGRITY.size
-    assert_select "main", text: /#{I18n.t("admin.integrity.rows").first[:name]}/
-    # The closed case shows its outcome instead of the action row.
-    assert_select "main", text: /#{I18n.t("admin.integrity.closed")}/
+    assert_select "main", text: /#{student.name}/
+    assert_select "main", text: /#{I18n.t("admin.integrity.severity.high")}/
+    assert_select "main", text: /#{I18n.t("lesson.proctor.events.capture")}/
+    assert_select "main", text: /57 \/ 100/
   end
 
-  test "the integrity badge counts open cases only" do
+  test "no open cases renders the empty state" do
+    get admin_url(tab: :integrity)
+
+    assert_response :success
+    assert_select "main", text: /#{I18n.t("admin.integrity.empty_title")}/
+  end
+
+  test "the integrity badge counts learners with unreviewed events" do
+    make_events(users(:one), %w[ blur ])
+    make_events(users(:two), %w[ menu ])
+
     assert_equal 2, AdminConsole.badge_for(:integrity)
+  end
+
+  test "closing a case stamps the events and empties the tab" do
+    student = users(:one)
+    make_events(student, %w[ paste blur ])
+
+    post close_integrity_case_url(student)
+
+    assert_redirected_to admin_path(tab: :integrity)
+    assert_equal 0, ProctorEvent.unreviewed.count
+    assert_equal 2, ProctorEvent.where.not(reviewed_at: nil).count
+
+    # New events open a new case — closing reviews history, it is not a pardon.
+    make_events(student, %w[ blur ])
+    assert_equal 1, AdminConsole.badge_for(:integrity)
+  end
+
+  test "closing a case takes the admin role" do
+    make_events(users(:one), %w[ blur ])
+    sign_in_as users(:instructor)
+
+    post close_integrity_case_url(users(:one))
+
+    assert_response :redirect
+    assert_equal 1, ProctorEvent.unreviewed.count
   end
 
   test "the permissions matrix is one row per capability and one column per role" do
@@ -97,4 +135,13 @@ class AdminConsoleTabsTest < ActionDispatch::IntegrationTest
     assert_equal [ student.admin?, instructor.admin?, admin.admin? ], flags[5],
                  "roles are granted by admin alone"
   end
+
+  private
+    def make_events(user, kinds)
+      course = Course.find_by!(code: "AI1101")
+      topic = Topic.find_by!(key: "1-1")
+      kinds.each_with_index do |kind, index|
+        ProctorEvent.create!(user:, course:, topic:, kind:, occurred_at: (kinds.size - index).minutes.ago)
+      end
+    end
 end

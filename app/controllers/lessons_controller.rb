@@ -3,6 +3,9 @@ class LessonsController < ApplicationController
   # who redoes a topic writes no second row — but nothing stops a script from
   # hammering it either.
   rate_limit to: 30, within: 3.minutes, only: :submit
+  # Incidents can fire in bursts — a flurry of tab switches is exactly the
+  # signal — so the ceiling is looser than grading's.
+  rate_limit to: 60, within: 3.minutes, only: :incident
 
   before_action :set_course, only: :show
   before_action :set_topic, only: :show
@@ -34,6 +37,21 @@ class LessonsController < ApplicationController
     # The progress screens count the rows when they next render; nothing here
     # reads back a total.
     render json: verdict
+  end
+
+  # The proctor reporting one incident. Whitelist-or-nothing like every param,
+  # but no lock check on purpose: the report is evidence against the reporter,
+  # and forging evidence against yourself is not a threat worth code.
+  def incident
+    kind = params[:kind].to_s
+    return head :unprocessable_entity unless ProctorEvent::KINDS.include?(kind)
+
+    course = Course.find_by(code: params[:course].to_s)
+    topic = Topic.find_by(key: params[:topic].to_s)
+    return head :unprocessable_entity unless course && topic
+
+    ProctorEvent.create!(user: Current.user, course:, topic:, kind:, occurred_at: Time.current)
+    head :created
   end
 
   private

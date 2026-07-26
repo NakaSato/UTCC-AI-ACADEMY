@@ -15,6 +15,9 @@
           own step, and every step is about the same topic. %>
       data-lesson-course="<%= @course.code %>" data-lesson-topic="<%= @topic_key %>"
       <% if monitored %>
+        data-proctor-url-value="<%= lesson_incident_path %>"
+        data-proctor-course-value="<%= @course.code %>"
+        data-proctor-topic-value="<%= @topic_key %>"
         data-proctor-score-value="<%= Proctoring::START_SCORE %>"
         data-proctor-paste-limit-value="<%= Proctoring::PASTE_LIMIT %>"
         data-proctor-max-events-value="<%= Proctoring::MAX_EVENTS %>"

@@ -1,6 +1,6 @@
-<%# Proctor incidents, most severe first. Placeholder like the queue — the
-    proctor's score dies with the page — so the action buttons are inert the way
-    Export CSV is: deciding a case needs somewhere to write the decision. %>
+<%# Real cases: a learner's unreviewed proctor events, scored on the fly and
+    worst first — see Proctoring.cases. Close writes; Notify and Escalate wait
+    on notifications existing, and stay inert the way Export CSV once did. %>
 <div class="mb-4.5">
   <h2 class="mb-1.25 text-21 font-bold tracking-[-0.02em]"><%= t("admin.integrity.title") %></h2>
   <p class="text-14 text-balance text-muted-2"><%= t("admin.integrity.sub") %></p>
@@ -11,8 +11,15 @@
                      low: "bg-surface-2 text-muted" } %>
 <% severity_edge = { high: "border-danger-line", medium: "border-gold-tint", low: "border-hairline" } %>
 
+<% if @cases.empty? %>
+  <div class="rounded-card border border-hairline bg-surface px-7 py-9 text-center">
+    <p class="text-15 font-semibold text-ink-4"><%= t("admin.integrity.empty_title") %></p>
+    <p class="mt-1.5 text-13-5 text-balance text-muted-2"><%= t("admin.integrity.empty_body") %></p>
+  </div>
+<% end %>
+
 <div class="flex flex-col gap-3.5">
-  <% AdminConsole.integrity_cases.each do |kase| %>
+  <% @cases.each do |kase| %>
     <section class="animate-rise rounded-[16px] border bg-surface px-6.5 py-5.5 <%= severity_edge[kase.severity] %>">
       <div class="flex flex-wrap items-start gap-5">
         <div class="min-w-[240px] flex-1">
@@ -21,10 +28,10 @@
                          <%= severity_pill[kase.severity] %>">
               <%= kase.severity_name %>
             </span>
-            <span class="font-mono text-11-5 text-muted-3"><%= kase.score %> / 100</span>
+            <span class="font-mono text-11-5 text-muted-3"><%= kase.score %> / <%= Proctoring::START_SCORE %></span>
           </div>
-          <div class="text-17 font-semibold tracking-[-0.01em]"><%= kase.name %></div>
-          <div class="mt-0.75 font-mono text-12 text-muted-2"><%= kase.sid %></div>
+          <div class="text-17 font-semibold tracking-[-0.01em]"><%= kase.user.name %></div>
+          <div class="mt-0.75 font-mono text-12 text-muted-2"><%= kase.user.student_id %></div>
           <div class="mt-2 text-13-5 text-muted"><%= kase.where_text %></div>
         </div>
 
@@ -33,40 +40,34 @@
             <%= t("admin.integrity.evidence_title") %>
           </div>
           <div class="flex flex-col gap-2.25">
-            <% kase.evidence.each do |item| %>
+            <% kase.events.each do |event| %>
               <div class="flex items-baseline gap-2.75">
                 <span aria-hidden="true" class="size-1.5 flex-none rounded-full bg-gold"></span>
-                <span class="flex-1 text-13 text-balance text-ink-4"><%= item[:text] %></span>
-                <span class="flex-none font-mono text-11 text-muted-3"><%= item[:when] %></span>
+                <span class="flex-1 text-13 text-balance text-ink-4"><%= event.text %></span>
+                <span class="flex-none font-mono text-11 text-muted-3">
+                  <%= event.occurred_at.in_time_zone.strftime("%d/%m %H:%M") %> · −<%= event.weight %>
+                </span>
               </div>
             <% end %>
           </div>
         </div>
       </div>
 
-      <% if kase.open? %>
-        <div class="mt-4.5 flex flex-wrap gap-2 border-t border-surface-5 pt-4">
-          <button type="button"
-                  class="rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25 text-13-5
-                         text-muted transition-colors hover:border-success hover:text-success">
-            <%= t("admin.integrity.actions.clear") %>
-          </button>
-          <button type="button"
-                  class="rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25 text-13-5
-                         text-muted transition-colors hover:border-brand hover:text-brand">
-            <%= t("admin.integrity.actions.notify") %>
-          </button>
-          <button type="button"
-                  class="rounded-[10px] bg-brand px-4.5 py-2.5 text-13-5 font-semibold text-white
-                         transition-colors hover:bg-brand-deep">
-            <%= t("admin.integrity.actions.escalate") %>
-          </button>
-        </div>
-      <% else %>
-        <div class="mt-4.5 border-t border-surface-5 pt-4 text-13-5 font-semibold text-success">
-          <%= t("admin.integrity.closed") %>
-        </div>
-      <% end %>
+      <div class="mt-4.5 flex flex-wrap gap-2 border-t border-surface-5 pt-4">
+        <%= button_to t("admin.integrity.actions.clear"), close_integrity_case_path(kase.user),
+              class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
+                      text-13-5 text-muted transition-colors hover:border-success hover:text-success" %>
+        <button type="button"
+                class="rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25 text-13-5
+                       text-muted transition-colors hover:border-brand hover:text-brand">
+          <%= t("admin.integrity.actions.notify") %>
+        </button>
+        <button type="button"
+                class="rounded-[10px] bg-brand px-4.5 py-2.5 text-13-5 font-semibold text-white
+                       transition-colors hover:bg-brand-deep">
+          <%= t("admin.integrity.actions.escalate") %>
+        </button>
+      </div>
     </section>
   <% end %>
 </div>

@@ -17,10 +17,20 @@ class AdminController < ApplicationController
         needle = "%#{User.sanitize_sql_like(@query)}%"
         @users = @users.where("name LIKE :q OR student_id LIKE :q", q: needle)
       end
+    in :integrity then @cases = Proctoring.cases
     in :audit then @level = AdminConsole.level_filter(params[:level])
     in :courses then @query = params[:q].to_s.strip
     else nil
     end
+  end
+
+  # Closing a case is stamping the learner's unreviewed events — there is no
+  # case row, so there is nothing else to write. New events open a new case.
+  def close_case
+    user = User.find(params[:user_id])
+    ProctorEvent.unreviewed.where(user:).update_all(reviewed_at: Time.current, updated_at: Time.current)
+
+    redirect_to admin_path(tab: :integrity), notice: t("flash.integrity_closed", name: user.name)
   end
 
   def update

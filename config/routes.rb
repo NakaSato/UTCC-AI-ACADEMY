@@ -46,7 +46,16 @@ Rails.application.routes.draw do
   # see LessonsController#submit. It replaced lesson/complete, which took the
   # browser's word for a pass.
   post "lesson/submit", to: "lessons#submit", as: :submit_lesson
+  # The proctor reporting what it saw — see LessonsController#incident. The
+  # browser is reporting evidence against itself, which is why this is the one
+  # post the lock does not guard.
+  post "lesson/incident", to: "lessons#incident", as: :lesson_incident
   get "my-learning", to: "my_learning#show", as: :my_learning
+  # The account's own details. One helper for both verbs, like the auth screens:
+  # profile_path is the link and the form action. This is the only place an
+  # account acquires an email address — sign-up does not ask for one.
+  get "profile", to: "profiles#edit", as: :profile
+  patch "profile", to: "profiles#update"
   get "map", to: "knowledge_maps#show", as: :knowledge_map
   get "progress", to: "progress#show", as: :progress
   get "leaderboard", to: "leaderboards#show", as: :leaderboard
@@ -59,6 +68,8 @@ Rails.application.routes.draw do
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin
   patch "admin/users/:id", to: "admin#update", as: :admin_user
+  # Closing an integrity case stamps a learner's unreviewed proctor events.
+  post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
