@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_093003) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_093004) do
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -35,6 +35,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093003) do
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_courses_on_code", unique: true
     t.index ["position"], name: "index_courses_on_position", unique: true
+  end
+
+  create_table "enrollments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "section_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["section_id", "user_id"], name: "index_enrollments_on_section_id_and_user_id", unique: true
+    t.index ["section_id"], name: "index_enrollments_on_section_id"
+    t.index ["user_id", "section_id"], name: "index_enrollments_on_user_id_and_section_id"
+    t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "sections", force: :cascade do |t|
+    t.string "code", null: false
+    t.integer "course_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "instructor_id"
+    t.string "term", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "term", "code"], name: "index_sections_on_course_id_and_term_and_code", unique: true
+    t.index ["course_id"], name: "index_sections_on_course_id"
+    t.index ["instructor_id"], name: "index_sections_on_instructor_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -104,6 +127,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_093003) do
     t.index ["student_id"], name: "index_users_on_student_id", unique: true
   end
 
+  add_foreign_key "enrollments", "sections"
+  add_foreign_key "enrollments", "users"
+  add_foreign_key "sections", "courses"
+  add_foreign_key "sections", "users", column: "instructor_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "submissions", "courses"
   add_foreign_key "submissions", "topics"

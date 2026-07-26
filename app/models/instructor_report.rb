@@ -1,27 +1,52 @@
 # The instructor view of a section: cohort figures, the topics students fail
 # most often on first attempt, and the roster.
-module InstructorReport
-  STAT_VALUES = [ "38%", "82%", "6", "7.4" ].freeze
-
-  # Percent failing on first attempt, in the same order as
-  # `instructor.hard_topics` in the locale files.
-  HARD_TOPIC_PERCENTS = [ 61, 54, 43, 29, 12 ].freeze
-
-  # Above this share the bar reads as a problem rather than a warning.
-  ALARM_THRESHOLD = 50
-  WARN_THRESHOLD = 40
-
-  # A student is on track at 50%+, behind under 25%.
+#
+# It was a module of frozen figures because there was no section to report on and
+# no record of an attempt to count. Both exist now, so this is an ordinary class
+# over `sections`, `enrollments`, `topic_completions` and `submissions` — the
+# same shape LearnerProgress takes, and it keeps every reader name the view
+# already called.
+#
+# One figure is still fabricated and says so: `AVERAGE_SCORE`. Nothing scores an
+# exercise out of ten — a submission is passed or not — so inventing a mean would
+# be the kind of number that looks measured and is not.
+class InstructorReport
+  # A student is on track at 50% of the syllabus, behind under 25%.
   ON_TRACK = 50
   BEHIND = 25
 
-  Student = Data.define(:id, :name, :percent, :projects, :projects_total, :seen) do
+  # Above this share of first attempts failing, a topic reads as a problem rather
+  # than as a warning.
+  ALARM_THRESHOLD = 50
+  WARN_THRESHOLD = 40
+
+  # How many of the hardest topics the panel lists.
+  HARD_TOPIC_LIMIT = 5
+
+  # Out of ten, and not counted from anything — see the note above.
+  AVERAGE_SCORE = "7.4"
+
+  # A learner is "inactive" once this many days have passed with nothing recorded.
+  INACTIVE_AFTER = 7
+
+  attr_reader :section
+
+  def initialize(section)
+    @section = section
+  end
+
+  # ---- Roster ---------------------------------------------------------------
+
+  Student = Data.define(:user, :percent, :projects, :projects_total, :seen) do
+    def id = user.student_id
+    def name = user.name
     def on_track? = percent >= ON_TRACK
     def behind? = percent < BEHIND
     def projects_text = "#{projects} / #{projects_total}"
 
     def seen_text
       case seen
+      in nil then I18n.t("instructor.seen.never")
       in 0 then I18n.t("instructor.seen.today")
       in 1 then I18n.t("instructor.seen.yesterday")
       else      I18n.t("instructor.seen.days_ago", count: seen)
@@ -29,49 +54,114 @@ module InstructorReport
     end
   end
 
-  # id, percent, projects submitted, days since last seen
-  ROSTER = [
-    [ "6512400118", 74, 6,  0 ],
-    [ "6512400226", 68, 5,  0 ],
-    [ "6512400341", 59, 5,  1 ],
-    [ "6512400407", 32, 4,  0 ],
-    [ "6512400512", 28, 3,  3 ],
-    [ "6512400633", 21, 2,  8 ],
-    [ "6512400744",  9, 1, 12 ]
-  ].freeze
-
-  PROJECTS_TOTAL = 6
-
-  class << self
-    def stats
-      I18n.t("instructor.stats").each_with_index.map do |copy, index|
-        copy.merge(value: STAT_VALUES[index])
-      end
-    end
-
-    def hard_topics
-      names = I18n.t("instructor.hard_topics")
-
-      HARD_TOPIC_PERCENTS.each_with_index.map do |percent, index|
-        { name: names[index], percent:, severity: severity_for(percent) }
-      end
-    end
-
-    def roster
-      names = I18n.t("instructor.roster")
-
-      ROSTER.each_with_index.map do |(id, percent, projects, seen), index|
-        Student.new(id:, name: names[index], percent:, projects:,
-                    projects_total: PROJECTS_TOTAL, seen:)
-      end
-    end
-
-    private
-      def severity_for(percent)
-        return :alarm if percent >= ALARM_THRESHOLD
-        return :warn  if percent >= WARN_THRESHOLD
-
-        :notice
-      end
+  # Ordered by progress, furthest along first — the design's order, and the one
+  # that puts the students worth following up at the bottom where they are easy
+  # to find.
+  def roster
+    @roster ||= students.map { student_row(it) }.sort_by { [ -it.percent, it.name ] }
   end
+
+  # ---- Cohort figures -------------------------------------------------------
+
+  def size = students.size
+
+  def average_percent = roster.any? ? (roster.sum(&:percent) / roster.size.to_f).round : 0
+
+  # On time means the project topics that are done, over the ones that exist,
+  # across the whole section — the closest honest reading of "submissions in" for
+  # a course with no deadlines in it yet.
+  def on_time_percent
+    total = roster.sum(&:projects_total)
+    total.zero? ? 0 : (roster.sum(&:projects) * 100.0 / total).round
+  end
+
+  def inactive_count = roster.count { it.seen.nil? || it.seen > INACTIVE_AFTER }
+
+  def projects_done = roster.sum(&:projects)
+  def projects_total = roster.sum(&:projects_total)
+
+  # The on-time tile's note is counted rather than written: it used to read
+  # "39 of 48 students" beside whatever the value was, which is the kind of
+  # caption that goes on looking authoritative long after it stops being true.
+  def stats
+    copy = I18n.t("instructor.stats").each_with_index.map { |row, index| row.merge(value: stat_values[index]) }
+
+    copy[1] = copy[1].merge(note: I18n.t("instructor.on_time_note", done: projects_done, total: projects_total))
+    copy
+  end
+
+  # ---- The topics students get wrong ----------------------------------------
+
+  # Share of learners whose **first** attempt at a topic failed. Counted off
+  # submissions, which is the whole reason failures are kept: a topic everybody
+  # eventually passes can still be the one everybody gets wrong first.
+  def hard_topics
+    first_attempts
+      .map { |topic, attempts| hard_topic_row(topic, attempts) }
+      .reject { it[:percent].zero? }
+      .sort_by { -it[:percent] }
+      .first(HARD_TOPIC_LIMIT)
+  end
+
+  private
+    def students = @students ||= section.students.order(:name).to_a
+
+    def student_row(user)
+      progress = LearnerProgress.new(user)
+      done = progress.keys_for(section.course.code)
+
+      Student.new(user:,
+                  percent: percent(done.size, Syllabus.topic_count),
+                  projects: (done & project_keys).size,
+                  projects_total: project_keys.size,
+                  seen: days_since_last_seen(user))
+    end
+
+    def project_keys = @project_keys ||= Syllabus.topics.select { it.kind == "project" }.map(&:key).to_set
+
+    # The most recent thing this learner did — a topic finished or an answer
+    # sent. Nil for someone who has done neither.
+    def last_seen_at
+      @last_seen_at ||= begin
+        learned = TopicCompletion.where(user: students).group(:user_id).maximum(:learned_at)
+        sent = Submission.where(user: students).group(:user_id).maximum(:created_at)
+
+        learned.merge(sent) { |_id, a, b| [ a, b ].max }
+      end
+    end
+
+    def days_since_last_seen(user)
+      at = last_seen_at[user.id] or return nil
+
+      (Date.current - at.in_time_zone.to_date).to_i
+    end
+
+    def stat_values
+      [ "#{average_percent}%", "#{on_time_percent}%", inactive_count.to_s, AVERAGE_SCORE ]
+    end
+
+    # topic => the first submission each learner made against it.
+    def first_attempts
+      Submission.where(user: students, kind: "quiz")
+                .includes(:topic)
+                .order(:created_at, :id)
+                .group_by(&:topic)
+                .transform_values { it.group_by(&:user_id).values.map(&:first) }
+    end
+
+    def hard_topic_row(topic, attempts)
+      failed = attempts.count { !it.passed? }
+
+      { name: Syllabus.topic_name(topic.key), key: topic.key,
+        percent: percent(failed, attempts.size), severity: severity_for(percent(failed, attempts.size)) }
+    end
+
+    def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round
+
+    def severity_for(percent)
+      return :alarm if percent >= ALARM_THRESHOLD
+      return :warn  if percent >= WARN_THRESHOLD
+
+      :notice
+    end
 end

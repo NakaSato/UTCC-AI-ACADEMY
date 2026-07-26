@@ -1,0 +1,8 @@
+# One section, so the Teaching console has something to be a report on. Its
+# course and instructor are fixtures too — a section is a course, a term and an
+# instructor, and none of the three is optional here.
+ba_2:
+  course: ai1101
+  instructor: instructor
+  code: BA-2
+  term: 1/2569

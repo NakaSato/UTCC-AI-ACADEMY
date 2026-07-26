@@ -2,6 +2,13 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :topic_completions, dependent: :destroy
+  has_many :submissions, dependent: :destroy
+
+  has_many :enrollments, dependent: :destroy
+  has_many :sections, through: :enrollments
+  # The other side of the same table: what this user teaches, not what they take.
+  has_many :sections_taught, class_name: "Section", foreign_key: :instructor_id,
+                             dependent: :nullify, inverse_of: :instructor
 
   # Sign-up never asks for a role — everyone starts a student, and an admin grants
   # the rest from /admin. `validate: true` keeps a role posted from that form a

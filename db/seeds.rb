@@ -105,6 +105,56 @@ if Rails.env.local?
                            kind: :learned, at: index.days.ago)
   end
 
+  # ---- A section to teach ----------------------------------------------------
+  # The Teaching console is a report on a section, and the leaderboard ranks
+  # within one, so without this both screens have nothing to be about. Five more
+  # students than the two above, because a roster of two demonstrates nothing.
+  section = Section.find_or_initialize_by(course: Course.find_by!(code: "AI1101"), term: "1/2569", code: "BA-2")
+  section.update!(instructor: User.find_by!(student_id: "2011071730801"))
+
+  cohort = {
+    "2011071730003" => [ "ปัณณธร สุวรรณเวช", 9 ],
+    "2011071730004" => [ "ญาณิศา กิตติวัฒน์", 6 ],
+    "2011071730005" => [ "กันตพัฒน์ วรพงศ์", 4 ],
+    "2011071730006" => [ "ศุภกร ตันติเวช", 1 ],
+    "2011071730007" => [ "พิชญา มณีรัตน์", 0 ]
+  }
+
+  cohort.each do |student_id, (name, finished)|
+    student = User.find_or_initialize_by(student_id:)
+    student.assign_attributes(name:, faculty: "บริหารธุรกิจ", study_year: 2)
+    student.password = "utcc2026"
+    student.save!
+
+    # Some progress each, so the roster is a spread rather than a flat zero.
+    Syllabus.topic_keys.first(finished).each_with_index do |key, index|
+      TopicCompletion.record(user: student, course_code: "AI1101", topic_key: key,
+                             kind: :learned, at: (finished - index).days.ago)
+    end
+  end
+
+  ([ demo, rival ] + User.where(student_id: cohort.keys).to_a).each do |student|
+    Enrollment.find_or_create_by!(section:, user: student)
+  end
+
+  # The hard-topics panel counts first attempts that failed, so it needs some.
+  # Every second student gets one wrong before getting it right — which is what
+  # makes a topic look hard without making it look unpassable.
+  course = Course.find_by!(code: "AI1101")
+  section.students.each_with_index do |student, index|
+    next unless index.even?
+
+    Topic.where(key: Syllabus.keys_in(1).first(2)).each do |topic|
+      next if Submission.exists?(user: student, topic:, kind: "quiz")
+
+      Submission.create!(user: student, course:, topic:, kind: "quiz",
+                         answer: (LessonContent::CORRECT_OPTION + 1).to_s, passed: false)
+    end
+  end
+
+  puts "Seeded 1 section (#{section.label}) with #{section.students.count} students " \
+       "and #{Submission.count} submissions"
+
   puts "Seeded #{User.count} users — student 2011071730001, instructor 2011071730801, " \
        "admin 2011071730802; password utcc2026 for all"
   puts "Seeded #{TopicCompletion.count} topic completions"

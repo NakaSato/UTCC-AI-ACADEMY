@@ -255,8 +255,8 @@ class AppScreensTest < ActionDispatch::IntegrationTest
 
   test "the staff screens render for the roles that own them" do
     {
-      users(:instructor) => { instructor_url => I18n.t("instructor.title") },
-      users(:admin) => { instructor_url => I18n.t("instructor.title"),
+      users(:instructor) => { instructor_url => I18n.t("instructor.title", course: "AI1101") },
+      users(:admin) => { instructor_url => I18n.t("instructor.title", course: "AI1101"),
                          admin_url => I18n.t("admin.title") }
     }.each do |user, screens|
       sign_in_as user

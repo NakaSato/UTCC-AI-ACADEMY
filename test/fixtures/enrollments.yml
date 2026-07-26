@@ -1,0 +1,8 @@
+# Who is in BA-2. Deliberately not everyone: users(:two) is outside the section,
+# which is what makes "the roster is the section, not the user table" testable.
+one:
+  section: ba_2
+  user: one
+student:
+  section: ba_2
+  user: student

@@ -268,20 +268,4 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     assert_equal 3, entries.count(&:podium?)
     assert_equal (1..entries.size).to_a, entries.map(&:rank)
   end
-
-  test "roster students classify their own standing and last-seen wording" do
-    roster = InstructorReport.roster
-
-    assert_predicate roster.first, :on_track?
-    assert_predicate roster.last, :behind?
-    assert_equal I18n.t("instructor.seen.today"), roster.first.seen_text
-    assert_equal I18n.t("instructor.seen.yesterday"), roster[2].seen_text
-    assert_equal I18n.t("instructor.seen.days_ago", count: 12), roster.last.seen_text
-  end
-
-  test "hard topics escalate with the failure rate" do
-    severities = InstructorReport.hard_topics.map { it[:severity] }
-
-    assert_equal %i[ alarm alarm warn notice notice ], severities
-  end
 end
