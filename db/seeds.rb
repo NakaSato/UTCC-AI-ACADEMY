@@ -190,8 +190,25 @@ if Rails.env.local?
       next if Submission.exists?(user: student, topic:, kind: "quiz")
 
       Submission.create!(user: student, course:, topic:, kind: "quiz",
-                         answer: (LessonContent::CORRECT_OPTION + 1).to_s, passed: false)
+                         answer: (LessonContent::CORRECT_OPTION + 1).to_s, passed: false, score: 0)
+      # And then got it right, so the average is of best attempts rather than of
+      # one bad one — which is the distinction the tile is making.
+      Submission.create!(user: student, course:, topic:, kind: "quiz",
+                         answer: LessonContent::CORRECT_OPTION.to_s, passed: true, score: 100)
     end
+  end
+
+  # Coding tasks at three depths, so the Teaching console's average lands
+  # somewhere honest rather than at 0 or 100. The scores are what `grade_code`
+  # would return for source matching one, two and three of its criteria.
+  section.students.each_with_index do |student, index|
+    topic = Topic.find_by!(key: Syllabus.keys_in(1).first)
+    next if Submission.exists?(user: student, topic:, kind: "code")
+
+    met = index % 3 + 1
+    Submission.create!(user: student, course:, topic:, kind: "code",
+                       answer: "train_test_split(", passed: met == 3,
+                       score: (met * 100.0 / 3).round)
   end
 
   # A couple of integrity cases, so the admin tab has something real to show.

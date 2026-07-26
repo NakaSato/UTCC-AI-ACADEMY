@@ -48,6 +48,37 @@ class SubmissionTest < ActiveSupport::TestCase
 
     assert_equal [ true, true, true ], verdict[:checks]
     assert_not verdict[:passed]
+    # Partial credit measures how close the source got, and the blank rule is
+    # about whether the attempt counts — the two do not soften each other.
+    assert_equal 100, verdict[:score]
+  end
+
+  # A quiz is one right answer, so its score is honestly binary.
+  test "the quiz scores all or nothing" do
+    assert_equal 100, LessonContent.grade_quiz(LessonContent::CORRECT_OPTION)[:score]
+    assert_equal 0, LessonContent.grade_quiz(LessonContent::CORRECT_OPTION + 1)[:score]
+  end
+
+  # The share of criteria matched, which is the only granularity the app has.
+  test "the coding task scores how much of it matched" do
+    assert_equal 0, LessonContent.grade_code("x = 1")[:score]
+    assert_equal 33, LessonContent.grade_code("train_test_split(")[:score]
+    assert_equal 67, LessonContent.grade_code("train_test_split(X, y, test_size=0.2)")[:score]
+    assert_equal 100, LessonContent.grade_code("train_test_split(X, y, test_size=0.2, random_state=42)")[:score]
+  end
+
+  test "the score the grader returned is the score on the row" do
+    assert_equal 0, record("quiz", LessonContent::CORRECT_OPTION + 1).score
+    assert_equal 100, record("quiz", LessonContent::CORRECT_OPTION).score
+  end
+
+  # NULL is the honest record of an attempt nothing scored, and is what every row
+  # written before the column existed says.
+  test "a verdict with no score writes no score" do
+    submission = Submission.record(user: @user, course: @course, topic: @topic,
+                                   kind: "quiz", answer: "1", verdict: { passed: true })
+
+    assert_nil submission.score
   end
 
   test "a passing submission records the completion it earns" do

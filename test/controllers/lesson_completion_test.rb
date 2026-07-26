@@ -57,6 +57,24 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
     assert_not_predicate Submission.sole, :passed?
   end
 
+  # The grader scores the attempt and the controller has to carry that to the
+  # row — a score that stops being passed through would leave the Teaching
+  # console averaging nothing, with no other screen to notice.
+  test "the score the grader worked out reaches the row" do
+    submit(kind: "quiz", answer: WRONG_ANSWER)
+    assert_equal 0, Submission.sole.score
+
+    submit(kind: "quiz", answer: RIGHT_ANSWER)
+    assert_equal 100, Submission.newest_first.first.score
+  end
+
+  test "a partly correct coding task is scored for what matched" do
+    submit(kind: "code", answer: "train_test_split(")
+
+    assert_not_predicate Submission.sole, :passed?
+    assert_equal 33, Submission.sole.score
+  end
+
   test "the answer key is not in the page" do
     get lesson_url(course: topic_params[:course], step: "exercise")
 

@@ -107,7 +107,57 @@ class InstructorReportTest < ActiveSupport::TestCase
     assert_equal 0, report.size
     assert_equal 0, report.average_percent
     assert_equal 0, report.on_time_percent
+    assert_equal 0, report.average_score
     assert_empty report.hard_topics
+  end
+
+  # ---- The average score ------------------------------------------------------
+
+  # A gradebook reports what a student achieved, not what they first guessed —
+  # and first attempts are what the hard-topics panel is already about.
+  test "the average takes each learner's best attempt, not their first or their mean" do
+    topic = Topic.find_by!(key: Syllabus.topic_keys.first)
+    scored(users(:one), topic, 0)
+    scored(users(:one), topic, 33)
+    scored(users(:one), topic, 100)
+
+    assert_equal 10.0, @report.average_score
+  end
+
+  # A learner who retried until they passed must not score below one who got it
+  # first time.
+  test "persistence is not penalised" do
+    topic = Topic.find_by!(key: Syllabus.topic_keys.first)
+    scored(users(:one), topic, 0)
+    scored(users(:one), topic, 100)
+    scored(users(:student), topic, 100)
+
+    assert_equal 10.0, @report.average_score
+  end
+
+  test "each topic and each kind counts once" do
+    first, second = Syllabus.topic_keys.first(2).map { Topic.find_by!(key: it) }
+    scored(users(:one), first, 100)
+    scored(users(:one), second, 0)
+    scored(users(:one), first, 50, kind: "code")
+
+    assert_equal 5.0, @report.average_score, "100, 0 and 50 over three (topic, kind) pairs"
+  end
+
+  # They predate the column and were graded pass/fail and nothing more; counting
+  # them as zero would invent the number this figure exists to stop inventing.
+  test "rows with no score do not vote" do
+    topic = Topic.find_by!(key: Syllabus.topic_keys.first)
+    scored(users(:one), topic, 100)
+    attempt(users(:student), topic, passed: false)
+
+    assert_equal 10.0, @report.average_score
+  end
+
+  test "a section that has scored nothing reports zero rather than dividing by it" do
+    attempt(users(:one), Topic.find_by!(key: Syllabus.topic_keys.first), passed: false)
+
+    assert_equal 0, @report.average_score
   end
 
   private
@@ -120,6 +170,11 @@ class InstructorReportTest < ActiveSupport::TestCase
     def attempt(user, topic, passed:)
       Submission.create!(user:, course: @course, topic:, kind: "quiz",
                          answer: passed ? LessonContent::CORRECT_OPTION.to_s : "3", passed:)
+    end
+
+    def scored(user, topic, score, kind: "quiz")
+      Submission.create!(user:, course: @course, topic:, kind:, answer: "1",
+                         passed: score == 100, score:)
     end
 
     def fail_then_pass(user, topic)

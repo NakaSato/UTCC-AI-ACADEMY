@@ -132,14 +132,24 @@ module LessonContent
     # graded, recorded attempt rather than sitting in the page beforehand — a
     # student can still learn it by guessing, but not without leaving a failed
     # submission behind, which is the row the instructor report wants anyway.
+    # `score` is the share of the step's criteria that matched, which for one
+    # right answer is 0 or 100. The page ignores it — it is kept on the row so
+    # the Teaching console has something to average that is not a pass rate.
     def grade_quiz(answer)
-      { passed: answer.to_s == CORRECT_OPTION.to_s, gems: QUIZ_GEMS, correct_index: CORRECT_OPTION }
+      passed = answer.to_s == CORRECT_OPTION.to_s
+
+      { passed:, score: passed ? 100 : 0, gems: QUIZ_GEMS, correct_index: CORRECT_OPTION }
     end
 
+    # Partial credit even on a fail: how close a student got is the thing worth
+    # measuring, and these three booleans are the only granularity the app has.
+    # The leftover blank still fails the attempt outright — it just does not zero
+    # what did match.
     def grade_code(source)
       results = CHECKS.map { source.to_s.match?(it) }
 
-      { passed: results.all? && source.to_s.exclude?(BLANK), checks: results, gems: CODE_GEMS }
+      { passed: results.all? && source.to_s.exclude?(BLANK),
+        score: percent(results.count(true), results.size), checks: results, gems: CODE_GEMS }
     end
 
     def rewards
@@ -149,5 +159,8 @@ module LessonContent
         { value: REWARD_STREAK.to_s, label: I18n.t("lesson.done.rewards.streak") }
       ]
     end
+
+    private
+      def percent(part, whole) = whole.zero? ? 0 : (part * 100.0 / whole).round
   end
 end

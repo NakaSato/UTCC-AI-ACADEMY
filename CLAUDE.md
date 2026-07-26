@@ -244,7 +244,14 @@ Recording is a consequence of grading, not a report of it. `quiz` and `code_task
 
 `submissions` holds one row per **attempt** — `user`, `course`, `topic`, `kind` (`quiz` | `code`), `answer` (the option index, or the source), `passed`. A completion is the outcome and there is exactly one per learner per topic; a submission is the trying and there are as many as it took.
 
-**Failures are kept on purpose.** They are what `InstructorReport`'s "share failing on first attempt" — still the fabricated figure on the Teaching console — will be counted from.
+**Failures are kept on purpose.** They are what `InstructorReport`'s "share failing on first attempt" is counted from, and half of what its average score is a mean of.
+
+**`score` is what the server made of the attempt beyond whether it passed** — an integer percentage, the share of the step's criteria that matched. `grade_code` was always computing one boolean per `LessonContent::CHECKS` entry so the page could light its list, and throwing them away; this keeps them. A quiz is one right answer, so its score is honestly 0 or 100. Partial credit is given even on a fail, and a leftover `___` still fails outright — how close the source got and whether the attempt counts are two different questions.
+
+Two things about it are load-bearing:
+
+- **Stored, not derived.** Re-running `CHECKS` over a stored `answer` would re-mark old work under criteria that did not exist when it was submitted. A grade is a fact about a moment — the mirror of `Notification`, which stores a kind precisely so the *reader's* present wins.
+- **NULL is not zero.** Rows written before the column existed were graded pass/fail and nothing more; they do not vote in the average. Counting them as zero would invent the measured-looking number the change removed.
 
 Grading lives in `LessonContent`: `grade_quiz` compares against `CORRECT_OPTION`, `grade_code` matches `CHECKS` and rejects any leftover `___` however well the rest matches. Neither the key nor the patterns are rendered. The cost, accepted deliberately: the coding task's criteria no longer tick as you type — they light up when the run answers, because live ticking needs the patterns in the page.
 
@@ -267,7 +274,7 @@ A consequence worth knowing: **a brand-new account can only open module 1.** Tha
 
 Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_count` and `applied_topic_count` are counted off `ENTRIES`, and every course reuses the one placeholder syllabus. That is why every course shows the same total — and it is deliberate, because a course whose stat tile and progress bar disagreed could never be finished.
 
-**Still placeholder, and what each is waiting for:** the instructor's average exercise score (a submission is passed or not — nothing scores one out of ten), and the lesson's prose, quiz and coding task being the same for every topic (a content job). Everything else a learner sees is counted — the leaderboard, the Teaching console, awards, projects, hearts, notifications — off `sections`, `enrollments`, `topic_completions`, `submissions`, `proctor_events` and `notifications`.
+**Still placeholder, and what it is waiting for:** the lesson's prose, quiz and coding task are the same for every topic — a content job, not a modelling one. That is now the only one. **Nothing on a staff-facing screen is invented any more**: the Teaching console's average exercise score was the last, and `submissions.score` retired it. Everything a learner sees is counted — the leaderboard, the Teaching console, awards, projects, hearts, notifications — off `sections`, `enrollments`, `topic_completions`, `submissions`, `proctor_events` and `notifications`.
 
 ## Internationalisation
 

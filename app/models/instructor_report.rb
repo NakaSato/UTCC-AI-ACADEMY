@@ -7,9 +7,10 @@
 # same shape LearnerProgress takes, and it keeps every reader name the view
 # already called.
 #
-# One figure is still fabricated and says so: `AVERAGE_SCORE`. Nothing scores an
-# exercise out of ten — a submission is passed or not — so inventing a mean would
-# be the kind of number that looks measured and is not.
+# Nothing on this screen is invented any more. The last figure that was —
+# "average exercise score" — is counted now that `submissions.score` exists: the
+# coding task's criteria were always graded one at a time, and the share of them
+# that matched is what the tile is a mean of.
 class InstructorReport
   # A student is on track at 50% of the syllabus, behind under 25%.
   ON_TRACK = 50
@@ -23,8 +24,8 @@ class InstructorReport
   # How many of the hardest topics the panel lists.
   HARD_TOPIC_LIMIT = 5
 
-  # Out of ten, and not counted from anything — see the note above.
-  AVERAGE_SCORE = "7.4"
+  # The tile reads out of ten, while a score is stored out of a hundred.
+  SCORE_DIVISOR = 10
 
   # A learner is "inactive" once this many days have passed with nothing recorded.
   INACTIVE_AFTER = 7
@@ -76,6 +77,20 @@ class InstructorReport
   end
 
   def inactive_count = roster.count { it.seen.nil? || it.seen > INACTIVE_AFTER }
+
+  # Each learner's best attempt at each graded step, averaged over the section.
+  # Best rather than first, for two reasons: a gradebook reports what a student
+  # achieved rather than what they first guessed, and first attempts are what the
+  # hard-topics panel below is already about — counting them here too would make
+  # the screen say one thing twice.
+  #
+  # Rows with no score predate the column and do not vote; a section with nothing
+  # scored reports 0, the way the other three tiles do when they have nothing.
+  def average_score
+    best = scored_attempts.values.map(&:max)
+
+    best.any? ? (best.sum / best.size.to_f / SCORE_DIVISOR).round(1) : 0
+  end
 
   def projects_done = roster.sum(&:projects)
   def projects_total = roster.sum(&:projects_total)
@@ -157,7 +172,16 @@ class InstructorReport
     end
 
     def stat_values
-      [ "#{average_percent}%", "#{on_time_percent}%", inactive_count.to_s, AVERAGE_SCORE ]
+      [ "#{average_percent}%", "#{on_time_percent}%", inactive_count.to_s, average_score.to_s ]
+    end
+
+    # One query for the cohort, folded in Ruby — the same shape as
+    # `first_attempts` below, and for the same reason: a per-student query would
+    # make this screen's cost grow with the size of a section.
+    def scored_attempts
+      @scored_attempts ||= Submission.where(user: students).where.not(score: nil)
+                                     .group_by { [ it.user_id, it.topic_id, it.kind ] }
+                                     .transform_values { |attempts| attempts.map(&:score) }
     end
 
     # topic => the first submission each learner made against it.

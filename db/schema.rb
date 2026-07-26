@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_150000) do
   create_table "audit_events", force: :cascade do |t|
     t.string "action", null: false
     t.datetime "created_at", null: false
@@ -136,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
     t.datetime "created_at", null: false
     t.string "kind", null: false
     t.boolean "passed", default: false, null: false
+    t.integer "score"
     t.integer "topic_id", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
