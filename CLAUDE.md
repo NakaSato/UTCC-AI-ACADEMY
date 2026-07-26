@@ -47,7 +47,7 @@ bin/rails test test/models/foo_test.rb:42  # single test by line number
 bin/rails db:test:prepare test          # from a clean test database
 ```
 
-**There are no system tests yet** — `test/system/` does not exist, so `bin/rails test:system` has nothing to run. Capybara and `selenium-webdriver` are in the Gemfile's `:test` group ready for the first one; add it there and uncomment the step in `config/ci.rb`.
+**System tests exist and run in `bin/ci`** — `test/system/learning_walk_test.rb` walks the definition-of-done path in a real browser: sign in through the form, fail then pass the graded exercise, and see the pass counted on My Learning. The driver is headless Edge, registered by hand in `test/application_system_test_case.rb` because Rails' shorthand knows Chrome and Firefox; it also pins the browser's language to Thai, since the assertions are the app's default copy. Swap the two `:edge` references there to run against another browser.
 
 Lint and security (each is also a `bin/ci` step):
 
@@ -58,7 +58,7 @@ bin/bundler-audit      # gem CVEs; ignore entries go in config/bundler-audit.yml
 bin/importmap audit    # JS dependency CVEs
 ```
 
-`bin/ci` also runs `env RAILS_ENV=test bin/rails db:seed:replant`, so `db/seeds.rb` must stay runnable against a fresh test database. The system-test step is commented out in `config/ci.rb` — leave it that way until `test/system/` actually has something in it.
+`bin/ci` also runs `env RAILS_ENV=test bin/rails db:seed:replant`, so `db/seeds.rb` must stay runnable against a fresh test database. The system-test step runs `bin/rails test:system` as part of the pipeline.
 
 There is no CI service and no GitHub Actions workflow — `.github/` holds only `dependabot.yml`, and `bin/ci` is the whole pipeline, run locally. `docs/process.md` makes "`bin/ci` passes on your machine" the definition of done, so treat a green run as the shipping gate rather than a formality.
 

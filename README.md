@@ -158,7 +158,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | Cache | `solid_cache` | |
 | WebSockets | `solid_cable` | nothing uses it yet |
 | Deploy | Docker, via Kamal or Render | `config/deploy.yml`, `render.yaml` — one image, two targets |
-| Tests | Minitest (**not** RSpec), parallel | Capybara + selenium present, unused |
+| Tests | Minitest (**not** RSpec), parallel | Capybara + selenium drive the system tests |
 | Lint / security | `rubocop-rails-omakase`, Brakeman, bundler-audit, `importmap audit` | all wired into `bin/ci` |
 
 There is **no Redis, no Memcached and no separate job runner** — every piece of infrastructure is a SQLite database.
@@ -459,7 +459,7 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 Setup → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds
 ```
 
-The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. **There are no system tests yet** — `test/system/` does not exist and that step stays commented out in `config/ci.rb` until it does.
+The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — one walk of the definition-of-done path: sign in, fail then pass the graded exercise, see it counted.
 
 ---
 
