@@ -42,6 +42,36 @@ class ToastsTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller=toast]", 1
   end
 
+  # The host had no callers for a while: it shipped on every screen and never
+  # showed anything. The first two are the lesson's grading failures — the one
+  # case with no other surface, since a refusal brings no page load and so no
+  # flash. Asserted here for the same reason as the targets above: the copy is
+  # read out of the DOM by name, so a renamed attribute fails silently.
+  test "the lesson carries the copy its toasts are raised with" do
+    sign_in_as users(:one)
+
+    get lesson_path
+
+    assert_response :success
+    assert_select "template[data-quiz-target=copy][data-unreachable=?]",
+                  I18n.t("lesson.grading_unreachable")
+    assert_select "template[data-code-task-target=copy][data-unreachable=?]",
+                  I18n.t("lesson.grading_unreachable")
+  end
+
+  # A pass deliberately raises no toast: the exercise writes its verdict into the
+  # feedback panel and the coding task into the console, both of which stay on
+  # screen. Toasting it too would say the same thing twice and then take it away.
+  test "a graded verdict has its own surface, so nothing toasts it" do
+    sign_in_as users(:one)
+
+    get lesson_path
+
+    assert_response :success
+    assert_select "[data-quiz-target=feedback]"
+    assert_select "[data-code-task-target=console]"
+  end
+
   private
     def assert_toast_host
       assert_select "[data-controller=toast][data-action='toast:show@window->toast#show']", 1

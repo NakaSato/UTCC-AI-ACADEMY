@@ -7,7 +7,8 @@
 <%= form_with url: login_path do |form| %>
   <div class="mb-5.5 flex flex-col gap-4">
     <label class="flex flex-col gap-1.75">
-      <%# The controller turns the ID into <id>@utcc.ac.th before authenticating. %>
+      <%# The ID is the credential itself: authenticate_by reads :student_id, and
+          most accounts have no email address at all. %>
       <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.student_id") %></span>
       <%# 13 digits, matching User::STUDENT_ID_FORMAT. maxlength stops the typo
           at the keyboard; the model is still the authority. %>

@@ -1,17 +1,20 @@
 <%# The summary a form shows when it comes back. Two things earn their keep here
     beyond listing the messages:
 
-    - Each message is a **link to the field it is about**. `form.text_field :name`
-      renders id="user_name", which is what `field_id` rebuilds, and navigating
-      to a fragment focuses the target when it is focusable — so a student fixes
-      the problem by clicking it rather than by re-reading the form. An error on
-      :base (the terms checkbox) belongs to no field and stays plain text.
+    - Each message is a **link to the field it is about**, so a student fixes the
+      problem by clicking it rather than by re-reading the form — navigating to a
+      fragment focuses the target when it is focusable. Which id to point at
+      depends on how the form was built: `form_with model:` renders
+      id="user_name", `form_with url:` renders id="name". `scope` is that prefix
+      and defaults to the record's; pass `scope: nil` for an unbound form. An
+      error on :base (the terms checkbox) belongs to no field and stays text.
     - `tabindex="-1"` makes the panel itself focusable, so those links have
       somewhere to send a keyboard user back to. `role=alert` is what announces
       the panel when it appears.
 
     The heading counts nothing — the list is what says how many and which — so
     auth.errors_title takes no interpolation and needs no plural forms. %>
+<% scope = local_assigns.fetch(:scope, record.model_name.param_key) %>
 <% if record.errors.any? %>
   <div role="alert" tabindex="-1"
        class="mb-5 rounded-field border border-danger-line border-l-[3px] border-l-brand-alert bg-danger-tint
@@ -28,7 +31,7 @@
           <% if error.attribute == :base %>
             <%= error.full_message %>
           <% else %>
-            <%= link_to error.full_message, "##{field_id(record, error.attribute)}",
+            <%= link_to error.full_message, "##{[ scope, error.attribute ].compact.join("_")}",
                   class: "underline decoration-brand-alert underline-offset-[3px]
                           transition-colors hover:text-brand-deep hover:decoration-brand-deep" %>
           <% end %>

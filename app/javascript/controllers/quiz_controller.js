@@ -42,10 +42,16 @@ export default class extends Controller {
     })
 
     // Refused or unreachable: let them try again rather than marking an answer
-    // the server never saw.
+    // the server never saw. Say so, too — re-enabling the button on its own
+    // looks identical to the click not having registered, and there is no page
+    // load here to carry a flash.
     if (!verdict) {
       this.checked = false
       this.checkTarget.disabled = false
+      this.dispatch("show", {
+        prefix: "toast",
+        detail: { message: this.copyTarget.dataset.unreachable, kind: "error" }
+      })
       return
     }
 

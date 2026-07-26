@@ -55,8 +55,10 @@
                   transition-colors hover:bg-brand-tint" %>
   </div>
 
-  <%# The strings the controller writes into the feedback panel. %>
+  <%# The strings the controller writes into the feedback panel, plus the one it
+      raises as a toast when the answer never reached the server. %>
   <template data-quiz-target="copy"
+            data-unreachable="<%= t("lesson.grading_unreachable") %>"
             data-correct-title="<%= t("lesson.quiz.correct_title") %>"
             data-correct-body="<%= t("lesson.quiz.correct_body") %>"
             data-wrong-title="<%= t("lesson.quiz.wrong_title") %>"

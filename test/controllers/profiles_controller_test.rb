@@ -137,4 +137,151 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     patch profile_url, params: { user: { name: "ไม่ควรบันทึก" } }
     assert_redirected_to root_path
   end
+
+  # ---- Changing the password ---------------------------------------------
+  # /reset-password is the signed-out way in and needs mail that is not
+  # configured. This is the signed-in one and needs nothing, which is the whole
+  # point of it existing.
+
+  test "changes the password when the current one is right" do
+    patch profile_password_url, params: {
+      current_password: "password",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_redirected_to profile_url
+    assert_equal I18n.t("flash.password_changed"), flash[:notice]
+    assert users(:two).reload.authenticate("brand-new-password9"), "the new password works"
+    assert_not users(:two).authenticate("password"), "the old one does not"
+  end
+
+  test "the new password is what signs in afterwards" do
+    patch profile_password_url, params: {
+      current_password: "password",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+    sign_out
+
+    post login_path, params: { student_id: users(:two).student_id, password: "password" }
+    assert_redirected_to login_path, "the old password is refused"
+
+    post login_path, params: { student_id: users(:two).student_id, password: "brand-new-password9" }
+    assert_redirected_to root_url
+  end
+
+  # The session cookie alone should not be enough to change the password it
+  # protects — a borrowed laptop is the case this is for.
+  test "a wrong current password changes nothing" do
+    patch profile_password_url, params: {
+      current_password: "not-my-password1",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_response :unprocessable_entity
+    assert users(:two).reload.authenticate("password"), "the password is untouched"
+    assert_select "div[role=alert]"
+  end
+
+  test "a blank current password changes nothing" do
+    patch profile_password_url, params: {
+      current_password: "",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_response :unprocessable_entity
+    assert users(:two).reload.authenticate("password")
+  end
+
+  # User's own rules apply — this is an ordinary update, not a special path
+  # around them.
+  test "a weak new password is rejected" do
+    [ "short1", "password", "12345678", "onlyletters" ].each do |weak|
+      patch profile_password_url, params: {
+        current_password: "password", password: weak, password_confirmation: weak
+      }
+
+      assert_response :unprocessable_entity, "#{weak.inspect} should be refused"
+      assert users(:two).reload.authenticate("password"), "#{weak.inspect} must not have been saved"
+    end
+  end
+
+  test "a mismatched confirmation is rejected" do
+    patch profile_password_url, params: {
+      current_password: "password",
+      password: "brand-new-password9",
+      password_confirmation: "something-else9"
+    }
+
+    assert_response :unprocessable_entity
+    assert users(:two).reload.authenticate("password")
+  end
+
+  # Two forms, one record. A rejected password must not report itself above the
+  # name and email fields, and vice versa.
+  test "errors are shown on the form that was submitted" do
+    patch profile_password_url, params: {
+      current_password: "wrong-password1", password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "form[action=?] div[role=alert]", profile_password_path, count: 1
+    assert_select "form[action=?] div[role=alert]", profile_path, count: 0
+
+    patch profile_url, params: { user: { email_address: "not-an-email" } }
+
+    assert_response :unprocessable_entity
+    assert_select "form[action=?] div[role=alert]", profile_path, count: 1
+    assert_select "form[action=?] div[role=alert]", profile_password_path, count: 0
+  end
+
+  # Everywhere else is now signed in with a password its holder replaced. This
+  # device is spared: being made to sign in again on the machine you just used
+  # reads as a failure rather than as security.
+  test "changing the password signs out other devices but not this one" do
+    other = users(:two).sessions.create!(user_agent: "elsewhere", ip_address: "10.0.0.9")
+
+    patch profile_password_url, params: {
+      current_password: "password",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_not Session.exists?(other.id), "the other session is gone"
+    assert_equal 1, users(:two).sessions.count
+
+    # Still signed in here: the next request does not bounce to the landing page.
+    get profile_url
+    assert_response :success
+  end
+
+  test "a failed change leaves other sessions alone" do
+    other = users(:two).sessions.create!(user_agent: "elsewhere", ip_address: "10.0.0.9")
+
+    patch profile_password_url, params: {
+      current_password: "wrong-password1",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_response :unprocessable_entity
+    assert Session.exists?(other.id), "a refused attempt must not sign anyone out"
+  end
+
+  test "changing a password requires a session" do
+    sign_out
+
+    patch profile_password_url, params: {
+      current_password: "password",
+      password: "brand-new-password9",
+      password_confirmation: "brand-new-password9"
+    }
+
+    assert_redirected_to root_path
+    assert users(:two).reload.authenticate("password")
+  end
 end

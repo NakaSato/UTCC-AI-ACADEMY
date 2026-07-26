@@ -72,6 +72,8 @@ bin/rails instructor:create                # create or promote an instructor
 
 `/profile` ("Edit info") is the account's own details, reached from the avatar menu and from the card on My Learning. It is the only screen where a student changes their own record, and the only place an account acquires an **email address** — sign-up asks for a name, a student ID and a password and nothing else. That matters more than it looks: password reset finds a user by email and by nothing else, so until a student fills this in there is no way to recover their account. Their student ID is shown but not editable, and `role` is not on the form for the same reason it is not on sign-up.
 
+The same screen is where a signed-in student **changes their password**, asking for the current one first. That is deliberately separate from `/reset-password`, which is for someone locked out and needs a working mailer — with SMTP unconfigured there is otherwise no way to change a password at all. A successful change signs the account out everywhere except the device that made it.
+
 Screen state lives in the query string rather than in client-side JS: filter chips, lesson steps, tabs and the selected node on the knowledge map are all plain links, so any view of a screen is a URL you can share.
 
 ## Accounts and roles
@@ -338,6 +340,7 @@ post "lesson/submit"   => "lessons#submit"
 get   "my-learning"    => "my_learning#show"    # ?tab=progress|done
 get   "profile"        => "profiles#edit"       # the account's own details
 patch "profile"        => "profiles#update"     # the only place an email is set
+patch "profile/password" => "profiles#update_password"  # change it while signed in
 get   "map"            => "knowledge_maps#show" # ?topic=<node id>&mode=course|project
 get   "progress"       => "progress#show"
 get   "leaderboard"    => "leaderboards#show"   # ?tab=week|semester|university

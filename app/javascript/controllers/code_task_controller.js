@@ -23,8 +23,15 @@ export default class extends Controller {
       kind: "code", answer: this.editorTarget.value
     })
 
+    // Nothing was graded. Putting the console back to idle on its own reads as
+    // if the run never happened, so say why — a toast rather than a flash,
+    // since no page load is coming.
     if (!verdict) {
       this.consoleTarget.textContent = `$ python split_customers.py\n${copy.idle}`
+      this.dispatch("show", {
+        prefix: "toast",
+        detail: { message: copy.unreachable, kind: "error" }
+      })
       return
     }
 

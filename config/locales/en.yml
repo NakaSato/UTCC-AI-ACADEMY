@@ -240,6 +240,9 @@ en:
           - "Data privacy"
 
   lesson:
+    # Raised as a toast rather than a flash: there is no page load to carry a
+    # flash, and the exercise and the coding task both fail this way.
+    grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
     back_module: "← AI1101 · Module 2"
     steps_label: "Lesson steps"
     step_of: "Step %{current} of %{total} · %{name}"

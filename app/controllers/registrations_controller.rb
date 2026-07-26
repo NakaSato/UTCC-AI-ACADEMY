@@ -32,9 +32,11 @@ class RegistrationsController < ApplicationController
 
   private
     def user_params
-      # :student_id, not :email_address — the setter derives the address. Faculty
-      # and study year are no longer asked for at sign-up; the columns stay for
-      # accounts that already have them (see User#display_affiliation).
+      # :student_id, not :email_address — the ID is the credential, and nothing
+      # derives an address from it. Faculty and study year are not asked for
+      # here either. All three are set afterwards on /profile, which is the only
+      # screen that writes them (see ProfilesController and the note there about
+      # what an account with no address cannot do).
       #
       # :role is deliberately absent and must stay absent — sign-up may only ever
       # produce a student. Instructor and admin are granted from /admin, and

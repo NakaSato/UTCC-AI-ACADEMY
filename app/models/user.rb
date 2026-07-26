@@ -18,6 +18,13 @@ class User < ApplicationRecord
 
   enum :role, ROLES.index_by(&:itself), default: "student", validate: true
 
+  # Not a column: the password-change form on /profile asks for the password in
+  # force before it will set a new one, and ProfilesController reports a wrong
+  # answer as an error on this name. Active Model reads an attribute back while
+  # building that message, so the accessor has to exist or `errors.add` raises
+  # NoMethodError instead of reporting anything. Nothing assigns it.
+  attr_accessor :current_password
+
   normalizes :student_id, with: ->(id) { id.strip.downcase }
   # `presence` matters as much as the downcasing: the column carries a unique
   # index and most accounts have no address, so a cleared field has to come back

@@ -9,7 +9,9 @@
 
     <section class="rounded-panel border border-hairline bg-surface px-6 py-7 sm:px-8.5">
       <%= form_with model: @user, url: profile_path, method: :patch do |form| %>
-        <%= render "shared/form_errors", record: @user %>
+        <%# Two forms, one record: the summary belongs to whichever one was
+            posted, or a rejected password would report itself above the name. %>
+        <%= render "shared/form_errors", record: @user if @errors_on == :profile %>
 
         <%# Not a field. The student ID is issued by the university, is what
             sign-in authenticates on, and is absent from profile_params — so it
@@ -79,8 +81,66 @@
       <% end %>
     </section>
 
-    <%# The password is not on this form: changing it needs the reset flow, which
-        needs an address, which is the field above. %>
+    <%# The password is its own form and its own action — see ProfilesController.
+        It sits below rather than beside: it is the thing a student came here to
+        do second, and mixing it into the fields above would make one Save button
+        mean two different commitments. %>
+    <section class="mt-6 rounded-panel border border-hairline bg-surface px-6 py-7 sm:px-8.5">
+      <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("profile.password.title") %></h2>
+      <p class="mb-6 text-14 leading-[1.6] text-balance text-muted"><%= t("profile.password.subtitle") %></p>
+
+      <%= form_with url: profile_password_path, method: :patch do |form| %>
+        <%# scope: nil — this form is not model-bound, so its fields render as
+            id="current_password" rather than id="user_current_password". %>
+        <%= render "shared/form_errors", record: @user, scope: nil if @errors_on == :password %>
+
+        <div class="mb-6 flex flex-col gap-4">
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("profile.password.current") %></span>
+            <%# autocomplete tells a password manager which of the three this is,
+                so it offers the stored one here and a generated one below. %>
+            <%= form.password_field :current_password, required: true, maxlength: 72,
+                  autocomplete: "current-password", placeholder: "••••••••",
+                  "aria-invalid": @user.errors[:current_password].any?.to_s,
+                  class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15
+                          text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand
+                          aria-[invalid=true]:border-brand-alert" %>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.new_password") %></span>
+            <%= form.password_field :password, required: true, minlength: 8, maxlength: 72,
+                  autocomplete: "new-password", placeholder: "••••••••",
+                  "aria-invalid": @user.errors[:password].any?.to_s,
+                  class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15
+                          text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand
+                          aria-[invalid=true]:border-brand-alert" %>
+            <span class="text-12-5 text-muted-2"><%= t("auth.fields.password_hint") %></span>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.new_password_confirmation") %></span>
+            <%= form.password_field :password_confirmation, required: true, minlength: 8, maxlength: 72,
+                  autocomplete: "new-password", placeholder: "••••••••",
+                  "aria-invalid": @user.errors[:password_confirmation].any?.to_s,
+                  class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15
+                          text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand
+                          aria-[invalid=true]:border-brand-alert" %>
+          </label>
+        </div>
+
+        <%= form.submit t("profile.password.submit"),
+              class: "cursor-pointer rounded-[12px] bg-brand px-6 py-3.25 text-15-5 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+      <% end %>
+
+      <%# Saying so before the click, not after: the surprise is finding yourself
+          signed out of the library computer you forgot about. %>
+      <p class="mt-4 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("profile.password.note") %></p>
+    </section>
+
+    <%# The reset flow is still there for the other case — locked out, not signed
+        in — and it is the one that needs the address above. %>
     <p class="mt-5 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("profile.password_note") %></p>
   </div>
 </main>
