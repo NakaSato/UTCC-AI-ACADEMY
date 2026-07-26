@@ -1,0 +1,46 @@
+# The landing page's taxonomy — which cards exist and in what order. Unlike
+# landing_texts.yml this one carries rows, because `db:test:prepare` loads the
+# schema and a schema holds no data: with an empty table the landing page has
+# nothing on it and half the suite asserts against an empty list.
+#
+# Copy is NOT here. Every word still comes from `landing.*` in the locale files,
+# keyed by the slug below — which is what lets landing_test.rb go on asserting
+# that every card resolves in both languages.
+#
+# One of three copies that must agree: db/migrate/…_create_landing_cards.rb
+# (what production has), db/seeds.rb (what restores them after db:seed:replant)
+# and this. landing_card_test.rb asserts the shape all three have to produce.
+#
+# The fixture name is the collection and the slug, so `topics_prompting` is the
+# "prompting" card of the "topics" collection.
+
+topics_what_is_ai:       { collection: topics, key: what_is_ai,       position: 1 }
+topics_prompting:        { collection: topics, key: prompting,        position: 2 }
+topics_machine_learning: { collection: topics, key: machine_learning, position: 3 }
+topics_build_apps:       { collection: topics, key: build_apps,       position: 4 }
+topics_ethics:           { collection: topics, key: ethics,           position: 5 }
+topics_business:         { collection: topics, key: business,         position: 6 }
+
+tracks_beginners:     { collection: tracks, key: beginners,     position: 1, level: beginner,     weeks: 4 }
+tracks_engineering:   { collection: tracks, key: engineering,   position: 2, level: beginner,     weeks: 6 }
+tracks_first_project: { collection: tracks, key: first_project, position: 3, level: intermediate, weeks: 8 }
+tracks_data_ml:       { collection: tracks, key: data_ml,       position: 4, level: intermediate, weeks: 8 }
+tracks_agents:        { collection: tracks, key: agents,        position: 5, level: advanced,     weeks: 10 }
+# The open-ended one: no week count, so the card reads "ongoing" and publishes
+# no timeRequired.
+tracks_research:      { collection: tracks, key: research,      position: 6, level: advanced }
+
+shares_chatbot:    { collection: shares, key: chatbot,    position: 1 }
+shares_free_tools: { collection: shares, key: free_tools, position: 2 }
+shares_neural_net: { collection: shares, key: neural_net, position: 3 }
+
+# Only the middle one has a date; the other two recur, so they publish no Event
+# node at all.
+events_study_jam:     { collection: events, key: study_jam,     position: 1 }
+events_workshop:      { collection: events, key: workshop,      position: 2, starts_on: 2026-08-08 }
+events_show_and_tell: { collection: events, key: show_and_tell, position: 3 }
+
+faqs_no_background:    { collection: faqs, key: no_background,    position: 1 }
+faqs_homework:         { collection: faqs, key: homework,         position: 2 }
+faqs_share_project:    { collection: faqs, key: share_project,    position: 3 }
+faqs_other_faculties:  { collection: faqs, key: other_faculties,  position: 4 }

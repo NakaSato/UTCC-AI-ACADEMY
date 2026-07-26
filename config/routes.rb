@@ -88,6 +88,13 @@ Rails.application.routes.draw do
   patch "admin/sections/:id", to: "admin#update_section", as: :admin_section
   post "admin/sections/:id/enrol", to: "admin#enrol", as: :admin_enrol
   delete "admin/sections/:id/enrol/:user_id", to: "admin#unenrol", as: :admin_unenrol
+  # The marketing landing page. Its copy is `landing_texts` over the locale
+  # files, which are still what ships; its cards are `landing_cards`, which is
+  # what makes a topic or an event something an admin adds rather than a deploy.
+  patch "admin/landing", to: "admin#update_landing", as: :admin_landing
+  post "admin/landing/cards", to: "admin#create_card", as: :admin_landing_cards
+  patch "admin/landing/cards/:id/move", to: "admin#move_card", as: :move_admin_landing_card
+  delete "admin/landing/cards/:id", to: "admin#destroy_card", as: :admin_landing_card
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

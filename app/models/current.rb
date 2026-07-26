@@ -13,4 +13,13 @@ class Current < ActiveSupport::CurrentAttributes
   # one of them. CurrentAttributes is reset around each request and each test,
   # so the cache cannot outlive what it was read from.
   attribute :syllabus
+
+  # The landing page's copy overrides, held the same way and for the same
+  # reasons — one query for a page that reads a hundred strings, and a cache that
+  # cannot outlive the database it was read from. See LandingText.overrides.
+  attribute :landing_texts
+
+  # And the landing page's cards, grouped by collection — one query for the five
+  # collections the page renders. See Landing.cards.
+  attribute :landing_cards
 end

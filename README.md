@@ -107,7 +107,7 @@ Crimson `#A81E32` on cream, IBM Plex Sans Thai, Tailwind v4 through `tailwindcss
 
 **`app/assets/tailwind/application.css` is the entire stylesheet and the single source of truth for the visual tokens** — an `@theme` block, a small `@layer base`, and a handful of `@utility` escape hatches for gradients and clip-paths that cannot be expressed as utilities. There are no component classes: recipes are repeated as utilities in the markup, and no hex value belongs anywhere but that `@theme` block. Read it before making visual changes.
 
-`docs/design-system.md` documents the **earlier** port from [eng.utcc.ac.th](https://eng.utcc.ac.th) (maroon, Noto Sans Thai Looped, daisyUI anatomy). The app UI has since moved on — treat that document as background on the reference site, not as a description of the current tokens.
+`docs/design-system.md` explains the current tokens and conventions in prose, with the earlier port from [eng.utcc.ac.th](https://eng.utcc.ac.th) (maroon, Noto Sans Thai Looped, daisyUI anatomy) kept as a history section. The CSS wins where they disagree.
 
 ## How we work
 
@@ -191,7 +191,7 @@ db/
   {queue,cache,cable}_schema.rb     the solid_* databases, kept separate on purpose
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
 lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
-docs/design-system.md               background on the earlier eng.utcc.ac.th port
+docs/design-system.md               the visual tokens and conventions, explained; the CSS wins
 ```
 
 ## Request path
@@ -215,7 +215,7 @@ Controllers below it are deliberately tiny: read a param, validate it against a 
 
 ## Data model
 
-Nine tables. That is the whole schema (`db/schema.rb`, version `2026_07_26_093004`):
+Thirteen tables. That is the whole schema (`db/schema.rb`, version `2026_07_27_130000`):
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -250,6 +250,24 @@ They are what the browser posts, what `LearnerProgress` folds on, and what the U
 
 `TopicCompletion.record` is **idempotent** — a `find_or_initialize_by` that never moves a timestamp already set, and that fills both stamps when the first report is an `applied` one. The exercise and the coding task each report a pass on every run; re-running the lesson writes no second row and inflates no count.
 
+**`landing_cards`** — `collection` (`topics` | `tracks` | `shares` | `events` | `faqs`), `key`, `position`, plus `level` and `weeks` for a track and `starts_on` for an event. Unique on `[collection, key]`. The marketing landing page's taxonomy: which cards exist and in what order.
+
+This is what makes `/` a CMS rather than only an editable page — an admin adds, reorders and deletes cards from `/admin?tab=landing`. Copy is **not** here, same as `courses`: a card carries identity, order and its own attributes, and every word comes from the locale files with a `landing_texts` override in front. A track's level and an event's date *are* here, because they are one fact in both languages rather than two translations of it; `starts_on` is a real `date`, so a value that will not parse becomes "undated" instead of shipping an invalid `startDate`.
+
+A card's slug is generated, never typed (`LandingCard.key_for`) — `parameterize` strips non-ASCII, so a Thai-only title falls back to a generic stem plus a numeric suffix. Destroying a card destroys its copy, so a slug that comes back cannot inherit the words of the card that had it before.
+
+**`landing_texts`** — `key`, `locale`, `value`, unique on `[key, locale]`. That copy, as an admin wrote it.
+
+For a card that ships with the app this is an *override layer*, not a home: `config/locales/{th,en}.yml` still holds the copy and is still what a fresh install renders, and `LandingText.write` **deletes** the row when a box is cleared or retyped to match the default — so clearing a field is the reset button and the table can never fill with duplicates of the locale files. For a card an admin created there is nothing to override, so the row is the only copy that string has.
+
+`Landing.copy` reconciles the two in three steps — what an admin wrote in this language, then what ships in it, then what an admin wrote in the *other* one:
+
+```ruby
+LandingText.for(key) || default(key).presence || LandingText.any(key).to_s
+```
+
+The last step is what keeps an admin-made card visible on both pages instead of blank in one; the middle one comes first so a Thai-only rewrite never displaces the English the repo ships. `key` is the path under `landing.` — `"topics.prompting.title"` — and is checked against a whitelist `Landing` derives from the cards, so an override for a string the page does not render cannot be written.
+
 ## Progress: the one thing that is recorded
 
 `LearnerProgress` is an ordinary class over those rows, and the worked example of what replacing a placeholder looks like — it kept the reader methods the views already called, so nothing in the views changed when it landed.
@@ -277,7 +295,7 @@ Recording is a consequence of grading. `quiz` and `code_task` POST what the stud
 
 ## Placeholder content: the app's central pattern
 
-`app/models/` holds the Active Record classes (`User`, `Session`, `Course`, `CourseModule`, `Topic`, `TopicCompletion`, `Submission`, `Section`, `Enrollment`, `ProctorEvent`, `Notification`) with modules and `Data.define` value objects in front of them: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `KnowledgeMap`, `Proctoring`, `AdminConsole` — plus the three bridges `LearnerProgress`, `InstructorReport` and `Leaderboard`.
+`app/models/` holds the Active Record classes (`User`, `Session`, `Course`, `CourseModule`, `Topic`, `TopicCompletion`, `Submission`, `Section`, `Enrollment`, `ProctorEvent`, `Notification`, `LandingCard`, `LandingText`) with modules and `Data.define` value objects in front of them: `CourseCatalog`, `Syllabus`, `LessonContent`, `Landing`, `Policy`, `KnowledgeMap`, `Proctoring`, `AdminConsole` — plus the three bridges `LearnerProgress`, `InstructorReport` and `Leaderboard`.
 
 The split inside them is consistent:
 
@@ -345,8 +363,9 @@ get   "map"            => "knowledge_maps#show" # ?topic=<node id>&mode=course|p
 get   "progress"       => "progress#show"
 get   "leaderboard"    => "leaderboards#show"   # ?tab=week|semester|university
 get   "instructor"     => "instructor#show"
-get   "admin"          => "admin#show"          # ?tab=features|overview|users|courses|queue|audit
+get   "admin"          => "admin#show"          # ?tab=features|overview|users|courses|landing|sections|queue|integrity|perms|audit
 patch "admin/users/:id" => "admin#update"
+patch "admin/landing"  => "admin#update_landing"  # the landing page's copy, both languages at once
 get   "up"             => "rails/health#show"
 
 get "privacy"     => "policies#privacy"         # public — the PDPA notice
@@ -366,7 +385,7 @@ The last three are for machines, and they are rendered rather than checked into 
 
 The sitemap lists every page **once per language**, and each entry names the whole hreflang set including itself, since a cluster that does not name itself is discarded rather than read partially. `shared/_meta` publishes the same set as `<link rel="alternate">` with an `x-default` pointing at Thai, and a page's canonical is the URL of that translation rather than of the path.
 
-Pages also publish JSON-LD: the school on every page from `shared/_meta`, and on the landing page a `FAQPage`, an `ItemList` of `Course` and an `ItemList` of `Event`, added with `content_for :schema` (see `SchemaHelper`). All of it is built from the same reader methods the sections on screen use, so it is translated with the page. Only events with a date in `Landing::EVENTS` are published — `Event` without a `startDate` is invalid rather than vague, and "every Wednesday" is not a date.
+Pages also publish JSON-LD: the school on every page from `shared/_meta`, and on the landing page a `FAQPage`, an `ItemList` of `Course` and an `ItemList` of `Event`, added with `content_for :schema` (see `SchemaHelper`). All of it is built from the same reader methods the sections on screen use, so it is translated with the page. Only events whose card carries a `starts_on` are published — `Event` without a `startDate` is invalid rather than vague, and "every Wednesday" is not a date. A collection an admin has emptied publishes no list at all, rather than an `ItemList` of nothing.
 
 ## Views and layouts
 
@@ -453,10 +472,12 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `tasks/instructor_task_test.rb` | `instructor:create`, including that it leaves an admin alone rather than demoting one |
 | `models/instructor_report_test.rb`, `models/leaderboard_test.rb` | the Teaching console and the board, counted from a real section |
 | `models/awards_test.rb` | one test per award rule, and that a new account has earned nothing |
+| `models/landing_card_test.rb` | the landing taxonomy: generated slugs, a card's place, and that deleting one deletes its copy |
+| `models/landing_text_test.rb`, `controllers/admin_landing_test.rb` | the landing CMS: a copy row is only ever a departure from what ships, an unlisted key cannot be written, a card written in one language shows it in the other, and adding, reordering and deleting all reach the page a stranger reads |
 
 Assertions compare against `I18n.t(...)` rather than literal strings, and are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page — a copy change in a locale file should not break a test.
 
-**`test/fixtures/topic_completions.yml` is deliberately empty and must stay present.** Tests that need progress record it themselves; the file exists so fixtures clear the table, because `bin/ci` seeds completions into the test database and those rows would otherwise outlive the users they point at.
+**`test/fixtures/topic_completions.yml`, `submissions.yml`, `notifications.yml` and `landing_texts.yml` are deliberately empty and must stay present.** Tests that need progress, an attempt or a copy override write it themselves; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users they point at. `landing_texts.yml` earns its keep twice over: an empty table *is* the landing page as shipped, which is what lets `landing_test.rb`, `structured_data_test.rb` and `crawlers_test.rb` go on asserting against the locale files.
 
 **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` asserts the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
 
@@ -479,8 +500,9 @@ A learner's progress is genuinely recorded — `topic_completions` holds one row
 - **The learning material is copy, not records.** Courses, modules and topics are rows now, but every word a human reads — titles, prose, topic names — lives in the locale files, and every course still shares the one syllabus, which is why they all show the same topic total.
 - **A lesson's *content* is the same whichever topic you open.** `/lesson?course=AI1101&topic=2-3` is a real position in the syllabus: it decides what gets recorded, which module unlocks next, and where "continue" goes. But the prose, the quiz and the coding task behind it are one placeholder set — writing sixteen of them is a content job, not a modelling one.
 - **Grading runs on the server**, and every attempt is kept in `submissions`. The answer key and the passing patterns are not rendered, so a pass cannot be claimed by posting one. The quiz verdict does return the correct option so the page can mark it — after a graded, recorded attempt, not before.
-- **The leaderboard, the Teaching console, the award shelf and the projects tile are counted** — off `sections`, `enrollments`, `topic_completions` and `submissions`. An award is a derived rule, never stored; one ("Helping Hand") is honestly unearnable until a forum exists. Hearts and notifications are still placeholder, because nothing records a lost life or an event worth notifying about.
-- **`/admin` is the exception** — its Users tab is real records and the `role` column, and it is the only screen backed by the database rather than a module. Its other five tabs are placeholder.
-- The landing page's content is still hardcoded in `HomeController#index`.
+- **The leaderboard, the Teaching console, the award shelf and the projects tile are counted** — off `sections`, `enrollments`, `topic_completions` and `submissions`. An award is a derived rule, never stored; one ("Helping Hand") is honestly unearnable until a forum exists.
+- **Hearts and notifications are counted too, now.** A heart is derived rather than stored — `LearnerProgress#hearts` is five minus the failed attempts of the last four hours, with the refill time taken from when the oldest of those ages out. **Hearts gate nothing at zero**: whether an empty set should block an attempt is a pedagogy decision nobody has made, and the display does not sneak it in. Notifications have a table of their own.
+- **`/admin` is the exception** — it is the screen backed by the database rather than by a module. Its Users tab is real records and the `role` column, Sections manages cohorts and enrolments, Integrity reads the proctor's own `proctor_events`, and Landing is a small CMS over the marketing page; the rest are still placeholder.
+- **The landing page is the one thing an admin can genuinely author.** Its cards are `landing_cards` rows, so they can be added, reordered and deleted; its words are `landing.*` in both locale files with a `landing_texts` override in front, joined by key rather than by position. Those locales are the **default**, not the last word — for a card that ships, an empty box is the shipped copy; for a card an admin added there is no default, and the page falls back to whichever language was filled in.
 
 See `CLAUDE.md` for the conventions to follow when changing any of this, and `docs/process.md` for how the team works — sprints, roles, the four Scrum events, and what "done" means here.

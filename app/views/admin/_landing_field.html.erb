@@ -1,0 +1,41 @@
+<%# One run of copy fields, Thai beside English. Shared by a section's own
+    strings and by every card's, because a blurb is edited the same way wherever
+    it appears. `fields` is a list of paths under `landing.`.
+
+    `form_id` names the group's save form rather than nesting inside it — a
+    card's own reorder and delete buttons are forms, and a form inside a form is
+    dropped by the browser. %>
+<% fields.each do |field| %>
+  <div class="grid gap-2 sm:grid-cols-2">
+    <div class="flex flex-wrap items-baseline gap-2 sm:col-span-2">
+      <span class="text-12-5 font-semibold text-ink-4">
+        <%= t("admin.landing.fields.#{Landing.field_name(field)}") %>
+      </span>
+      <span class="font-mono text-11-5 text-muted-3"><%= field %></span>
+    </div>
+
+    <% I18n.available_locales.each do |locale| %>
+      <label class="flex flex-col gap-1.5">
+        <span class="text-11-5 font-semibold tracking-[0.05em] text-muted-2 uppercase">
+          <%= t("language_name", locale:) %>
+        </span>
+        <%# The default as placeholder: an empty box is not a missing
+            translation, it is the shipped one. A card an admin added has no
+            shipped copy, so its placeholder is empty and the page falls back to
+            whichever language was written. %>
+        <% name = "text[#{field}][#{locale}]" %>
+        <% written = LandingText.for(field, locale) %>
+        <% attrs = { form: form_id, placeholder: Landing.default(field, locale),
+                     "aria-label": "#{t("admin.landing.fields.#{Landing.field_name(field)}")} · #{locale}",
+                     class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25
+                             text-14 text-ink transition-colors outline-none placeholder:text-muted-3
+                             focus:border-brand" } %>
+        <% if Landing.long?(field) %>
+          <%= text_area_tag name, written, rows: 3, **attrs %>
+        <% else %>
+          <%= text_field_tag name, written, **attrs %>
+        <% end %>
+      </label>
+    <% end %>
+  </div>
+<% end %>

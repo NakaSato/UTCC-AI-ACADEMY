@@ -40,8 +40,10 @@ module SchemaHelper
   # screen, and order is the one thing a flat set would lose. Each carries the
   # name of the section it came from, which is also what tells two ItemLists on
   # the same page apart.
+  # A collection an admin has emptied has nothing to list, and an ItemList with
+  # no items is a claim about nothing rather than a shorter claim.
   def course_list_schema(tracks, url:)
-    item_list t("landing.tracks.title"), tracks.map { course_schema(it, url:) }
+    item_list Landing.copy("tracks.title"), tracks.map { course_schema(it, url:) } if tracks.any?
   end
 
   # Only the events that happen on a day. A recurring "every Wednesday" has no
@@ -49,7 +51,7 @@ module SchemaHelper
   def event_list_schema(events, url:)
     dated = events.select(&:dated?)
 
-    item_list t("landing.events.title"), dated.map { event_schema(it, url:) } if dated.any?
+    item_list Landing.copy("events.title"), dated.map { event_schema(it, url:) } if dated.any?
   end
 
   private

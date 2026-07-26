@@ -18,6 +18,9 @@ class AdminController < ApplicationController
         @users = @users.where("name LIKE :q OR student_id LIKE :q", q: needle)
       end
     in :sections then load_sections
+    # Which group of the landing page is open is the URL, like every other bit
+    # of screen state; an unknown one simply opens nothing.
+    in :landing then @group = Landing.group_for(params[:group])&.key
     in :integrity then @cases = Proctoring.cases
     in :audit then @level = AdminConsole.level_filter(params[:level])
     in :courses then @query = params[:q].to_s.strip
@@ -86,6 +89,84 @@ class AdminController < ApplicationController
                 notice: t("flash.unenrolled", name: enrollment.user.name, label: section.label)
   end
 
+  # The landing page's copy, in both languages at once.
+  #
+  # Whitelist-driven rather than strong-params, like every other param in this
+  # controller: `Landing.editable_keys` decides what can be read out of the
+  # request at all, so a key posted for a string the page does not render is
+  # never looked at and cannot become a row.
+  #
+  # One form posts one group, so a field the params do not carry was not on the
+  # form and is left alone — only a field that was there and came back empty is
+  # a deletion. The whole save is one transaction: a level that is not a level
+  # must not leave half a group rewritten.
+  #
+  # A card's own attributes — a track's level and weeks, an event's date — ride
+  # on the same form as its copy, because they are the same card.
+  def update_landing
+    group = Landing.group_for(params[:group])
+
+    LandingText.transaction do
+      Landing.editable_keys.each do |key|
+        I18n.available_locales.each do |locale|
+          value = posted(:text, key, locale.to_s)
+          LandingText.write(key, locale, value) unless value.nil?
+        end
+      end
+
+      group&.cards&.each { save_attributes(it.record) }
+    end
+
+    redirect_to landing_tab(group), notice: t("flash.landing_saved")
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to landing_tab(group), alert: invalid.record.errors.full_messages.to_sentence
+  end
+
+  # A new card is created with its titles, so it is never born nameless — the
+  # editor names a card by its own title, and one with neither would be a row an
+  # admin could only tell apart by its slug.
+  def create_card
+    collection = params[:collection].to_s
+    return redirect_to landing_tab(nil), alert: t("flash.card_invalid") unless
+      LandingCard::COLLECTIONS.include?(collection)
+
+    titles = I18n.available_locales.to_h { [ it, posted(:title, it.to_s).to_s.strip ] }
+    # One language is enough — the page falls back to whichever has copy — but
+    # neither is a card nobody can tell from its slug.
+    return redirect_to landing_tab(group_of(collection)), alert: t("flash.card_untitled") if
+      titles.values.all?(&:blank?)
+
+    card = LandingCard.new(collection:, key: LandingCard.key_for(collection, titles[:en], titles[:th]))
+
+    if card.save
+      Landing.forget_cards
+      titles.each { |locale, title| LandingText.write("#{card.prefix}.title", locale, title) }
+      redirect_to landing_tab(group_of(collection)), notice: t("flash.card_added")
+    else
+      redirect_to landing_tab(group_of(collection)), alert: card.errors.full_messages.to_sentence
+    end
+  end
+
+  # A no-op at either end: the button is not rendered there, and a request that
+  # arrives anyway is not worth a flash of its own.
+  def move_card
+    card = LandingCard.find(params[:id])
+    card.move(params[:dir]) if %w[ up down ].include?(params[:dir].to_s)
+    Landing.forget_cards
+
+    redirect_to landing_tab(group_of(card.collection)), notice: t("flash.card_moved")
+  end
+
+  # Destroying a card takes its copy with it — see LandingCard's after_destroy.
+  def destroy_card
+    card = LandingCard.find(params[:id])
+    card.destroy
+    Landing.forget_cards
+    LandingText.forget
+
+    redirect_to landing_tab(group_of(card.collection)), notice: t("flash.card_removed")
+  end
+
   # "Notify student": the learner hears their case was flagged, in their own
   # language when they read it.
   def notify_case
@@ -139,6 +220,34 @@ class AdminController < ApplicationController
     end
   end
   private
+    # One posted field, or nil where the form did not carry it. Dug by hand
+    # rather than with `params.dig`, which raises when a request posts a string
+    # where the form posts a hash — and anything but a string is not an answer.
+    def posted(scope, *path)
+      value = path.reduce(params[scope]) { |node, key| node.is_a?(ActionController::Parameters) ? node[key] : nil }
+      value if value.is_a?(String)
+    end
+
+    def landing_tab(group) = admin_path(tab: :landing, group: group&.key)
+
+    def group_of(collection) = Landing.groups.find { it.collection == collection }
+
+    # A card's own attributes, where the form carried them. Blank is a real
+    # answer for both: no week count means the track is open-ended, and no date
+    # means the event recurs rather than happens once.
+    def save_attributes(card)
+      level = posted(:card, card.id.to_s, "level")
+      weeks = posted(:card, card.id.to_s, "weeks")
+      starts_on = posted(:card, card.id.to_s, "starts_on")
+
+      changes = {}
+      changes[:level] = level if level
+      changes[:weeks] = weeks.presence if weeks
+      changes[:starts_on] = starts_on.presence if starts_on
+
+      card.update!(changes) if changes.any?
+    end
+
     def load_sections
       @sections = Section.includes(:course, :instructor).order(:id).to_a
       # Selection is by lookup, so an unknown id falls back rather than raises.

@@ -1,14 +1,17 @@
-# The admin console's five placeholder tabs.
+# The admin console's placeholder tabs.
 #
-# The sixth tab, Users, is NOT here — it is the real roster, backed by the
-# `role` column and `AdminController#update`. Everything in this file is
-# fabricated the way the rest of app/models is: numbers and taxonomy in Ruby,
-# every readable word in `admin.*` in the locale files, joined BY INDEX.
+# Four tabs are NOT here, because they are backed by records rather than by this
+# file: Users is the real roster (the `role` column and `AdminController#update`),
+# Sections is real cohorts, Integrity reads `proctor_events` through `Proctoring`,
+# and Landing is the marketing page's copy (`LandingText`, over `Landing`).
+# Everything in this file is fabricated the way the rest of app/models is:
+# numbers and taxonomy in Ruby, every readable word in `admin.*` in the locale
+# files, joined BY INDEX.
 #
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
 module AdminConsole
-  TABS = %i[ features overview users courses sections queue integrity perms audit ].freeze
+  TABS = %i[ features overview users courses landing sections queue integrity perms audit ].freeze
 
   # ---- The dark header ------------------------------------------------------
 

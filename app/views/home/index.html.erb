@@ -1,4 +1,4 @@
-<% content_for :title, "UTCC AI Academy — #{t("landing.hero.headline")}" %>
+<% content_for :title, "UTCC AI Academy — #{Landing.copy("hero.headline")}" %>
 
 <%# What is worth quoting back to somebody who asked a search engine rather than
     the page: the tracks, the answers in the FAQ, and any event with a date on
@@ -26,29 +26,29 @@
                       "hero-eng-utcc-1280.webp" => "1280w" },
             sizes: "(min-width: 672px) 640px, calc(100vw - 2rem)",
             width: 800, height: 316, fetchpriority: "high", class: "h-auto w-full" %>
-      <span class="sr-only">UTCC AI Academy — <%= t("landing.hero.headline") %></span>
+      <span class="sr-only">UTCC AI Academy — <%= Landing.copy("hero.headline") %></span>
     </h1>
 
-    <p class="text-36 leading-tight font-bold lg:text-54"><%= t("landing.hero.headline") %></p>
+    <p class="text-36 leading-tight font-bold lg:text-54"><%= Landing.copy("hero.headline") %></p>
 
-    <p class="max-w-[60ch] text-20 font-light opacity-90"><%= t("landing.hero.lede") %></p>
+    <p class="max-w-[60ch] text-20 font-light opacity-90"><%= Landing.copy("hero.lede") %></p>
 
     <div class="mt-4 flex flex-wrap justify-center gap-4">
       <a href="#learn"
          class="inline-flex items-center gap-2 rounded-full bg-surface px-6 py-2.5 text-18 leading-tight font-normal
                 whitespace-nowrap uppercase text-brand-deep shadow-md transition duration-300
-                hover:bg-brand-tint hover:shadow-lg active:scale-97"><%= t("landing.hero.cta_learn") %></a>
+                hover:bg-brand-tint hover:shadow-lg active:scale-97"><%= Landing.copy("hero.cta_learn") %></a>
       <%# On the maroon field an outline button takes the light-on-dark variant. %>
       <a href="#community"
          class="inline-flex items-center gap-2 rounded-full border border-surface px-6 py-2.5 text-18 leading-tight
                 font-normal whitespace-nowrap uppercase text-surface transition duration-300
-                hover:bg-surface hover:text-brand-deep active:scale-97"><%= t("landing.hero.cta_community") %></a>
+                hover:bg-surface hover:text-brand-deep active:scale-97"><%= Landing.copy("hero.cta_community") %></a>
     </div>
 
     <%# Student-run project — say so on the hero so no one mistakes it for a
         university property. Repeated in the footer. %>
     <p class="mt-2 max-w-[60ch] text-16 font-light text-on-brand opacity-80">
-      <%= t("landing.hero.disclaimer") %>
+      <%= Landing.copy("hero.disclaimer") %>
     </p>
   </div>
 </section>
@@ -58,11 +58,11 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand"><%= t("landing.learn.eyebrow") %></p>
+          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand"><%= Landing.copy("learn.eyebrow") %></p>
           <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
-            <%= t("landing.learn.title") %>
+            <%= Landing.copy("learn.title") %>
           </h2>
-          <p class="max-w-[65ch] text-20 leading-body text-muted"><%= t("landing.learn.subtitle") %></p>
+          <p class="max-w-[65ch] text-20 leading-body text-muted"><%= Landing.copy("learn.subtitle") %></p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@
 
             <span class="mt-auto inline-flex items-center gap-2 pt-3 text-16 font-medium text-brand"
                   aria-hidden="true">
-              <%= t("landing.learn.card_cta") %>
+              <%= Landing.copy("learn.card_cta") %>
               <span class="size-[0.5em] -rotate-45 border-t-2 border-r-2 border-current transition-transform
                            duration-300 group-hover:translate-x-1"></span>
             </span>
@@ -97,11 +97,11 @@
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
-            <%= t("landing.tracks.title") %>
+            <%= Landing.copy("tracks.title") %>
           </h2>
-          <p class="max-w-[65ch] text-20 text-muted"><%= t("landing.tracks.subtitle") %></p>
+          <p class="max-w-[65ch] text-20 text-muted"><%= Landing.copy("tracks.subtitle") %></p>
         </div>
-        <div class="flex flex-wrap gap-2" role="tablist" aria-label="<%= t("landing.tracks.filter_label") %>">
+        <div class="flex flex-wrap gap-2" role="tablist" aria-label="<%= Landing.copy("tracks.filter_label") %>">
           <% Landing.track_filters.each_with_index do |filter, i| %>
             <button type="button" role="tab"
                     class="rounded-full border border-hairline px-4 py-1.5 text-18 text-muted transition duration-300
@@ -129,7 +129,7 @@
               <a href="#tracks"
                  class="inline-flex items-center gap-2 rounded-full border border-brand px-6 py-2.5 text-18
                         leading-tight font-normal whitespace-nowrap uppercase text-brand transition duration-300
-                        hover:bg-brand hover:text-surface active:scale-97"><%= t("landing.tracks.card_cta") %></a>
+                        hover:bg-brand hover:text-surface active:scale-97"><%= Landing.copy("tracks.card_cta") %></a>
             </div>
           </article>
         <% end %>
@@ -142,14 +142,14 @@
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
-            <%= t("landing.community.title") %>
+            <%= Landing.copy("community.title") %>
           </h2>
-          <p class="max-w-[65ch] text-20 text-muted"><%= t("landing.community.subtitle") %></p>
+          <p class="max-w-[65ch] text-20 text-muted"><%= Landing.copy("community.subtitle") %></p>
         </div>
         <a href="#community"
            class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight font-normal
                   whitespace-nowrap uppercase text-surface transition duration-300
-                  hover:bg-brand-deep active:scale-97"><%= t("landing.community.cta") %></a>
+                  hover:bg-brand-deep active:scale-97"><%= Landing.copy("community.cta") %></a>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -173,7 +173,7 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
-          <%= t("landing.events.title") %>
+          <%= Landing.copy("events.title") %>
         </h2>
       </div>
 
@@ -193,7 +193,7 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
-          <%= t("landing.faq_title") %>
+          <%= Landing.copy("faq_title") %>
         </h2>
       </div>
       <% Landing.faqs.each do |faq| %>

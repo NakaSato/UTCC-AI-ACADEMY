@@ -1,0 +1,153 @@
+<%# Real records, like Users and Sections: the marketing landing page itself.
+    Its cards are rows, so they can be added, reordered and removed here; their
+    copy is `landing_texts` over the locale files, in both languages side by
+    side so an untranslated field is visible rather than silently drifting.
+
+    A box's VALUE is the override and its PLACEHOLDER is the shipped copy, so an
+    empty box means "use the locale file" and clearing one is the reset button.
+    A card an admin added has no shipped copy, so its placeholder is empty and
+    the page falls back to whichever language was filled in.
+
+    The copy form does NOT wrap the cards, and every field it owns names it with
+    `form=` instead. Reorder and delete are `button_to`s, which are forms of
+    their own, and a form inside a form is dropped by the browser — the button
+    then silently submits the one it is standing in. `display: contents` keeps
+    the split invisible in the layout.
+
+    Which group is open is `?group=` — screen state lives in the URL. %>
+<div class="mb-4.5">
+  <h2 class="mb-1.25 text-21 font-bold tracking-[-0.02em]"><%= t("admin.landing.title") %></h2>
+  <p class="text-14 text-balance text-muted-2"><%= t("admin.landing.sub") %></p>
+</div>
+
+<p class="mb-4 rounded-field border border-hairline bg-surface-4 px-4 py-3 text-13-5 text-balance text-muted-2">
+  <%= t("admin.landing.default_hint") %>
+</p>
+
+<% Landing.groups.each do |group| %>
+  <% form_id = "landing-#{group.key}" %>
+
+  <details class="group mb-2.5 overflow-hidden rounded-card border border-hairline bg-surface"
+           <%= "open" if group.key == @group %>>
+    <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-15 font-bold
+                    tracking-[-0.01em] transition-colors hover:bg-surface-4
+                    after:size-[0.5em] after:flex-none after:rotate-45 after:border-r-2 after:border-b-2
+                    after:border-muted-2 after:transition-transform after:content-['']
+                    group-open:after:rotate-[-135deg]">
+      <%= t("admin.landing.sections.#{group.key}") %>
+    </summary>
+
+    <div class="flex flex-col gap-5 border-t border-surface-3 px-6 py-5">
+      <%= form_with url: admin_landing_path, method: :patch, id: form_id, class: "contents" do %>
+        <%# Which group came back, so the save reopens the one that was edited. %>
+        <%= hidden_field_tag :group, group.key %>
+
+        <% if group.fields.any? %>
+          <div class="flex flex-col gap-3.5">
+            <%= render "admin/landing_field", fields: group.fields, form_id: %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% group.cards.each_with_index do |card, index| %>
+        <section class="flex flex-col gap-3.5 rounded-field border border-hairline bg-surface-4 px-4 py-3.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h3 class="min-w-0 flex-1 truncate text-13-5 font-semibold text-ink-4">
+              <%= Landing.card_label(card) %>
+            </h3>
+
+            <%# Reorder is two buttons rather than a drag: no JS owns this
+                page's state, and a card's place is a row's `position`. %>
+            <% if index.positive? %>
+              <%= button_to t("admin.landing.move_up"), move_admin_landing_card_path(card.id, dir: :up),
+                    method: :patch, form_class: "contents",
+                    class: "cursor-pointer rounded-[8px] border border-hairline-2 bg-surface px-2 py-1 text-12-5
+                            text-muted-2 transition-colors hover:border-brand hover:text-brand" %>
+            <% end %>
+            <% if index < group.cards.size - 1 %>
+              <%= button_to t("admin.landing.move_down"), move_admin_landing_card_path(card.id, dir: :down),
+                    method: :patch, form_class: "contents",
+                    class: "cursor-pointer rounded-[8px] border border-hairline-2 bg-surface px-2 py-1 text-12-5
+                            text-muted-2 transition-colors hover:border-brand hover:text-brand" %>
+            <% end %>
+
+            <%# The one irreversible control on this screen: it takes the
+                card's copy in both languages with it. %>
+            <%= button_to t("admin.landing.delete"), admin_landing_card_path(card.id),
+                  method: :delete, form_class: "contents",
+                  form: { data: { turbo_confirm: t("admin.landing.confirm_delete") } },
+                  class: "cursor-pointer rounded-[8px] border border-transparent px-2 py-1 text-12-5
+                          text-muted-2 transition-colors hover:border-danger-line hover:text-brand-accent" %>
+          </div>
+
+          <%# A track's level and an event's date are not copy — they are the
+              same fact in both languages — so they sit on the card rather than
+              in a language column. %>
+          <% if group.collection == "tracks" %>
+            <div class="flex flex-wrap gap-3">
+              <label class="flex flex-col gap-1.5">
+                <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.fields.level") %></span>
+                <%= select_tag "card[#{card.id}][level]",
+                      options_for_select(LandingCard::LEVELS.map { [ t("levels.#{it}"), it ] }, card.record.level),
+                      form: form_id,
+                      class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                              transition-colors outline-none focus:border-brand" %>
+              </label>
+              <label class="flex flex-col gap-1.5">
+                <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.fields.weeks") %></span>
+                <%= number_field_tag "card[#{card.id}][weeks]", card.record.weeks, min: 1, form: form_id,
+                      placeholder: t("admin.landing.ongoing_ph"),
+                      class: "w-40 rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14
+                              text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+              </label>
+            </div>
+          <% elsif group.collection == "events" %>
+            <label class="flex flex-col gap-1.5 sm:max-w-[240px]">
+              <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.fields.starts_on") %></span>
+              <%= date_field_tag "card[#{card.id}][starts_on]", card.record.starts_on, form: form_id,
+                    class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                            transition-colors outline-none focus:border-brand" %>
+            </label>
+          <% end %>
+
+          <%= render "admin/landing_field", fields: card.fields, form_id: %>
+        </section>
+      <% end %>
+
+      <div class="flex justify-end border-t border-surface-5 pt-4">
+        <%= submit_tag t("admin.landing.save"), form: form_id,
+              class: "cursor-pointer rounded-field bg-brand px-4 py-2.5 text-14 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+      </div>
+
+      <%# Adding a card asks for its title and nothing else — the slug is
+          generated, the position is last, and everything else is edited above
+          once the card exists. %>
+      <% if group.collection %>
+        <%= form_with url: admin_landing_cards_path, method: :post,
+              class: "flex flex-col gap-3 border-t border-surface-3 pt-5" do %>
+          <%= hidden_field_tag :collection, group.collection %>
+          <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.add_title") %></span>
+
+          <div class="flex flex-wrap items-end gap-3">
+            <% I18n.available_locales.each do |locale| %>
+              <label class="flex min-w-[200px] flex-1 flex-col gap-1.5">
+                <span class="text-11-5 font-semibold tracking-[0.05em] text-muted-2 uppercase">
+                  <%= t("language_name", locale:) %>
+                </span>
+                <%= text_field_tag "title[#{locale}]", nil,
+                      "aria-label": "#{t("admin.landing.add_title")} · #{locale}",
+                      class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
+                              text-ink transition-colors outline-none focus:border-brand" %>
+              </label>
+            <% end %>
+
+            <%= submit_tag t("admin.landing.add"),
+                  class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
+                          text-14 font-semibold text-ink-4 transition-colors hover:border-brand hover:text-brand" %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </details>
+<% end %>

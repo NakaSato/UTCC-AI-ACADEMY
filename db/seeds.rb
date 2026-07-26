@@ -62,6 +62,48 @@ Syllabus.reload!
 
 puts "Seeded #{Course.count} courses and #{Topic.count} topics across #{CourseModule.count} modules"
 
+# ---- The landing page's cards -----------------------------------------------
+# Outside the fence for the same reason as the catalog: no credentials, and a
+# landing page with no cards on it is not a landing page. One of three copies
+# that must agree — the CreateLandingCards migration, this, and
+# test/fixtures/landing_cards.yml.
+#
+# Copy is NOT here. A card carries its slug, its order and (for a track or an
+# event) its own attributes; the words are `landing.*` in the locale files, with
+# a `landing_texts` override in front of them.
+landing_cards = {
+  "topics" => %w[ what_is_ai prompting machine_learning build_apps ethics business ].map { [ it ] },
+  # key, level, weeks — nil weeks where the track is open-ended.
+  "tracks" => [
+    [ "beginners", "beginner", 4 ], [ "engineering", "beginner", 6 ],
+    [ "first_project", "intermediate", 8 ], [ "data_ml", "intermediate", 8 ],
+    [ "agents", "advanced", 10 ], [ "research", "advanced", nil ]
+  ],
+  "shares" => %w[ chatbot free_tools neural_net ].map { [ it ] },
+  # key, then the calendar date where there is one.
+  "events" => [ [ "study_jam" ], [ "workshop", "2026-08-08" ], [ "show_and_tell" ] ],
+  "faqs" => %w[ no_background homework share_project other_faculties ].map { [ it ] }
+}
+
+landing_cards.each do |collection, rows|
+  rows.each_with_index do |row, index|
+    card = LandingCard.find_or_initialize_by(collection:, key: row.first)
+    attributes = { position: index + 1 }
+
+    case collection
+    in "tracks" then attributes.merge!(level: row[1], weeks: row[2])
+    in "events" then attributes[:starts_on] = row[1]
+    else nil
+    end
+
+    card.update!(attributes)
+  end
+end
+
+Landing.forget_cards
+
+puts "Seeded #{LandingCard.count} landing cards across #{landing_cards.size} collections"
+
 # ---- Demo accounts ----------------------------------------------------------
 # Shared password, so this half is fenced to development and test.
 if Rails.env.local?

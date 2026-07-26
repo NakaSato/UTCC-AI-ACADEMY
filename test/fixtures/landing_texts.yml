@@ -1,0 +1,5 @@
+# Deliberately empty, and must stay present. An empty table is the app as
+# shipped — the landing page renders the locale files, which is what
+# landing_test.rb, structured_data_test.rb and crawlers_test.rb all assert
+# against. A test that needs an override writes one; the file exists so fixtures
+# clear the table between runs.

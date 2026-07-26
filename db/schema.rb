@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_121151) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
   create_table "course_modules", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "number", null: false
@@ -46,6 +46,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_121151) do
     t.index ["section_id"], name: "index_enrollments_on_section_id"
     t.index ["user_id", "section_id"], name: "index_enrollments_on_user_id_and_section_id"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "landing_cards", force: :cascade do |t|
+    t.string "collection", null: false
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "level"
+    t.integer "position", null: false
+    t.date "starts_on"
+    t.datetime "updated_at", null: false
+    t.integer "weeks"
+    t.index ["collection", "key"], name: "index_landing_cards_on_collection_and_key", unique: true
+    t.index ["collection", "position"], name: "index_landing_cards_on_collection_and_position"
+  end
+
+  create_table "landing_texts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "locale", null: false
+    t.datetime "updated_at", null: false
+    t.text "value", null: false
+    t.index ["key", "locale"], name: "index_landing_texts_on_key_and_locale", unique: true
   end
 
   create_table "notifications", force: :cascade do |t|
