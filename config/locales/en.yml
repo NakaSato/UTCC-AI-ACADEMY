@@ -7,6 +7,7 @@ en:
     course_missing: "That course could not be found"
     topic_missing: "That topic is not in the syllabus"
     topic_locked: "Finish the modules before it to open that topic"
+    sign_in_required: "Sign in to open that screen"
     forbidden: "That screen is for teaching staff only"
     role_changed: "%{name} is now %{role}"
     role_self: "You cannot change your own role"
@@ -102,6 +103,7 @@ en:
     hours: "%{count} hours"
     minutes: "%{count} min"
     days: "%{count} days"
+    weeks: "%{count} weeks"
     topics: "%{count} topics"
     learners: "%{count} learning now"
     topics_learned: "%{done} / %{total} topics learned"
@@ -776,6 +778,16 @@ en:
     meta: "6512400407 · Section BA-2"
     student_id: "6512400407"
 
+  # Name and alternateName swap round with the locale, so the JSON-LD leads with
+  # the name a reader of that language would recognise.
+  meta:
+    title: "UTCC AI Academy — an AI learning space for students"
+    description: "A place for University of the Thai Chamber of Commerce students to learn and share AI — foundational topics, tracks by level, projects from fellow students, and events anyone can join."
+    keywords: "AI, artificial intelligence, machine learning, prompt engineering, utcc, University of the Thai Chamber of Commerce, School of Engineering"
+    og_locale: "en_US"
+    org_name: "School of Engineering, University of the Thai Chamber of Commerce"
+    org_alt_name: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย"
+
   landing:
     brand_name: "UTCC"
     brand_alt: "School of Engineering, University of the Thai Chamber of Commerce"
@@ -792,9 +804,276 @@ en:
       community: "Community"
       events: "Events"
       faq: "FAQ"
+    hero:
+      headline: "Learn AI together"
+      logo_alt: "UTCC ENG — School of Engineering, University of the Thai Chamber of Commerce"
+      lede: "A place for UTCC students who want to get started with AI — from no background at all, through building a real project, to sharing what you learned with your friends."
+      cta_learn: "Start learning"
+      cta_community: "See what others built"
+      disclaimer: "This site is built by upperclassmen to help juniors through AI Fundamental — it is not an official university website."
+    learn:
+      eyebrow: "Suggested topics"
+      title: "Learn AI"
+      subtitle: "The basics we suggest starting from. Read one and you can put it to work straight away."
+      card_cta: "Read this topic"
+    topics:
+      what_is_ai:
+        title: "What is AI? Starting from zero"
+        blurb: "How artificial intelligence works, how it differs from ordinary software, explained with no prerequisites."
+      prompting:
+        title: "Prompt engineering"
+        blurb: "Getting the result you actually wanted out of an AI — techniques that hold up in coursework and at work."
+      machine_learning:
+        title: "Machine learning basics"
+        blurb: "How a model learns from data, with examples you can run on your own machine."
+      build_apps:
+        title: "Building apps with AI"
+        blurb: "Wiring an API into your own project, from a chatbot through to a tool that does real work."
+      ethics:
+        title: "Ethics and using AI responsibly"
+        blurb: "Copyright, model bias, and how to cite AI output in academic work."
+      business:
+        title: "AI in business"
+        blurb: "Real case studies from Thai industry, and the skills employers are actually asking for."
+    tracks:
+      title: "Learning tracks"
+      subtitle: "Pick the starting point that matches your background."
+      filter_label: "Filter by level"
+      filter_all: "All"
+      ongoing: "Ongoing"
+      card_cta: "See the syllabus"
+      items:
+        beginners:
+          title: "Complete beginners"
+          blurb: "No programming needed to start. Lays the groundwork for how AI works and how to use the tools."
+        engineering:
+          title: "Engineering students"
+          blurb: "Python, data, and calling models through an API — aimed at project work."
+        first_project:
+          title: "Build your first project"
+          blurb: "A real project from design through to shipping it, with review from upperclassmen."
+        data_ml:
+          title: "Data and machine learning"
+          blurb: "Preparing data, training a model, and measuring the result properly."
+        agents:
+          title: "AI agents and automation"
+          blurb: "Designing an agent that reaches for its own tools, and connecting it to real work."
+        research:
+          title: "Research and going further"
+          blurb: "Reading papers, reproducing results, and preparing for postgraduate study."
+    community:
+      title: "Student community"
+      subtitle: "What everyone is trying out. You do not have to wait until a project is finished to share it."
+      cta: "Share your work"
+    shares:
+      chatbot:
+        title: "What I took away from building my first chatbot"
+        author: "Year 1 · Computer Engineering"
+        tag: "Project"
+        date: "20 Jul 2026"
+      free_tools:
+        title: "Free AI tools that genuinely help with coursework"
+        author: "Year 2 · Logistics Engineering"
+        tag: "Tools"
+        date: "15 Jul 2026"
+      neural_net:
+        title: "Study notes: what it took to understand a neural network"
+        author: "Year 1 · Business Engineering"
+        tag: "Study notes"
+        date: "09 Jul 2026"
+    events:
+      title: "Events and workshops"
+      items:
+        study_jam:
+          title: "AI Study Jam for first years"
+          when: "Every Wednesday 17:00"
+          where: "Lab room, Building 21"
+        workshop:
+          title: "Workshop: build your first AI app in three hours"
+          when: "8 Aug 2026"
+          where: "UTCC AI Institute"
+        show_and_tell:
+          title: "Show and tell — this month's projects"
+          when: "End of month"
+          where: "Online"
+    faq_title: "Frequently asked questions"
+    faqs:
+      no_background:
+        q: "I have never written a line of code. Where do I start?"
+        a: "Start on the “Complete beginners” track. It builds up from the basic ideas behind AI through to using the tools, and you do not need to write code yet."
+      homework:
+        q: "Can I use AI for my homework, or is that against the rules?"
+        a: "It depends on each course's own rules. The principle we recommend is to use AI to help you learn rather than to submit work for you, and to cite it whenever you use its output. The ethics topic covers this in detail."
+      share_project:
+        q: "How do I share a project with everyone?"
+        a: "Post it on the community page: say what you built, where you got stuck, and what you learned. It does not have to be finished."
+      other_faculties:
+        q: "Is this open to students from other faculties?"
+        a: "It is open to UTCC students from every faculty. The material is designed so you can start without an engineering background."
 
   # Kept 1:1 with th.yml, where these do the real work — Rails ships the English
   # wording already, so the values here just restate it.
+  policy:
+    updated_on: "Last updated %{date}"
+    read_other: "Read the %{document} →"
+
+  privacy:
+    title: "Privacy notice (PDPA)"
+    intro: "What this site records about you, why, and what you can ask us to do with it. Written to meet the Personal Data Protection Act B.E. 2562 (2019)."
+    updated_on: "26 July 2026"
+    sections:
+      who:
+        title: "Who is responsible for your data"
+        body:
+          - "This site is built and run by a group of UTCC upperclassmen as a study aid for juniors taking the AI Fundamental curriculum. It is not an official University of the Thai Chamber of Commerce service, and the university does not operate it."
+          - "That means the student group running this site is the data controller under the PDPA — not the university. Questions about your data should come to us, at the contact address at the end of this notice."
+      collected:
+        title: "What we collect"
+        body:
+          - "We keep only what the site needs in order to work. There is no profile builder, no advertising profile, and nothing is bought from anyone else."
+        items:
+          - "Your account: name, student ID, faculty, year of study, and a password stored only as a bcrypt hash — never as text we can read."
+          - "Your email address, only if you choose to give one. Sign-up does not ask for it, and most accounts have none."
+          - "Sign-in records: the IP address and browser user-agent of each session, and when it started. These exist so you can be signed in, and so we can spot an account being broken into."
+          - "Your learning progress: which topic you finished, in which course, and when you learned and applied it."
+          - "Your role — student, instructor or admin — which decides which screens you can open."
+      purposes:
+        title: "Why we use it"
+        body:
+          - "Each purpose below is the reason a specific piece of the list above exists. We do not use your data for anything else without asking you first."
+        items:
+          - "To give you an account and keep you signed in."
+          - "To show your progress, level, streak and gems, and to place you on the leaderboard."
+          - "To let teaching staff see how a class is progressing."
+          - "To send you a password reset link, if you asked for one and gave us an email address."
+          - "To keep the site secure — rate limiting, and investigating abuse."
+      basis:
+        title: "Our lawful basis"
+        body:
+          - "Under the PDPA we rely on the following bases. Where we rely on your consent, you may withdraw it at any time without affecting anything that happened before you did."
+        items:
+          - "Performance of a contract, for running the account you asked us to create."
+          - "Legitimate interest, for security, abuse prevention and keeping the service working."
+          - "Your consent, for the optional email address and for anything we add later that is not needed to run the site."
+      cookies:
+        title: "Cookies"
+        body:
+          - "We set one cookie. It is called `session_id`, it holds a signed reference to your sign-in record, and it is marked HttpOnly and SameSite=Lax so that scripts cannot read it and other sites cannot use it."
+          - "Ticking “remember me on this device” makes that cookie persist; leaving it unticked means the cookie disappears when you close the browser. We also remember your language choice for the length of your visit."
+          - "There are no advertising cookies, no analytics cookies, and no third-party trackers on this site."
+      sharing:
+        title: "Who else sees it"
+        body:
+          - "We do not sell your data, share it for advertising, or send it to anyone for their own purposes. Three technical exceptions are worth naming plainly:"
+        items:
+          - "Our hosting provider stores the database and server logs on our behalf."
+          - "This site loads its typefaces from Google Fonts. That means your IP address and browser details reach Google every time a page loads. If you would rather that did not happen, a browser extension that blocks third-party fonts will stop it, and the site stays readable."
+          - "If you request a password reset, the email provider we use handles that message."
+      retention:
+        title: "How long we keep it"
+        body:
+          - "Your account and your learning progress are kept for as long as your account exists. Sign-in records are kept while they are useful for security and then removed."
+          - "Ask us to delete your account and we will remove it, along with your progress. Because progress is the point of the site, deleting the account deletes the record of what you finished — we cannot give it back afterwards."
+      security:
+        title: "How we protect it"
+        body:
+          - "Passwords are hashed with bcrypt and never stored in a form we can read. Traffic is served over HTTPS. The session cookie is signed and HttpOnly. Staff screens are gated by role, and an administrator cannot change their own role."
+          - "We should also be straight with you: this is a student-run teaching project, not a bank. We have taken the precautions we know how to take, and you should not store anything here that you would be harmed by losing. Do not reuse a password you use anywhere important."
+      rights:
+        title: "Your rights under the PDPA"
+        body:
+          - "The Act gives you the following rights over your own data. Write to the address below and we will answer within 30 days."
+        items:
+          - "To be informed about, and to access, the data we hold about you."
+          - "To receive a copy of it, and to ask us to send it to someone else."
+          - "To correct anything inaccurate or incomplete."
+          - "To have it erased, or made anonymous."
+          - "To ask us to pause using it while a dispute is resolved."
+          - "To object to a particular use of it."
+          - "To withdraw consent you previously gave."
+      complaints:
+        title: "If you are not satisfied"
+        body:
+          - "Tell us first and we will try to put it right. You also have the right to complain to the Personal Data Protection Committee (PDPC) in Thailand, and you do not need our permission to do so."
+      children:
+        title: "Students under 20"
+        body:
+          - "This site is for enrolled UTCC students, who are usually adults. If you are under 20, Thai law may require a parent or guardian to consent on your behalf — please ask them before you create an account."
+      changes:
+        title: "Changes to this notice"
+        body:
+          - "If we change what we collect or why, we will update this page and change the date at the top. Where a change needs your consent, we will ask for it rather than assume it."
+      contact:
+        title: "How to reach us"
+        body:
+          - "Write to the UTCC upperclassmen community that runs this site. Because this is a student project rather than a company, the fastest route is usually the person who gave you the link, or the contact address published alongside it."
+          - "CONTACT DETAILS TO BE FILLED IN before this notice is published — the PDPA requires a working contact point for the data controller."
+
+  terms:
+    title: "Terms of use"
+    intro: "The rules for using this site. Short version: it is a study aid built by students, use it honestly, and do not mistake it for the university's own systems."
+    updated_on: "26 July 2026"
+    sections:
+      who:
+        title: "Who runs this site"
+        body:
+          - "This is a study aid built and run by UTCC upperclassmen for juniors taking the AI Fundamental curriculum. It is not an official University of the Thai Chamber of Commerce website, and nothing here is an official university record or communication."
+      eligibility:
+        title: "Who may use it"
+        body:
+          - "Accounts are for enrolled UTCC students and for the teaching staff who work with them. One account per person, registered with your own student ID."
+      account:
+        title: "Your account"
+        body:
+          - "Keep your password to yourself and do not let anyone else use your account. Tell us if you think someone else has got into it."
+          - "Do not create an account with someone else's student ID, and do not try to obtain a role — instructor or admin — that has not been given to you."
+      acceptable_use:
+        title: "Acceptable use"
+        body:
+          - "Use the site as a place to learn. The following are not allowed:"
+        items:
+          - "Attacking the site, or trying to reach data that is not yours."
+          - "Automated scraping, or hammering the site with requests."
+          - "Uploading someone else's personal data, or anything unlawful or abusive."
+          - "Passing your account to someone else, or using the site to help another student misrepresent their own work."
+      academic:
+        title: "Academic honesty"
+        body:
+          - "This site does not grant credit. Your progress, level and place on the leaderboard are here to help you learn and mean nothing to the registrar."
+          - "Each course sets its own rules about using AI in assessed work, and those rules win over anything you read here. When you use AI for coursework, cite it. Using this site is not a defence against an academic misconduct finding."
+      grading:
+        title: "How grading actually works, and what it is worth"
+        body:
+          - "You should know how the exercises are marked, because it affects how much the result means. Lesson grading currently runs in your browser, which means the answer key is technically visible to anyone who looks for it, and the site records a pass because your browser reported one."
+          - "So your progress here is a record of what you told us you finished, not a proctored assessment, and it should never be presented as one. We are telling you this rather than letting you assume otherwise. Marking students' work properly belongs on the server, and that is where it will move."
+      content:
+        title: "Course material and your work"
+        body:
+          - "Course material on this site belongs to whoever wrote it. You may use it to study; do not republish it or sell it."
+          - "Anything you write into the site stays yours. By putting it here you allow us to store and display it as part of running the site."
+      availability:
+        title: "Availability"
+        body:
+          - "This is run by students in their own time. There is no uptime guarantee, no support desk, and no promise that the site will exist next semester. Features may change or be removed, and we may need to reset data while the site is still being built."
+      liability:
+        title: "No warranty, and limits on liability"
+        body:
+          - "The site is provided as it is, with no warranty of any kind. The content is a study aid written by students and may be wrong or out of date."
+          - "To the extent Thai law allows, the people running this site are not liable for loss arising from your use of it — including lost work, lost progress, or a grade you did not get. Nothing here limits liability that cannot lawfully be limited."
+      termination:
+        title: "Suspension"
+        body:
+          - "We may suspend or remove an account that breaks these terms, particularly where it puts other students' data or the site itself at risk. You can stop using the site and ask us to delete your account whenever you like."
+      changes:
+        title: "Changes to these terms"
+        body:
+          - "We may update these terms as the site grows. The date at the top says when we last did. If you keep using the site after a change, you accept the new version."
+      contact:
+        title: "How to reach us"
+        body:
+          - "The same contact route as the privacy notice — see the address published alongside the link that brought you here."
+          - "CONTACT DETAILS TO BE FILLED IN before these terms are published."
+
   errors:
     messages:
       blank: "can't be blank"

@@ -1,0 +1,37 @@
+<%# Transient feedback for something that happened without a page load — a copy
+    that succeeded, a tab that opened. `shared/_flashes` covers the other half:
+    a message that has to survive a redirect.
+
+    Any Stimulus controller raises one with
+
+      this.dispatch("show", { prefix: "toast", detail: { message:, kind: } })
+
+    and the one action below routes every `toast:show` here, so a new caller
+    needs no wiring in this file. `kind` is "info" (the default), "success" or
+    "error".
+
+    The row is a <template> cloned per message rather than markup built in JS,
+    the same shape as the proctor log's row. %>
+<div data-controller="toast" data-action="toast:show@window->toast#show"
+     class="pointer-events-none fixed top-4 right-4 left-4 z-50 sm:left-auto sm:w-[380px]">
+  <%# aria-live on the list rather than the row: the row does not exist yet when
+      the screen reader starts watching, and announcing needs a stable host. %>
+  <div data-toast-target="list" role="status" aria-live="polite"
+       class="flex flex-col gap-2"></div>
+
+  <template data-toast-target="row">
+    <div data-kind="info" data-visible="false"
+         class="group flex items-start gap-2.5 -translate-y-1.5 rounded-field border border-chrome-line
+                bg-chrome px-3.5 py-2.75 text-13-5 leading-[1.5] text-on-chrome-bright opacity-0
+                shadow-menu-dark transition-[opacity,transform] duration-200
+                data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100">
+      <%# One glyph per kind, shown by the variant rather than swapped in JS. %>
+      <span aria-hidden="true"
+            class="hidden font-semibold text-success group-data-[kind=success]:inline">✓</span>
+      <span aria-hidden="true"
+            class="hidden font-semibold text-danger-bright group-data-[kind=error]:inline">✕</span>
+
+      <span data-slot="message" class="text-balance"></span>
+    </div>
+  </template>
+</div>

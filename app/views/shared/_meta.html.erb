@@ -1,16 +1,16 @@
 <%# SEO / social metadata, ported from eng.utcc.ac.th — see docs/design-system.md.
     Pages override per-page values with content_for :title / :description / :meta_image. %>
-<% page_title       = content_for(:title).presence || "UTCC AI Academy — พื้นที่เรียนรู้ AI สำหรับนักศึกษา" %>
-<% page_description = content_for(:description).presence ||
-                      "พื้นที่เรียนรู้และแบ่งปันความรู้ด้าน AI สำหรับนักศึกษามหาวิทยาลัยหอการค้าไทย " \
-                      "รวมหัวข้อพื้นฐาน เส้นทางการเรียนแบบเป็นระดับ ผลงานจากเพื่อนนักศึกษา และกิจกรรมที่เปิดให้เข้าร่วม" %>
+<%# The defaults follow the locale: an English visitor who shares the link should
+    not get a Thai preview card. %>
+<% page_title       = content_for(:title).presence || t("meta.title") %>
+<% page_description = content_for(:description).presence || t("meta.description") %>
 <% page_image       = content_for(:meta_image).presence || "#{request.base_url}/icon.png" %>
 <% canonical_url    = "#{request.base_url}#{request.path}" %>
 
 <title><%= page_title %></title>
 <meta name="title" content="<%= page_title %>">
 <meta name="description" content="<%= page_description %>">
-<meta name="keywords" content="AI, ปัญญาประดิษฐ์, machine learning, prompt engineering, utcc, มหาวิทยาลัยหอการค้าไทย, คณะวิศวกรรมศาสตร์">
+<meta name="keywords" content="<%= t("meta.keywords") %>">
 <meta name="author" content="University of the Thai Chamber of Commerce">
 
 <link rel="canonical" href="<%= canonical_url %>">
@@ -18,7 +18,7 @@
 <%# Open Graph / Facebook %>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UTCC AI Academy">
-<meta property="og:locale" content="th_TH">
+<meta property="og:locale" content="<%= t("meta.og_locale") %>">
 <meta property="og:url" content="<%= canonical_url %>">
 <meta property="og:title" content="<%= page_title %>">
 <meta property="og:description" content="<%= page_description %>">
@@ -35,8 +35,8 @@
   <%= raw JSON.pretty_generate({
         "@context" => "https://schema.org",
         "@type" => "EducationalOrganization",
-        "name" => "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย",
-        "alternateName" => "School of Engineering, University of the Thai Chamber of Commerce",
+        "name" => t("meta.org_name"),
+        "alternateName" => t("meta.org_alt_name"),
         "url" => request.base_url,
         "sameAs" => [ "https://eng.utcc.ac.th/", "https://www.facebook.com/eng.utcc/" ],
         "address" => {

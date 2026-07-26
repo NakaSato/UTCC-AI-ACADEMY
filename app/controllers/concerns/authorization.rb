@@ -11,9 +11,11 @@ module Authorization
   end
 
   private
-    # `require_authentication` runs first and has already redirected a signed-out
-    # visitor to /login, so reaching here without a user is not expected — the
-    # safe navigation is there so a misordered callback cannot raise.
+    # `require_authentication` runs first and has already sent a signed-out
+    # visitor to the landing page, so reaching here without a user is not
+    # expected — the safe navigation is there so a misordered callback cannot
+    # raise. Both denials land on root now; the ordering is what decides which
+    # of the two flashes a visitor gets.
     def authorize_role(roles)
       return if roles.any? { Current.user&.public_send("#{it}?") }
 

@@ -29,9 +29,16 @@ module Authentication
       Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
 
+    # Denial sends a visitor to the front door, not to the form — `/` is the
+    # landing page when there is no session, so it explains the app rather than
+    # demanding credentials for a screen they may not have meant to open. Same
+    # shape as `Authorization#authorize_role`: root plus a flash saying why.
+    #
+    # The stash still happens, so a deep link survives the detour — sign in from
+    # the landing page and `after_authentication_url` returns the original screen.
     def request_authentication
       session[:return_to_after_authenticating] = request.url
-      redirect_to login_path
+      redirect_to root_path, alert: t("flash.sign_in_required")
     end
 
     def after_authentication_url

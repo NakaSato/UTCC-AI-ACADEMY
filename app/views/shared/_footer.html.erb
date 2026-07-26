@@ -61,12 +61,10 @@
               lg:mt-11 xl:px-8">
     <span class="text-12-5 text-on-chrome-dim"><%= t("chrome.footer.rights") %></span>
     <div class="flex flex-wrap items-center gap-[22px]">
-      <a href="#" class="text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface">
-        <%= t("chrome.footer.pdpa") %>
-      </a>
-      <a href="#" class="text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface">
-        <%= t("chrome.footer.terms") %>
-      </a>
+      <%= link_to t("chrome.footer.pdpa"), privacy_path,
+            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface" %>
+      <%= link_to t("chrome.footer.terms"), terms_path,
+            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface" %>
     </div>
   </div>
 </footer>

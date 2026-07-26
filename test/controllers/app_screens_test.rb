@@ -337,8 +337,22 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     [ course_url("AI1101"), lesson_url, my_learning_url, knowledge_map_url,
       progress_url, leaderboard_url, instructor_url, admin_url ].each do |url|
       get url
-      assert_redirected_to login_path, "#{url} should require authentication"
+      assert_redirected_to root_path, "#{url} should require authentication"
+      assert_equal I18n.t("flash.sign_in_required"), flash[:alert], url
     end
+  end
+
+  # Denial goes to the landing page rather than the form, so signing in is now a
+  # second hop. The stashed URL has to survive it, or every deep link into the
+  # app quietly lands the visitor on the catalog instead of where they were going.
+  test "a deep link survives the detour through the landing page" do
+    sign_out
+
+    get progress_url
+    assert_redirected_to root_path
+
+    post login_path, params: { student_id: users(:one).student_id, password: "password" }
+    assert_redirected_to progress_url
   end
 
   test "root is the public landing page when signed out" do

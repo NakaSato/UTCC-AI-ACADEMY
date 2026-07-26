@@ -53,6 +53,10 @@
     </div>
 
     <div class="ml-auto flex flex-none items-center gap-2">
+      <%# The landing page reads from `landing.*` in both locales now, so the
+          toggle belongs here as much as it does on the app header. %>
+      <%= render "shared/language_toggle", dark: true %>
+
       <div class="hidden items-center gap-2 lg:flex">
         <%= link_to t("landing.sign_in"), login_path,
               class: "relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-surface

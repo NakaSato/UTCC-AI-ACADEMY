@@ -13,6 +13,7 @@
     <%= authenticated? ? render("shared/app_header") : render("shared/header") %>
 
     <%= render "shared/flashes" %>
+    <%= render "shared/toasts" %>
 
     <%= yield %>
 

@@ -10,7 +10,16 @@ A learning platform for UTCC students getting started with AI. Rails 8.1, Ruby 3
 
 **Users, sessions and topic completions are persisted; nothing else is.** There are still no Course/Lesson/Topic tables — every screen's *content* comes from plain-Ruby placeholder modules in `app/models/` (see below) — but a learner's **progress is real**, counted off `topic_completions`. See "Progress" below for what that covers and what it does not.
 
-Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in the header.
+Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in the app header and on the auth screens — **not** on the marketing header, so a signed-out visitor to `/` has no way to switch (see the landing-page exception below).
+
+**Three names, all current, none a typo.** The product is *UTCC AI Academy by Upperclassman*, the Kamal service and image are `utcc_ai_academy`, and the Rails module is still `UtccAiFundamental` — the app was renamed and the constant was deliberately left alone, since renaming it touches every environment file and the encrypted credentials for no user-visible gain. Do not "fix" the module to match the repo.
+
+## Other docs, and which one wins
+
+- **`README.md`** is written for a human joining the project, and its second half ("Technical overview" onward) covers the same ground as this file — stack, layout, request path, data model, auth, routing, tests. **The two must not drift.** An architectural change here needs the matching README section updated in the same commit; that is where the eight screens and the setup path are explained for a person who has never run the app.
+- **`docs/process.md`** — the team's Scrum process: two-week sprints, the four events, and a definition of done that points back at the invariants in this file. Read it before proposing what to build next; it also fixes the dependency order of the remaining work.
+- **`docs/design-system.md`** — background on the reference site, **not** the current tokens. See "Design system" below; the CSS wins.
+- **`.claude/skills/`** — four project skills (`explore-codebase`, `debug-issue`, `refactor-safely`, `review-changes`) that drive the code-review-graph MCP tools. Prefer them over hand-rolling a search.
 
 ## Commands
 
@@ -24,6 +33,7 @@ bin/rails tailwindcss:build   # one-off CSS build into app/assets/builds/tailwin
 bin/rails tailwindcss:watch   # rebuild on change (what bin/dev runs)
 
 bin/rails admin:create        # create or promote an admin — the only way to get the first one
+bin/rails instructor:create   # create or promote an instructor — never demotes an admin
 ```
 
 `bin/dev` is required for CSS changes to take effect — `bin/rails server` alone serves whatever `app/assets/builds/tailwind.css` was last built. `assets:precompile` builds Tailwind first, so the Dockerfile needs no extra step.
@@ -50,7 +60,7 @@ bin/importmap audit    # JS dependency CVEs
 
 `bin/ci` also runs `env RAILS_ENV=test bin/rails db:seed:replant`, so `db/seeds.rb` must stay runnable against a fresh test database. The system-test step is commented out in `config/ci.rb` — leave it that way until `test/system/` actually has something in it.
 
-There is no CI workflow in this repo — `bin/ci` is the whole pipeline, run locally.
+There is no CI service and no GitHub Actions workflow — `.github/` holds only `dependabot.yml`, and `bin/ci` is the whole pipeline, run locally. `docs/process.md` makes "`bin/ci` passes on your machine" the definition of done, so treat a green run as the shipping gate rather than a formality.
 
 ## Software system design
 
@@ -65,7 +75,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 ```
 
 - **Views call reader methods and nothing else.** No queries, no `I18n.t` for content (they ask `course.title`, which does the lookup). A view that reaches past its assigned object is the smell that a module is missing a method.
-- **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`.
+- **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`. **`HomeController#landing` is the one exception** — see "The landing page is the exception to both rules" below before touching it.
 - **`Data` objects are the presenters.** There is no presenter/serializer/service-object layer, and adding one would duplicate what `Data.define … do … end` already does.
 - **The dependency arrow runs from the persisted side to the placeholder side, not the other way.** `TopicCompletion` validates `course_code` against `CourseCatalog.codes` and `topic_key` against `Syllabus.topic_keys`. That inversion is the whole trick: a real table can reference a taxonomy that has no tables yet, and the strings stay honest until they do.
 - **`LearnerProgress` is the only bridge.** It is the one object that reads records and returns placeholder value objects (`CourseCatalog::Course` with the counts filled in). Keep it the only one — if a second class starts joining the two sides, the seam stops being replaceable.
@@ -86,8 +96,8 @@ The rule that follows: **nothing that must survive a reload may live only in JS*
 ### Request lifecycle of one signed-in screen
 
 1. Thruster → Puma → Rails.
-2. `require_authentication` resolves `Current.session` from the signed cookie, or stashes `return_to_after_authenticating` and redirects to `/login`.
-3. `allow_only` runs next where a controller declares it — after authentication, so signed-out lands on `/login` rather than the flash.
+2. `require_authentication` resolves `Current.session` from the signed cookie, or stashes `return_to_after_authenticating` and redirects to `/` with `flash.sign_in_required`.
+3. `allow_only` runs next where a controller declares it — after authentication, so a signed-out visitor gets the "sign in" flash rather than the "staff only" one.
 4. `switch_locale` wraps the action in `I18n.with_locale`.
 5. The action validates its params against a whitelist and assigns from a module.
 6. The view renders; the `progress` helper loads the learner's completions **once** (memoised on the `User`) and every counter, bar and tile folds off that one array.
@@ -156,7 +166,16 @@ No API layer, no service objects, no presenters, no form objects, no Redis, no N
 The split is deliberate and consistent:
 
 - **Ruby holds numbers, taxonomy and shape** — course codes, percentages, the tree structure, which module is locked.
-- **`config/locales/{th,en}.yml` holds every word a human reads.** The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
+- **`config/locales/{th,en}.yml` holds every word a human reads** — everywhere behind the login. The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
+
+### The landing page is the exception to both rules
+
+`app/views/home/index.html.erb` and `HomeController#landing` break the pattern the rest of the app follows, and they are the likeliest place to waste time looking for a module or a locale key that does not exist:
+
+- **Its copy is hardcoded Thai, not I18n.** The view calls `t` for none of its own text — two dozen-odd lines of Thai sit inline in the ERB, and five more arrays of it (`@topics`, `@tracks`, `@shares`, `@events`, `@faqs`) are literals in the controller's private `landing` method. **The landing page body is therefore Thai-only**, which is why `shared/_header` carries no language toggle — it would offer a switch that changes almost nothing on the page. The `landing.*` namespace in the locale files covers only that marketing header and the footer chrome.
+- **It is the only controller holding content.** Nothing in `app/models/` describes the landing page, so "add a section to the landing page" means editing the controller and the view, not a placeholder module.
+
+Both are the same debt as the rest of the placeholder content, just parked one layer higher. Moving that copy into locale files (and the arrays into a module, if it earns one) is the fix; until then do not read the "no copy in controllers" and "no words outside locales" rules as describing this file.
 
 **Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `InstructorReport::HARD_TOPIC_PERCENTS[i]` with `instructor.hard_topics[i]`, `LearnerProfile::AWARDS[i]` with `my_learning.awards[i]`, `Leaderboard::FIGURES[i]` with `leaderboard.leaders[i]`, `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
@@ -202,7 +221,7 @@ Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_
 - `ApplicationController` has `around_action :switch_locale`, which reads `session[:locale]`. `LanguagesController#update` writes it.
 - The route is **POST** `language/:locale` with a `/th|en/` constraint. It is POST on purpose: Turbo prefetches links on hover, and a GET would switch language just by pointing at the toggle. The constraint means an unsupported locale 404s at the router and never reaches `I18n`.
 - `th.yml` and `en.yml` are 1:1 in structure — add a key to both. Some values are **arrays consumed by index** (see above); keep their length and order identical across the two files.
-- The toggle partial (`shared/_language_toggle`) takes a `dark:` local because it renders on chrome (header, auth screens) and on light surfaces.
+- The toggle partial (`shared/_language_toggle`) has exactly two render sites — `shared/_app_header` (signed in) and `shared/_auth_hero` (the auth screens, which pass `dark: true`). It takes that `dark:` local because it sits on the chrome field in one place and on a light surface in the other. The marketing header does not render it at all.
 
 ## Routing and layouts
 
@@ -215,7 +234,10 @@ get "map"         => "knowledge_maps#show"      # ?topic=<node id>&mode=course|p
 get "progress"    => "progress#show"
 get "leaderboard" => "leaderboards#show"        # ?tab=week|semester|university
 get "instructor"  => "instructor#show"
+get "privacy"     => "policies#privacy"         # public — the PDPA notice
+get "terms"       => "policies#terms"           # public — terms of use
 get "admin"       => "admin#show"               # ?tab=features|overview|users|courses|queue|audit
+patch "admin/users/:id" => "admin#update"       # admin_user_path — the only role grant in the app
 root "home#index"                               # catalog signed in, /admin for an admin, landing when not
 ```
 
@@ -247,14 +269,15 @@ Ruby style is modern and terse throughout — `Data.define` with endless methods
 
 Built on Rails 8's `bin/rails generate authentication` (cookie sessions in a `sessions` table, no Devise), plus a hand-written `RegistrationsController` since the generator omits sign-up.
 
-- **Everything requires login by default.** `ApplicationController` includes `Authentication`, whose `included do` block adds a global `before_action :require_authentication`. Any publicly reachable action must opt out with `allow_unauthenticated_access` — only `HomeController#index` and `LanguagesController` do. Forgetting it is the usual cause of an unexpected redirect to `/login`.
+- **Everything requires login by default.** `ApplicationController` includes `Authentication`, whose `included do` block adds a global `before_action :require_authentication`. Any publicly reachable action must opt out with `allow_unauthenticated_access` — only `HomeController#index`, `LanguagesController` and `PoliciesController` do. Forgetting it is the usual cause of an unexpected redirect to the landing page carrying `flash.sign_in_required`.
 - `Current.user` / `Current.session` (an `ActiveSupport::CurrentAttributes`) are how views read the signed-in user; `authenticated?` is the exposed helper method, and layouts branch on it.
 - **Authorization is a separate concern from authentication.** `users.role` is a string column defaulting to `"student"`, declared on `User` as `enum :role, ROLES.index_by(&:itself), default: "student", validate: true`. `validate: true` is deliberate: the admin form posts a role from params, and without it an unknown value raises `ArgumentError` instead of failing validation.
   - **admin is a superset of instructor.** `User#staff?` is `instructor? || admin?`, so a staff-wide gate needs no second rule for admins.
-  - `Authorization` (`app/controllers/concerns/authorization.rb`) is included in `ApplicationController` **after** `Authentication`, so `require_authentication` runs first and a signed-out visitor still lands on `/login` rather than the catalog. Its `allow_only` macro mirrors `allow_unauthenticated_access` — it names who is let in, and any `User` predicate works: `allow_only :staff` on `InstructorController`, `allow_only :admin` on `AdminController`. Denial is a redirect to `root_path` with `flash[:alert]`, matching `CoursesController#show`'s handling of an unknown course code.
+  - `Authorization` (`app/controllers/concerns/authorization.rb`) is included in `ApplicationController` **after** `Authentication`. Both denials now redirect to `root_path` with a flash, so the ordering is what decides *which* flash: a signed-out visitor gets `flash.sign_in_required` from `require_authentication` rather than the misleading `flash.forbidden`. Its `allow_only` macro mirrors `allow_unauthenticated_access` — it names who is let in, and any `User` predicate works: `allow_only :staff` on `InstructorController`, `allow_only :admin` on `AdminController`. Denial is a redirect to `root_path` with `flash[:alert]`, matching `CoursesController#show`'s handling of an unknown course code.
   - **`ApplicationHelper#app_nav_items` is built from the role** — the instructor entry is appended only for the roles that can open it, so a gate that is missing shows up as a link nobody can use. An admin gets a **different list entirely** (`admin_nav_items`: admin, then instructor) rather than the learner nav with staff entries bolted on — `/` only redirects them back to `/admin`, so the catalog, the AI1101 shortcuts and the learner screens are not part of their app. The desktop rail and the burger drawer both read that one list.
   - `/admin` (`AdminController`) is the **only** screen backed by real records rather than a placeholder module, and the only place a role is granted — sign-up always produces a student, and `RegistrationsController#user_params` never whitelists `role`. **Do not add `:role` to that list**; `test/controllers/registrations_controller_test.rb` fails if you do. An admin cannot change their own role; since only an admin reaches the action, that single rule is what guarantees at least one admin always survives.
-  - **The first admin comes from `bin/rails admin:create`** (`lib/tasks/admin.rake`) — /admin cannot grant it, since opening /admin already requires the role, and `db/seeds.rb` is fenced to `Rails.env.local?`. The task prompts when attached to a terminal and reads `ADMIN_STUDENT_ID` / `ADMIN_NAME` / `ADMIN_PASSWORD` when not, so it also works over `kamal app exec`. An existing account with that student ID is promoted rather than duplicated.
+  - **The first admin comes from `bin/rails admin:create`** (`lib/tasks/roles.rake`) — /admin cannot grant it, since opening /admin already requires the role, and `db/seeds.rb` is fenced to `Rails.env.local?`. The task prompts when attached to a terminal and reads `ADMIN_STUDENT_ID` / `ADMIN_NAME` / `ADMIN_PASSWORD` when not, so it also works over `kamal app exec`. An existing account with that student ID is promoted rather than duplicated.
+  - **`bin/rails instructor:create`** sits beside it in the same file and behaves identically, reading `INSTRUCTOR_STUDENT_ID` / `INSTRUCTOR_NAME` / `INSTRUCTOR_PASSWORD`. Both go through `RoleTask.grant`, which takes the predicate that counts as already holding the role. For admin that is `admin?`; for instructor it is **`staff?`, not `instructor?`** — admin is a superset, so writing the role onto an admin would demote them, and demoting the only admin is the one way around invariant 4. An admin is therefore reported and left alone.
 - `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a session cookie instead of a permanent one.
 - `User` validates a password of 8–72 characters (`PASSWORD_LENGTH`) that contains a letter and a digit, is not in `COMMON_PASSWORDS`, and does not contain the student's own ID. A weak password in a test will fail validation rather than the assertion you intended — `"password"` and `"12345678"` are both rejected now.
 - Sign-in, sign-up and password-reset `create` actions are all `rate_limit to: 10, within: 3.minutes`.
@@ -282,6 +305,7 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 - `test/controllers/lesson_completion_test.rb` — the browser-to-record seam, and that a completion then shows up on the screens that count it.
 - **`test/fixtures/topic_completions.yml` is deliberately empty and must stay present.** Tests that need progress record it themselves; the file exists so fixtures clear the table, because `bin/ci` seeds completions into the test database and those rows would otherwise outlive the users they point at.
 - `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s.
+- The auth and role suites: `admin_test.rb` (the roster and the one place a role is granted), `user_test.rb` (the password rules and the `role` enum), `sessions_`/`registrations_`/`passwords_controller_test.rb`, `auth_switch_test.rb`, `legacy_auth_routes_test.rb` (the `redirect()`s above still resolve), `footer_test.rb` (the columns branch on the session), `test/tasks/admin_task_test.rb` (`admin:create` promotes rather than duplicates) and `test/tasks/instructor_task_test.rb` (`instructor:create` leaves an admin alone rather than demoting one).
 
 Assertions compare against `I18n.t(...)` rather than literal strings; a copy change in the locale file should not break a test.
 

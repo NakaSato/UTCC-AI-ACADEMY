@@ -1,0 +1,56 @@
+<%# Both policy documents render through here — same shape, different section
+    list. Prose measure is capped at 74ch rather than the page width: a legal
+    notice is read, not scanned. %>
+<% content_for :title, "#{Policy.title_for(@document)} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-10 pb-20 sm:px-8">
+  <article class="mx-auto max-w-[74ch]">
+    <header class="mb-10 border-b border-hairline pb-8">
+      <h1 class="mb-3 text-30 leading-[1.25] font-bold tracking-[-0.025em] sm:text-38">
+        <%= Policy.title_for(@document) %>
+      </h1>
+      <p class="mb-4 text-16-5 leading-[1.7] text-balance text-muted">
+        <%= Policy.intro_for(@document) %>
+      </p>
+      <p class="text-13-5 text-muted-2">
+        <%= t("policy.updated_on", date: Policy.updated_on_for(@document)) %>
+      </p>
+    </header>
+
+    <%# Numbered by CSS rather than by hand, so reordering SECTIONS renumbers the
+        document and no locale string carries a stale "3.". %>
+    <ol class="flex list-none flex-col gap-9 [counter-reset:section]">
+      <% @sections.each do |section| %>
+        <li class="[counter-increment:section]">
+          <h2 class="mb-3 text-20 leading-[1.3] font-bold tracking-[-0.02em]
+                     before:mr-2 before:text-brand before:content-[counter(section)_'.']">
+            <%= section.title %>
+          </h2>
+
+          <div class="flex flex-col gap-3.5">
+            <% section.paragraphs.each do |paragraph| %>
+              <p class="text-16 leading-[1.75] text-balance text-ink-2"><%= paragraph %></p>
+            <% end %>
+
+            <% if section.items? %>
+              <ul class="flex list-disc flex-col gap-2 pl-5.5">
+                <% section.items.each do |item| %>
+                  <li class="text-15-5 leading-[1.7] text-ink-4 marker:text-brand"><%= item %></li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+
+    <%# Each document points at the other: a visitor who reads one is usually
+        being asked to accept both. %>
+    <footer class="mt-12 border-t border-hairline pt-7">
+      <% other = @document == :privacy ? :terms : :privacy %>
+      <%= link_to t("policy.read_other", document: Policy.title_for(other)),
+            other == :privacy ? privacy_path : terms_path,
+            class: "text-15 font-medium text-brand transition-colors hover:text-brand-deep" %>
+    </footer>
+  </article>
+</main>

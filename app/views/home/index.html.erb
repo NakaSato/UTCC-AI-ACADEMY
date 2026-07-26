@@ -1,39 +1,45 @@
-<% content_for :title, "UTCC AI Academy — เรียนรู้ AI ไปด้วยกัน" %>
+<% content_for :title, "UTCC AI Academy — #{t("landing.hero.headline")}" %>
 
 <section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-surface">
   <div class="flex max-w-7xl flex-col items-center gap-4 p-4">
     <%# The UTCC ENG lockup is a white logo on transparency — it sits directly on
-        the maroon field, so it needs no plate or scrim of its own. %>
+        the maroon field, so it needs no plate or scrim of its own.
+
+        It is the LCP element, so it ships in three widths rather than one. The
+        h1 is capped at 40rem, so 640px is the widest it ever draws: 1280w covers
+        that at 2x, 800w at 1x, and 480w is for a phone. `sizes` restates the
+        cap — below 672px the field's only inset is the wrapper's p-4. %>
     <h1 class="mx-auto w-full max-w-[40rem]">
-      <%= image_tag "hero-eng-utcc.webp",
-            alt: "UTCC ENG — School of Engineering คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย",
-            width: 1650, height: 650, fetchpriority: "high", class: "h-auto w-full" %>
-      <span class="sr-only">UTCC AI Academy — เรียนรู้ AI ไปด้วยกัน</span>
+      <%= image_tag "hero-eng-utcc-800.webp",
+            alt: t("landing.hero.logo_alt"),
+            srcset: { "hero-eng-utcc-480.webp" => "480w",
+                      "hero-eng-utcc-800.webp" => "800w",
+                      "hero-eng-utcc-1280.webp" => "1280w" },
+            sizes: "(min-width: 672px) 640px, calc(100vw - 2rem)",
+            width: 800, height: 316, fetchpriority: "high", class: "h-auto w-full" %>
+      <span class="sr-only">UTCC AI Academy — <%= t("landing.hero.headline") %></span>
     </h1>
 
-    <p class="text-36 leading-tight font-bold lg:text-54">เรียนรู้ AI ไปด้วยกัน</p>
+    <p class="text-36 leading-tight font-bold lg:text-54"><%= t("landing.hero.headline") %></p>
 
-    <p class="max-w-[60ch] text-20 font-light opacity-90">
-      พื้นที่สำหรับนักศึกษา UTCC ที่อยากเริ่มต้นกับเทคโนโลยี AI
-      ตั้งแต่ยังไม่มีพื้นฐาน ไปจนถึงการลงมือทำโปรเจกต์จริง และแบ่งปันสิ่งที่เรียนรู้กับเพื่อน ๆ
-    </p>
+    <p class="max-w-[60ch] text-20 font-light opacity-90"><%= t("landing.hero.lede") %></p>
 
     <div class="mt-4 flex flex-wrap justify-center gap-4">
       <a href="#learn"
          class="inline-flex items-center gap-2 rounded-full bg-surface px-6 py-2.5 text-18 leading-tight font-normal
                 whitespace-nowrap uppercase text-brand-deep shadow-md transition duration-300
-                hover:bg-brand-tint hover:shadow-lg active:scale-97">เริ่มเรียนรู้</a>
+                hover:bg-brand-tint hover:shadow-lg active:scale-97"><%= t("landing.hero.cta_learn") %></a>
       <%# On the maroon field an outline button takes the light-on-dark variant. %>
       <a href="#community"
          class="inline-flex items-center gap-2 rounded-full border border-surface px-6 py-2.5 text-18 leading-tight
                 font-normal whitespace-nowrap uppercase text-surface transition duration-300
-                hover:bg-surface hover:text-brand-deep active:scale-97">ดูผลงานเพื่อน ๆ</a>
+                hover:bg-surface hover:text-brand-deep active:scale-97"><%= t("landing.hero.cta_community") %></a>
     </div>
 
     <%# Student-run project — say so on the hero so no one mistakes it for a
         university property. Repeated in the footer. %>
     <p class="mt-2 max-w-[60ch] text-16 font-light text-on-brand opacity-80">
-      เว็บไซต์นี้จัดทำโดยรุ่นพี่เพื่อช่วยรุ่นน้องผ่านวิชา AI Fundamental — ไม่ใช่เว็บไซต์ทางการของมหาวิทยาลัย
+      <%= t("landing.hero.disclaimer") %>
     </p>
   </div>
 </section>
@@ -43,16 +49,16 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand">หัวข้อแนะนำ</p>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">เรียนรู้ AI</h2>
-          <p class="max-w-[65ch] text-20 leading-body text-muted">
-            หัวข้อพื้นฐานที่แนะนำให้เริ่ม อ่านจบแล้วลงมือทำต่อได้ทันที
-          </p>
+          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand"><%= t("landing.learn.eyebrow") %></p>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+            <%= t("landing.learn.title") %>
+          </h2>
+          <p class="max-w-[65ch] text-20 leading-body text-muted"><%= t("landing.learn.subtitle") %></p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <% @topics.each_with_index do |topic, i| %>
+        <% Landing.topics.each_with_index do |topic, i| %>
           <%# The whole card is the link; the arrow row is decoration, so it is
               hidden from the accessible name the title and blurb already give. %>
           <a href="#learn"
@@ -61,13 +67,13 @@
                     hover:shadow-card-hover"
              style="animation-delay: <%= i * 60 %>ms">
             <h3 class="text-24 leading-tight font-bold text-balance text-brand-deep transition-colors duration-300
-                       group-hover:text-brand"><%= topic[:title] %></h3>
+                       group-hover:text-brand"><%= topic.title %></h3>
 
-            <p class="text-17 leading-body text-muted"><%= topic[:blurb] %></p>
+            <p class="text-17 leading-body text-muted"><%= topic.blurb %></p>
 
             <span class="mt-auto inline-flex items-center gap-2 pt-3 text-16 font-medium text-brand"
                   aria-hidden="true">
-              อ่านหัวข้อนี้
+              <%= t("landing.learn.card_cta") %>
               <span class="size-[0.5em] -rotate-45 border-t-2 border-r-2 border-current transition-transform
                            duration-300 group-hover:translate-x-1"></span>
             </span>
@@ -81,38 +87,40 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">เส้นทางการเรียน</h2>
-          <p class="max-w-[65ch] text-20 text-muted">เลือกจุดเริ่มต้นที่ตรงกับพื้นฐานของคุณ</p>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+            <%= t("landing.tracks.title") %>
+          </h2>
+          <p class="max-w-[65ch] text-20 text-muted"><%= t("landing.tracks.subtitle") %></p>
         </div>
-        <div class="flex flex-wrap gap-2" role="tablist" aria-label="กรองตามระดับ">
-          <% [["ทั้งหมด", "all"], ["เริ่มต้น", "beginner"], ["ระดับกลาง", "intermediate"], ["ขั้นสูง", "advanced"]].each_with_index do |(label, level), i| %>
+        <div class="flex flex-wrap gap-2" role="tablist" aria-label="<%= t("landing.tracks.filter_label") %>">
+          <% Landing.track_filters.each_with_index do |filter, i| %>
             <button type="button" role="tab"
                     class="rounded-full border border-hairline px-4 py-1.5 text-18 text-muted transition duration-300
                            hover:border-brand hover:text-brand
                            aria-selected:border-brand aria-selected:bg-brand aria-selected:text-surface"
-                    data-tabs-target="tab" data-level="<%= level %>"
+                    data-tabs-target="tab" data-level="<%= filter.key %>"
                     data-action="tabs#select"
-                    aria-selected="<%= i.zero? %>"><%= label %></button>
+                    aria-selected="<%= i.zero? %>"><%= filter.label %></button>
           <% end %>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <% @tracks.each do |track| %>
+        <% Landing.tracks.each do |track| %>
           <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
                           hover:-translate-y-0.5 hover:shadow-lg"
-                   data-tabs-target="item" data-level="<%= track[:level] %>">
+                   data-tabs-target="item" data-level="<%= track.level %>">
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center rounded-full border border-brand px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track[:badge] %></span>
-              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track[:weeks] %></span>
+              <span class="inline-flex items-center rounded-full border border-brand px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track.level_label %></span>
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track.duration %></span>
             </div>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= track[:title] %></h3>
-            <p class="text-18 text-muted"><%= track[:blurb] %></p>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= track.title %></h3>
+            <p class="text-18 text-muted"><%= track.blurb %></p>
             <div class="mt-auto pt-2">
               <a href="#tracks"
                  class="inline-flex items-center gap-2 rounded-full border border-brand px-6 py-2.5 text-18
                         leading-tight font-normal whitespace-nowrap uppercase text-brand transition duration-300
-                        hover:bg-brand hover:text-surface active:scale-97">ดูเนื้อหา</a>
+                        hover:bg-brand hover:text-surface active:scale-97"><%= t("landing.tracks.card_cta") %></a>
             </div>
           </article>
         <% end %>
@@ -124,28 +132,28 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">ชุมชนนักศึกษา</h2>
-          <p class="max-w-[65ch] text-20 text-muted">
-            สิ่งที่เพื่อน ๆ กำลังลองทำ ไม่ต้องรอให้โปรเจกต์เสร็จสมบูรณ์ก็แชร์ได้
-          </p>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+            <%= t("landing.community.title") %>
+          </h2>
+          <p class="max-w-[65ch] text-20 text-muted"><%= t("landing.community.subtitle") %></p>
         </div>
         <a href="#community"
            class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight font-normal
                   whitespace-nowrap uppercase text-surface transition duration-300
-                  hover:bg-brand-deep active:scale-97">แชร์ผลงานของคุณ</a>
+                  hover:bg-brand-deep active:scale-97"><%= t("landing.community.cta") %></a>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <% @shares.each do |share| %>
+        <% Landing.shares.each do |share| %>
           <a href="#community"
              class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
                     hover:-translate-y-0.5 hover:shadow-lg">
             <div class="aspect-video w-full rounded-md bg-linear-to-br from-surface-3 to-surface-2"></div>
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= share[:tag] %></span>
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= share.tag %></span>
             </div>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= share[:title] %></h3>
-            <p class="text-18 text-muted-2"><%= share[:author] %> · <%= share[:date] %></p>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= share.title %></h3>
+            <p class="text-18 text-muted-2"><%= share.author %> · <%= share.date %></p>
           </a>
         <% end %>
       </div>
@@ -155,15 +163,17 @@
   <section class="bg-surface-2 py-16 lg:py-24" id="events">
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">กิจกรรมและเวิร์กชอป</h2>
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+          <%= t("landing.events.title") %>
+        </h2>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <% @events.each do |event| %>
+        <% Landing.events.each do |event| %>
           <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md">
-            <span class="inline-flex w-fit items-center rounded-full bg-brand px-3 py-0.5 text-18 font-medium text-surface"><%= event[:when] %></span>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= event[:title] %></h3>
-            <p class="text-18 text-muted-2"><%= event[:where] %></p>
+            <span class="inline-flex w-fit items-center rounded-full bg-brand px-3 py-0.5 text-18 font-medium text-surface"><%= event.when_label %></span>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= event.title %></h3>
+            <p class="text-18 text-muted-2"><%= event.where_label %></p>
           </article>
         <% end %>
       </div>
@@ -173,15 +183,17 @@
   <section class="py-16 lg:py-24" id="faq">
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">คำถามที่พบบ่อย</h2>
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+          <%= t("landing.faq_title") %>
+        </h2>
       </div>
-      <% @faqs.each do |faq| %>
+      <% Landing.faqs.each do |faq| %>
         <details class="group border-b border-hairline">
           <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 py-4 text-24 font-medium
                           text-brand-deep after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
                           after:border-b-2 after:border-current after:transition-transform after:duration-300
-                          after:content-[''] group-open:after:rotate-[-135deg]"><%= faq[:q] %></summary>
-          <div class="pb-4 text-18 text-muted"><%= faq[:a] %></div>
+                          after:content-[''] group-open:after:rotate-[-135deg]"><%= faq.question %></summary>
+          <div class="pb-4 text-18 text-muted"><%= faq.answer %></div>
         </details>
       <% end %>
     </div>

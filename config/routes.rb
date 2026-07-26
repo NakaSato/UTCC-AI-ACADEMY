@@ -26,6 +26,11 @@ Rails.application.routes.draw do
   post "language/:locale", to: "languages#update", as: :language,
        constraints: { locale: /th|en/ }
 
+  # The policy documents. Public, and named for what they are rather than nested
+  # under a /policies prefix nobody would type.
+  get "privacy", to: "policies#privacy", as: :privacy
+  get "terms", to: "policies#terms", as: :terms
+
   # The app proper. Everything here requires a session — see the Authentication
   # concern, which adds `before_action :require_authentication` globally.
   resources :courses, only: :show, param: :code

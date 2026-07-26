@@ -100,10 +100,10 @@ class AdminTest < ActionDispatch::IntegrationTest
     sign_out
 
     get admin_url
-    assert_redirected_to login_path
+    assert_redirected_to root_path
 
     patch admin_user_url(users(:two)), params: { role: "admin" }
-    assert_redirected_to login_path
+    assert_redirected_to root_path
     assert_equal("student", users(:two).reload.role)
   end
 end
