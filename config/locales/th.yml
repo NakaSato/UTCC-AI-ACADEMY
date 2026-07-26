@@ -327,7 +327,7 @@ th:
 
   my_learning:
     learning_now: "กำลังเรียนอยู่"
-    cert_count: "ใบรับรอง: 1 / 4"
+    cert_count: "ใบรับรอง: %{earned} / %{total}"
     course_link: "รายละเอียดวิชา AI1101"
     learned_topics: "หัวข้อที่เรียนแล้ว"
     applied_topics: "หัวข้อที่ลงมือทำ"
@@ -341,7 +341,7 @@ th:
     applied_count: "ลงมือทำ %{done} / %{total}"
     streak_label: "วันต่อเนื่อง"
     badges_title: "เหรียญตรา"
-    badges_count: "5 จาก 8"
+    badges_count: "%{earned} จาก %{total}"
     tabs:
       progress: "กำลังเรียน (%{count})"
       done: "เรียนจบแล้ว (%{count})"
@@ -440,8 +440,7 @@ th:
       - label: "หัวข้อที่เรียนแล้ว"
       - label: "ชั่วโมงเรียนรวม"
       - label: "โปรเจกต์ที่ส่ง"
-        value: "5 / 9"
-        delta: "ครบกำหนด 2 ส.ค."
+        delta: "นับจากหัวข้อโปรเจกต์ที่ทำแล้ว"
       - label: "อันดับในหมู่เรียน"
         delta: "จากนักศึกษาทั้งหมด"
     delta:

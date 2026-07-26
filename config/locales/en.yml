@@ -320,7 +320,7 @@ en:
 
   my_learning:
     learning_now: "Learning now"
-    cert_count: "Certificates: 1 / 4"
+    cert_count: "Certificates: %{earned} / %{total}"
     course_link: "AI1101 course description"
     learned_topics: "Learned topics"
     applied_topics: "Applied topics"
@@ -334,7 +334,7 @@ en:
     applied_count: "Applied %{done} / %{total}"
     streak_label: "Day streak"
     badges_title: "Badges"
-    badges_count: "5 of 8"
+    badges_count: "%{earned} of %{total}"
     tabs:
       progress: "In progress (%{count})"
       done: "Completed (%{count})"
@@ -433,8 +433,7 @@ en:
       - label: "Topics learned"
       - label: "Hours studied"
       - label: "Projects submitted"
-        value: "5 / 9"
-        delta: "next due 2 Aug"
+        delta: "counted from finished project topics"
       - label: "Rank in section"
         delta: "among all students"
     delta:

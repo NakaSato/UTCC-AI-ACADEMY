@@ -1,11 +1,13 @@
-# What is still placeholder about a learner once LearnerProgress took over the
-# counting: hearts, the award shelf, the badge row and the notification list.
+# What is still placeholder about a learner. The list has shrunk twice: the
+# counting moved to LearnerProgress when topic_completions landed, and the award
+# shelf followed once submissions gave its rules something to check. What is
+# left is exactly what nothing records yet:
 #
-# Each of these is waiting for something to record it — a wrong answer costing a
-# life, a rule saying which award a run of completions earns, a notification
-# worth sending. Until then they are the same frozen constants the rest of
-# app/models/ holds, and the same rule applies: numbers and shape here, every
-# word a human reads in config/locales.
+#   hearts        — no wrong answer costs a life, and nothing refills one
+#   notifications — no deadline, grade or approval exists to notify about
+#
+# When either gets a table, its copy moves out of here the same way the awards'
+# rules did — and this module gets smaller again, which is the point.
 module LearnerProfile
   LIVES = 5
   MAX_LIVES = 5
@@ -14,43 +16,9 @@ module LearnerProfile
   # show/hide in the browser, not a round trip.
   TABS = %i[ progress done ].freeze
 
-  # glyph, earned?, tier — index matches `my_learning.awards` in the locales.
-  AWARDS = [
-    [ "◆", true,  2 ],
-    [ "▲", true,  1 ],
-    [ "✦", true,  4 ],
-    [ "❖", true,  1 ],
-    [ "◈", false, nil ],
-    [ "✚", false, nil ],
-    [ "♦", false, nil ],
-    [ "☗", true,  1 ]
-  ].freeze
-
-  # The smaller badge row on the dashboard: name, earned?, glyph.
-  DASHBOARD_BADGES = [
-    [ "First Model",   true,  "▲" ],
-    [ "7-Day Streak",  true,  "✦" ],
-    [ "Data Cleaner",  true,  "❖" ],
-    [ "Model Builder", false, "◈" ],
-    [ "Deep Diver",    false, "◆" ],
-    [ "Ethics Aware",  false, "☗" ]
-  ].freeze
-
   class << self
     def tab_for(param)
       TABS.include?(param.to_s.to_sym) ? param.to_s.to_sym : TABS.first
-    end
-
-    def awards
-      copy = I18n.t("my_learning.awards")
-
-      AWARDS.each_with_index.map do |(glyph, earned, tier), index|
-        { name: copy[index][:name], hint: copy[index][:hint], glyph:, earned:, tier: }
-      end
-    end
-
-    def dashboard_badges
-      DASHBOARD_BADGES.map { |name, earned, glyph| { name:, earned:, glyph: } }
     end
 
     def notifications

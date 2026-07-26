@@ -120,8 +120,9 @@ class LearnerProgressTest < ActiveSupport::TestCase
 
     assert_equal "1", stats[0][:value]
     assert_equal I18n.t("progress.delta.none"), stats[0][:delta]
-    # Projects are not recorded anywhere, so that tile is still written copy.
-    assert_equal I18n.t("progress.stats")[2][:value], stats[2][:value]
+    # Projects are counted now — one project topic per started course, none of
+    # them applied by this learner.
+    assert_equal "0 / 1", stats[2][:value]
   end
 
   test "rank orders students by xp and leaves an idle learner unranked" do

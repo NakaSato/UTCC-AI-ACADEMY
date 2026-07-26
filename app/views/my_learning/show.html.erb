@@ -9,7 +9,7 @@
             <%= t("my_learning.learning_now") %>
           </span>
           <span class="rounded-[10px] border border-hairline-2 px-3.75 py-1.75 text-13-5 font-medium text-ink-4">
-            <%= t("my_learning.cert_count") %>
+            <%= t("my_learning.cert_count", earned: progress.certificates_earned, total: progress.certificates_total) %>
           </span>
         </div>
 
@@ -161,7 +161,7 @@
       <section class="rounded-panel border border-hairline bg-surface px-7 py-6.5">
         <div class="mb-4.5 flex items-baseline justify-between">
           <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("my_learning.badges_title") %></h2>
-          <span class="text-13 text-muted-2"><%= t("my_learning.badges_count") %></span>
+          <span class="text-13 text-muted-2"><%= t("my_learning.badges_count", earned: progress.awards_earned, total: progress.awards_total) %></span>
         </div>
 
         <ul class="grid grid-cols-3 gap-x-2.5 gap-y-5.5">

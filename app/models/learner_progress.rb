@@ -141,6 +141,54 @@ class LearnerProgress
     Array.new(ACTIVITY_DAYS) { [ counts[first + it], HOTTEST ].min }
   end
 
+  # ---- Projects and certificates ------------------------------------------
+  # A project is a syllabus topic of kind "project", and submitting one is
+  # applying it. Certificates follow the courses that carry the flag.
+
+  def projects_done = completions.count { it.applied? && project_keys.include?(it.topic_key) }
+  def projects_total = started_courses.sum { project_keys.size }
+
+  def certificates_earned = courses.count { it.certificate && it.completed? }
+  def certificates_total = courses.count(&:certificate)
+
+  # ---- Awards -------------------------------------------------------------
+  # Derived, never stored — the same trick as Syllabus locking: each award is a
+  # rule over the rows this class already holds, so earning one cannot drift
+  # from the work that earned it. Position joins `my_learning.awards`, which
+  # still owns every word.
+  #
+  # `forum_helper?` is the one rule with nothing to count: no forum records an
+  # answer, so the award stays honestly unearnable until one does.
+
+  AWARDS = [
+    { glyph: "◆", rule: :ten_topics? },
+    { glyph: "▲", rule: :first_project? },
+    { glyph: "✦", rule: :week_streak? },
+    { glyph: "❖", rule: :every_exercise? },
+    { glyph: "◈", rule: :module_in_a_day? },
+    { glyph: "✚", rule: :forum_helper? },
+    { glyph: "♦", rule: :passed_after_fails? },
+    { glyph: "☗", rule: :final_module? }
+  ].freeze
+
+  # The dashboard's smaller shelf shows the first six of the same awards — one
+  # list, two crops, so the two screens cannot disagree about what is earned.
+  DASHBOARD_BADGE_COUNT = 6
+
+  # "Persistent" asks for this many wrong answers before the pass.
+  PERSISTENT_FAILS = 3
+
+  def awards
+    @awards ||= I18n.t("my_learning.awards").each_with_index.map do |copy, index|
+      award = AWARDS[index]
+      { name: copy[:name], hint: copy[:hint], glyph: award[:glyph], earned: send(award[:rule]) }
+    end
+  end
+
+  def dashboard_badges = awards.first(DASHBOARD_BADGE_COUNT)
+  def awards_earned = awards.count { it[:earned] }
+  def awards_total = AWARDS.size
+
   # ---- Standing -----------------------------------------------------------
 
   # Rank among students by XP, ties broken by who got there first. Nil until the
@@ -152,16 +200,16 @@ class LearnerProgress
     self.class.standings.index { it.first == user.id }&.+(1)
   end
 
-  # The dashboard's four tiles. Three are counted; "projects submitted" is not —
-  # nothing records a project yet, so its value and its delta stay copy, and the
-  # locale file is where that shows.
+  # The dashboard's four tiles, every value counted. The projects tile's delta
+  # stays copy: it states where the number comes from, because nothing stores a
+  # deadline to count down to.
   def dashboard_stats
     copy = I18n.t("progress.stats")
 
     [
       copy[0].merge(value: learned.to_s, delta: delta("topics", learned_this_week)),
       copy[1].merge(value: hours_studied.to_s, delta: delta("hours", hours_this_week)),
-      copy[2],
+      copy[2].merge(value: "#{projects_done} / #{projects_total}"),
       copy[3].merge(value: rank ? "##{rank}" : "—")
     ]
   end
@@ -180,6 +228,68 @@ class LearnerProgress
 
   private
     def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round
+
+    # ---- The award rules --------------------------------------------------
+
+    def project_keys = @project_keys ||= Syllabus.topics.select { it.kind == "project" }.map(&:key).to_set
+    def exercise_keys = @exercise_keys ||= Syllabus.topics.select { it.kind == "exercise" }.map(&:key)
+
+    def ten_topics? = learned >= 10
+
+    def first_project? = projects_done.positive?
+
+    # The longest run ever, not the current streak — a streak once run stays
+    # earned even after it breaks.
+    def week_streak?
+      dates = active_dates.sort
+      return false if dates.empty?
+
+      longest = run = 1
+      dates.each_cons(2) do |a, b|
+        run = b == a + 1 ? run + 1 : 1
+        longest = [ longest, run ].max
+      end
+      longest >= 7
+    end
+
+    def every_exercise?
+      started_courses.any? { |course| exercise_keys.all? { keys_for(course.code).include?(it) } }
+    end
+
+    # Every topic of one module learned on the same day, in any course.
+    def module_in_a_day?
+      started_courses.any? do |course|
+        by_key = completions.select { it.course_code == course.code }.index_by(&:topic_key)
+
+        Syllabus.entries.map(&:number).any? do |number|
+          keys = Syllabus.keys_in(number)
+          keys.all? { by_key[it] } &&
+            keys.map { by_key[it].learned_at.in_time_zone.to_date }.uniq.one?
+        end
+      end
+    end
+
+    # No forum records an answer yet; see the note above AWARDS.
+    def forum_helper? = false
+
+    # A pass that took persistence: the same task failed PERSISTENT_FAILS times
+    # before the submission that made it. Counted off submissions, which is why
+    # the failures are kept.
+    def passed_after_fails?
+      own_submissions.group_by { [ it.topic_id, it.kind ] }.any? do |_task, tries|
+        first_pass = tries.index(&:passed?)
+        first_pass && first_pass >= PERSISTENT_FAILS
+      end
+    end
+
+    def final_module?
+      last = Syllabus.entries.map(&:number).max
+      started_courses.any? { |course| Syllabus.keys_in(last).all? { keys_for(course.code).include?(it) } }
+    end
+
+    def own_submissions
+      @own_submissions ||= user ? user.submissions.order(:created_at, :id).to_a : []
+    end
 
     # "+0 this week" reads as a broken counter rather than as a quiet week.
     def delta(kind, count)

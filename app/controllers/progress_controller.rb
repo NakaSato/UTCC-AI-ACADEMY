@@ -3,6 +3,6 @@ class ProgressController < ApplicationController
     @stats = progress.dashboard_stats
     @activity = progress.activity
     @enrolments = progress.courses_for(:progress)
-    @badges = LearnerProfile.dashboard_badges
+    @badges = progress.dashboard_badges
   end
 end
