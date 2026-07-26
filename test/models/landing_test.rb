@@ -59,6 +59,21 @@ class LandingTest < ActiveSupport::TestCase
     assert_equal I18n.t("landing.tracks.ongoing"), ongoing.duration
   end
 
+  # The date lives in Ruby and the words live in the locale files, which gives the
+  # two a way to disagree — and only the structured data would notice. English is
+  # the half that parses, since Thai writes the Buddhist year, so English is where
+  # they are held to each other.
+  test "a dated event's copy says the same day its data does" do
+    dated = Landing.events.select(&:dated?)
+
+    assert dated.any?, "expected at least one event with a date"
+    I18n.with_locale(:en) do
+      dated.each do |event|
+        assert_equal Date.parse(event.starts_on), Date.parse(event.when_label), event.key
+      end
+    end
+  end
+
   test "the level filter reuses the shared level names" do
     filters = Landing.track_filters
 

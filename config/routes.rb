@@ -31,6 +31,13 @@ Rails.application.routes.draw do
   get "privacy", to: "policies#privacy", as: :privacy
   get "terms", to: "policies#terms", as: :terms
 
+  # What a crawler reads before it reads a page. Rendered rather than checked into
+  # public/ because each one has to name absolute URLs and only the request knows
+  # the host — see CrawlersController.
+  get "robots.txt", to: "crawlers#robots", as: :robots, defaults: { format: :text }
+  get "sitemap.xml", to: "crawlers#sitemap", as: :sitemap, defaults: { format: :xml }
+  get "llms.txt", to: "crawlers#llms", as: :llms, defaults: { format: :text }
+
   # The app proper. Everything here requires a session — see the Authentication
   # concern, which adds `before_action :require_authentication` globally.
   resources :courses, only: :show, param: :code

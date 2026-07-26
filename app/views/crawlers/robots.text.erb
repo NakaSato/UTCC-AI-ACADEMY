@@ -1,0 +1,14 @@
+<%# `Allow: /` next to the disallowed paths is not a contradiction: the longest
+    matching rule wins, so `/login` beats `/`. It is there to state the default
+    rather than leave it implied.
+
+    The blank line between the groups is for a human — a `User-agent` line after a
+    rule already starts a new record — and the second group's agents are stacked
+    because consecutive `User-agent` lines share one set of rules. %>
+User-agent: *
+<%= render "rules" %>
+<% @agents.each do |agent| %>
+User-agent: <%= agent %>
+<% end %>
+<%= render "rules" %>
+Sitemap: <%= @sitemap_url %>

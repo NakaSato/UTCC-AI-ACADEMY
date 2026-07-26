@@ -5,7 +5,11 @@
 <% page_title       = content_for(:title).presence || t("meta.title") %>
 <% page_description = content_for(:description).presence || t("meta.description") %>
 <% page_image       = content_for(:meta_image).presence || "#{request.base_url}/icon.png" %>
-<% canonical_url    = "#{request.base_url}#{request.path}" %>
+<%# The canonical is the URL of *this* translation, not of the path — the whole
+    point of ?lang= is that the English page is a page rather than a rendering
+    of the Thai one. Query strings other than the language are screen state and
+    are deliberately dropped: /leaderboard?tab=week is one page, not three. %>
+<% canonical_url    = locale_url(I18n.locale) %>
 
 <title><%= page_title %></title>
 <meta name="title" content="<%= page_title %>">
@@ -15,10 +19,21 @@
 
 <link rel="canonical" href="<%= canonical_url %>">
 
+<%# Every translation, this one included — an hreflang set that does not name
+    itself is discarded whole. x-default points at Thai: it is what a visitor
+    with no matching language gets, which is the same rule switch_locale uses. %>
+<% locale_urls.each do |locale, url| %>
+<link rel="alternate" hreflang="<%= locale %>" href="<%= url %>">
+<% end %>
+<link rel="alternate" hreflang="x-default" href="<%= locale_url(I18n.default_locale) %>">
+
 <%# Open Graph / Facebook %>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UTCC AI Academy">
 <meta property="og:locale" content="<%= t("meta.og_locale") %>">
+<% (I18n.available_locales - [ I18n.locale ]).each do |locale| %>
+<meta property="og:locale:alternate" content="<%= t("meta.og_locale", locale: locale) %>">
+<% end %>
 <meta property="og:url" content="<%= canonical_url %>">
 <meta property="og:title" content="<%= page_title %>">
 <meta property="og:description" content="<%= page_description %>">
@@ -31,10 +46,13 @@
 <meta property="twitter:description" content="<%= page_description %>">
 <meta property="twitter:image" content="<%= page_image %>">
 
-<%= tag.script type: "application/ld+json" do %>
-  <%= raw JSON.pretty_generate({
+<%# The school itself, on every page. It carries an @id so a page's own documents
+    — the landing page's course list, below — can name the provider by reference
+    instead of repeating the address on each of them. %>
+<%= json_ld({
         "@context" => "https://schema.org",
         "@type" => "EducationalOrganization",
+        "@id" => organization_id,
         "name" => t("meta.org_name"),
         "alternateName" => t("meta.org_alt_name"),
         "url" => request.base_url,
@@ -53,4 +71,7 @@
         },
         "description" => page_description
       }) %>
-<% end %>
+
+<%# Whatever else this page has to declare — see SchemaHelper. Templates render
+    before their layout, so a content_for in the body still lands in <head>. %>
+<%= yield :schema %>

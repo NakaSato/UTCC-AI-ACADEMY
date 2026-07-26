@@ -1,0 +1,51 @@
+<%# The prose here is English and lives in the template rather than in a locale
+    file, because unlike every other screen this file has exactly one language —
+    see CrawlersController#llms. Everything named below comes from `Landing`, so
+    a card added to the landing page shows up here without a second edit. %>
+# UTCC AI Academy
+
+> <%= t("meta.description") %>
+
+The site is Thai-first. A bare URL is Thai, and `?lang=en` on any of them is the
+same page in English — the links below are the English ones. A browser sending
+`Accept-Language` gets the language it asked for without the parameter.
+
+Only the pages listed under Pages are readable without an account. The rest of the
+site — the course catalog, the lessons, a learner's progress and the leaderboard —
+is a private area for enrolled students and answers a redirect to the home page.
+
+It is run by the <%= t("meta.org_name") %>.
+
+## Pages
+
+- [Home](<%= locale_url(:en, path: root_path) %>): what the academy is, the topics it covers, the learning tracks, projects from students, upcoming events, and a FAQ.
+- [Privacy notice](<%= locale_url(:en, path: privacy_path) %>): what student data is collected and why, under Thailand's PDPA.
+- [Terms of use](<%= locale_url(:en, path: terms_path) %>): the terms a student accepts when signing up.
+
+## What it teaches
+
+<% Landing.topics.each do |topic| %>
+- **<%= topic.title %>**: <%= topic.blurb %>
+<% end %>
+
+## Learning tracks
+
+<% Landing.tracks.each do |track| %>
+- **<%= track.title %>** (<%= track.level_label %>, <%= track.duration %>): <%= track.blurb %>
+<% end %>
+
+## Events
+
+<% Landing.events.each do |event| %>
+- **<%= event.title %>** — <%= event.when_label %>, <%= event.where_label %>
+<% end %>
+
+## Questions students ask
+
+<% Landing.faqs.each do |question| %>
+- **<%= question.question %>** <%= question.answer %>
+<% end %>
+
+## Optional
+
+- [Sitemap](<%= sitemap_url %>): every publicly readable URL.

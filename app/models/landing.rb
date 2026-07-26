@@ -28,7 +28,14 @@ module Landing
   TRACK_FILTERS = %i[ all beginner intermediate advanced ].freeze
 
   SHARES = %i[ chatbot free_tools neural_net ].freeze
-  EVENTS = %i[ study_jam workshop show_and_tell ].freeze
+
+  # The calendar date, where there is one. The copy carries when an event happens
+  # in words — and in two calendars, since Thai writes the Buddhist year — which
+  # reads well and parses as nothing; this is the same fact in the form a crawler
+  # can use. `nil` for the two that recur rather than happen once, and a date
+  # nobody can name is left unnamed rather than guessed at.
+  EVENTS = { study_jam: nil, workshop: "2026-08-08", show_and_tell: nil }.freeze
+
   FAQS   = %i[ no_background homework share_project other_faculties ].freeze
 
   Topic = Data.define(:key) do
@@ -55,10 +62,13 @@ module Landing
     def date = I18n.t("landing.shares.#{key}.date")
   end
 
-  Event = Data.define(:key) do
+  Event = Data.define(:key, :starts_on) do
     def title = I18n.t("landing.events.items.#{key}.title")
     def when_label = I18n.t("landing.events.items.#{key}.when")
     def where_label = I18n.t("landing.events.items.#{key}.where")
+
+    # A recurring event has no one date, so it has nothing to publish.
+    def dated? = starts_on.present?
   end
 
   Question = Data.define(:key) do
@@ -79,7 +89,7 @@ module Landing
 
     def shares = SHARES.map { Share.new(key: it) }
 
-    def events = EVENTS.map { Event.new(key: it) }
+    def events = EVENTS.map { |key, starts_on| Event.new(key:, starts_on:) }
 
     def faqs = FAQS.map { Question.new(key: it) }
   end

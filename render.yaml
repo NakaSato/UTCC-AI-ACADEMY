@@ -1,0 +1,65 @@
+# Render blueprint — the second deploy target, beside Kamal in config/deploy.yml.
+# Both run the same Dockerfile; what differs is who terminates TLS and where the
+# storage/ volume comes from. Sync this file with the dashboard via
+# https://dashboard.render.com/blueprints rather than editing the service by hand,
+# so the disk and the port pair below cannot drift out of the repo.
+
+services:
+  - type: web
+    name: utcc-ai-academy
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    branch: main
+    autoDeploy: true
+
+    # The database is a file, and SQLite takes one writer. A second instance would
+    # be a second process writing the same file over a shared mount — keep this at 1.
+    # Scaling out means leaving SQLite, not raising this number.
+    numInstances: 1
+
+    # A disk requires a paid instance type; on a free one storage/ is ephemeral and
+    # every deploy starts from an empty database.
+    plan: starter
+
+    # config/database.yml puts four SQLite files under storage/ — the primary plus
+    # the solid_cache, solid_queue and solid_cable databases. Without this mount the
+    # entrypoint's `db:prepare` recreates all four on each deploy and every user,
+    # session and topic_completion is gone. Same volume Kamal declares in deploy.yml.
+    disk:
+      name: storage
+      mountPath: /rails/storage
+      sizeGB: 1
+
+    # /up is excluded from the http-to-https redirect in production.rb, which is what
+    # lets Render reach it from inside the network.
+    healthCheckPath: /up
+
+    # Render issues the certificate and terminates TLS here; this name has to match
+    # `config.hosts` in production.rb or the app answers 403 to its own domain.
+    # Point academy.boring9.dev at the service with the CNAME Render shows once the
+    # blueprint syncs — the certificate is only issued after that resolves.
+    domains:
+      - academy.boring9.dev
+
+    envVars:
+      # Decrypts config/credentials.yml.enc, which is where secret_key_base lives.
+      # config/master.key is gitignored and so is not in the image; without this the
+      # entrypoint's `db:prepare` aborts before the server ever starts.
+      # sync: false means the value is set in the dashboard, never committed here.
+      - key: RAILS_MASTER_KEY
+        sync: false
+
+      # Thruster fronts Puma. HTTP_PORT is the port Thruster itself listens on and
+      # PORT is how Render knows where to route; they have to agree. Thruster then
+      # hands Puma its own PORT (TARGET_PORT, 3000) inside the container.
+      - key: HTTP_PORT
+        value: 10000
+      - key: PORT
+        value: 10000
+
+      # Run the Solid Queue supervisor inside Puma — read by config/puma.rb. The only
+      # enqueued work in the app is the password-reset email, so it does not earn a
+      # worker service of its own.
+      - key: SOLID_QUEUE_IN_PUMA
+        value: true

@@ -1,0 +1,5 @@
+<%# Rendered once per user-agent group, so the two groups cannot drift apart. %>
+Allow: /
+<% @disallowed.each do |path| %>
+Disallow: <%= path %>
+<% end %>

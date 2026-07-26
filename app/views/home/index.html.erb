@@ -1,5 +1,14 @@
 <% content_for :title, "UTCC AI Academy — #{t("landing.hero.headline")}" %>
 
+<%# What is worth quoting back to somebody who asked a search engine rather than
+    the page: the tracks, the answers in the FAQ, and any event with a date on
+    it. All three are the same values the sections below render. %>
+<% content_for :schema do %>
+  <%= json_ld course_list_schema(Landing.tracks, url: "#{root_url}#tracks") %>
+  <%= json_ld faq_schema(Landing.faqs) %>
+  <%= json_ld event_list_schema(Landing.events, url: "#{root_url}#events") %>
+<% end %>
+
 <section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-surface">
   <div class="flex max-w-7xl flex-col items-center gap-4 p-4">
     <%# The UTCC ENG lockup is a white logo on transparency — it sits directly on

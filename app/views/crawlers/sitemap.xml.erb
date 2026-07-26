@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%# Every page appears once per language, and each entry names the whole set —
+    including itself, since an hreflang cluster that does not is thrown away. The
+    Thai URL is the bare path and the x-default, matching switch_locale: Thai is
+    what a visitor gets when nothing they asked for matches.
+
+    No <lastmod> and no <changefreq>: nothing in the app records when a page last
+    changed, and a made-up date is worse than no date. Both are optional. %>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<% @paths.each do |path| %>
+<% alternates = locale_urls(path: path) %>
+<% alternates.each_value do |url| %>
+  <url>
+    <loc><%= url %></loc>
+<% alternates.each do |locale, alternate| %>
+    <xhtml:link rel="alternate" hreflang="<%= locale %>" href="<%= alternate %>"/>
+<% end %>
+    <xhtml:link rel="alternate" hreflang="x-default" href="<%= alternates.fetch(I18n.default_locale) %>"/>
+  </url>
+<% end %>
+<% end %>
+</urlset>

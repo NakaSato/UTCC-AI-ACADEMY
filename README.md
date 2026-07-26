@@ -95,6 +95,8 @@ Thai is the default locale, English the fallback, and the toggle lives in the he
 
 The toggle posts to `POST /language/:locale` rather than linking to it: Turbo prefetches links on hover, and a GET would switch language just by pointing at the button.
 
+A visitor who has not touched the toggle gets whichever language their browser asks for, and adding `?lang=en` to any URL renders that page in English without changing the setting — which is how a search engine finds the English half of a site whose language is otherwise a session setting.
+
 ## Design
 
 Crimson `#A81E32` on cream, IBM Plex Sans Thai, Tailwind v4 through `tailwindcss-rails` (still no Node, no npm).
@@ -155,7 +157,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | Background jobs | `solid_queue` | in-process under Puma |
 | Cache | `solid_cache` | |
 | WebSockets | `solid_cable` | nothing uses it yet |
-| Deploy | Kamal + Docker | `config/deploy.yml` |
+| Deploy | Docker, via Kamal or Render | `config/deploy.yml`, `render.yaml` — one image, two targets |
 | Tests | Minitest (**not** RSpec), parallel | Capybara + selenium present, unused |
 | Lint / security | `rubocop-rails-omakase`, Brakeman, bundler-audit, `importmap audit` | all wired into `bin/ci` |
 
@@ -339,10 +341,25 @@ get   "instructor"     => "instructor#show"
 get   "admin"          => "admin#show"          # ?tab=features|overview|users|courses|queue|audit
 patch "admin/users/:id" => "admin#update"
 get   "up"             => "rails/health#show"
+
+get "privacy"     => "policies#privacy"         # public — the PDPA notice
+get "terms"       => "policies#terms"           # public — terms of use
+get "robots.txt"  => "crawlers#robots"          # public — rendered, not a file in public/
+get "sitemap.xml" => "crawlers#sitemap"
+get "llms.txt"    => "crawlers#llms"
+
 root "home#index"                               # catalog / admin / landing
 ```
 
 The generator's old auth URLs (`/session/new`, `/passwords/:token/edit`, …) survive only as `redirect()`s so reset links already in inboxes still resolve; nothing in the app links to them.
+
+### What a crawler reads
+
+The last three are for machines, and they are rendered rather than checked into `public/` because each one has to name absolute URLs and the app has no configured host — only the request knows where the site lives. `CrawlersController::DISALLOWED` is the private half of the app written out for `robots.txt`, and the sitemap is tested against it so a path can never be advertised and closed at once; `layouts/auth` adds `noindex, nofollow` on top, because robots.txt stops a crawl but not an indexing. `AI_AGENTS` names the model crawlers and hands them the wildcard group's rules verbatim; a group written by name replaces the wildcard rather than adding to it, so repeating the rules is what keeps them equal. `llms.txt` is the one page in the app with a single language — it is always English, because it is read by models rather than by students — and everything in it comes from `Landing`.
+
+The sitemap lists every page **once per language**, and each entry names the whole hreflang set including itself, since a cluster that does not name itself is discarded rather than read partially. `shared/_meta` publishes the same set as `<link rel="alternate">` with an `x-default` pointing at Thai, and a page's canonical is the URL of that translation rather than of the path.
+
+Pages also publish JSON-LD: the school on every page from `shared/_meta`, and on the landing page a `FAQPage`, an `ItemList` of `Course` and an `ItemList` of `Event`, added with `content_for :schema` (see `SchemaHelper`). All of it is built from the same reader methods the sections on screen use, so it is translated with the page. Only events with a date in `Landing::EVENTS` are published — `Event` without a `startDate` is invalid rather than vague, and "every Wednesday" is not a date.
 
 ## Views and layouts
 
@@ -382,16 +399,31 @@ config.i18n.available_locales = %i[ th en ]
 config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders English rather than raising
 ```
 
-`ApplicationController#switch_locale` is an `around_action` reading `session[:locale]`; `LanguagesController#update` writes it. The route constraint `/th|en/` means an unsupported locale 404s at the router and never reaches `I18n`. The toggle partial takes a `dark:` local because it renders both on chrome and on light surfaces.
+`ApplicationController#switch_locale` is an `around_action`, and three sources decide which language a page renders in — **`?lang=`, then `session[:locale]`, then the browser's `Accept-Language`**, with Thai only when none of them match. The toggle writes the session one through `LanguagesController#update`, whose route constraint `/th|en/` means an unsupported locale 404s at the router and never reaches `I18n`. The toggle partial takes a `dark:` local because it renders both on chrome and on light surfaces.
+
+`?lang=` is read for one request and never written to the session. It exists so each translation has a URL of its own — one that can be linked, canonicalised and paired in an hreflang — and `ApplicationHelper#locale_url` is the only place that builds them: the default locale keeps the bare path, so `/` is Thai and `/?lang=en` is the same page in English. Making the param stick would reintroduce the problem the POST toggle route exists to avoid, since Turbo prefetches links on hover.
 
 ## Infrastructure
 
 - In production the solid_* adapters live in **separate SQLite databases** (`storage/production_{queue,cache,cable}.sqlite3`), declared as extra entries under `production:` in `config/database.yml`, each with its own `migrations_paths`. Their schemas are `db/{queue,cache,cable}_schema.rb` — **do not fold these into `db/schema.rb`**.
 - Development and test use a single `storage/development.sqlite3` / `storage/test.sqlite3`; the solid_* adapters are only wired up in `config/environments/production.rb`.
 - Workers run **in-process**: `config/puma.rb` loads `plugin :solid_queue` when `SOLID_QUEUE_IN_PUMA` is set, which `config/deploy.yml` sets. `bin/jobs` runs the supervisor standalone; recurring jobs go in `config/recurring.yml`.
-- `storage/` is a persistent Docker volume — that is where the production SQLite files live.
+- `storage/` is a persistent Docker volume — that is where the production SQLite files live. **A deploy target that does not mount it has no database that outlives a push**: `bin/docker-entrypoint` runs `db:prepare` before the server, so an unmounted `storage/` is silently recreated empty on every release, taking the users, sessions and completions with it.
 - `assets:precompile` builds Tailwind first, so the Dockerfile needs no extra step.
-- `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`. `config/deploy.yml` still carries the placeholder server `192.168.0.1` and registry `localhost:5555`.
+- `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`, and `secret_key_base` is in there — so the variable is not optional in production, it is what lets the app boot at all. `config/master.key` is gitignored and therefore never in the image; the target has to supply the value. `config/deploy.yml` still carries the placeholder server `192.168.0.1` and registry `localhost:5555`.
+- **`config.assume_ssl` and `config.force_ssl` are on in production**, which makes `proxy: ssl: true` in `deploy.yml` part of the same decision rather than an option. Kamal's proxy terminates TLS and speaks http to Thruster, so without `assume_ssl` Rails believes every request arrived unencrypted — and `request.base_url` is what builds every canonical, hreflang and sitemap URL the app publishes. `/up` is excluded from the https redirect so the proxy and uptime monitors can still reach it.
+- **The production site is `https://academy.boring9.dev`**, and that name is written down in three places that have to agree: `config.hosts` (what the app will answer to), `config.action_mailer.default_url_options` (the only URLs not built from a request — the password-reset link) and `domains:` in `render.yaml` (what Render issues a certificate for). A mismatch between the first and the third is a 403 on your own domain, not a redirect.
+- Still to fill in: **SMTP**. `config.action_mailer.smtp_settings` is commented out, so the password-reset mail is composed and enqueued and then goes nowhere — the one user-facing feature that is not actually working in production. `ApplicationMailer`'s `from:` is `no-reply@academy.boring9.dev`, which will need to be an address the eventual provider is allowed to send as.
+- Kamal's own placeholders are untouched — `servers.web` is still `192.168.0.1`, the registry `localhost:5555`, and the `proxy` block still commented. That is fine while Render is the live target; it does mean `config/deploy.yml` is not a description of where the site runs.
+
+### Render
+
+`render.yaml` is a blueprint for the same Dockerfile, kept in the repo so the two settings that are easy to get wrong cannot drift into the dashboard:
+
+- the **disk** mounted at `/rails/storage`, which needs a paid instance type — a free one has no disk option, and see the `storage/` note above for what that costs;
+- the **port pair**, `HTTP_PORT` and `PORT`, both `10000`. `HTTP_PORT` is what Thruster listens on and `PORT` is how Render knows where to route; Thruster then hands Puma its own `PORT` (3000) inside the container, so setting only one of the two leaves Render routing to a port nothing is bound to.
+
+`RAILS_MASTER_KEY` is declared `sync: false` — Render prompts for it and stores it, and it is never written to this file. `numInstances` stays at 1 because SQLite takes one writer. Render terminates TLS itself and forwards `X-Forwarded-Proto`, so `assume_ssl` is as correct here as it is behind Kamal's proxy.
 
 ## Tests and CI
 
@@ -404,6 +436,10 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `controllers/lesson_completion_test.rb` | the browser-to-record seam, and that a completion then shows on the screens that count it |
 | `controllers/registrations_controller_test.rb` | sign-up, including that `:role` can never be mass-assigned |
 | `controllers/languages_controller_test.rb` | the locale switch sticks across requests; an unroutable locale 404s |
+| `controllers/locale_negotiation_test.rb` | which of `?lang=`, the session and `Accept-Language` wins, and that `?lang=` never sticks |
+| `controllers/crawlers_test.rb` | robots.txt, the sitemap and llms.txt agree about what is public |
+| `controllers/indexing_test.rb` | canonicals, the hreflang set, and which pages ask not to be indexed |
+| `controllers/structured_data_test.rb` | the JSON-LD each page publishes, in both locales |
 | `models/placeholder_content_test.rb` | derived values and the positional locale wiring, in **both** locales |
 | `models/learner_progress_test.rb`, `topic_completion_test.rb` | every counted figure, and what the table will and will not accept |
 | `tasks/admin_task_test.rb` | `admin:create`, including promotion of an existing account |

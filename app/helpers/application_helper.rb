@@ -1,4 +1,23 @@
 module ApplicationHelper
+  # A page in one language. Language is a session setting, so without this every
+  # translation of a page shares one URL — and a URL that cannot be linked cannot
+  # be canonicalised, put in an hreflang pair or listed in a sitemap.
+  #
+  # The default locale keeps the bare path: `/` is Thai and stays the URL everyone
+  # already links to, while English is `/?lang=en`. The param is read for the
+  # length of one request and never written to the session — see
+  # ApplicationController#requested_locale.
+  def locale_url(locale, path: request.path)
+    url = "#{request.base_url}#{path}"
+    locale.to_sym == I18n.default_locale ? url : "#{url}?lang=#{locale}"
+  end
+
+  # Every translation of a page, including the one being rendered — an hreflang
+  # set has to name itself or search engines discard the whole cluster.
+  def locale_urls(path: request.path)
+    I18n.available_locales.index_with { locale_url(it, path:) }
+  end
+
   # The dark header's primary nav. `Course` and `Lesson` are shortcuts into
   # AI1101 — the course a student is currently working through.
   #

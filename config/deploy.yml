@@ -18,6 +18,11 @@ servers:
 #
 # Using an SSL proxy like this requires turning on config.assume_ssl and config.force_ssl in production.rb!
 #
+# Both of those are already on — see the note beside them. This block is the other
+# half, and until it is filled in with the real host the app has no https to
+# assume: every canonical, hreflang and sitemap URL it publishes is built from
+# the scheme and host of the request that asked for it.
+#
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
 # proxy:

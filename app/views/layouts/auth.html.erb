@@ -2,6 +2,12 @@
 <html lang="<%= I18n.locale %>">
   <head>
     <%= render "shared/head" %>
+
+    <%# robots.txt stops the crawl; this stops the indexing. A disallowed path
+        linked from somewhere else can still be listed as a bare URL, and a
+        sign-in form is never the answer to anything anyone searched for. Every
+        screen on this layout is one — see CrawlersController::DISALLOWED. %>
+    <meta name="robots" content="noindex, nofollow">
   </head>
 
   <%# The auth screens carry no app chrome: the ink panel on the left is the

@@ -75,7 +75,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 ```
 
 - **Views call reader methods and nothing else.** No queries, no `I18n.t` for content (they ask `course.title`, which does the lookup). A view that reaches past its assigned object is the smell that a module is missing a method.
-- **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`. **`HomeController#landing` is the one exception** — see "The landing page is the exception to both rules" below before touching it.
+- **Controllers hold no domain logic.** Read a param, validate it against a whitelist, ask a module, assign. If a controller grows a calculation, it belongs on the `Data` object or in `LearnerProgress`.
 - **`Data` objects are the presenters.** There is no presenter/serializer/service-object layer, and adding one would duplicate what `Data.define … do … end` already does.
 - **The taxonomy is a table, and the modules read it.** `CourseCatalog` and `Syllabus` fold `courses`, `course_modules` and `topics` into the same `Data` objects they used to build from constants, so the views never learned the difference. `TopicCompletion` and `Submission` point at those rows with foreign keys, which is what the string validations became.
 - **The bridges are few and named.** `LearnerProgress` (a learner's rows → every figure a learner screen shows), `InstructorReport` (a section's rows → the Teaching console) and `Leaderboard` (a scope's rows → ranked entries) are the only classes that read records and return value objects. Each folds one query set in Ruby. Keep the list this short — a new screen belongs behind one of them, not behind a fourth.
@@ -86,7 +86,7 @@ browser ──▶ routes ──▶ controller ──▶ ┌─ content module �
 | --- | --- | --- |
 | Screen state — filter, lesson step, tab, selected map node | the **query string** | reload, bookmark, sharing |
 | Who you are | signed `httponly` cookie holding a `sessions` row id, `same_site: :lax` | permanent when "remember me", browser session otherwise |
-| Language | `session[:locale]` | the session |
+| Language | `session[:locale]`, or `?lang=` for one request, or `Accept-Language` | the session; `?lang=` survives nothing on purpose |
 | Learning progress | `topic_completions` | forever |
 | Identity and role | `users` | forever |
 | Cohort membership — who is in which section, who teaches it | `sections`, `enrollments` | forever |
@@ -172,14 +172,13 @@ The split is deliberate and consistent:
 - **Ruby holds numbers, taxonomy and shape** — course codes, percentages, the tree structure, which module is locked.
 - **`config/locales/{th,en}.yml` holds every word a human reads** — everywhere behind the login. The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
 
-### The landing page is the exception to both rules
+### The landing page
 
-`app/views/home/index.html.erb` and `HomeController#landing` break the pattern the rest of the app follows, and they are the likeliest place to waste time looking for a module or a locale key that does not exist:
+`app/views/home/index.html.erb` used to be the exception to both rules above — two dozen lines of hardcoded Thai in the ERB and five arrays of it in a private `HomeController#landing`. It is not any more. `Landing` holds the taxonomy, `landing.*` in both locale files holds every word, and the view reads `Landing` directly rather than through assigns, the same way the header reads `LearnerProfile`. `HomeController#index` therefore assigns nothing when it renders it.
 
-- **Its copy is hardcoded Thai, not I18n.** The view calls `t` for none of its own text — two dozen-odd lines of Thai sit inline in the ERB, and five more arrays of it (`@topics`, `@tracks`, `@shares`, `@events`, `@faqs`) are literals in the controller's private `landing` method. **The landing page body is therefore Thai-only**, which is why `shared/_header` carries no language toggle — it would offer a switch that changes almost nothing on the page. The `landing.*` namespace in the locale files covers only that marketing header and the footer chrome.
-- **It is the only controller holding content.** Nothing in `app/models/` describes the landing page, so "add a section to the landing page" means editing the controller and the view, not a placeholder module.
+**Its joins are by key, not by position** — unlike every module listed below. A card looks up its own copy by name, so adding one to `Landing::TOPICS` without writing its copy renders a missing translation instead of silently shifting the card after it.
 
-Both are the same debt as the rest of the placeholder content, just parked one layer higher. Moving that copy into locale files (and the arrays into a module, if it earns one) is the fix; until then do not read the "no copy in controllers" and "no words outside locales" rules as describing this file.
+The one thing still held in Ruby beyond the taxonomy is `Landing::EVENTS`, which maps each event to a calendar date or `nil`. The copy says when an event happens in words, and in two calendars; the date is the same fact in the form the structured data can use. See "What a crawler reads".
 
 **Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `LearnerProgress::AWARDS[i]` with `my_learning.awards[i]` (rule and glyph on one side, name and hint on the other), `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
@@ -230,10 +229,12 @@ Denominators come from `Syllabus`, not from per-course numbers: `Syllabus.topic_
 ## Internationalisation
 
 - `config/application.rb`: `default_locale = :th`, `available_locales = %i[th en]`, `fallbacks = [:en]` — a key missing from `th.yml` renders the English rather than raising.
-- `ApplicationController` has `around_action :switch_locale`, which reads `session[:locale]`. `LanguagesController#update` writes it.
+- `ApplicationController` has `around_action :switch_locale`, and **three sources decide, most specific first: `?lang=`, then `session[:locale]`, then `Accept-Language`.** Thai is only the answer when none of them match. `LanguagesController#update` writes the session one.
 - The route is **POST** `language/:locale` with a `/th|en/` constraint. It is POST on purpose: Turbo prefetches links on hover, and a GET would switch language just by pointing at the toggle. The constraint means an unsupported locale 404s at the router and never reaches `I18n`.
+- **`?lang=` deliberately does not persist.** It exists so each translation has a URL that can be linked, canonicalised and paired in an hreflang — `ApplicationHelper#locale_url` is the one place that builds them, and the default locale keeps the bare path, so `/` stays Thai and `/?lang=en` is the English page. A param that wrote the session would reintroduce exactly the prefetch problem the POST route avoids.
+- **`Accept-Language` is parsed in quality order** and matched on the primary subtag, so `th-TH` answers Thai and `en-GB` English. This is what a crawler gets, since it has no session and never sees the toggle.
 - `th.yml` and `en.yml` are 1:1 in structure — add a key to both. Some values are **arrays consumed by index** (see above); keep their length and order identical across the two files.
-- The toggle partial (`shared/_language_toggle`) has exactly two render sites — `shared/_app_header` (signed in) and `shared/_auth_hero` (the auth screens, which pass `dark: true`). It takes that `dark:` local because it sits on the chrome field in one place and on a light surface in the other. The marketing header does not render it at all.
+- The toggle partial (`shared/_language_toggle`) has three render sites — `shared/_app_header` (signed in), `shared/_auth_hero` and `shared/_header` (the marketing chrome), the last two passing `dark: true`. It takes that local because it sits on the chrome field in two places and on a light surface in the other.
 
 ## Routing and layouts
 
@@ -248,6 +249,9 @@ get "leaderboard" => "leaderboards#show"        # ?tab=week|semester|university
 get "instructor"  => "instructor#show"
 get "privacy"     => "policies#privacy"         # public — the PDPA notice
 get "terms"       => "policies#terms"           # public — terms of use
+get "robots.txt"  => "crawlers#robots"          # public — rendered, not a file in public/
+get "sitemap.xml" => "crawlers#sitemap"         # public — the three readable pages
+get "llms.txt"    => "crawlers#llms"            # public — the site in English, for a model
 get "admin"       => "admin#show"               # ?tab=features|overview|users|courses|queue|audit
 patch "admin/users/:id" => "admin#update"       # admin_user_path — the only role grant in the app
 root "home#index"                               # catalog signed in, /admin for an admin, landing when not
@@ -262,6 +266,17 @@ Two layouts:
 
 `shared/_head` is shared by both layouts — the layouts differ only in what wraps `<body>`.
 
+### What a crawler reads
+
+`robots.txt`, `sitemap.xml` and `llms.txt` are **rendered by `CrawlersController`, not checked into `public/`** — all three have to name absolute URLs and the app has no configured host (`config/deploy.yml` is still a placeholder), so the only thing that knows where the site lives is the request. A static `public/robots.txt` would be served first and the action would never run, which is why it was deleted rather than kept as a fallback.
+
+- **`DISALLOWED` is the private half of the app spelled out**, and `test/controllers/crawlers_test.rb` asserts the sitemap against it — a path cannot be advertised and closed at the same time. robots.txt stops the crawl and `layouts/auth` adds `noindex, nofollow` to stop the indexing, since a disallowed path linked from elsewhere can still be listed as a bare URL.
+- **The sitemap lists every page once per language**, each entry naming the whole hreflang set including itself — a cluster that does not name itself is discarded rather than read partially. `shared/_meta` publishes the same set as `<link rel=alternate>` plus an `x-default` pointing at Thai, and the canonical is the URL of *that translation* rather than of the path.
+- **`AI_AGENTS` names the model crawlers** and gives them the wildcard group's rules verbatim; both groups render the same `_rules` partial. A group written by name *replaces* the wildcard rather than adding to it, so repeating the rules is the only way to keep the two equal.
+- **`llms.txt` is the one page with a single language.** `#llms` forces `I18n.with_locale(:en)` whatever the session says, because the file is read by models rather than by students, and it says so in its own first paragraph. Everything it lists comes from `Landing`, so a card added to the landing page shows up there without a second edit.
+
+Structured data is `SchemaHelper` plus `yield :schema` in `shared/_meta`. Every page carries the `EducationalOrganization`; a template adds its own documents with `content_for :schema` — the landing page publishes an `ItemList` of `Course`, a `FAQPage` and an `ItemList` of `Event`, all built from `Landing` and so all translated with the page. Two `ItemList`s on one page are told apart by `name`, which is the heading of the section they came from. Only the events with a `Landing::EVENTS` date are published: `Event` without a `startDate` is invalid rather than vague, and "every Wednesday" is not a date. Templates render before their layout, which is what lets a `content_for` in the body land in `<head>`. Each course names its provider as an `@id` reference to the organization rather than repeating the address, and carries no `offers`: the tracks have no price in this codebase, and inventing a free one to earn a richer search result would be a claim nothing here backs.
+
 ## Architecture notes
 
 **All infrastructure is SQLite + database-backed.** There is no Redis, Memcached, or separate job runner:
@@ -273,7 +288,11 @@ Two layouts:
 
 **Frontend is importmap + Hotwire, still no Node.** Add JS dependencies with `bin/importmap pin <pkg>` (writes to `config/importmap.rb`, vendors into `vendor/javascript`) — never npm/yarn. Stimulus controllers in `app/javascript/controllers/` are auto-registered via `pin_all_from`; the filename determines the identifier. Assets are served by Propshaft (no Sprockets manifest, no `app/assets/config/`). CSS is Tailwind v4 via `tailwindcss-rails`, which ships a standalone binary — no npm, no `package.json`, no PostCSS config.
 
-**Deployment is Kamal + Docker**, configured in `config/deploy.yml` (currently placeholder server `192.168.0.1` and registry `localhost:5555`). `storage/` is a persistent Docker volume — that's where the production SQLite files live. Thruster fronts Puma in the container. `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`.
+**Deployment is Kamal + Docker**, configured in `config/deploy.yml` (currently placeholder server `192.168.0.1` and registry `localhost:5555`). **`config.assume_ssl` and `config.force_ssl` are on**, so `proxy: ssl: true` in `deploy.yml` is not optional — the two are one decision. Without the proxy Rails sees plain http and `request.base_url` starts publishing `http://` canonicals, hreflangs and `<loc>`s for pages served over https. `/up` is excluded from the redirect, since the proxy and any uptime monitor reach it from inside the network. `storage/` is a persistent Docker volume — that's where the production SQLite files live. Thruster fronts Puma in the container. `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc` — and `secret_key_base` lives in there, so a target that does not set the variable fails in `bin/docker-entrypoint`'s `db:prepare` before the server starts, not later at a request.
+
+**There is a second target: `render.yaml`**, a blueprint over the same Dockerfile. It exists so three things stay in the repo rather than in a dashboard — the disk mounted at `/rails/storage` (paid instance types only; without it `db:prepare` recreates an empty database on every deploy), `numInstances: 1` (SQLite takes one writer), and the `HTTP_PORT`/`PORT` pair, which must agree because `HTTP_PORT` is Thruster's listening port and `PORT` is what tells Render where to route. Kamal and Render are alternatives, not layers: `config/deploy.yml` is untouched by a Render deploy and vice versa, and both rely on the same `assume_ssl` decision above.
+
+**The site is `https://academy.boring9.dev`**, and the name appears in exactly three places that must agree — `config.hosts`, `config.action_mailer.default_url_options` and `domains:` in `render.yaml`. `config.hosts` is a publishing control as much as a security one: `request.base_url` builds every canonical, hreflang and `<loc>`, so any name the app answers to is a name it can publish itself under. `/up` is excluded from host authorization as well as from the https redirect, since the platform health-checks it under an internal name. The mailer host is spelled out with `protocol: "https"` because there is no request to infer it from and `force_ssl` does not reach into a mailer. **SMTP is still not configured**, so the password-reset mail is enqueued and never delivered — the one broken user-facing path in production.
 
 Ruby style is modern and terse throughout — `Data.define` with endless methods, `class << self`, `it` as the implicit block parameter, pattern matching in `case/in`. Match it.
 
@@ -317,7 +336,8 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 - `test/controllers/lesson_completion_test.rb` — the browser-to-record seam, and that a completion then shows up on the screens that count it.
 - **`test/fixtures/topic_completions.yml` and `submissions.yml` are deliberately empty and must stay present.** Tests that need progress or an attempt make one; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users and topics they point at.
 - **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That is three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant`) and these. `taxonomy_test.rb` asserts the shape all three have to produce.
-- `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s.
+- `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s. `locale_negotiation_test.rb` covers the rest of the rule: which of `?lang=`, the session and `Accept-Language` wins, and that `?lang=` never persists.
+- The three that nothing on screen would catch — `crawlers_test.rb` (robots.txt, the sitemap and llms.txt agreeing about what is public), `indexing_test.rb` (canonicals, the hreflang set, and which pages ask not to be indexed) and `structured_data_test.rb` (the JSON-LD each page publishes, in both locales).
 - The auth and role suites: `admin_test.rb` (the roster and the one place a role is granted), `user_test.rb` (the password rules and the `role` enum), `sessions_`/`registrations_`/`passwords_controller_test.rb`, `auth_switch_test.rb`, `legacy_auth_routes_test.rb` (the `redirect()`s above still resolve), `footer_test.rb` (the columns branch on the session), `test/tasks/admin_task_test.rb` (`admin:create` promotes rather than duplicates) and `test/tasks/instructor_task_test.rb` (`instructor:create` leaves an admin alone rather than demoting one).
 
 Assertions compare against `I18n.t(...)` rather than literal strings; a copy change in the locale file should not break a test.
