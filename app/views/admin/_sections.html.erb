@@ -1,0 +1,124 @@
+<%# Real records, like the Users tab: the three writes a deployment needs
+    before the cohort features have anyone in them. Which section is open is
+    `?section=` — screen state lives in the URL. %>
+<div class="mb-4.5">
+  <h2 class="mb-1.25 text-21 font-bold tracking-[-0.02em]"><%= t("admin.sections.title") %></h2>
+  <p class="text-14 text-balance text-muted-2"><%= t("admin.sections.sub") %></p>
+</div>
+
+<div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
+  <div class="flex flex-col gap-5">
+    <%# The list: each row is a link that selects the section. %>
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <% if @sections.empty? %>
+        <p class="px-6 py-7 text-14 text-balance text-muted-2"><%= t("admin.sections.empty") %></p>
+      <% end %>
+
+      <% @sections.each do |section| %>
+        <%= link_to admin_path(tab: :sections, section: section.id),
+              class: class_names(
+                "flex items-center gap-3 border-b border-surface-5 px-5.5 py-3.75 transition-colors",
+                "bg-brand-tint" => section == @selected,
+                "hover:bg-surface-4" => section != @selected
+              ) do %>
+          <div class="min-w-0 flex-1">
+            <div class="text-14-5 font-semibold"><%= section.label %></div>
+            <div class="mt-0.5 text-12-5 text-muted-2">
+              <%= section.term_text %> ·
+              <%= section.instructor&.name || t("admin.sections.no_instructor") %>
+            </div>
+          </div>
+          <span class="flex-none text-13 text-muted"><%= section.students.size %></span>
+        <% end %>
+      <% end %>
+    </section>
+
+    <%# New section. %>
+    <section class="rounded-card border border-hairline bg-surface px-6 py-5.5">
+      <h3 class="mb-4 text-15 font-bold tracking-[-0.01em]"><%= t("admin.sections.new_title") %></h3>
+
+      <%= form_with url: admin_sections_path, method: :post, class: "flex flex-col gap-3.5" do %>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.sections.course_label") %></span>
+          <%= select_tag :course_code,
+                options_for_select(CourseCatalog.codes.map { [ it, it ] }),
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
+                        text-ink transition-colors outline-none focus:border-brand" %>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.sections.code_label") %></span>
+          <%= text_field_tag :code, nil, required: true,
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
+                        text-ink transition-colors outline-none focus:border-brand" %>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.sections.term_label") %></span>
+          <%= text_field_tag :term, nil, required: true, placeholder: "1/2569",
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
+                        text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.sections.instructor_label") %></span>
+          <%= select_tag :instructor_id,
+                options_for_select([ [ t("admin.sections.no_instructor"), "" ] ] + @staff.map { [ it.name, it.id ] }),
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
+                        text-ink transition-colors outline-none focus:border-brand" %>
+        </label>
+        <%= submit_tag t("admin.sections.create"),
+              class: "cursor-pointer rounded-field bg-brand px-4 py-2.5 text-14 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+      <% end %>
+    </section>
+  </div>
+
+  <%# The selected section's roster and instructor. %>
+  <% if @selected %>
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <div class="flex flex-wrap items-center gap-4 px-6 pt-5.5 pb-4">
+        <h3 class="min-w-0 flex-1 text-17 font-bold tracking-[-0.01em]">
+          <%= t("admin.sections.roster_title", label: @selected.label) %>
+        </h3>
+
+        <%= form_with url: admin_section_path(@selected), method: :patch, class: "flex items-center gap-2" do %>
+          <%= select_tag :instructor_id,
+                options_for_select([ [ t("admin.sections.no_instructor"), "" ] ] + @staff.map { [ it.name, it.id ] },
+                                   @selected.instructor_id),
+                "aria-label": t("admin.sections.instructor_label"),
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-13-5
+                        text-ink transition-colors outline-none focus:border-brand" %>
+          <%= submit_tag t("admin.sections.assign"),
+                class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
+                        text-13-5 text-ink-4 transition-colors hover:border-brand hover:text-brand" %>
+        <% end %>
+      </div>
+
+      <%= form_with url: admin_enrol_path(@selected), method: :post,
+            class: "flex flex-wrap items-center gap-2 border-y border-surface-3 bg-surface-4 px-6 py-3.5" do %>
+        <%= text_field_tag :student_id, nil, required: true, inputmode: :numeric,
+              pattern: "[0-9]{13}", maxlength: 13, placeholder: "2X1071730XXXX",
+              "aria-label": t("admin.sections.enrol_label"),
+              class: "w-56 rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 font-mono
+                      text-13-5 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+        <%= submit_tag t("admin.sections.enrol"),
+              class: "cursor-pointer rounded-field bg-brand px-4 py-2.25 text-13-5 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+        <span class="text-12-5 text-muted-2"><%= t("admin.sections.enrol_label") %></span>
+      <% end %>
+
+      <% if @selected.students.none? %>
+        <p class="px-6 py-7 text-14 text-balance text-muted-2"><%= t("admin.sections.empty_roster") %></p>
+      <% end %>
+
+      <% @selected.students.order(:name).each do |student| %>
+        <div class="flex items-center gap-3 border-b border-surface-5 px-6 py-3">
+          <span class="w-32 font-mono text-12-5 text-muted"><%= student.student_id %></span>
+          <span class="min-w-0 flex-1 truncate text-14-5"><%= student.name %></span>
+          <%= button_to t("admin.sections.unenrol"), admin_unenrol_path(@selected, student),
+                method: :delete,
+                class: "cursor-pointer rounded-[8px] border border-transparent px-2.5 py-1.5 text-12-5
+                        text-muted-2 transition-colors hover:border-danger-line hover:text-brand-accent" %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+</div>

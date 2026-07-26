@@ -13,8 +13,15 @@ class Section < ApplicationRecord
 
   validates :code, presence: true, uniqueness: { scope: %i[ course_id term ] }
   validates :term, presence: true
+  # Nullable, but never a student: assigning one would put them on their own
+  # Teaching console.
+  validate :instructor_is_staff
 
   scope :taught_by, ->(user) { where(instructor: user) }
+
+  private def instructor_is_staff
+    errors.add(:instructor, :not_staff) if instructor && !instructor.staff?
+  end
 
   # "AI1101 · BA-2" — how a section is named wherever both matter.
   def label = "#{course.code} · #{code}"

@@ -8,7 +8,7 @@
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
 module AdminConsole
-  TABS = %i[ features overview users courses queue integrity perms audit ].freeze
+  TABS = %i[ features overview users courses sections queue integrity perms audit ].freeze
 
   # ---- The dark header ------------------------------------------------------
 

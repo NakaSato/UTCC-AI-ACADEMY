@@ -70,6 +70,13 @@ Rails.application.routes.draw do
   patch "admin/users/:id", to: "admin#update", as: :admin_user
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
+  # Section management: real records, admin only. Creating a section, pointing
+  # an instructor at it, and putting students in it are the three writes a
+  # deployment needs before anyone can use the cohort features.
+  post "admin/sections", to: "admin#create_section", as: :admin_sections
+  patch "admin/sections/:id", to: "admin#update_section", as: :admin_section
+  post "admin/sections/:id/enrol", to: "admin#enrol", as: :admin_enrol
+  delete "admin/sections/:id/enrol/:user_id", to: "admin#unenrol", as: :admin_unenrol
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
