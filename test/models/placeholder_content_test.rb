@@ -48,7 +48,9 @@ class PlaceholderContentTest < ActiveSupport::TestCase
           "admin.overview.health" => AdminConsole::HEALTH,
           "admin.courses.rows" => AdminConsole::COURSES,
           "admin.queue.rows" => AdminConsole::QUEUE_KINDS,
-          "admin.audit.rows" => AdminConsole::AUDIT_LEVELS
+          "admin.audit.rows" => AdminConsole::AUDIT_LEVELS,
+          "admin.integrity.rows" => AdminConsole::INTEGRITY,
+          "admin.perms.rows" => AdminConsole::PERMS
         }.each do |key, rows|
           assert_equal rows.size, I18n.t(key).size, "#{key} in #{locale}"
         end
@@ -56,6 +58,13 @@ class PlaceholderContentTest < ActiveSupport::TestCase
         assert_equal(
           AdminConsole::ACTIVITY_COUNT, I18n.t("admin.overview.activity").size, "activity in #{locale}"
         )
+
+        # An integrity case's evidence nests one level deeper, and the count in
+        # Ruby is what the view trusts.
+        AdminConsole::INTEGRITY.each_with_index do |(_sev, _score, _state, evidence_count), index|
+          assert_equal evidence_count, I18n.t("admin.integrity.rows")[index][:evidence].size,
+                       "integrity case #{index} in #{locale}"
+        end
 
         # The groups nest, so their item counts have to agree row by row too.
         AdminConsole::FLAG_GROUPS.each_with_index do |items, index|

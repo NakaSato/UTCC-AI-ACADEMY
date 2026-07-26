@@ -1,17 +1,31 @@
 <% content_for :title, "#{t("admin.title")} — UTCC AI Academy" %>
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
-  <div class="mb-6.5 flex flex-wrap items-end justify-between gap-6">
-    <div>
-      <div class="mb-3 flex items-center gap-2.5">
-        <span class="font-mono text-11 tracking-[0.12em] text-muted-2 uppercase"><%= t("admin.eyebrow") %></span>
-        <span class="rounded-full border border-danger-line bg-brand-tint px-2.25 py-0.75
-                     text-11 font-semibold tracking-[0.06em] text-brand-deep uppercase">
-          <%= t("admin.roles.admin") %>
-        </span>
+  <%# The chrome header: the console names itself on the dark field, and the
+      strip below it is counted from the live tables — the one placeholder
+      module allowed to touch records, because this is the screen that is
+      backed by them. %>
+  <div class="mb-6.5 overflow-hidden rounded-card bg-chrome px-7 pt-7 sm:px-8">
+    <div class="mb-3.5 flex items-center gap-2.75">
+      <span aria-hidden="true" class="size-1.75 rounded-full bg-brand"></span>
+      <span class="font-mono text-11 tracking-[0.16em] text-on-chrome-muted uppercase"><%= t("admin.eyebrow") %></span>
+      <span class="rounded-full border border-chrome-edge-2 px-2.5 py-0.75 text-10-5 font-semibold
+                   tracking-[0.1em] text-brand-soft uppercase">
+        <%= t("admin.roles.admin") %>
+      </span>
+    </div>
+    <h1 class="text-30 font-bold tracking-[-0.035em] text-on-chrome-bright sm:text-38"><%= t("admin.title") %></h1>
+
+    <div class="mt-6 flex flex-wrap items-stretch border-t border-chrome-line-2">
+      <% AdminConsole.head_stats.each do |stat| %>
+        <div class="mr-8 border-r border-chrome-line-2 py-4.5 pr-8">
+          <div class="mb-1.75 text-10-5 font-semibold tracking-[0.1em] text-on-chrome-dim uppercase"><%= stat[:label] %></div>
+          <div class="text-22 leading-none font-bold tracking-[-0.02em] text-on-chrome-bright"><%= stat[:value] %></div>
+        </div>
+      <% end %>
+      <div class="flex min-w-[200px] flex-1 items-center py-4.5">
+        <p class="max-w-[38ch] text-12-5 leading-[1.6] text-balance text-on-chrome-dim"><%= t("admin.head.note") %></p>
       </div>
-      <h1 class="mb-1.5 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("admin.title") %></h1>
-      <p class="text-16 text-muted"><%= t("admin.subtitle") %></p>
     </div>
   </div>
 

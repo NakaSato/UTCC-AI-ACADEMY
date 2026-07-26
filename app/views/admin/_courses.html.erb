@@ -1,5 +1,13 @@
 <%# The publish switch is inert for the same reason the feature flags are: a
     course has no record to write "hidden" to yet. %>
+<%= form_with url: admin_path, method: :get, class: "mb-4 flex" do %>
+  <%= hidden_field_tag :tab, :courses %>
+  <%= search_field_tag :q, @query, placeholder: t("admin.courses_search_ph"),
+        "aria-label": t("admin.courses_search_ph"),
+        class: "w-full max-w-[340px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25
+                text-14 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+<% end %>
+
 <div class="overflow-x-auto rounded-card border border-hairline bg-surface">
   <div class="min-w-[800px]">
     <div class="grid grid-cols-[104px_minmax(0,1fr)_150px_92px_96px_168px] border-b border-surface-3
@@ -12,7 +20,7 @@
       <span class="text-right"><%= t("admin.courses.th_state") %></span>
     </div>
 
-    <% AdminConsole.courses.each do |course| %>
+    <% AdminConsole.courses(matching: @query).each do |course| %>
       <div class="grid grid-cols-[104px_minmax(0,1fr)_150px_92px_96px_168px] items-center
                   border-b border-surface-5 px-6.5 py-3.75">
         <span class="font-mono text-12-5 text-muted"><%= course.code %></span>

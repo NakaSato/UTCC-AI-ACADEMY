@@ -3,7 +3,24 @@ class AdminController < ApplicationController
 
   def show
     @tab = AdminConsole.tab_for(params[:tab])
-    @users = User.order(:role, :name) if @tab == :users
+
+    case @tab
+    in :users
+      # Both filters are whitelist-or-default; the search is a plain substring
+      # over the two columns the roster shows.
+      @role = AdminConsole.role_filter(params[:role])
+      @query = params[:q].to_s.strip
+
+      @users = User.order(:role, :name)
+      @users = @users.where(role: @role) unless @role == :all
+      if @query.present?
+        needle = "%#{User.sanitize_sql_like(@query)}%"
+        @users = @users.where("name LIKE :q OR student_id LIKE :q", q: needle)
+      end
+    in :audit then @level = AdminConsole.level_filter(params[:level])
+    in :courses then @query = params[:q].to_s.strip
+    else nil
+    end
   end
 
   def update

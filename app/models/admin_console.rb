@@ -8,7 +8,21 @@
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
 module AdminConsole
-  TABS = %i[ features overview users courses queue audit ].freeze
+  TABS = %i[ features overview users courses queue integrity perms audit ].freeze
+
+  # ---- The dark header ------------------------------------------------------
+
+  # The one placeholder module allowed to count real rows: /admin is the screen
+  # backed by records, so its head stats are counts, not copy. Labels are
+  # `admin.head.stats`, positional as ever.
+  def self.head_stats
+    values = [
+      User.count, User.student.count, User.instructor.count + User.admin.count,
+      Section.count, TopicCompletion.count
+    ]
+
+    I18n.t("admin.head.stats").zip(values).map { |label, value| { label:, value: } }
+  end
 
   # ---- Feature control ------------------------------------------------------
 
@@ -98,6 +112,51 @@ module AdminConsole
     def copy = I18n.t("admin.queue.rows")[position]
   end
 
+  # ---- Integrity cases ------------------------------------------------------
+
+  # severity, integrity score, open or closed, evidence count. The proctor
+  # persists nothing — its score dies with the page — so these are placeholder
+  # like the queue, and the evidence count must match the locale rows.
+  INTEGRITY = [
+    [ :high, 42, :open, 3 ],
+    [ :medium, 68, :open, 2 ],
+    [ :low, 81, :closed, 2 ]
+  ].freeze
+
+  IntegrityCase = Data.define(:severity, :score, :state, :position) do
+    def open? = state == :open
+    def name = copy[:name]
+    def sid = copy[:sid]
+    def where_text = copy[:where]
+    def evidence = copy[:evidence]
+    def severity_name = I18n.t("admin.integrity.severity.#{severity}")
+
+    private
+
+    def copy = I18n.t("admin.integrity.rows")[position]
+  end
+
+  # ---- Permissions matrix ---------------------------------------------------
+
+  # One row per capability, one flag per role in User::ROLES order. Every row is
+  # a true statement about the code — the leaderboard really does rank students
+  # only, proctoring really is student-only, and the two staff gates are the two
+  # `allow_only` declarations. Change a gate and this table is lying until it
+  # changes too; the row labels are `admin.perms.rows`, positional.
+  PERMS = [
+    [ true,  true,  true  ],   # learn lessons, record progress
+    [ true,  false, false ],   # appear on the leaderboard
+    [ true,  false, false ],   # proctoring active in lessons
+    [ false, true,  true  ],   # open the Teaching console
+    [ false, false, true  ],   # open this console
+    [ false, false, true  ]    # grant roles
+  ].freeze
+
+  # The Users tab's role chips and the audit levels. :all is a chip, not a
+  # role, so it can never leak into a where().
+  ROLE_FILTERS = [ :all, *User::ROLES.map(&:to_sym) ].freeze
+  LEVEL_FILTERS = %i[ all info warn ].freeze
+
   # ---- Audit log ------------------------------------------------------------
 
   # info | warn, one per entry.
@@ -151,10 +210,16 @@ module AdminConsole
       end
     end
 
-    def courses
-      COURSES.each_with_index.map do |(code, sections, students), position|
+    # `matching` filters by code or localized name, so the search box works in
+    # whichever language the console is being read in.
+    def courses(matching: nil)
+      rows = COURSES.each_with_index.map do |(code, sections, students), position|
         CourseRow.new(code:, sections:, students:, position:)
       end
+      return rows if matching.blank?
+
+      needle = matching.downcase
+      rows.select { it.code.downcase.include?(needle) || it.name.downcase.include?(needle) }
     end
 
     def queue
@@ -163,18 +228,41 @@ module AdminConsole
 
     def pending_count = queue.size
 
-    def audit
-      copy = I18n.t("admin.audit.rows")
-      AUDIT_LEVELS.each_with_index.map do |level, index|
-        { level:, stamp: copy[index][:stamp], actor: copy[index][:actor], event: copy[index][:event] }
+    def integrity_cases
+      INTEGRITY.each_with_index.map do |(severity, score, state), position|
+        IntegrityCase.new(severity:, score:, state:, position:)
       end
+    end
+
+    def open_case_count = integrity_cases.count(&:open?)
+
+    def perm_rows
+      I18n.t("admin.perms.rows").zip(PERMS).map { |label, flags| { label:, flags: } }
+    end
+
+    def role_filter(param)
+      ROLE_FILTERS.include?(param.to_s.to_sym) ? param.to_s.to_sym : :all
+    end
+
+    def level_filter(param)
+      LEVEL_FILTERS.include?(param.to_s.to_sym) ? param.to_s.to_sym : :all
+    end
+
+    def audit(level: :all)
+      copy = I18n.t("admin.audit.rows")
+      rows = AUDIT_LEVELS.each_with_index.map do |row_level, index|
+        { level: row_level, stamp: copy[index][:stamp], actor: copy[index][:actor], event: copy[index][:event] }
+      end
+
+      level == :all ? rows : rows.select { it[:level] == level }
     end
 
     # Only two tabs carry a badge; the rest would show a meaningless zero.
     def badge_for(tab)
       case tab
-      in :features then flags_off
-      in :queue    then pending_count
+      in :features  then flags_off
+      in :queue     then pending_count
+      in :integrity then open_case_count
       else nil
       end
     end
