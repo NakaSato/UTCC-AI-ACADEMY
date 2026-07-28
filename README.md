@@ -167,6 +167,8 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 
 There is **no Redis, no Memcached and no separate job runner** — every piece of infrastructure is a SQLite database.
 
+Every response carries a **Content-Security-Policy** (`config/initializers/content_security_policy.rb`). The directive that matters is `script-src 'self'` plus a per-request nonce — no `unsafe-inline`, no remote script origin — so injected markup cannot execute. Two consequences to know before editing it: `SchemaHelper#json_ld` has to pass the nonce by hand or the site's JSON-LD is silently dropped, and `style-src` allows `unsafe-inline` on purpose, because the progress bars are computed `style="width: …%"` attributes and CSP has no nonce for style attributes. The browser also loads webfonts from Google, which is why `fonts.googleapis.com` and `fonts.gstatic.com` appear in the policy.
+
 ## Repository layout
 
 ```

@@ -10,10 +10,18 @@ module SchemaHelper
   # `json_escape` because the one thing that must never survive into a <script>
   # is a closing tag. A nil document renders nothing, so a page can offer a
   # section that has nothing to say without guarding at the call site.
+  #
+  # The nonce is passed by hand. Browsers gate `<script type="application/ld+json">`
+  # under `script-src` even though it never executes, and
+  # `content_security_policy_nonce_auto` only reaches `javascript_tag` and
+  # friends — not a `tag.script` built here. Without it every structured-data
+  # document on the site would be dropped by the policy, which is a security
+  # change quietly becoming an SEO regression.
   def json_ld(document)
     return if document.blank?
 
-    tag.script raw(json_escape(JSON.pretty_generate(document))), type: "application/ld+json"
+    tag.script raw(json_escape(JSON.pretty_generate(document))),
+               type: "application/ld+json", nonce: content_security_policy_nonce
   end
 
   # Documents that name the school point at this id instead of repeating the

@@ -64,7 +64,7 @@ There is no CI service and no GitHub Actions workflow — `.github/` holds only 
 
 ## Software system design
 
-A server-rendered monolith: one Puma process, one SQLite file, no API layer, no client-side router, no external service. Every screen is a full HTML response that Turbo Drive swaps in. There is exactly one WebSocket, to our own `/cable`, and it carries the notification bell and nothing else. Hold that shape — most of the decisions below only make sense because nothing is distributed.
+A server-rendered monolith: one Puma process, one SQLite file, no API layer, no client-side router, no external service **the app talks to** — the browser fetches webfonts from Google (`shared/_fonts`), which is the one origin other than our own that any page depends on, and the two `fonts.*` allowances in the CSP are there to say so. Every screen is a full HTML response that Turbo Drive swaps in. There is exactly one WebSocket, to our own `/cable`, and it carries the notification bell and nothing else. Hold that shape — most of the decisions below only make sense because nothing is distributed.
 
 ### Layers, and which way the arrows point
 
@@ -121,6 +121,11 @@ The browser is untrusted, with one deliberate, documented exception.
 - **No user enumeration on password reset** — `PasswordsController#create` redirects identically whether or not the address exists, and checks `present?` first so a blank submission cannot match the many accounts with a null email.
 - **Rate limits** on sign-in, sign-up, password reset (10/3min) and lesson completion (30/3min).
 - Password max length is 72 because that is bcrypt's ceiling — anything longer is silently ignored, so accepting it would be a lie.
+- **A Content-Security-Policy ships on every response**, and its whole value is `script-src 'self'` plus a per-request nonce: with no `unsafe-inline` and no remote origin, an injected `<script>` is a blocked resource rather than executing code. Three things about it are load-bearing and easy to undo by accident:
+  - **The nonce is `SecureRandom`, not `request.session.id`.** The landing page is served to visitors with no session, for whom a session-derived nonce is the empty string — that would leave the inline importmap unsigned and break every screen for the audience least able to report it. The cost is that HTML bodies are no longer byte-identical between requests, so `Rack::ETag` stops answering 304 for them.
+  - **`SchemaHelper#json_ld` passes the nonce by hand.** Browsers gate `<script type="application/ld+json">` under `script-src` even though it never executes, and `content_security_policy_nonce_auto` does not reach a `tag.script` built in a helper. Without it every JSON-LD document on the site is silently dropped — a security change turning into an SEO regression. importmap-rails already stamps its own two inline tags.
+  - **`style-src` allows `unsafe-inline` deliberately.** Nineteen computed `style="width: …%"` attributes carry the progress bars and stagger delays, and CSP has no nonce for style *attributes* — only for `<style>` elements. The alternative is not a stricter policy but a broken layout.
+  - `test/controllers/content_security_policy_test.rb` asserts both directions: that `script-src` never gains `unsafe-inline`, and that every inline `<script>` on a rendered page carries the nonce the header names.
 - Brakeman, bundler-audit and `importmap audit` are `bin/ci` steps, not optional extras.
 
 ### Invariants
