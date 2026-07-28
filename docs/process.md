@@ -82,13 +82,20 @@ Work is done when it is **shippable**, not when it is written. In this repo that
 
 ## Ordering the backlog
 
-The remaining work on this app has a natural dependency order, and the product backlog should respect it — each item unlocks the next:
+**This section is now history, and that is the point of leaving it here.** The dependency order below was the backlog, and every item on it is finished:
 
-1. **Course and Topic tables** — they anchor the strings everything else already references.
-2. **Submissions** — the prerequisite for moving lesson grading off the client, which is the app's one known trust gap.
-3. **Sections / cohorts** — the leaderboard and the instructor report are both blocked on a concept `users` does not have.
-4. **Projects, awards, notifications** — the last of the placeholder surfaces.
+1. ~~**Course and Topic tables**~~ — they anchored the strings everything else already referenced.
+2. ~~**Submissions**~~ — the prerequisite for moving lesson grading off the client, which was the app's one known trust gap.
+3. ~~**Sections / cohorts**~~ — the leaderboard and the instructor report were both blocked on a concept `users` did not have.
+4. ~~**Projects, awards, notifications**~~ — the last of the placeholder surfaces.
 
-A sprint goal that takes one placeholder module and makes it real is a good sprint goal: it is a vertical slice, it is demonstrable at the review, and `LearnerProgress` is the worked example of how to do it without changing a single view.
+A sprint goal that takes one placeholder module and makes it real was a good sprint goal: a vertical slice, demonstrable at the review, and `LearnerProgress` is the worked example of how to do it without changing a single view. That well is now dry — **there is one placeholder left and it is not a modelling job.** So the next Product Owner decision is a genuine one rather than a reading of this list, and it should be made at planning rather than inferred here.
+
+What is known to be wanted, unordered, for whoever orders it:
+
+- **A working mailer.** SMTP is unconfigured, so password reset enqueues a message that reaches nobody — the one broken user-facing path in production, and the only route back in for an account whose owner forgot their password. It needs credentials, which is a decision and not a commit.
+- **Lesson content per topic.** The prose, quiz and coding task are the same whichever topic is open. Sixteen topics × two languages is a writing job with an engineering seam already built for it; scope it as content, and do not let it masquerade as a sprint of code.
+- **Whether hearts gate anything at zero.** `LearnerProgress#hearts` counts down and the display stops there, deliberately, because nobody has decided whether an empty set should block an attempt. That is a pedagogy decision.
+- **Revocation better than a 30-day cap.** With no mailer, `Session::MAX_AGE` is the only thing that ends a stolen session.
 
 See `CLAUDE.md` for the engineering conventions, and `README.md` for how to run the app.
