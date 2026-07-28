@@ -1,12 +1,22 @@
 <%# The bell. Real rows since notifications landed — each is a kind plus
     interpolations, rendered in the reader's language at read time. The dot on
     the bell is the unread count's existence, and "mark all read" is the one
-    write this menu has. %>
-<% notifications = Current.user.notifications.newest_first.limit(Notification::RECENT) %>
-<% unread = Current.user.notifications.unread.any? %>
+    write this menu has.
 
-<div class="relative flex-none"
-     data-controller="dropdown"
+    Takes a `bell:` and reaches for nothing else. It used to query
+    `Current.user` twice from inside the template, which was a view reaching past
+    what it was handed; NotificationBell answers both questions now.
+
+    A frame rather than a plain div, and deliberately one with no `src`: this is
+    what a request renders, content and all. The version that names a src is
+    `_app_notifications_refetch`, which is what a broadcast pushes — the frame is
+    the seam between the two, and `NotificationsController#show` is what the
+    second one comes back to. %>
+<% notifications = bell.recent %>
+<% unread = bell.unread? %>
+
+<%= turbo_frame_tag bell.id, class: "relative block flex-none" do %>
+<div data-controller="dropdown"
      data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
   <button type="button"
           aria-haspopup="true" aria-expanded="false" aria-label="<%= t("chrome.notif_toggle") %>"
@@ -48,3 +58,4 @@
     <% end %>
   </div>
 </div>
+<% end %>

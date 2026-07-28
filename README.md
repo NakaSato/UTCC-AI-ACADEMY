@@ -160,7 +160,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | Auth | Rails 8 `generate authentication` + `bcrypt` | cookie sessions in a table, no Devise |
 | Background jobs | `solid_queue` | in-process under Puma |
 | Cache | `solid_cache` | |
-| WebSockets | `solid_cable` | nothing uses it yet |
+| WebSockets | `solid_cable` | one subscription per signed-in page, carrying the notification bell |
 | Deploy | Docker, via Kamal or Render | `config/deploy.yml`, `render.yaml` — one image, two targets |
 | Tests | Minitest (**not** RSpec), parallel | Capybara + selenium drive the system tests |
 | Lint / security | `rubocop-rails-omakase`, Brakeman, bundler-audit, `importmap audit` | all wired into `bin/ci` |
@@ -212,6 +212,16 @@ end
 `progress` is `Current.user&.progress || LearnerProgress.new(nil)` — a null-object fallback so the helper is safe on the one screen that renders without a user.
 
 Controllers below it are deliberately tiny: read a param, validate it against a whitelist, ask a module, assign. `ProgressController` is 238 bytes; `LeaderboardsController` is 154. **A param is never trusted and never raises** — each controller falls back to a default (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold.
+
+
+**And one component is pushed to rather than asked.** Notifications are written *for* somebody by somebody else — every `Notification.notify` call is in `AdminController`, acting on a student — so until the bell learned to redraw itself, the person it concerned found out on their next page load. `NotificationBell` is a plain class that owns the DOM id it replaces, the Action Cable channel it is replaced over, the path it is re-read from and the figures the panel shows; `shared/_app_header` subscribes with `turbo_stream_from notification_bell.stream`, and two callers say `broadcast_refresh!`.
+
+What crosses the socket is an **empty frame naming its own `src`**, not a rendered bell, because a broadcast has no session and two things depend on one:
+
+- the panel's "mark all read" is a form, and a form rendered outside a session gets no CSRF token at all — measured, not assumed — so a pushed button would be refused while looking exactly like one that worked;
+- a reader's language is in `session[:locale]`, and `Notification` stores a kind rather than a sentence precisely so the sentence is the *reader's*.
+
+The browser therefore fetches the bell back from `GET /notifications` with its own cookies, which carry both. The pushed frame holds a wordless 38px placeholder so the header rail does not jump while that happens, and the frame a page renders normally has no `src` — otherwise every screen would fetch the bell twice.
 
 ## Data model
 
@@ -365,6 +375,8 @@ post "language/:locale" => "languages#update", constraints: { locale: /th|en/ }
 resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?step=theory|exercise|code|summary
 post "lesson/submit"   => "lessons#submit"
+get   "notifications"  => "notifications#show"  # the bell alone, for the pushed frame
+post  "notifications/read" => "notifications#read_all"
 get   "my-learning"    => "my_learning#show"    # ?tab=progress|done
 get   "profile"        => "profiles#edit"       # the account's own details
 patch "profile"        => "profiles#update"     # the only place an email is set
@@ -481,6 +493,7 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `tasks/admin_task_test.rb` | `admin:create`, including promotion of an existing account |
 | `tasks/instructor_task_test.rb` | `instructor:create`, including that it leaves an admin alone rather than demoting one |
 | `models/instructor_report_test.rb`, `models/leaderboard_test.rb` | the Teaching console and the board, counted from a real section |
+| `models/notification_bell_test.rb`, `controllers/notification_broadcast_test.rb` | the bell that redraws itself: what a broadcast may contain (a frame with a src, a placeholder, and **no copy or CSRF token in either language**) and what the refetch must supply (the reader's own language and a token they can submit) |
 | `models/awards_test.rb` | one test per award rule, and that a new account has earned nothing |
 | `models/landing_card_test.rb` | the landing taxonomy: generated slugs, a card's place, and that deleting one deletes its copy |
 | `models/audit_event_test.rb`, `controllers/admin_audit_test.rb` | the audit log: the actor is whoever is signed in, the level is derived rather than stored, and — driven through every endpoint — each admin action logs exactly once while a failed one logs nothing |

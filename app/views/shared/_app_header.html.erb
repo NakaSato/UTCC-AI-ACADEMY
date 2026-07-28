@@ -41,7 +41,11 @@
     <div class="ml-auto flex flex-none items-center gap-2">
       <%= render "shared/language_toggle" %>
 
-      <%= render "shared/app_notifications" %>
+      <%# Subscribed here rather than inside the bell, so a replacement cannot
+          tear down the subscription that delivered it. The channel name still
+          lives in exactly one place — the bell names it. %>
+      <%= turbo_stream_from notification_bell.stream %>
+      <%= render "shared/app_notifications", bell: notification_bell %>
       <%= render "shared/app_account_menu" %>
       <%= render "shared/app_nav_menu" %>
     </div>

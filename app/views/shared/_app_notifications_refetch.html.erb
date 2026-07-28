@@ -1,0 +1,14 @@
+<%# What a broadcast pushes, and the only thing it ever pushes: an empty frame
+    naming its own source, so the browser fetches the bell back over an ordinary
+    authenticated request. See NotificationBell for why the bell itself cannot
+    travel this way — no session means no CSRF token and no language.
+
+    The placeholder is not decoration. Without it the frame collapses to nothing
+    for the length of the fetch and the whole right-hand rail of the header jumps
+    sideways. It is a 38px square because the bell button is, and it is wordless
+    because a broadcast has no language to write words in. %>
+<%= turbo_frame_tag NotificationBell::ID, src: notifications_path,
+      class: "relative block flex-none" do %>
+  <span aria-hidden="true"
+        class="block size-[38px] animate-shimmer rounded-[10px] skeleton-on-chrome"></span>
+<% end %>

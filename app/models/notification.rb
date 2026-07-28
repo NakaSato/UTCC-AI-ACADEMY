@@ -18,7 +18,13 @@ class Notification < ApplicationRecord
   # The dropdown is a sidebar, not an archive.
   RECENT = 8
 
-  def self.notify(user, kind, **params) = create!(user:, kind:, params:)
+  # The one place a notification is written, and therefore the one place the
+  # bell has to be told. Every caller is in AdminController acting *on* somebody
+  # else, so the recipient is by definition looking at a different page than the
+  # one that caused this — see NotificationBell.
+  def self.notify(user, kind, **params)
+    create!(user:, kind:, params:).tap { NotificationBell.new(user).broadcast_refresh! }
+  end
 
   def unread? = read_at.nil?
 

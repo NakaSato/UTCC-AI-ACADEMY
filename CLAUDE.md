@@ -64,7 +64,7 @@ There is no CI service and no GitHub Actions workflow — `.github/` holds only 
 
 ## Software system design
 
-A server-rendered monolith: one Puma process, one SQLite file, no API layer, no client-side router, no external service. Every screen is a full HTML response that Turbo Drive swaps in. Hold that shape — most of the decisions below only make sense because nothing is distributed.
+A server-rendered monolith: one Puma process, one SQLite file, no API layer, no client-side router, no external service. Every screen is a full HTML response that Turbo Drive swaps in. There is exactly one WebSocket, to our own `/cable`, and it carries the notification bell and nothing else. Hold that shape — most of the decisions below only make sense because nothing is distributed.
 
 ### Layers, and which way the arrows point
 
@@ -108,6 +108,8 @@ The rule that follows: **nothing that must survive a reload may live only in JS*
 6. The view renders; the `progress` helper loads the learner's completions **once** (memoised on the `User`) and every counter, bar and tile folds off that one array.
 7. Turbo Drive swaps the body on the next navigation; no JSON crosses the wire.
 
+**One thing on every signed-in screen is also pushed to.** `shared/_app_header` renders `turbo_stream_from notification_bell.stream`, so each page holds one Action Cable subscription for the length of its visit — the first thing in the app to open a channel. `NotificationBell` owns that channel, the DOM id it replaces and the path it is re-read from; `Notification.notify` and `NotificationsController#read_all` are the only two callers of `broadcast_refresh!`. See "The notification bell" below for why what travels over that socket is a frame rather than a rendered bell.
+
 ### Trust boundaries
 
 The browser is untrusted, with one deliberate, documented exception.
@@ -142,6 +144,7 @@ Sized for a classroom, not a public site, and the design leans on that.
 
 - **The N+1 that isn't:** `LearnerProgress` issues one query for a learner's rows and folds them in Ruby for six different cuts. Adding a per-course query to a view would undo it.
 - **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the *entire* `topic_completions` table, run on every render that shows a rank. Correct and cheap at a few thousand rows; it is the first thing to cache or denormalise when it is not. `Leaderboard`'s university tab does the same shape of work — every student's rows, folded per learner — so the two share that fate.
+- **The bell's socket is one subscription per open page, and one poller per process.** `solid_cable` polls its own SQLite file every 100ms for new messages — once per Puma process, not once per subscriber, so a section of ninety students is ninety in-memory fan-outs off the same poll rather than ninety pollers. It is a different database file from the one that takes writes, which is why constant reads on it do not compete with the single writer. The broadcast itself is **synchronous** rather than `_later`: it renders nothing (the payload is a constant frame), so there is no rendering cost to move off the request, and enqueuing it would make the admin path the second thing in the app to need Solid Queue.
 - Nothing uses `Rails.cache` yet. `stale_when_importmap_changes` gives HTML responses an etag; Thruster handles asset caching and compression.
 - One writer: SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
 - The only enqueued work in the whole app is the password-reset email (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.
@@ -185,6 +188,23 @@ The split is deliberate and consistent:
 
 - **Ruby holds numbers, taxonomy and shape** — course codes, percentages, the tree structure, which module is locked.
 - **`config/locales/{th,en}.yml` holds every word a human reads** — everywhere behind the login. The `Data` objects reach copy through `I18n.t` in their own methods (`course.title` is `I18n.t("catalog.courses.#{code}.title")`).
+
+### The notification bell
+
+The one component in the app that updates itself. `NotificationBell` is a plain class in `app/models/` — not a component object, because there is no component layer here and adding one would be the presenter this design refuses — and it owns four things that would otherwise be scattered as matching strings: the DOM id it replaces (`ID`), the channel it is replaced over (`stream`), the path it is re-read from, and the two figures the panel shows. A caller writes `NotificationBell.new(user).broadcast_refresh!` and knows none of them. `Notification.notify` is one such caller and `NotificationsController#read_all` is the other, which is the whole list.
+
+**The broadcast pushes an empty frame, never a rendered bell**, and that is the load-bearing decision. Both reasons are the same reason — **a broadcast has no session**:
+
+- **The panel contains the one form this menu has**, and a form rendered outside a session gets no CSRF token at all. That is measured, not assumed: with forgery protection on, `button_to` in an out-of-band render emits no `authenticity_token`, so "mark all read" clicked on a pushed bell would be refused — and would look identical to one that worked.
+- **A reader's language lives in `session[:locale]`**, so a bell rendered by whoever *triggered* the notification would be written in their language. `Notification` stores a kind rather than a sentence precisely to stop that happening.
+
+So `shared/_app_notifications_refetch` — an empty `<turbo-frame>` naming its own `src` — is what crosses the wire, and the browser fetches the bell back from `GET /notifications` over an ordinary authenticated request that carries the reader's cookies, and therefore their token and their language. One extra round trip on an event that happens a handful of times a term. `test/models/notification_bell_test.rb` asserts that no copy and no token ever appear in a broadcast payload, and `notification_broadcast_test.rb` asserts the refetched bell has both.
+
+Three smaller things are easy to undo by accident:
+
+- **The frame a request renders must have no `src`**, or every screen in the app fetches the bell a second time on load. `_app_notifications` is the version without one; `_app_notifications_refetch` is the version with. Both name the same id, which is what makes them two shapes of one frame rather than two frames.
+- **The pushed frame is not empty** — it holds a wordless 38px `skeleton-on-chrome` square. Without it the frame collapses for the length of the fetch and the header's whole right-hand rail slides sideways. Wordless because a broadcast has no language to write words in.
+- **`turbo_stream_from` lives in `shared/_app_header`, outside the frame**, so a replacement cannot tear down the subscription that delivered it. The channel name is still in one place: the header asks the bell for it.
 
 ### The landing page
 
@@ -293,6 +313,8 @@ resources :courses, only: :show, param: :code   # /courses/AI1101
 get  "lesson"          => "lessons#show"        # ?course=AI1101&topic=2-3&step=theory|exercise|code|summary
 post "lesson/submit"   => "lessons#submit"      # an answer sent to be graded; replaced lesson/complete
 post "lesson/incident" => "lessons#incident"    # the proctor reporting what it saw — the one post the lock does not guard
+get  "notifications"      => "notifications#show"      # the bell alone, for the frame a
+                                                       # broadcast pushes to come back to
 post "notifications/read" => "notifications#read_all"  # the bell's "mark all read"
 get "my-learning" => "my_learning#show"         # ?tab=progress|done
 get   "profile"   => "profiles#edit"            # profile_path — the account's own details
@@ -351,7 +373,7 @@ Structured data is `SchemaHelper` plus `yield :schema` in `shared/_meta`. Every 
 
 **All infrastructure is SQLite + database-backed.** There is no Redis, Memcached, or separate job runner:
 
-- `solid_queue` for Active Job, `solid_cache` for `Rails.cache`, `solid_cable` for Action Cable.
+- `solid_queue` for Active Job, `solid_cache` for `Rails.cache`, `solid_cable` for Action Cable — and Action Cable is now in use, so `solid_cable` is no longer dead weight in production. Development uses the `async` adapter and test the `test` one, which is why the bell can be driven locally at all; note that `async` is per-process, so a broadcast from `bin/rails runner` reaches no browser.
 - In production these live in *separate* SQLite databases (`storage/production_{queue,cache,cable}.sqlite3`) declared as extra entries under `production:` in `config/database.yml`, each with its own `migrations_paths` (`db/queue_migrate`, etc.). Their schemas are `db/{queue,cache,cable}_schema.rb` — do not fold these into `db/schema.rb`.
 - Workers run in-process: `config/puma.rb` loads `plugin :solid_queue` when `SOLID_QUEUE_IN_PUMA` is set, which `config/deploy.yml` sets. `bin/jobs` runs the supervisor standalone. Recurring jobs go in `config/recurring.yml`.
 - Development and test use a single `storage/development.sqlite3` / `storage/test.sqlite3`; the solid_* adapters are only wired up in `config/environments/production.rb`.
@@ -409,6 +431,7 @@ Tests run in parallel (`parallelize(workers: :number_of_processors)`) and load a
 - `test/models/placeholder_content_test.rb` — derived values and locale wiring for the placeholder modules, checked in both locales.
 - `test/models/learner_progress_test.rb` and `topic_completion_test.rb` — every counted figure, and what the table will and will not accept.
 - `test/controllers/lesson_completion_test.rb` — the browser-to-record seam, and that a completion then shows up on the screens that count it.
+- `test/models/notification_bell_test.rb` and `test/controllers/notification_broadcast_test.rb` — the bell that redraws itself. The model side asserts what a broadcast may contain: a replace of the bell's own id, a frame naming a src, a placeholder to hold the header open, and **no copy and no CSRF token in either language** — both of which would be a bell nobody can read or use. The controller side asserts the other half: every signed-in page subscribes and a signed-out one does not, the frame a page renders has no `src` of its own, an admin acting on a case reaches that student's bell, and the refetched bell comes back in the *reader's* language carrying a token they can actually submit (with forgery protection turned on for the length of the exchange, the way `sessions_controller_test` lends the rate limiter a real cache store).
 - **`test/fixtures/topic_completions.yml`, `submissions.yml`, `notifications.yml`, `landing_texts.yml` and `audit_events.yml` are deliberately empty and must stay present.** Tests that need progress, an attempt or an override make one; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users and topics they point at. `landing_texts.yml` is load-bearing beyond that: an empty table *is* the app as shipped, which is what lets `landing_test.rb`, `structured_data_test.rb` and `crawlers_test.rb` go on asserting against the locale files.
 - **`courses.yml`, `course_modules.yml`, `topics.yml` and `landing_cards.yml` are the opposite** — they carry taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. Each is one of three copies of the same rows that must agree: the migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant`) and the fixture. `taxonomy_test.rb` and `landing_card_test.rb` assert the shape all three have to produce.
 - `test/controllers/languages_controller_test.rb` — the locale switch, that it sticks across requests, and that an unroutable locale 404s. `locale_negotiation_test.rb` covers the rest of the rule: which of `?lang=`, the session and `Accept-Language` wins, and that `?lang=` never persists.

@@ -12,11 +12,14 @@ class ApplicationController < ActionController::Base
   around_action :switch_locale
 
   # The header's gem and streak counters sit on every signed-in screen, so this
-  # is a helper rather than something each controller has to assign.
-  helper_method :progress
+  # is a helper rather than something each controller has to assign. The bell is
+  # there for the same reason, and is also what names the channel it listens on.
+  helper_method :progress, :notification_bell
 
   private
     def progress = Current.user&.progress || LearnerProgress.new(nil)
+
+    def notification_bell = @notification_bell ||= NotificationBell.new(Current.user)
 
     # Three sources, most specific first: the URL, the toggle, then the browser.
     #

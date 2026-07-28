@@ -50,6 +50,11 @@ Rails.application.routes.draw do
   # browser is reporting evidence against itself, which is why this is the one
   # post the lock does not guard.
   post "lesson/incident", to: "lessons#incident", as: :lesson_incident
+  # The bell on its own, for the frame a broadcast pushes to come back to. It is a
+  # GET because it is a read, and it exists because a broadcast has no session:
+  # this request carries the reader's own cookies, and so their language and their
+  # CSRF token. See NotificationBell.
+  get "notifications", to: "notifications#show", as: :notifications
   # The bell's "mark all read" — one write, back to where you were.
   post "notifications/read", to: "notifications#read_all", as: :read_notifications
   get "my-learning", to: "my_learning#show", as: :my_learning
