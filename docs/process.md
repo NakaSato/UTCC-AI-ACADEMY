@@ -62,7 +62,7 @@ Closes the sprint, after the review. Time-boxed to **90 minutes**.
 
 The team inspects **itself** — how it worked, not what it built: what went well, what went badly, what to change. The output is **one or two concrete improvements carried into the next sprint**, owned by someone. A retrospective that produces a list of complaints and no change has not finished.
 
-Retrospectives only work if it is safe to be honest in them. Nothing said in a retro is used against anyone afterwards.
+Retrospectives only work if it is safe to be honest in them. Nothing said in a retro is used against anyone afterwards — which is why `docs/slack.md` rules out any bot that captures, summarises or exports one. All four of these events stay live; that file says which parts of them may go async and which may not.
 
 ## Artifacts
 
@@ -74,7 +74,7 @@ Retrospectives only work if it is safe to be honest in them. Nothing said in a r
 
 Work is done when it is **shippable**, not when it is written. In this repo that means all of:
 
-- `bin/ci` passes locally — setup, RuboCop, bundler-audit, `importmap audit`, Brakeman, the test suite, and the seed replant. There is no CI service; green means green on your machine before it is called done.
+- `bin/ci` passes locally — setup, RuboCop, bundler-audit, `importmap audit`, Brakeman, the test suite, and the seed replant. Green on your machine is what "done" means; `.github/workflows/ci.yml` then runs the same steps on a clean runner, and a red one on `main` is a broken build whoever pushed it owns.
 - New behaviour has a test, and copy changes have not broken the locale assertions.
 - Both `th.yml` and `en.yml` were updated together, with any positionally-indexed arrays kept the same length and order.
 - The change does not break an invariant listed under "Software system design" in `CLAUDE.md`.
@@ -97,5 +97,7 @@ What is known to be wanted, unordered, for whoever orders it:
 - **Lesson content per topic.** The prose, quiz and coding task are the same whichever topic is open. Sixteen topics × two languages is a writing job with an engineering seam already built for it; scope it as content, and do not let it masquerade as a sprint of code.
 - **Whether hearts gate anything at zero.** `LearnerProgress#hearts` counts down and the display stops there, deliberately, because nobody has decided whether an empty set should block an attempt. That is a pedagogy decision.
 - **Revocation better than a 30-day cap.** With no mailer, `Session::MAX_AGE` is the only thing that ends a stolen session.
+
+Whichever it is, it is the first decision on this project that has a losing alternative worth recording — `docs/mdlc.md` proposes where that record goes and what it has to contain.
 
 See `CLAUDE.md` for the engineering conventions, and `README.md` for how to run the app.

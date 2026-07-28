@@ -19,6 +19,11 @@ Bilingual, Thai-first: `default_locale = :th`, English as fallback, a toggle in 
 - **`README.md`** is written for a human joining the project, and its second half ("Technical overview" onward) covers the same ground as this file — stack, layout, request path, data model, auth, routing, tests. **The two must not drift.** An architectural change here needs the matching README section updated in the same commit; that is where the nine screens and the setup path are explained for a person who has never run the app.
 - **`docs/process.md`** — the team's Scrum process: two-week sprints, the four events, and a definition of done that points back at the invariants in this file. Read it before proposing what to build next; it also fixes the dependency order of the remaining work.
 - **`docs/design-system.md`** — the current tokens and conventions explained in prose, with the earlier eng.utcc.ac.th port kept as a history section. The `@theme` block is still the source of truth; the CSS wins where they disagree.
+- **`docs/mdlc.md`** — how a decision gets written down: the artifact set (ADR, spec, runbook, postmortem), the frontmatter schema, and the rule that status belongs to a person rather than an agent. **Most of it is a proposal and nothing in it is wired up yet** — its first section is what the repo already does, and this file wins over it on anything about the app. Read it before writing a document that is not one of the four above.
+- **`docs/landing-cms.md`** — the only fully editable content in the app: the two halves (`landing_cards` for what exists, `landing_texts` in front of the locale files for the words), the three-step ladder in `Landing.copy`, and the rules that make invariants 9 and 10 true. Read it before changing anything the landing editor touches.
+- **`docs/performance.md`** — the query budget per screen, the regressions each performance rule came from (the 3n + 12 instructor report, the doubled `LearnerProgress`, the whole-table standings fold) and why the leaderboard is deferred rather than optimised. Read it before changing how a screen loads its data; the rules distilled from it are under "Performance and scale" below.
+- **`docs/agent-flow.md`** — the operating discipline for a repo an agent does most of the typing in, which this one is. What the gates actually are (`bin/ci` is both the self-check and the policy gate, which is a named weakness), which paths are Tier C and why the locale files are not Tier A, that ambiguity must be asked about rather than guessed, and that everything the agent reads — including a `submissions.answer` row a student wrote — is data rather than instruction. Its §4 is the index of which invariant is enforced by which test; read it before adding an invariant to the list below.
+- **`docs/slack.md`** — what Slack may and may not carry: the signal classes, which Scrum events stay live, and what each remaining layer is blocked on. **One thing is wired**, the CI `notify` job, and it stays silent until `SLACK_BOT_TOKEN` and `SLACK_CI_CHANNEL` are set; §5 argues against ever accepting an inbound command. Three of its rules are load-bearing here rather than generic: a *local* `bin/ci` result must not be posted, a failed run posts once rather than once per job, and the app's own `Notification` rows must not be bridged to a webhook.
 - **`.claude/skills/`** — five project skills. Four of them (`explore-codebase`, `debug-issue`, `refactor-safely`, `review-changes`) drive the code-review-graph MCP tools; prefer them over hand-rolling a search. The fifth, **`run-app`**, is the cold-started path to seeing a change work in a real browser — the server, the headless-Edge driver, the seeded accounts, and the gotchas already paid for. Reach for it whenever a change needs to be *seen* rather than only tested.
 
 ## Commands
@@ -60,7 +65,15 @@ bin/importmap audit    # JS dependency CVEs
 
 `bin/ci` also runs `env RAILS_ENV=test bin/rails db:seed:replant`, so `db/seeds.rb` must stay runnable against a fresh test database. The system-test step runs `bin/rails test:system` as part of the pipeline.
 
-There is no CI service and no GitHub Actions workflow — `.github/` holds only `dependabot.yml`, and `bin/ci` is the whole pipeline, run locally. `docs/process.md` makes "`bin/ci` passes on your machine" the definition of done, so treat a green run as the shipping gate rather than a formality.
+**The same steps run twice, and the two must not drift.** `config/ci.rb` is what a developer runs before committing; `.github/workflows/ci.yml` is the same set on `ubuntu-latest`, on every push to `main` and every pull request, and it is the only authority that can say a commit is green independently of whoever wrote it. A step added to one belongs in the other. The workflow shipped with the Rails scaffold, was deleted in `5b510e6` while the app was being built, and was restored deliberately; `dependabot.yml`'s `github-actions` entry is the half that never left.
+
+Three things about it are load-bearing:
+
+- **`bin/setup` has no equivalent there on purpose** — it installs gems (`ruby/setup-ruby` does that), prepares the *development* database and clears logs, none of which a runner has.
+- **The system-test job checks for Edge before running**, because `test/application_system_test_case.rb` registers that driver by hand and a missing browser otherwise fails somewhere unreadable inside Selenium.
+- **One Slack message per failed run, not one per job**, from a `notify` job that needs all five. It posts only on failure, only on `main`, and only when `vars.SLACK_CI_CHANNEL` is set — see `docs/slack.md` for why success is not news and why a local `bin/ci` result still must not be posted.
+
+`docs/process.md` makes "`bin/ci` passes on your machine" the definition of done, so treat a green local run as the shipping gate rather than a formality — the workflow catches what a machine-specific pass would have hidden, it does not replace running it.
 
 ## Software system design
 
@@ -149,18 +162,16 @@ Break one of these and something rots quietly rather than failing loudly:
 
 ### Performance and scale
 
-Sized for a classroom, not a public site, and the design leans on that.
+Sized for a classroom, not a public site, and the design leans on that. **`docs/performance.md` holds the measurements, the regressions each rule came from, and the reasoning to reuse when a screen gets slow** — read it before changing how any screen loads its data. The rules themselves:
 
 - **The N+1 that isn't:** `LearnerProgress` issues one query for a learner's rows and folds them in Ruby for six different cuts. Adding a per-course query to a view would undo it.
-- **Every screen is constant-cost in the size of the data it folds**, and `test/models/query_budget_test.rb` is what keeps it that way — it grows a section and asserts the roster's query count does not move. Measured per render against the seeds: landing 2, map and profile 6, the leaderboard's shell 6 and its board frame 6 again (10 in one response before the frame), course/lesson/My Learning 12, catalog 13, progress 14, instructor 16, admin 12–20.
-  - **A cohort is loaded once, never once per member.** `Leaderboard#completions` and `InstructorReport#done_keys` are the same move — one `where(user: …)` grouped by `user_id` in Ruby. `InstructorReport` used to build a `LearnerProgress` per roster row, which cost three queries a student and made `/instructor` **3n + 12**: 273 queries for an 87-student section. It reads one thing from that object, so it now reads one query for the section instead.
-  - **A `LearnerProgress` per user per request, no more.** `User#progress` memoises one and `ApplicationController#progress` hands the view that same one, so `CourseCatalog.for` goes through `user.progress` rather than `LearnerProgress.new(user)` — building a second loaded the learner's completions twice on every course and lesson screen.
-- **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the *entire* `topic_completions` table. It is memoised on `Current.standings` for the length of a request, because `/progress` asks for a rank more than once and used to pay for all of it twice; `TopicCompletion.record` calls `LearnerProgress.forget_standings`, the same contract `LandingText.forget` carries. Correct and cheap at a few thousand rows, and the per-request memo is what buys time before it has to be cached or denormalised. `Leaderboard`'s university tab does the same shape of work — every student's rows, folded per learner — so the two share that fate.
-  - **Which is why the board is deferred rather than optimised.** `/leaderboard`'s shell no longer folds the cohort at all: the four queries behind `Leaderboard#entries` moved into the lazy frame, so the screen paints on the viewer's own rows and the whole-table fold happens behind a skeleton. It buys perceived latency, not queries — the total is unchanged and the frame costs a second round trip. Nothing else on the app is split this way, and a screen should only be split when the deferred half is genuinely the expensive half.
-- **The bell's socket is one subscription per open page, and one poller per process.** `solid_cable` polls its own SQLite file every 100ms for new messages — once per Puma process, not once per subscriber, so a section of ninety students is ninety in-memory fan-outs off the same poll rather than ninety pollers. It is a different database file from the one that takes writes, which is why constant reads on it do not compete with the single writer. The broadcast itself is **synchronous** rather than `_later`: it renders nothing (the payload is a constant frame), so there is no rendering cost to move off the request, and enqueuing it would make the admin path the second thing in the app to need Solid Queue.
-- Nothing uses `Rails.cache` yet. `stale_when_importmap_changes` gives HTML responses an etag; Thruster handles asset caching and compression.
-- One writer: SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
-- The only enqueued work in the whole app is the password-reset email (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.
+- **Every screen is constant-cost in the size of the data it folds**, and `test/models/query_budget_test.rb` is what keeps it that way. If a change moves a query count, explain it rather than update it quietly.
+- **A cohort is loaded once, never once per member.** An object that is cheap for one learner, constructed once per learner, is the mistake — it is what made `/instructor` 3n + 12.
+- **One `LearnerProgress` per user per request.** Go through `user.progress`, never `LearnerProgress.new(user)`.
+- **The known hotspot is `LearnerProgress.standings`** — two grouped counts over the entire `topic_completions` table, memoised on `Current.standings` and dropped by `LearnerProgress.forget_standings` on write. Any other whole-table memo owes the same `forget` contract, as `LandingText.forget` and `Landing.forget_cards` do.
+- **The leaderboard's board is deferred into a lazy frame, not optimised** — it buys perceived latency, not queries. Split a screen only when the deferred half is genuinely the expensive half; nothing else in the app is split this way.
+- **Nothing uses `Rails.cache`.** One writer: SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
+- **The only enqueued work in the whole app is the password-reset email** (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.
 
 ### Evolving a placeholder into a real model
 
@@ -221,42 +232,15 @@ Three smaller things are easy to undo by accident:
 
 ### The landing page
 
-`app/views/home/index.html.erb` used to be the exception to both rules above — two dozen lines of hardcoded Thai in the ERB and five arrays of it in a private `HomeController#landing`. It is not any more, and it is now the one screen an admin can edit without a deploy. **It is also the only content in the app that is fully a CMS**: not just reworded but added to, reordered and deleted from, at `/admin?tab=landing`.
+`/` for a signed-out visitor is the one screen an admin can change without a deploy, and **the only content in the app that is fully a CMS** — added to, reordered and deleted from at `/admin?tab=landing`, not merely reworded. `Landing` is a read model rather than a placeholder module, and it holds no taxonomy of its own: the five card collections are `landing_cards` rows.
 
-`Landing` is a read model, not a placeholder module. It holds no taxonomy of its own any more — the five card collections that used to be `TOPICS`/`TRACKS`/`SHARES`/`EVENTS`/`FAQS` are `landing_cards` rows. `TRACK_FILTERS` is the one constant left, because it is the three shared `levels.*` and not a collection.
+**`docs/landing-cms.md` is the whole of how it works** — read it before touching `Landing`, `LandingCard`, `LandingText` or `AdminController#update_landing`. Three things about it are worth knowing before you get there:
 
-**Two halves, in two places:**
+- **Its joins are by key, not by position** — a card finds its copy by its own slug, so adding one never shifts the copy of the card below it. That is the opposite of every other locale join in this app, and it is what makes the collection editable at all.
+- **`Landing.copy` is a three-step ladder**, not a lookup: what an admin wrote in this language, then what ships in this language, then what an admin wrote in the other one. Each step exists for a case the one before it cannot serve, and the order is load-bearing.
+- **A `landing_texts` row is a departure from the shipped copy, never a duplicate of it**, and destroying a card destroys its copy with it. Those are invariants 9 and 10.
 
-| | Home | Editable how |
-| --- | --- | --- |
-| Which cards exist, in what order, a track's level and weeks, an event's date | `landing_cards` | add / reorder / delete, and the attributes ride on the copy form |
-| Every word a card shows | `landing.*` in both locale files, with `landing_texts` in front | the bilingual editor |
-
-**Its joins are by key, not by position.** A card looks up its own copy by its own slug (`LandingCard#prefix` — note `tracks` and `events` nest under `items.` in the locale files, which is the one thing that map exists for), so adding a card never shifts the copy of the card below it.
-
-**The locale files are the default, not the last word — and for a card an admin created, there is no default at all.** `Landing.copy(key)` is the three-step ladder that reconciles those two cases:
-
-```ruby
-LandingText.for(key) || default(key).presence || LandingText.any(key).to_s
-```
-
-Every reader on every `Data` object goes through it, and so does the view — which is why the section headings in `home/index.html.erb` are `Landing.copy("tracks.title")` rather than `t()`. The steps matter in that order:
-
-1. **What an admin wrote in this language.**
-2. **What ships in this language** — `Landing.default` is `I18n.t(…, default: nil)`, and the explicit `nil` is load-bearing: without it a card an admin added renders `translation missing`. Because this beats step 3, a Thai-only rewrite still never displaces the English the repo ships.
-3. **What an admin wrote in the other language.** This is what keeps an admin-made card visible on both pages rather than blank in one — and keeps a blank `name` out of the `Course`/`Event` JSON-LD.
-
-Then:
-
-- **A row is a departure from the default, never a copy of it.** `LandingText.write` deletes rather than stores when a box is cleared or retyped to match what ships, so the editor needs no reset control and the locale files can never be shadowed by a stale duplicate of themselves. That is invariant 9. For an admin-made card the default is nothing, so clearing simply removes the copy.
-- **The editable surface is derived, not listed.** `Landing.groups` is built from the rows, so a card an admin adds arrives in the editor with copy fields of its own; `editable_keys` is the whitelist `LandingText` validates against and `AdminController#update_landing` reads params through. Chrome is deliberately outside it — `landing.brand_*`, `landing.nav.*` and `hero.logo_alt` belong to `shared/_header`, and `levels.*`/`units.*` are shared with the catalog, so the landing editor cannot reword another screen.
-- **A track's level and an event's date are on the card, not in the copy.** They are one fact in both languages, so they are columns; they are edited on the same form as the copy because they are the same card. An event's `starts_on` is a real `date`, so an unparseable one casts to "undated" rather than shipping an invalid `startDate`.
-- **Deleting a card deletes its copy** — `LandingCard`'s `after_destroy`. That is invariant 10; without it a slug that came back would silently inherit someone else's words.
-- A card's slug is **generated, never typed** (`LandingCard.key_for`): an admin should not have to invent a stable identifier. `parameterize` strips non-ASCII, so a Thai-only title falls back to `"card"` plus a numeric suffix.
-- `LandingText.overrides` and `Landing.cards` each read their whole table once per request and memoise on `Current`, for the same reason `Current.syllabus` exists. Anything that writes must call `LandingText.forget` / `Landing.forget_cards`.
-- The taxonomy is **three copies that must agree** — the `CreateLandingCards` migration, `db/seeds.rb` above the `Rails.env.local?` fence, and `test/fixtures/landing_cards.yml`. `landing_card_test.rb` asserts the shape all three have to produce, exactly as `taxonomy_test.rb` does for the catalog.
-
-**Several of these joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `LearnerProgress::AWARDS[i]` with `my_learning.awards[i]` (rule and glyph on one side, name and hint on the other), `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
+**Several other joins are positional, not keyed** — `Syllabus::ENTRIES[i]` lines up with `course.modules[i]` in the locale file (and its topics with `course.modules[i][:topics][j]`, which is what a `"<module>-<position>"` topic key points into), `LearnerProgress::AWARDS[i]` with `my_learning.awards[i]` (rule and glyph on one side, name and hint on the other), `LearnerProgress#dashboard_stats` with `progress.stats[i]`, `LessonContent::BLOCKS[i]` with `lesson.theory.blocks[i]`, and every `AdminConsole` array with its `admin.*` counterpart (`STATS`, `ADOPTION`, `HEALTH`, `COURSES`, `QUEUE_KINDS`, `AUDIT_LEVELS`, plus `FLAG_GROUPS` which nests one level deeper). Inserting a row in one place without the other silently shifts every label after it. `test/models/placeholder_content_test.rb` exists mainly to catch that, and asserts across **both** locales.
 
 Replacing a placeholder with a real model means keeping the same reader methods; the views only ever call those. `LearnerProgress` is the worked example — see below.
 
@@ -495,38 +479,9 @@ Assertions compare against `I18n.t(...)` rather than literal strings; a copy cha
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+**This project has a knowledge graph — reach for the code-review-graph MCP tools before Grep/Glob/Read.** It is cheaper and answers structural questions file scanning cannot: callers, dependents, blast radius, which tests cover a thing. Fall back to file scanning only where the graph does not reach.
 
-### When to use graph tools FIRST
+The tools carry their own descriptions, so they are not restated here. What is specific to this repo:
 
-- **Exploring code**: `semantic_search_nodes_tool` or `query_graph_tool` instead of Grep
-- **Understanding impact**: `get_impact_radius_tool` instead of manually tracing imports
-- **Code review**: `detect_changes_tool` + `get_review_context_tool` instead of reading entire files
-- **Finding relationships**: `query_graph_tool` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview_tool` + `list_communities_tool`
-
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
-
-### Key Tools
-
-| Tool | Use when |
-| ------ | ---------- |
-| `detect_changes_tool` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context_tool` | Need source snippets for review — token-efficient |
-| `get_impact_radius_tool` | Understanding blast radius of a change |
-| `get_affected_flows_tool` | Finding which execution paths are impacted |
-| `query_graph_tool` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes_tool` | Finding functions/classes by name or keyword |
-| `get_architecture_overview_tool` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
-
-### Workflow
-
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes_tool` for code review.
-3. Use `get_affected_flows_tool` to understand impact.
-4. Use `query_graph_tool` pattern="tests_for" to check coverage.
+- **Four of the five project skills already drive these tools** — `explore-codebase`, `debug-issue`, `refactor-safely`, `review-changes`. Prefer the skill over assembling the calls by hand.
+- **The graph rebuilds itself on every `Edit`/`Write`**, through the `PostToolUse` hook in `.claude/settings.json`. That file is a command that executes on file change — treat a change to it as Tier C under `docs/agent-flow.md`.

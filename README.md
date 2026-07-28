@@ -60,7 +60,7 @@ Use `bin/dev` rather than `bin/rails server` — it runs the Tailwind watcher al
 ```bash
 bin/rails test                             # run the tests
 bin/rails test test/models/user_test.rb:12 # run one test
-bin/ci                                     # the full pipeline: lint, security scans, tests (run locally — there is no CI service)
+bin/ci                                     # the full pipeline: lint, security scans, tests (also runs in GitHub Actions)
 bin/rubocop -a                             # autocorrect style
 bin/rails admin:create                     # create or promote an admin
 bin/rails instructor:create                # create or promote an instructor
@@ -193,7 +193,13 @@ db/
   {queue,cache,cable}_schema.rb     the solid_* databases, kept separate on purpose
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
 lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
+docs/process.md                     the Scrum process, and what "done" means here
 docs/design-system.md               the visual tokens and conventions, explained; the CSS wins
+docs/performance.md                 the query budget per screen, and the regressions behind each rule
+docs/landing-cms.md                 how the editable landing page resolves its copy
+docs/mdlc.md                        how a decision gets written down — mostly proposal, not yet wired up
+docs/slack.md                       what Slack may carry — policy only; there is no integration
+docs/agent-flow.md                  how work gets verified when an agent writes most of it
 ```
 
 ## Request path
@@ -523,13 +529,13 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 
 **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` asserts the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
 
-`bin/ci` is the whole pipeline — there is no CI service and no GitHub workflow:
+`bin/ci` is the pipeline you run before committing, and `.github/workflows/ci.yml` runs the same steps on every push to `main` and every pull request:
 
 ```
 Setup → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds
 ```
 
-The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
+A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
 
 ---
 
