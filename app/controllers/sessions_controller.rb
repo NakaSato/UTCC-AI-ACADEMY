@@ -2,7 +2,20 @@ class SessionsController < ApplicationController
   layout "auth", only: :new
 
   allow_unauthenticated_access only: %i[ new create ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to login_path, alert: "พยายามเข้าสู่ระบบบ่อยเกินไป กรุณาลองใหม่ในภายหลัง" }
+
+  # Two limits, because they stop different things. The first is the default
+  # `by: request.remote_ip`, which slows one machine working through a list. The
+  # second keys on the account being tried, so guessing spread across many
+  # addresses is throttled too — an IP-only limit is no obstacle at all to
+  # someone with a list of real student IDs and more than one source.
+  #
+  # `name:` is what lets the two coexist; without it the second would replace the
+  # first. Blank submissions all share one bucket, which is fine.
+  rate_limit to: 10, within: 3.minutes, name: "ip", only: :create,
+             with: -> { redirect_to login_path, alert: t("flash.login_throttled") }
+  rate_limit to: 10, within: 3.minutes, name: "account", only: :create,
+             by: -> { params[:student_id].to_s },
+             with: -> { redirect_to login_path, alert: t("flash.login_throttled") }
 
   # The sign-up form shares this screen as the second tab, so this action has
   # to prepare it too — see shared/_auth_switch.

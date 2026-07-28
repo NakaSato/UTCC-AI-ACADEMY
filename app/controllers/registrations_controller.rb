@@ -8,7 +8,7 @@ class RegistrationsController < ApplicationController
 
   allow_unauthenticated_access
   rate_limit to: 10, within: 3.minutes, only: :create,
-             with: -> { redirect_to register_path, alert: "ลองใหม่อีกครั้งในภายหลัง" }
+             with: -> { redirect_to register_path, alert: t("flash.signup_throttled") }
 
   def new
     @user = User.new
