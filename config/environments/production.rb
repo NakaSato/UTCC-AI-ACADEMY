@@ -102,11 +102,16 @@ Rails.application.configure do
   # This is the list of names the app will answer to, and it is a second reason to
   # keep it short: `request.base_url` builds every canonical, hreflang and sitemap
   # <loc>, so a name that reaches the app is a name that can get itself published.
-  # The onrender.com address stays because it is what serves the site until the
-  # custom domain's certificate is issued.
+  #
+  # Both entries are spelled out. A `/\A.*\.onrender\.com\z/` wildcard used to
+  # stand here, and anyone can own a free name under that domain — a forged Host
+  # would have come back inside the canonical, the hreflang set, og:image, the
+  # JSON-LD url and every sitemap <loc>. The exact service name is `name:` in
+  # render.yaml, and this line can lose it once academy.boring9.dev's certificate
+  # is issued.
   config.hosts = [
     "academy.boring9.dev",
-    /\A.*\.onrender\.com\z/
+    "utcc-ai-academy.onrender.com"
   ]
 
   # Skip DNS rebinding protection for the default health check endpoint, which the
