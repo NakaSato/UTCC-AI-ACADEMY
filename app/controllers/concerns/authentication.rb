@@ -25,8 +25,11 @@ module Authentication
       Current.session ||= find_session_by_cookie
     end
 
+    # `live`, never a bare `find_by` — a session past Session::MAX_AGE is not a
+    # session, and a cookie that outlives its row must resolve to nobody.
+    # ApplicationCable::Connection does the same lookup and has to match.
     def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      Session.live.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
 
     # Denial sends a visitor to the front door, not to the form — `/` is the
@@ -47,11 +50,16 @@ module Authentication
 
     # `remember` backs the "remember me on this device" checkbox on the sign-in
     # screen: without it the cookie lasts only as long as the browser session.
+    #
+    # Either way the cookie now expires with the row rather than outliving it —
+    # `permanent` was twenty years against a record that Session::MAX_AGE stops
+    # honouring after thirty days, so the browser kept sending a dead id.
     def start_new_session_for(user, remember: true)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
-        jar = remember ? cookies.signed.permanent : cookies.signed
-        jar[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        cookie = { value: session.id, httponly: true, same_site: :lax }
+        cookie[:expires] = Session::MAX_AGE.from_now if remember
+        cookies.signed[:session_id] = cookie
       end
     end
 

@@ -7,8 +7,13 @@ module ApplicationCable
     end
 
     private
+      # `live`, matching Authentication#find_session_by_cookie — an expiry
+      # enforced in only one of the two places that resolve this cookie is an
+      # expiry that can be walked around. This is no longer hypothetical: every
+      # signed-in page subscribes the notification bell, so a dead session's
+      # cookie is offered here on every screen.
       def set_current_user
-        if session = Session.find_by(id: cookies.signed[:session_id])
+        if session = Session.live.find_by(id: cookies.signed[:session_id])
           self.current_user = session.user
         end
       end
