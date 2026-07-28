@@ -141,9 +141,21 @@ class InstructorReport
   private
     def students = @students ||= section.students.order(:name).to_a
 
+    # What each student has finished **in this section's course**, keyed by user
+    # id. One query for the cohort, exactly as Leaderboard#completions does for
+    # the board — a LearnerProgress per roster row used to cost three queries a
+    # student (its own rows, plus the course and topics it eagerly loads), which
+    # made this screen 3n + 12 and the only page in the app whose cost grew with
+    # the size of a section. It reads one thing from that object; this is it.
+    def done_keys
+      @done_keys ||= TopicCompletion.where(user: students, course: section.course)
+                                    .includes(:topic)
+                                    .group_by(&:user_id)
+                                    .transform_values { |rows| rows.map(&:topic_key).to_set }
+    end
+
     def student_row(user)
-      progress = LearnerProgress.new(user)
-      done = progress.keys_for(section.course.code)
+      done = done_keys.fetch(user.id, Set.new)
 
       Student.new(user:,
                   percent: percent(done.size, Syllabus.topic_count),
@@ -175,8 +187,8 @@ class InstructorReport
       [ "#{average_percent}%", "#{on_time_percent}%", inactive_count.to_s, average_score.to_s ]
     end
 
-    # One query for the cohort, folded in Ruby — the same shape as
-    # `first_attempts` below, and for the same reason: a per-student query would
+    # One query for the cohort, folded in Ruby — the same shape as `done_keys`
+    # and `first_attempts`, and for the same reason: a per-student query would
     # make this screen's cost grow with the size of a section.
     def scored_attempts
       @scored_attempts ||= Submission.where(user: students).where.not(score: nil)

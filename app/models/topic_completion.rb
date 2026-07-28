@@ -38,7 +38,7 @@ class TopicCompletion < ApplicationRecord
                                        topic: Topic.find_by(key: topic_key))
     completion.learned_at ||= at
     completion.applied_at ||= at if kind.to_sym == :applied
-    completion.save
+    LearnerProgress.forget_standings if completion.save
     completion
   end
 

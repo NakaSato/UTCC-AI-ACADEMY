@@ -22,4 +22,12 @@ class Current < ActiveSupport::CurrentAttributes
   # And the landing page's cards, grouped by collection — one query for the five
   # collections the page renders. See Landing.cards.
   attribute :landing_cards
+
+  # Every student's XP, ranked. Two grouped counts over the whole of
+  # topic_completions, and /progress asks for a rank more than once per render —
+  # so without this the most expensive query pair in the app ran twice for one
+  # page. Held here for the same reason as the syllabus: a module-level memo
+  # would outlive the database it was read from. TopicCompletion.record clears
+  # it; see LearnerProgress.forget_standings.
+  attribute :standings
 end

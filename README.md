@@ -292,6 +292,8 @@ The **level is derived, not stored** — `AuditEvent::WARN` names the entries wo
 
 It loads a learner's rows **once** and folds them in Ruby rather than aggregating in SQL: the volume is one row per topic per student, the date arithmetic wants `Time.zone` rather than SQLite's, and the screens ask for six different cuts of the same rows.
 
+That rule generalises, and it is the app's one hard performance constraint: **a screen loads a whole cohort in one query, never one query per member.** `Leaderboard` and `InstructorReport` both do it with a single `where(user: …)` grouped by `user_id`. `test/models/query_budget_test.rb` grows a section and asserts the query count does not move, because a page that quietly becomes 3n queries looks identical on screen — and on a single-writer SQLite file, one slow page is the whole box.
+
 The display conventions live in the class, not the table:
 
 ```ruby

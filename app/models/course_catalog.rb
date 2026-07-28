@@ -92,13 +92,20 @@ module CourseCatalog
 
     # The same list with one learner's counts filled in. LearnerProgress owns the
     # fold, so the whole catalog costs the one query it makes.
-    def for(user) = LearnerProgress.new(user).courses
+    # `user.progress`, not a fresh LearnerProgress — User memoises one per
+    # instance and the `progress` helper hands the view that same one, so
+    # building a second here loaded the learner's completions twice on every
+    # course and lesson screen.
+    def for(user) = (user&.progress || LearnerProgress.new(nil)).courses
 
     def find(code, user: nil) = (user ? self.for(user) : all).find { |course| course.code == code }
 
     # The chip row: every filter with the number of courses behind it.
     def filter_counts
-      FILTERS.index_with { |filter| all.count { |course| course.tagged?(filter) } }
+      # `all` is a query, and there are seven chips — read the catalog once and
+      # count the same array seven times rather than reading it seven times.
+      courses = all
+      FILTERS.index_with { |filter| courses.count { |course| course.tagged?(filter) } }
     end
   end
 end

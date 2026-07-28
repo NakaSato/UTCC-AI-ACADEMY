@@ -238,13 +238,25 @@ class LearnerProgress
   class << self
     # [[user_id, xp], …] best first. Two grouped counts rather than one SQL
     # expression, so the XP rule stays in Ruby where the rest of it lives.
+    #
+    # Both counts read the *whole* table, which is what makes this the app's
+    # known hotspot — so it is held on Current for the length of the request.
+    # /progress asks for a rank more than once and used to pay for all of it
+    # twice. This is the first thing to cache or denormalise when a few thousand
+    # rows becomes more; memoising per request is what buys the time to.
     def standings
-      learned = TopicCompletion.group(:user_id).count
-      applied = TopicCompletion.applied.group(:user_id).count
+      Current.standings ||= begin
+        learned = TopicCompletion.group(:user_id).count
+        applied = TopicCompletion.applied.group(:user_id).count
 
-      learned.map { |id, count| [ id, count * XP_PER_LEARNED + applied.fetch(id, 0) * XP_PER_APPLIED ] }
-             .sort_by { |id, xp| [ -xp, id ] }
+        learned.map { |id, count| [ id, count * XP_PER_LEARNED + applied.fetch(id, 0) * XP_PER_APPLIED ] }
+               .sort_by { |id, xp| [ -xp, id ] }
+      end
     end
+
+    # Anything that writes a completion has changed the ranking — the same
+    # contract LandingText.forget and Landing.forget_cards carry.
+    def forget_standings = Current.standings = nil
   end
 
   private
