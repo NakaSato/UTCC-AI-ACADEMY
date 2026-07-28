@@ -49,3 +49,11 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Ignore local tooling state. `COPY . .` takes the whole build context, so
+# without these the knowledge graph, the LSP index and the agent config all ship
+# inside the production image — and .claude/settings.local.json is exactly the
+# kind of file that shows up in one of them later.
+/.claude
+/.code-review-graph
+/.ruby-lsp
