@@ -1,0 +1,37 @@
+<%# What the shell's frame fetches: the rows, and nothing that would fetch them
+    again. No `src` and no `loading` here — a frame that names its own source on
+    the way back loops forever.
+
+    The rows still carry `data-in="true"` and their stagger, so arriving by frame
+    reads as the same arrival a full page load gives them. %>
+<%= turbo_frame_tag "leaderboard-board", role: "tabpanel", class: "block" do %>
+  <% if @entries.empty? %>
+    <p class="px-6 py-8 text-14-5 text-muted"><%= t("leaderboard.empty") %></p>
+  <% end %>
+
+  <% @entries.each_with_index do |entry, index| %>
+    <div style="animation-delay: <%= index * 45 %>ms" data-in="true"
+         class="grid data-[in=true]:animate-row-in grid-cols-[48px_minmax(0,1fr)_80px] items-center gap-2 border-b
+                border-surface-5 px-4 py-3.75 sm:grid-cols-[64px_minmax(0,1fr)_110px_110px_110px] sm:px-6
+                <%= "bg-brand-tint" if entry.you? %>">
+      <span class="text-15 font-bold <%= entry.podium? ? "text-brand" : "text-muted-3" %>">
+        <%= entry.rank %>
+      </span>
+
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="grid size-8 flex-none place-items-center rounded-[9px] text-11-5 font-semibold
+                     <%= entry.you? ? "bg-brand text-white" : "bg-surface-2 text-muted-2" %>">
+          <%= entry.initials %>
+        </span>
+        <div class="min-w-0">
+          <div class="truncate text-14-5 <%= entry.you? ? "font-bold" : "font-medium" %>"><%= entry.name %></div>
+          <div class="text-12 text-muted-2"><%= entry.section_text %></div>
+        </div>
+      </div>
+
+      <span class="text-right text-14-5 font-semibold"><%= entry.xp %></span>
+      <span class="hidden text-right text-14 text-muted sm:block"><%= entry.topics %></span>
+      <span class="hidden text-right text-14 text-muted sm:block"><%= entry.streak_text %></span>
+    </div>
+  <% end %>
+<% end %>

@@ -213,8 +213,20 @@ end
 
 `progress` is `Current.user&.progress || LearnerProgress.new(nil)` — a null-object fallback so the helper is safe on the one screen that renders without a user.
 
-Controllers below it are deliberately tiny: read a param, validate it against a whitelist, ask a module, assign. `ProgressController` is 238 bytes; `LeaderboardsController` is 154. **A param is never trusted and never raises** — each controller falls back to a default (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold.
+Controllers below it are deliberately tiny: read a param, validate it against a whitelist, ask a module, assign. `ProgressController` is 238 bytes. **A param is never trusted and never raises** — each controller falls back to a default (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold.
 
+**One screen answers twice, and it is the only one.** `/leaderboard` renders a shell — heading, tabs, column header — around a lazy Turbo frame whose `src` is that same URL, so the browser comes straight back for it with a `Turbo-Frame` header and `LeaderboardsController#show` branches on `turbo_frame_request?`:
+
+```ruby
+if turbo_frame_request?
+  @entries = board.entries   # every contender's completions — the expensive half
+  render "board"
+else
+  @section = board.section   # all the shell needs, and no completion is read
+end
+```
+
+The board is the one figure on the page that folds a whole cohort, and on the university tab that is the entire `topic_completions` table. Deferring it means the screen paints immediately and the fold happens behind a skeleton of the rows it is about to draw. Two rules come with the pattern: the frame's own response carries **no** `src` and **no** `loading`, or it fetches itself forever; and turbo-rails swaps in a minimal layout for the second request, so the app chrome is not rendered twice. It buys perceived latency, not queries — the total is the same plus a round trip.
 
 **And one component is pushed to rather than asked.** Notifications are written *for* somebody by somebody else — every `Notification.notify` call is in `AdminController`, acting on a student — so until the bell learned to redraw itself, the person it concerned found out on their next page load. `NotificationBell` is a plain class that owns the DOM id it replaces, the Action Cable channel it is replaced over, the path it is re-read from and the figures the panel shows; `shared/_app_header` subscribes with `turbo_stream_from notification_bell.stream`, and two callers say `broadcast_refresh!`.
 
@@ -292,7 +304,7 @@ The **level is derived, not stored** — `AuditEvent::WARN` names the entries wo
 
 It loads a learner's rows **once** and folds them in Ruby rather than aggregating in SQL: the volume is one row per topic per student, the date arithmetic wants `Time.zone` rather than SQLite's, and the screens ask for six different cuts of the same rows.
 
-That rule generalises, and it is the app's one hard performance constraint: **a screen loads a whole cohort in one query, never one query per member.** `Leaderboard` and `InstructorReport` both do it with a single `where(user: …)` grouped by `user_id`. `test/models/query_budget_test.rb` grows a section and asserts the query count does not move, because a page that quietly becomes 3n queries looks identical on screen — and on a single-writer SQLite file, one slow page is the whole box.
+That rule generalises, and it is the app's one hard performance constraint: **a screen loads a whole cohort in one query, never one query per member.** `Leaderboard` and `InstructorReport` both do it with a single `where(user: …)` grouped by `user_id`. `test/models/query_budget_test.rb` grows a section and asserts the query count does not move, because a page that quietly becomes 3n queries looks identical on screen — and on a single-writer SQLite file, one slow page is the whole box. The leaderboard goes one step further and does not run that query on the first response at all — see the lazy frame under [Request path](#request-path).
 
 The display conventions live in the class, not the table:
 
@@ -387,7 +399,8 @@ patch "profile"        => "profiles#update"     # the only place an email is set
 patch "profile/password" => "profiles#update_password"  # change it while signed in
 get   "map"            => "knowledge_maps#show" # ?topic=<node id>&mode=course|project
 get   "progress"       => "progress#show"
-get   "leaderboard"    => "leaderboards#show"   # ?tab=week|semester|university
+get   "leaderboard"    => "leaderboards#show"   # ?tab=week|semester|university — the shell, or
+                                                # the board when a Turbo frame asks for it
 get   "instructor"     => "instructor#show"
 get   "admin"          => "admin#show"          # ?tab=features|overview|users|courses|landing|sections|queue|integrity|perms|audit
 patch "admin/users/:id" => "admin#update"
@@ -429,7 +442,7 @@ Add JS dependencies with `bin/importmap pin <pkg>` — never npm or yarn. It wri
 | `header` | sticky header, mobile drawer |
 | `dropdown` | notifications, account menu |
 | `tabs` | segmented controls that navigate |
-| `panels` | tabs whose panels are all already in the document — show/hide, optionally pushing a path and title |
+| `panels` | tabs whose panels are all already in the document — show/hide, optionally pushing a path and title. It needs a `data-panels-target="panel"` to have anything to show; the leaderboard's tabs were wired to it with none, so they are plain links now |
 | `quiz`, `code_task` | in-browser lesson grading |
 | `rewards` | listens for the reward events those two emit, POSTs the completion |
 | `proctor` | lesson integrity monitoring |
@@ -498,6 +511,7 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 | `tasks/instructor_task_test.rb` | `instructor:create`, including that it leaves an admin alone rather than demoting one |
 | `models/instructor_report_test.rb`, `models/leaderboard_test.rb` | the Teaching console and the board, counted from a real section |
 | `models/notification_bell_test.rb`, `controllers/notification_broadcast_test.rb` | the bell that redraws itself: what a broadcast may contain (a frame with a src, a placeholder, and **no copy or CSRF token in either language**) and what the refetch must supply (the reader's own language and a token they can submit) |
+| `controllers/leaderboard_frame_test.rb` | the one screen that answers twice: the shell ships a lazy frame and none of the rows, the frame ships the rows and not the `src` that would loop, and the tab in the URL is the tab the frame counts |
 | `models/awards_test.rb` | one test per award rule, and that a new account has earned nothing |
 | `models/landing_card_test.rb` | the landing taxonomy: generated slugs, a card's place, and that deleting one deletes its copy |
 | `models/audit_event_test.rb`, `controllers/admin_audit_test.rb` | the audit log: the actor is whoever is signed in, the level is derived rather than stored, and — driven through every endpoint — each admin action logs exactly once while a failed one logs nothing |

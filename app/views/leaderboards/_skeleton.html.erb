@@ -1,0 +1,49 @@
+<%#
+  The board's placeholder, on screen for as long as the lazy frame takes to
+  answer. It repeats the row's grid rather than reaching for a shared class,
+  because the two have to line up under one column header and the design system
+  has no component classes to line them up with.
+
+  Eight rows and the name widths are the design's, not derived from anything;
+  the 90ms stagger is shared/_loading_skeleton's. Purely decorative, so the
+  placeholder is aria-hidden and the only thing a screen reader gets is the
+  live-region label.
+%>
+<% widths = [ 62, 78, 54, 71, 66, 83, 58, 74 ] %>
+
+<div role="status" aria-live="polite">
+  <span class="sr-only"><%= t("chrome.loading") %></span>
+
+  <div aria-hidden="true">
+    <% widths.each_with_index do |width, index| %>
+      <% delay = "animation-delay: #{index * 90}ms" %>
+      <div class="grid grid-cols-[48px_minmax(0,1fr)_80px] items-center gap-2 border-b border-surface-5
+                  px-4 py-3.75 sm:grid-cols-[64px_minmax(0,1fr)_110px_110px_110px] sm:px-6">
+        <div class="h-4 w-5 animate-shimmer rounded-[7px] skeleton" style="<%= delay %>"></div>
+
+        <%# The two bars sit inside `text-14-5` and `text-12` wrappers, inline-block
+            rather than block, so each line box is the height of the *text* it
+            stands in for. Stacking two bars with a `gap` instead made the row
+            65px against the real 73.375 — an 8px jump per row on arrival, which
+            is the one thing a skeleton is for. %>
+        <div class="flex min-w-0 items-center gap-3">
+          <div class="size-8 flex-none animate-shimmer rounded-[9px] skeleton" style="<%= delay %>"></div>
+          <div class="min-w-0" style="width: <%= width %>%">
+            <div class="text-14-5">
+              <span class="inline-block h-3.5 w-full align-middle animate-shimmer rounded-[7px] skeleton"
+                    style="<%= delay %>"></span>
+            </div>
+            <div class="text-12">
+              <span class="inline-block h-3 w-[55%] align-middle animate-shimmer rounded-[7px] skeleton"
+                    style="<%= delay %>"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ml-auto h-4 w-11 animate-shimmer rounded-[7px] skeleton" style="<%= delay %>"></div>
+        <div class="ml-auto hidden h-4 w-8 animate-shimmer rounded-[7px] skeleton sm:block" style="<%= delay %>"></div>
+        <div class="ml-auto hidden h-4 w-14 animate-shimmer rounded-[7px] skeleton sm:block" style="<%= delay %>"></div>
+      </div>
+    <% end %>
+  </div>
+</div>
