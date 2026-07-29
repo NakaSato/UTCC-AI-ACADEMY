@@ -1,40 +1,85 @@
-# SQLite. Versions 3.8.0 and up are supported.
-#   gem install sqlite3
+# PostgreSQL. Versions 9.3 and up are supported.
 #
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem "sqlite3"
+# The pg gem ships precompiled binaries for darwin and both linux platforms, so
+# `bundle install` needs no libpq and no pg_config on the host. A psql client is
+# still worth having to poke at the database by hand: `brew install libpq`, which
+# is keg-only, so its bin lands at /opt/homebrew/opt/libpq/bin.
 #
+# In development and test the server is the container in compose.yml — start it
+# with `docker compose up -d`, which bin/setup does for you. The defaults below
+# are that container's credentials, so a fresh clone needs no .env to boot.
+#
+# Every value is overridable by environment, which is what production uses:
+# DB_HOST, DB_PORT, DB_USER, DB_PASSWORD and DB_NAME come from the deploy target
+# (the Kamal db accessory in config/deploy.yml, or the managed instance Render
+# wires in through render.yaml).
 default: &default
-  adapter: sqlite3
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 5000
+  adapter: postgresql
+  encoding: unicode
+  # Connections per process. Puma's thread count is the ceiling on how many the
+  # app can actually use at once.
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("DB_PORT") { 5433 } %>
+  username: <%= ENV.fetch("DB_USER") { "utcc" } %>
+  password: <%= ENV.fetch("DB_PASSWORD") { "utcc" } %>
+  # Not a tuning knob — the test suite does not run without it. The precompiled
+  # pg gem bundles a libpq built with GSSAPI, and on macOS opening a connection
+  # from a *forked* child segfaults inside connect_start before it ever reaches
+  # the server. test_helper.rb parallelizes by forking one worker per core, so
+  # every worker crashes and the run wedges rather than failing.
+  #
+  # This turns off GSSAPI *encryption* negotiation only. It is not sslmode and it
+  # does not weaken TLS: nothing in the app's deploy path authenticates with
+  # Kerberos, so the negotiation it skips would have failed anyway. Safe to
+  # remove once pg ships a darwin build that survives fork.
+  gssencmode: disable
 
 development:
   <<: *default
-  database: storage/development.sqlite3
+  database: utcc_ai_academy_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
+#
+# The suite runs parallelized, so Rails creates one numbered copy of this
+# database per worker (utcc_ai_academy_test_0, _1, …) and manages them itself.
+# They outlive a `db:drop`, which only knows about the two named here.
 test:
   <<: *default
-  database: storage/test.sqlite3
+  database: utcc_ai_academy_test
 
-# Store production database in the storage/ directory, which by default
-# is mounted as a persistent Docker volume in config/deploy.yml.
+# One database, and one connection pool with it. Solid Cache, Solid Queue and
+# Solid Cable keep their tables in here alongside the app's own rather than in
+# three databases of their own, which is a **connection budget** decision:
+#
+#   Rails holds a pool per database *per process*. With SOLID_QUEUE_IN_PUMA the
+#   instance is Puma plus a dispatcher plus a worker, so four databases meant
+#   four pools in each of them. The managed Postgres this connects to allows 20
+#   connections and the provider itself holds 11, leaving about 6. Four pools of
+#   5 asks for 20 from one instance.
+#
+# So their schemas are migrations in db/migrate and their tables are in
+# db/schema.rb like everything else.
+#
+# `pool` is the ceiling on what ONE process takes, and SOLID_QUEUE_IN_PUMA means
+# there are five of them — Puma, plus Solid Queue's supervisor, dispatcher,
+# scheduler and worker, each forked with a pool of its own. The arithmetic that
+# matters is therefore `5 x pool` for the worst case, against roughly 11 free.
+# Measured at idle it sits at 6, because none of the five comes close to
+# saturating its pool; a busy queue is what would close that gap.
+#
+# If connections do run out, the lever is the queue rather than this number:
+# unsetting SOLID_QUEUE_IN_PUMA removes four of the five processes. Dropping
+# `pool` below Puma's thread count throttles requests instead, and the Solid
+# Cable poller holds one of them continuously.
+#
+# DATABASE_URL is the whole connection — host, port, database, credentials and
+# `sslmode=require`. It is a secret and is never written down in this repo: the
+# deploy target supplies it (`.kamal/secrets`, or the Render dashboard).
 production:
   primary:
     <<: *default
-    database: storage/production.sqlite3
-  cache:
-    <<: *default
-    database: storage/production_cache.sqlite3
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: storage/production_queue.sqlite3
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: storage/production_cable.sqlite3
-    migrations_paths: db/cable_migrate
+    url: <%= ENV.fetch("DATABASE_URL") { "" } %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

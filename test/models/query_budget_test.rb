@@ -3,7 +3,7 @@ require "test_helper"
 # The screens that fold a whole cohort must cost the same whether the cohort is
 # seven students or seventy. Nothing on screen changes when that stops being
 # true — the page just gets slower — so it is asserted here rather than noticed
-# in production, on a single-writer SQLite file where one slow page is the box.
+# in production, where the app is one Puma process and one slow page is the box.
 #
 # InstructorReport used to build a LearnerProgress per roster row, which cost
 # three queries a student and made /instructor 3n + 12.

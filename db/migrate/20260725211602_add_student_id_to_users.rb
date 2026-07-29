@@ -7,9 +7,14 @@ class AddStudentIdToUsers < ActiveRecord::Migration[8.1]
 
     # Accounts predating this carry their identifier in the local part of the
     # address — the only student ID they have, so it becomes the column value.
+    #
+    # split_part is Postgres; this read instr() while the app was on SQLite, which
+    # Postgres does not have. Rewritten rather than made adapter-aware, because
+    # the app has one adapter and a migration nobody can run is worse than one
+    # that only runs on the database we ship.
     execute <<~SQL.squish
       UPDATE users
-      SET student_id = substr(email_address, 1, instr(email_address, '@') - 1)
+      SET student_id = split_part(email_address, '@', 1)
       WHERE student_id IS NULL AND email_address IS NOT NULL
     SQL
 

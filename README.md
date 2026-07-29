@@ -4,7 +4,7 @@
 
 A learning platform for UTCC students getting started with AI — a course catalog, lessons that grade an exercise and a coding task as you go, and progress that follows you across the app. Thai-first interface with an English toggle.
 
-Rails 8.1 · Ruby 3.4.10 · SQLite · Hotwire (importmap, no Node)
+Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
 
 ![The course catalog — the first screen a signed-in student sees](docs/screenshots/catalog.png)
 
@@ -39,12 +39,16 @@ Rails 8.1 · Ruby 3.4.10 · SQLite · Hotwire (importmap, no Node)
 
 ## Getting started
 
+You need Ruby 3.4.10 and **Docker**, which is where the database runs — there is nothing to install and no Postgres to configure on your machine.
+
 ```bash
-bin/setup      # install gems, prepare the database, then start the server
+bin/setup      # start the database, install gems, prepare it, then start the server
 bin/dev        # start the server on http://localhost:3000
 ```
 
 Use `bin/dev` rather than `bin/rails server` — it runs the Tailwind watcher alongside Puma, so CSS changes actually rebuild.
+
+The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/setup` brings up for you; `docker compose up -d` and `docker compose down` start and stop it by hand, and `docker compose down -v` throws the data away. It listens on **5433**, not the usual 5432, so it cannot collide with another project's Postgres — `config/database.yml` defaults to the same port, and every value in it can be overridden with `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` if you would rather point at a server of your own.
 
 `bin/setup` seeds four demo accounts (development and test only). Password `utcc2026` for all of them:
 
@@ -152,7 +156,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | --- | --- | --- |
 | Framework | Rails 8.1, module `UtccAiFundamental` | `config.load_defaults 8.1` |
 | Language | Ruby 3.4.10 | `Data.define`, endless methods, `it` block param, pattern matching |
-| Database | SQLite (`sqlite3` >= 2.1) | one file in development and test; four in production |
+| Database | PostgreSQL 18 (`pg` ~> 1.6) | one database in development and test, from `compose.yml`; four in production |
 | Web server | Puma, fronted by Thruster in the container | |
 | Assets | Propshaft | no Sprockets manifest, no `app/assets/config/` |
 | CSS | Tailwind v4 via `tailwindcss-rails` | standalone binary, no npm, no PostCSS |
@@ -165,7 +169,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | Tests | Minitest (**not** RSpec), parallel | Capybara + selenium drive the system tests |
 | Lint / security | `rubocop-rails-omakase`, Brakeman, bundler-audit, `importmap audit` | all wired into `bin/ci` |
 
-There is **no Redis, no Memcached and no separate job runner** — every piece of infrastructure is a SQLite database.
+There is **no Redis, no Memcached and no separate job runner** — every piece of infrastructure is a Postgres database.
 
 Every response carries a **Content-Security-Policy** (`config/initializers/content_security_policy.rb`). The directive that matters is `script-src 'self'` plus a per-request nonce — no `unsafe-inline`, no remote script origin — so injected markup cannot execute. Two consequences to know before editing it: `SchemaHelper#json_ld` has to pass the nonce by hand or the site's JSON-LD is silently dropped, and `style-src` allows `unsafe-inline` on purpose, because the progress bars are computed `style="width: …%"` attributes and CSP has no nonce for style attributes. The browser also loads webfonts from Google, which is why `fonts.googleapis.com` and `fonts.gstatic.com` appear in the policy.
 
@@ -245,7 +249,7 @@ The browser therefore fetches the bell back from `GET /notifications` with its o
 
 ## Data model
 
-Fourteen tables. That is the whole schema (`db/schema.rb`, version `2026_07_27_140000`):
+Fourteen tables of the app's own. They are the whole of what follows; `db/schema.rb` (version `2026_07_29_160002`) also carries the thirteen `solid_queue_*`, `solid_cache_*` and `solid_cable_*` tables, which belong to those gems rather than to this data model and share the database only for the connection-budget reason under [Infrastructure](#infrastructure).
 
 **`users`** — `student_id` (unique, 13 digits, normalised to lowercase and stripped), `name`, `password_digest`, `role` (default `"student"`, not null), optional `email_address` (unique), `faculty`, `study_year`.
 
@@ -308,9 +312,9 @@ The **level is derived, not stored** — `AuditEvent::WARN` names the entries wo
 
 `LearnerProgress` is an ordinary class over those rows, and the worked example of what replacing a placeholder looks like — it kept the reader methods the views already called, so nothing in the views changed when it landed.
 
-It loads a learner's rows **once** and folds them in Ruby rather than aggregating in SQL: the volume is one row per topic per student, the date arithmetic wants `Time.zone` rather than SQLite's, and the screens ask for six different cuts of the same rows.
+It loads a learner's rows **once** and folds them in Ruby rather than aggregating in SQL: the volume is one row per topic per student, the date arithmetic wants `Time.zone` rather than the database's, and the screens ask for six different cuts of the same rows.
 
-That rule generalises, and it is the app's one hard performance constraint: **a screen loads a whole cohort in one query, never one query per member.** `Leaderboard` and `InstructorReport` both do it with a single `where(user: …)` grouped by `user_id`. `test/models/query_budget_test.rb` grows a section and asserts the query count does not move, because a page that quietly becomes 3n queries looks identical on screen — and on a single-writer SQLite file, one slow page is the whole box. The leaderboard goes one step further and does not run that query on the first response at all — see the lazy frame under [Request path](#request-path).
+That rule generalises, and it is the app's one hard performance constraint: **a screen loads a whole cohort in one query, never one query per member.** `Leaderboard` and `InstructorReport` both do it with a single `where(user: …)` grouped by `user_id`. `test/models/query_budget_test.rb` grows a section and asserts the query count does not move, because a page that quietly becomes 3n queries looks identical on screen — and with one Puma process serving a cohort, one slow page is the whole box. The leaderboard goes one step further and does not run that query on the first response at all — see the lazy frame under [Request path](#request-path).
 
 The display conventions live in the class, not the table:
 
@@ -362,7 +366,7 @@ Built on Rails 8's `bin/rails generate authentication`, plus a hand-written `Reg
 
 - `Current.user` / `Current.session` (an `ActiveSupport::CurrentAttributes`) are how views read the signed-in user; `authenticated?` is the exposed helper, and the layouts branch on it.
 - `start_new_session_for(user, remember: true)` backs the "remember me" checkbox — `remember: false` gives a browser-session cookie instead of a dated one.
-- **A session expires 30 days after it is created** (`Session::MAX_AGE`), and the cookie is dated to match. The cap is absolute rather than idle on purpose: an idle timeout means a database write on every authenticated request, and this app is a single Puma process over a single-writer SQLite file. Look sessions up through **`Session.live`** — both `Authentication#find_session_by_cookie` and `ApplicationCable::Connection` do, and an expiry enforced in only one of them would be no expiry at all. `Session.expired` is swept nightly by `clear_expired_sessions` in `config/recurring.yml`.
+- **A session expires 30 days after it is created** (`Session::MAX_AGE`), and the cookie is dated to match. The cap is absolute rather than idle on purpose: an idle timeout means a database write on every authenticated request, which is a per-request cost this app declines to pay whatever the database underneath could survive. Look sessions up through **`Session.live`** — both `Authentication#find_session_by_cookie` and `ApplicationCable::Connection` do, and an expiry enforced in only one of them would be no expiry at all. `Session.expired` is swept nightly by `clear_expired_sessions` in `config/recurring.yml`.
 - Sign-up and password-reset `create` are each `rate_limit to: 10, within: 3.minutes`. **Sign-in carries two limits**: one keyed on the IP (one machine working through a list of accounts) and one keyed on the posted `student_id` (one account guessed at from many addresses). `name:` is what lets two limits coexist on one action.
 - `config/initializers/filter_parameter_logging.rb` redacts `student_id`, `name`, `faculty` and `study_year` alongside passwords and email. `Parameters:` is logged at `info`, which is production's level, so anything missing from that list goes into log retention on every request that posts it — and the student ID is the credential.
 - `SessionsController#create` authenticates with `User.authenticate_by(params.permit(:student_id, :password))`.
@@ -476,10 +480,13 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 
 ## Infrastructure
 
-- In production the solid_* adapters live in **separate SQLite databases** (`storage/production_{queue,cache,cable}.sqlite3`), declared as extra entries under `production:` in `config/database.yml`, each with its own `migrations_paths`. Their schemas are `db/{queue,cache,cable}_schema.rb` — **do not fold these into `db/schema.rb`**.
-- Development and test use a single `storage/development.sqlite3` / `storage/test.sqlite3`; the solid_* adapters are only wired up in `config/environments/production.rb`.
+- **There is one database, and the solid_* adapters keep their tables in it** — migrated from `db/migrate` and dumped into `db/schema.rb` alongside the app's own, which is why the schema below has thirteen `solid_*` tables in it. They used to have a database each, and the reason they no longer do is the **connection budget**: Rails holds one pool per database *per process*, and with `SOLID_QUEUE_IN_PUMA` an instance is Puma plus a Solid Queue dispatcher plus a worker. Four databases meant four pools in each of them — up to twenty connections from one instance, against a managed Postgres that allows twenty in total and whose provider already holds eleven. One database is one pool.
+- **Four settings hold that together, and any one of them re-opens a pool**: no `solid_queue.connects_to` in `config/environments/production.rb`, no `database:` key in `config/cache.yml`, no `connects_to` in `config/cable.yml`, and no `db/{queue,cache,cable}_schema.rb`. `pool` in `config/database.yml` is the ceiling on what one process takes — keep it at or below Puma's thread count, with headroom for the job supervisor.
+- **Development and production get their database from different places.** Locally it is the `postgres:18-alpine` container in `compose.yml` — `utcc_ai_academy_development` and `_test`, configured by the `DB_*` defaults in `config/database.yml`. `bin/setup` runs `docker compose up -d --wait` before `db:prepare`, and skips it when docker is not installed so that pointing `DB_HOST` at your own Postgres still works. Production is an **external managed Postgres reached through `DATABASE_URL`** — one value carrying host, port, database, credentials and `sslmode=require`, and the only thing the production block reads. Neither deploy target runs a database of its own: there is no Kamal `db` accessory and no Render `databases:` block.
+- **`DATABASE_URL` is a credential and is never committed.** Kamal reads it from the environment via `.kamal/secrets`; Render holds it as a `sync: false` dashboard value. If it ever appears in a diff, a log or a chat window, rotate it at the provider rather than hoping.
+- **`gssencmode: disable` in `config/database.yml` is load-bearing, not tuning.** The precompiled `pg` gem bundles a libpq built with GSSAPI, and on macOS a connection opened from a *forked* child segfaults inside `connect_start`. The suite forks one worker per core, so without it every worker crashes and `bin/rails test` wedges instead of failing. It turns off GSSAPI encryption negotiation only — not `sslmode` — and nothing in the deploy path authenticates with Kerberos.
 - Workers run **in-process**: `config/puma.rb` loads `plugin :solid_queue` when `SOLID_QUEUE_IN_PUMA` is set, which `config/deploy.yml` sets. `bin/jobs` runs the supervisor standalone; recurring jobs go in `config/recurring.yml`.
-- `storage/` is a persistent Docker volume — that is where the production SQLite files live. **A deploy target that does not mount it has no database that outlives a push**: `bin/docker-entrypoint` runs `db:prepare` before the server, so an unmounted `storage/` is silently recreated empty on every release, taking the users, sessions and completions with it.
+- **Kamal runs no database of its own.** There is deliberately no `db` accessory: the app connects to the external managed Postgres through `DATABASE_URL`, so backing it up is the provider's job rather than a Docker volume's. `storage/` is still a persistent volume, but now only for local Active Storage files. Adding an accessory back would stand up an empty database nothing connects to.
 - `assets:precompile` builds Tailwind first, so the Dockerfile needs no extra step.
 - `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`, and `secret_key_base` is in there — so the variable is not optional in production, it is what lets the app boot at all. `config/master.key` is gitignored and therefore never in the image; the target has to supply the value. `config/deploy.yml` still carries the placeholder server `192.168.0.1` and registry `localhost:5555`.
 - **`config.assume_ssl` and `config.force_ssl` are on in production**, which makes `proxy: ssl: true` in `deploy.yml` part of the same decision rather than an option. Kamal's proxy terminates TLS and speaks http to Thruster, so without `assume_ssl` Rails believes every request arrived unencrypted — and `request.base_url` is what builds every canonical, hreflang and sitemap URL the app publishes. `/up` is excluded from the https redirect so the proxy and uptime monitors can still reach it.
@@ -489,12 +496,14 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 
 ### Render
 
-`render.yaml` is a blueprint for the same Dockerfile, kept in the repo so the two settings that are easy to get wrong cannot drift into the dashboard:
+`render.yaml` is a blueprint for the same Dockerfile, kept in the repo so the settings that are easy to get wrong cannot drift into the dashboard:
 
-- the **disk** mounted at `/rails/storage`, which needs a paid instance type — a free one has no disk option, and see the `storage/` note above for what that costs;
+- **`DATABASE_URL`, declared `sync: false`** — the database is an external managed Postgres rather than a Render one, so there is no `databases:` block here for Render to create and the blueprint never sees the value. Set it in the dashboard;
 - the **port pair**, `HTTP_PORT` and `PORT`, both `10000`. `HTTP_PORT` is what Thruster listens on and `PORT` is how Render knows where to route; Thruster then hands Puma its own `PORT` (3000) inside the container, so setting only one of the two leaves Render routing to a port nothing is bound to.
 
-`RAILS_MASTER_KEY` is declared `sync: false` — Render prompts for it and stores it, and it is never written to this file. `numInstances` stays at 1 because SQLite takes one writer. Render terminates TLS itself and forwards `X-Forwarded-Proto`, so `assume_ssl` is as correct here as it is behind Kamal's proxy.
+There is **no disk** any more. The database left the filesystem, and nothing else under `storage/` has to outlive a deploy — adding Active Storage attachments served from local disk would mean mounting one again at `/rails/storage`.
+
+`RAILS_MASTER_KEY` is declared `sync: false` — Render prompts for it and stores it, and it is never written to this file. `numInstances` stays at 1 because that is the size the app is built for, not because the database forces it: Postgres takes concurrent writers where the SQLite file did not, so raising it is now a capacity decision. Render terminates TLS itself and forwards `X-Forwarded-Proto`, so `assume_ssl` is as correct here as it is behind Kamal's proxy.
 
 ## Tests and CI
 
@@ -535,7 +544,7 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 Setup → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds
 ```
 
-A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
+A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. What `bin/setup` does locally that the runner still needs is start Postgres; there that is a **service container on the `test` and `system-test` jobs**, the only two that touch a database, with the `DB_*` values declared once at workflow level so the service and the client connecting to it cannot drift apart. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
 
 ---
 

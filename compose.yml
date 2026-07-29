@@ -1,0 +1,40 @@
+# The development and test database, and nothing else. The app itself is not in
+# here — it runs on the host under `bin/dev`, the way it always has; this file
+# exists only so that "install Postgres" is a container rather than a machine.
+#
+#   docker compose up -d      # start it (bin/setup does this for you)
+#   docker compose down       # stop it, keeping the data
+#   docker compose down -v    # stop it and throw the data away
+#
+# The port is 5433 rather than 5432 on purpose: 5432 is what every other Postgres
+# on this machine will also want, and a port clash surfaces as a connection
+# refused against a database that is running. config/database.yml reads
+# DB_PORT with the same default, so both halves move together.
+services:
+  postgres:
+    image: postgres:18-alpine
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-utcc}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-utcc}
+      # Rails creates utcc_ai_academy_development and _test itself through
+      # db:prepare; this one exists so the container has something to connect to
+      # while it initialises.
+      POSTGRES_DB: postgres
+    # /var/lib/postgresql, not /var/lib/postgresql/data — the 18 images moved
+    # PGDATA a level down (/var/lib/postgresql/18/docker) and refuse to start
+    # against a volume mounted at the old path.
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    # db:prepare runs the moment bin/setup reaches it, and a Postgres that is
+    # listening is not yet a Postgres that is ready. Depend on this rather than
+    # on a sleep.
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-utcc} -d postgres" ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  postgres_data:

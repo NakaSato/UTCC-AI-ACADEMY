@@ -139,7 +139,7 @@ Do not migrate anything. Nothing currently in `docs/` becomes an ADR retroactive
 1. **Write the first ADR when the first genuine decision arrives** — most likely the mailer, or whether hearts gate anything at zero. One file, the frontmatter above, `docs/decisions/adr-0001-*.md`.
 2. **Wait for three.** A schema written before there are three documents to fit it is a guess.
 3. **Then build `bin/docs`** with D1–D3 and add the `config/ci.rb` step. Not before: a checker over one file is ceremony.
-4. **Add a runbook before the first real deployment** — `config/deploy.yml` still points at a placeholder server, and the restore path for a SQLite file on a mounted disk is exactly the thing nobody reconstructs at 3 a.m.
+4. **Add a runbook before the first real deployment** — `config/deploy.yml` still points at a placeholder server, and the restore path for a Postgres volume — which accessory, which `pg_restore`, into which of the four databases — is exactly the thing nobody reconstructs at 3 a.m.
 5. **Postmortems only after an incident.**
 
 ## The five that carry the rest

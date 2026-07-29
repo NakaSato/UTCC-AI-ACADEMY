@@ -34,7 +34,7 @@ The convention is `<scope>-<domain>-<purpose>`, and the hard rule survives at an
 | `academy-alerts` | bot-only, no conversation, replies in-thread | CI failures on `main`, Dependabot, and later the uptime monitor and deploys | it has a source |
 | `inc-YYYYMMDD-NN` | ephemeral | one incident, exported before archiving | the first incident |
 
-**Do not create a channel before its event source exists.** An empty bot channel is a channel people learn to ignore, and they do not un-learn it when it finally has something to say. Three channels is the whole list until there is production traffic; the eleven-channel taxonomy is what a platform org with per-service ownership needs, and this is one Puma process over one SQLite file.
+**Do not create a channel before its event source exists.** An empty bot channel is a channel people learn to ignore, and they do not un-learn it when it finally has something to say. Three channels is the whole list until there is production traffic; the eleven-channel taxonomy is what a platform org with per-service ownership needs, and this is one Puma process over one database.
 
 ### `@Claude` is a third Slack surface, and the only inbound one
 

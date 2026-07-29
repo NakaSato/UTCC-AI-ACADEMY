@@ -10,8 +10,8 @@
 #
 # A learner's rows are loaded once and folded in Ruby rather than aggregated in
 # SQL. The volume is one row per topic per student, the date arithmetic wants
-# Time.zone rather than SQLite's, and the screens ask for six different cuts of
-# the same rows.
+# Time.zone rather than the database's, and the screens ask for six different
+# cuts of the same rows.
 class LearnerProgress
   XP_PER_LEARNED = 120
   XP_PER_APPLIED = 60

@@ -11,6 +11,7 @@ development:
 test:
   <<: *default
 
+# No `database:` key: solid_cache_entries lives in the primary database and
+# shares its pool. See config/database.yml for the connection budget behind that.
 production:
-  database: cache
   <<: *default

@@ -14,9 +14,11 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Install base packages. postgresql-client is what `bin/kamal dbc` shells out to
+# — bin/rails dbconsole execs psql, and without it the alias in config/deploy.yml
+# fails inside a running container rather than at build time.
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 sqlite3 && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 postgresql-client && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
@@ -30,9 +32,12 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install packages needed to build gems
+# Install packages needed to build gems. libpq-dev is only a fallback: pg ships
+# precompiled gems for both linux platforms in Gemfile.lock, so this stage
+# normally does not compile it — but this is the throw-away stage, and a missing
+# header here would fail the build rather than the image.
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems

@@ -50,9 +50,11 @@ Correct and cheap at a few thousand rows. The per-request memo is what buys time
 
 ## The bell's socket
 
-One subscription per open page, and **one poller per process**. `solid_cable` polls its own SQLite file every 100ms for new messages — once per Puma process, not once per subscriber — so a section of ninety students is ninety in-memory fan-outs off the same poll rather than ninety pollers.
+One subscription per open page, and **one poller per process**. `solid_cable` polls its own database every 100ms for new messages — once per Puma process, not once per subscriber — so a section of ninety students is ninety in-memory fan-outs off the same poll rather than ninety pollers.
 
-It is a different database file from the one that takes writes, which is why constant reads on it do not compete with the single writer.
+It polls **the same database the screens read from**, and on the same connection pool. That used to be a database of its own — on SQLite the separation was what stopped a poll every 100ms competing with the single writer. Two things changed it: Postgres has no single-writer contention to avoid, and the managed instance has a connection ceiling that a pool per database blows straight through (see `config/database.yml`). What keeps the poll cheap now is `message_retention: 1.day` and the index on `created_at`, not isolation.
+
+**The pool is therefore the thing to watch.** A poller holding a connection every 100ms is one of the handful the app gets; `pool` has to leave room for it, for Puma's threads and for the Solid Queue supervisor at the same time.
 
 The broadcast itself is **synchronous** rather than `_later`: it renders nothing (the payload is a constant frame), so there is no rendering cost to move off the request, and enqueuing it would make the admin path the second thing in the app to need Solid Queue.
 
@@ -60,5 +62,5 @@ The broadcast itself is **synchronous** rather than `_later`: it renders nothing
 
 - **Nothing uses `Rails.cache`.** `stale_when_importmap_changes` gives HTML responses an etag; Thruster handles asset caching and compression.
 - **The CSP nonce is `SecureRandom`, so HTML bodies are not byte-identical between requests** and `Rack::ETag` stops answering 304 for them. That is a deliberate cost — see the CSP notes in `CLAUDE.md` for why a session-derived nonce would break the landing page for signed-out visitors.
-- **One writer.** SQLite, single process, workers in-process under Puma. Horizontal scale is not available without changing the database, so do not design as if it were.
+- **One process.** Single Puma, workers in-process, `numInstances: 1` on both deploy targets. Postgres takes concurrent writers where the SQLite file did not, so horizontal scale is no longer barred by the database — but nothing here is deployed that way, and a memo that is correct per-request is not correct per-cluster. Adding a second instance is a decision to make on purpose, not to assume.
 - **The only enqueued work in the whole app is the password-reset email** (`deliver_later`). Solid Queue is wired up for it in production and nothing else uses it.

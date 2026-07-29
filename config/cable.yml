@@ -8,10 +8,11 @@ development:
 test:
   adapter: test
 
+# No `connects_to`: solid_cable_messages lives in the primary database, so the
+# 100ms poll runs on the pool the app already has instead of one of its own. See
+# config/database.yml for the connection budget that decides this — and note that
+# what keeps the poll cheap is message_retention below, not the isolation.
 production:
   adapter: solid_cable
-  connects_to:
-    database:
-      writing: cable
   polling_interval: 0.1.seconds
   message_retention: 1.day

@@ -7,7 +7,19 @@ name: CI
 #
 # bin/setup has no equivalent here on purpose — it installs gems (ruby/setup-ruby
 # does that), prepares the *development* database (a runner has none) and clears
-# logs (a runner has none of those either).
+# logs (a runner has none of those either). What it does do locally that matters
+# here is start the Postgres in compose.yml; on a runner that is the service
+# container declared on the two jobs that touch a database, and the DB_* env
+# there is the same set config/database.yml reads.
+
+# Kept in one place so the service container and the env that connects to it
+# cannot drift apart. The port is 5432 rather than the 5433 compose.yml uses —
+# a runner has no other Postgres to collide with.
+env:
+  DB_HOST: localhost
+  DB_PORT: 5432
+  DB_USER: utcc
+  DB_PASSWORD: utcc
 
 on:
   pull_request:
@@ -78,6 +90,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: utcc
+          POSTGRES_PASSWORD: utcc
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # db:test:prepare runs the moment the step starts, and a Postgres that is
+        # listening is not yet one that is ready. Without this the first job step
+        # races the server's initdb.
+        options: >-
+          --health-cmd "pg_isready -U utcc -d postgres"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -102,6 +132,21 @@ jobs:
 
   system-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: utcc
+          POSTGRES_PASSWORD: utcc
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U utcc -d postgres"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
 
     steps:
       - name: Checkout code

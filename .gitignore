@@ -21,7 +21,9 @@
 !/tmp/pids/
 !/tmp/pids/.keep
 
-# Ignore storage (uploaded files in development and any SQLite databases).
+# Ignore storage (uploaded files in development). The database is not in here any
+# more — in development and test it is the container in compose.yml, whose data
+# lives in a docker volume rather than in the working tree.
 /storage/*
 !/storage/.keep
 /tmp/storage/*

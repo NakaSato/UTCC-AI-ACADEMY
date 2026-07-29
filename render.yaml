@@ -1,8 +1,8 @@
 # Render blueprint — the second deploy target, beside Kamal in config/deploy.yml.
-# Both run the same Dockerfile; what differs is who terminates TLS and where the
-# storage/ volume comes from. Sync this file with the dashboard via
-# https://dashboard.render.com/blueprints rather than editing the service by hand,
-# so the disk and the port pair below cannot drift out of the repo.
+# Both run the same Dockerfile and both point at the same external managed
+# Postgres through DATABASE_URL; what differs is who terminates TLS. Sync this
+# file with the dashboard via https://dashboard.render.com/blueprints rather than
+# editing the service by hand, so the port pair below cannot drift out of the repo.
 
 services:
   - type: web
@@ -13,23 +13,18 @@ services:
     branch: main
     autoDeploy: true
 
-    # The database is a file, and SQLite takes one writer. A second instance would
-    # be a second process writing the same file over a shared mount — keep this at 1.
-    # Scaling out means leaving SQLite, not raising this number.
+    # One instance because that is the shape the app is built and sized for, not
+    # because the database forces it any more — Postgres takes concurrent writers
+    # and solid_cache, solid_queue and solid_cable are all safe across processes.
+    # Raising this is now a capacity decision rather than a rewrite.
     numInstances: 1
 
-    # A disk requires a paid instance type; on a free one storage/ is ephemeral and
-    # every deploy starts from an empty database.
     plan: starter
 
-    # config/database.yml puts four SQLite files under storage/ — the primary plus
-    # the solid_cache, solid_queue and solid_cable databases. Without this mount the
-    # entrypoint's `db:prepare` recreates all four on each deploy and every user,
-    # session and topic_completion is gone. Same volume Kamal declares in deploy.yml.
-    disk:
-      name: storage
-      mountPath: /rails/storage
-      sizeGB: 1
+    # No disk. The database moved off the filesystem to the managed Postgres
+    # declared under `databases:` below, and nothing else in storage/ has to
+    # outlive a deploy. Adding Active Storage attachments served from local disk
+    # would mean mounting one again at /rails/storage.
 
     # /up is excluded from the http-to-https redirect in production.rb, which is what
     # lets Render reach it from inside the network.
@@ -63,3 +58,13 @@ services:
       # worker service of its own.
       - key: SOLID_QUEUE_IN_PUMA
         value: true
+
+      # The whole database connection — host, port, database, credentials and
+      # sslmode — in one value, read by config/database.yml's production block.
+      #
+      # There is no `databases:` block in this blueprint: the database is an
+      # external managed Postgres (Aiven), not a Render one, so Render neither
+      # creates it nor knows its address. sync: false means the value is set in
+      # the dashboard and never committed here — it is a credential.
+      - key: DATABASE_URL
+        sync: false
