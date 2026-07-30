@@ -79,7 +79,7 @@ Retrospectives only work if it is safe to be honest in them. Nothing said in a r
 
 Work is done when it is **shippable**, not when it is written. In this repo that means all of:
 
-- `bin/ci` passes locally — setup, RuboCop, bundler-audit, `importmap audit`, Brakeman, the test suite, and the seed replant. Green on your machine is what "done" means; `.github/workflows/ci.yml` then runs the same steps on a clean runner, and a red one on `main` is a broken build whoever pushed it owns.
+- `bin/verify` passes locally — backlog and lifecycle-document validation, setup, RuboCop, bundler-audit, `importmap audit`, Brakeman, the test suite, the seed replant, and system tests. Green on your machine is what "done" means; `.github/workflows/ci.yml` then runs the same policy on a clean runner, and a red one on `main` is a broken build whoever pushed it owns.
 - New behaviour has a test, and copy changes have not broken the locale assertions.
 - Both `th.yml` and `en.yml` were updated together, with any positionally-indexed arrays kept the same length and order.
 - The change does not break an invariant listed under "Software system design" in `CLAUDE.md`.

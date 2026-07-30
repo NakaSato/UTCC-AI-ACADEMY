@@ -67,7 +67,8 @@ The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/se
 ```bash
 bin/rails test                             # run the tests
 bin/rails test test/models/user_test.rb:12 # run one test
-bin/ci                                     # the full pipeline: lint, security scans, tests (also runs in GitHub Actions)
+bin/docs                                   # validate backlog and lifecycle documents
+bin/verify                                 # full local gate; delegates to bin/ci
 bin/rubocop -a                             # autocorrect style
 bin/rails admin:create                     # create or promote an admin
 bin/rails instructor:create                # create or promote an instructor
@@ -200,7 +201,7 @@ app/
     layouts/auth.html.erb           split-screen sign-in/sign-up/reset
     shared/                         header, app header, footer, auth hero, language toggle
 config/
-  ci.rb                             the pipeline bin/ci runs
+  ci.rb                             the pipeline bin/verify runs
   locales/{th,en}.yml               every word a human reads
   routes.rb                         one line per verb, plain-English URLs
 db/
@@ -209,10 +210,14 @@ db/
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
 lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
 docs/process.md                     the Scrum process, and what "done" means here
+docs/development-flow.md            the Plan-to-Measure lifecycle and its gates
+docs/coding-standard.md             implementation rules a linter cannot enforce
+docs/test-strategy.md               risk-based test ownership and policy
+docs/build-release.md               current build controls and release requirements
 docs/design-system.md               the visual tokens and conventions, explained; the CSS wins
 docs/performance.md                 the query budget per screen, and the regressions behind each rule
 docs/landing-cms.md                 how the editable landing page resolves its copy
-docs/mdlc.md                        how a decision gets written down — mostly proposal, not yet wired up
+docs/mdlc.md                        lifecycle document schema enforced by bin/docs
 docs/slack.md                       what Slack may carry — policy only; there is no integration
 docs/agent-flow.md                  how work gets verified when an agent writes most of it
 ```
@@ -549,10 +554,10 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 
 **`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` asserts the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
 
-`bin/ci` is the pipeline you run before committing, and `.github/workflows/ci.yml` runs the same steps on every push to `main` and every pull request:
+`bin/verify` is the shared pipeline entry point you run before committing (it delegates to `bin/ci`), and `.github/workflows/ci.yml` runs the same policy on every push to `main` and every pull request:
 
 ```
-Setup → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds
+Setup → Docs → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds → Tests: System
 ```
 
 A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. What `bin/setup` does locally that the runner still needs is start Postgres; there that is a **service container on the `test` and `system-test` jobs**, the only two that touch a database, with the `DB_*` values declared once at workflow level so the service and the client connecting to it cannot drift apart. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.

@@ -12,7 +12,7 @@ trap cleanup EXIT
 
 cd "${repository_root}"
 
-ruby script/validate-backlog
+bin/docs
 
 mkdir -p "${source_dir}/_data"
 cp -R docs/. "${source_dir}/"

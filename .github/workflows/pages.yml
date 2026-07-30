@@ -43,22 +43,8 @@ jobs:
       - name: Install Tailwind CSS
         run: npm ci
 
-      - name: Validate JSON backlog
-        run: |
-          jq -e '
-            .schema_version == 1 and
-            (.updated_at | type == "string") and
-            (.allowed_statuses | type == "array") and
-            (.items | type == "array") and
-            (.updates | type == "array") and
-            (([.items[].id] | length) == ([.items[].id] | unique | length)) and
-            (.allowed_statuses as $allowed |
-              all(.items[];
-                (.status as $status | ($allowed | index($status)) != null) and
-                has("owner") and has("priority") and has("updated_at"))) and
-            all(.items[] | select(.status == "blocked"); .blocker != null) and
-            all(.updates[]; has("at") and has("item_id") and has("summary"))
-          ' docs/backlog.json > /dev/null
+      - name: Validate backlog and lifecycle documents
+        run: bin/docs
 
       - name: Prepare documentation source
         run: |

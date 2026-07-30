@@ -1,0 +1,208 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "pathname"
+require "set"
+require "yaml"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+
+TYPE_CONFIG = {
+  "adr" => {
+    directory: "docs/decisions",
+    prefix: "adr-",
+    id: /\AADR-\d{4}\z/,
+    statuses: %w[draft proposed accepted superseded deprecated rejected],
+    headings: ["## Context", "## Decision", "## Alternatives", "## Consequences", "## Fitness Functions"]
+  },
+  "spec" => {
+    directory: "docs/specs",
+    prefix: "spec-",
+    id: /\ASPEC-\d{4}\z/,
+    statuses: %w[draft proposed accepted superseded deprecated rejected],
+    headings: ["## Problem", "## Invariants", "## Acceptance Criteria", "## Verification"]
+  },
+  "runbook" => {
+    directory: "docs/runbooks",
+    prefix: "rb-",
+    id: /\ARB-\d{4}\z/,
+    statuses: %w[draft accepted superseded deprecated],
+    headings: ["## Preconditions", "## Procedure", "## Rollback", "## Verification"]
+  },
+  "postmortem" => {
+    directory: "docs/postmortems",
+    prefix: "pm-",
+    id: /\APM-\d{4}\z/,
+    statuses: %w[draft accepted],
+    headings: ["## Impact", "## Timeline", "## Root Cause", "## Action Items"]
+  },
+  "release" => {
+    directory: "docs/releases",
+    prefix: "release-",
+    id: /\AREL-\d{4}-\d{2}-\d{2}\z/,
+    statuses: %w[planned approved released rolled_back],
+    headings: ["## Changes", "## Rollback Plan", "## Post-release Verification"]
+  },
+  "outcome" => {
+    directory: "docs/outcomes",
+    prefix: "outcome-",
+    id: /\AOUT-\d{4}\z/,
+    statuses: %w[draft accepted],
+    headings: ["## Target", "## Actual", "## Decision"]
+  }
+}.freeze
+
+REQUIRED_FIELDS = %w[
+  id type title status owners created updated depends_on touches enforced_by
+  agent_writable
+].freeze
+
+ARRAY_FIELDS = %w[
+  owners depends_on touches enforced_by supersedes superseded_by implemented_by
+  includes verify_after_deploy
+].freeze
+
+REFERENCE_FIELDS = %w[depends_on supersedes superseded_by includes].freeze
+
+errors = []
+warnings = []
+documents = []
+
+unless system(ROOT.join("script/validate-backlog").to_s)
+  abort("Backlog validation failed.")
+end
+
+TYPE_CONFIG.each do |type, config|
+  directory = ROOT.join(config[:directory])
+  next unless directory.directory?
+
+  directory.glob("*.md").sort.each do |path|
+    next if path.basename.to_s.casecmp("README.md").zero?
+
+    relative_path = path.relative_path_from(ROOT).to_s
+    body = path.read
+    frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
+
+    unless frontmatter_match
+      errors << "#{relative_path}: missing YAML frontmatter"
+      next
+    end
+
+    begin
+      metadata = YAML.safe_load(
+        frontmatter_match[1],
+        permitted_classes: [Date],
+        aliases: false
+      )
+    rescue Psych::Exception => error
+      errors << "#{relative_path}: invalid YAML frontmatter (#{error.message.lines.first.strip})"
+      next
+    end
+
+    unless metadata.is_a?(Hash)
+      errors << "#{relative_path}: frontmatter must be a mapping"
+      next
+    end
+
+    missing_fields = REQUIRED_FIELDS.reject { |field| metadata.key?(field) }
+    errors << "#{relative_path}: missing #{missing_fields.join(', ')}" unless missing_fields.empty?
+
+    if metadata["type"] != type
+      errors << "#{relative_path}: type must be #{type.inspect}"
+    end
+
+    unless path.basename.to_s.start_with?(config[:prefix])
+      errors << "#{relative_path}: filename must start with #{config[:prefix]}"
+    end
+
+    unless metadata["id"].to_s.match?(config[:id])
+      errors << "#{relative_path}: invalid #{type} id #{metadata['id'].inspect}"
+    end
+
+    unless config[:statuses].include?(metadata["status"])
+      errors << "#{relative_path}: invalid status #{metadata['status'].inspect}"
+    end
+
+    ARRAY_FIELDS.each do |field|
+      next unless metadata.key?(field)
+      errors << "#{relative_path}: #{field} must be an array" unless metadata[field].is_a?(Array)
+    end
+
+    if metadata["owners"].is_a?(Array) && metadata["owners"].empty?
+      errors << "#{relative_path}: owners must name at least one human owner"
+    end
+
+    unless [true, false].include?(metadata["agent_writable"])
+      errors << "#{relative_path}: agent_writable must be true or false"
+    end
+
+    %w[created updated review_by].each do |field|
+      next unless metadata.key?(field)
+      begin
+        Date.iso8601(metadata[field].to_s)
+      rescue Date::Error
+        errors << "#{relative_path}: #{field} must be an ISO 8601 date"
+      end
+    end
+
+    config[:headings].each do |heading|
+      errors << "#{relative_path}: missing heading #{heading.inspect}" unless body.include?(heading)
+    end
+
+    if metadata["status"] == "superseded" &&
+        (!metadata["superseded_by"].is_a?(Array) || metadata["superseded_by"].empty?)
+      errors << "#{relative_path}: superseded documents require superseded_by"
+    end
+
+    if type == "spec" && metadata["status"] == "accepted" &&
+        (!metadata["enforced_by"].is_a?(Array) || metadata["enforced_by"].empty?)
+      errors << "#{relative_path}: accepted specs require at least one enforced_by path"
+    end
+
+    if metadata["review_by"] && Date.iso8601(metadata["review_by"].to_s) < Date.today &&
+        !%w[superseded deprecated rejected rolled_back].include?(metadata["status"])
+      warnings << "#{relative_path}: review_by is past due"
+    end
+
+    documents << {
+      path: relative_path,
+      body: body,
+      metadata: metadata
+    }
+  end
+end
+
+ids = documents.map { |document| document[:metadata]["id"] }.compact
+duplicate_ids = ids.group_by(&:itself).select { |_id, occurrences| occurrences.length > 1 }.keys
+errors << "duplicate document IDs: #{duplicate_ids.join(', ')}" unless duplicate_ids.empty?
+known_ids = ids.to_set
+
+documents.each do |document|
+  metadata = document[:metadata]
+  relative_path = document[:path]
+
+  REFERENCE_FIELDS.each do |field|
+    next unless metadata[field].is_a?(Array)
+
+    metadata[field].each do |reference|
+      errors << "#{relative_path}: #{field} references unknown id #{reference}" unless known_ids.include?(reference)
+      errors << "#{relative_path}: #{field} cannot reference itself" if reference == metadata["id"]
+    end
+  end
+
+  %w[touches enforced_by].each do |field|
+    next unless metadata[field].is_a?(Array)
+
+    metadata[field].each do |referenced_path|
+      candidate = ROOT.join(referenced_path.to_s).cleanpath
+      unless candidate.to_s.start_with?("#{ROOT}/") && candidate.exist?
+        errors << "#{relative_path}: #{field} path does not exist: #{referenced_path}"
+      end
+    end
+  end
+end
+
+warnings.each { |warning| warn("warning: #{warning}") }
+abort(errors.join("\n")) unless errors.empty?
+
+puts "Lifecycle documents are valid (#{documents.length} checked, #{warnings.length} warnings)."

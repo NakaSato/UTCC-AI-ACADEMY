@@ -7,7 +7,7 @@
 
 **Docs-as-code, sized to this repo.** Every document that influences an engineering decision lives in this repository, changes in the same commit as the code it describes, and is reviewed under the same rules. The point is not that Markdown is readable — it is that **documentation inherits the governance already built for code**: git history, `git blame`, review on a diff, and a pipeline that can be made to fail.
 
-> **Most of this file is a proposal, not a decision** — the same way sprint length is a proposal in `docs/process.md`. Section 1 is what the repo already does. Sections 3–6 are what it would do next, and nothing in them is wired up yet. Agree them as a team and edit this file; do not cite an unadopted section as though it were the rule.
+> **This lifecycle is adopted.** [ADR-0001](decisions/adr-0001-adopt-markdown-development-flow.md) records the decision, `docs/templates/` supplies the starting artifacts, and `bin/docs` enforces the machine-readable subset. The application-specific routing and gates live in [development-flow.md](development-flow.md).
 
 ## 1. What is already true
 
@@ -35,7 +35,7 @@ Because the two things that made the current arrangement work are both ending.
 
 And an agent reads this repo constantly. `CLAUDE.md` is already loaded into every session; a decision that exists only in someone's memory of a meeting is a decision the agent will contradict, plausibly and confidently.
 
-## 3. The artifact set — proposed
+## 3. The artifact set — adopted
 
 Deliberately shorter than the canonical taxonomy. **One document = one type = one question**; a document answering several questions is several files that link to each other.
 
@@ -45,24 +45,26 @@ Deliberately shorter than the canonical taxonomy. **One document = one type = on
 | **SPEC** — executable specification | `spec-` | `docs/specs/` | what to build, and how we will know it is done | the first item too large to hold in one sprint's head |
 | **RUNBOOK** | `rb-` | `docs/runbooks/` | what to do when production breaks | before the first real deployment |
 | **POSTMORTEM** | `pm-` | `docs/postmortems/` | what happened, and what stops it recurring | after the first incident, and not before |
+| **RELEASE** | `release-` | `docs/releases/` | what is being deployed, how it rolls back, and how it is verified | for each application production deployment |
+| **OUTCOME** | `outcome-` | `docs/outcomes/` | whether a milestone or experiment achieved its target | when enough evidence exists to make the next product decision |
 
 **Not adopted, each for a reason:**
 
 - **PRD** — one product owner, one classroom, and `process.md` already holds "what is known to be wanted". A PRD here would be a second backlog that disagrees with the first.
 - **RFC** — an ADR with `status: proposed` is the same document. Two names for one state is how a taxonomy starts rotting.
-- **CHANGELOG** — the commit log is honest and nothing consumes a version number; there are no releases, only deploys.
+- **CHANGELOG** — release records and the commit log provide traceability; nothing currently consumes a manually maintained change list.
 - **GUIDE** — `CLAUDE.md`, `README.md` and `design-system.md` are the guides. Adding a `gd-` prefix in front of files that already exist and already say which one wins buys nothing.
 
 **The folders stay flat inside `docs/`, with no numeric lifecycle prefixes.** Four directories sort fine alphabetically, and a `10-`/`20-` scheme is a solution to a problem this repo does not have yet.
 
-## 4. Frontmatter — proposed
+## 4. Frontmatter — adopted
 
 YAML frontmatter is what a machine reads; the body is what a person reads. The schema is lean on purpose — **every field has to earn a place by being queried by something**, or it becomes a field everybody copies and nobody updates.
 
 ```markdown
 ---
 id: ADR-0001
-type: adr                    # adr | spec | runbook | postmortem
+type: adr                    # adr | spec | runbook | postmortem | release | outcome
 title: Defer the leaderboard board into a lazy frame
 status: accepted             # draft | proposed | accepted | superseded | deprecated | rejected
 owners: ["@chanthawat"]
@@ -106,22 +108,22 @@ stateDiagram-v2
 - **A past-due `review_by` changes nothing about status.** It marks the document stale in a report; renewing or deprecating it is a person's call.
 - **An agent may draft, but never sets `accepted`.** That is the one rule here that must be enforced by tooling rather than by trust, because other things read status to decide what is current. In this repo it means `status` is set in a commit a human authored — there is no merge gate to hang it on, and pretending otherwise would be the same fiction as the PR numbers.
 
-## 6. Gates — what would run, and where
+## 6. Gates — what runs, and where
 
-There is now a GitHub Actions workflow (`.github/workflows/ci.yml`) running the same steps as `bin/ci`, but the canonical ten-gate documentation pipeline still does not apply: it is one repo, one team, and the checks below are cheap enough to belong in the run everyone already waits for. If document checks are adopted, they are a step in `config/ci.rb` — and therefore in the workflow too, since the two must not drift:
+The documentation checks are part of `config/ci.rb`, the independent GitHub Actions workflow, the Pages build, and the Vercel/local dashboard build:
 
 ```ruby
-step "Docs: Frontmatter and references", "bin/docs"
+step "Docs: Backlog, schema, and references", "bin/docs"
 ```
 
-Worth building, in this order:
+The implemented checks are:
 
 | | Checks | On failure |
 | --- | --- | --- |
 | **D1 Schema** | frontmatter parses and matches its type | fail the step |
 | **D2 References** | `depends_on`, `supersedes`, `superseded_by` name ids that exist | fail the step |
 | **D3 Enforcement** | every `enforced_by` path exists, and every `touches` path exists | fail the step |
-| **D4 Staleness** | `review_by` is past due | report, never fail |
+| **D4 Staleness** | `review_by` is past due | warn, never fail |
 
 Deliberately **not** worth building here: prose linting (one writer, and Vale would fight the voice these documents are written in), external link checking (a handful of links, and a flaky network failing `bin/ci` teaches people to skip the step), diagram rendering (`mermaid` blocks are few and reviewed on GitHub anyway), and secret scanning of `docs/` alone — Brakeman and `bundler-audit` already run, and the credentials in this project are encrypted rather than pasted.
 
@@ -137,15 +139,18 @@ The reason to do any of this in a repo that Claude Code works in daily.
 - **An agent may draft an ADR, a spec or a runbook, and may update a runbook after an incident.** It may not set `accepted`, may not edit a body marked `agent_writable: false`, and may not close a postmortem action item.
 - **A decision an agent was blocked on belongs here.** `docs/agent-flow.md` §6 requires that an ambiguity is asked about rather than guessed, and that the answer is written into the repo rather than left in a session. Once that answer has a losing alternative worth keeping, an ADR is where it goes — which is the most likely source of the first one.
 
-## 8. Adoption order
+## 8. Adoption state
 
-Do not migrate anything. Nothing currently in `docs/` becomes an ADR retroactively — `CLAUDE.md` is a better record of those decisions than a backfilled file would be, and a backfill with no author is how a staleness metric becomes meaningless on day one.
+Existing historical documentation is not being backfilled into artificial ADRs.
+`CLAUDE.md` remains the better record for decisions that predate this lifecycle.
 
-1. **Write the first ADR when the first genuine decision arrives** — most likely the mailer, or whether hearts gate anything at zero. One file, the frontmatter above, `docs/decisions/adr-0001-*.md`.
-2. **Wait for three.** A schema written before there are three documents to fit it is a guess.
-3. **Then build `bin/docs`** with D1–D3 and add the `config/ci.rb` step. Not before: a checker over one file is ceremony.
-4. **Add a runbook before the first real deployment** — `config/deploy.yml` still points at a placeholder server, and the restore path for a Postgres volume — which accessory, which `pg_restore`, into which of the four databases — is exactly the thing nobody reconstructs at 3 a.m.
-5. **Postmortems only after an incident.**
+The active state is:
+
+1. **ADR-0001 records adoption** and is the first checked lifecycle document.
+2. **`bin/docs` implements D1–D4** and runs in local CI, remote CI, and documentation builds.
+3. **Templates exist for all conditional artifacts.** A template is copied only when its triggering event exists.
+4. **The first application deployment remains blocked on real infrastructure.** A release record and tested backup/restore runbook are required before it.
+5. **Postmortems are created only after an incident or material near miss.**
 
 ## The five that carry the rest
 

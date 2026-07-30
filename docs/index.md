@@ -141,7 +141,7 @@ Only the states listed in `allowed_statuses` inside [backlog.json](backlog.json)
 An item moves to **Complete** only when its evidence is recorded here and the repository's definition of done is satisfied.
 
 - [ ] Relevant automated tests pass
-- [ ] `bin/ci` passes
+- [ ] `bin/verify` passes
 - [ ] Thai and English copy are updated together
 - [ ] Authorization and security invariants remain enforced
 - [ ] The behavior is demonstrated in the running application

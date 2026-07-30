@@ -16,11 +16,11 @@
 | Branching | trunk-based — one branch, `main`, no merge commits in 46. The only pull requests the remote has ever had are four from Dependabot, all closed unmerged |
 | Work item size | 1–8 files, 50–250 lines a commit, one stated purpose each |
 | Review | one person reads the diff; there is no second reviewer to escalate to |
-| Gate 1 (self-verify) | `bin/ci` — RuboCop, Brakeman, `bundler-audit`, `importmap audit`, the suite, the seed replant, the system tests |
+| Gate 1 (self-verify) | `bin/verify` — documentation checks, RuboCop, Brakeman, `bundler-audit`, `importmap audit`, the suite, the seed replant, and system tests |
 | Gate 2 (policy) | `.github/workflows/ci.yml`, the same steps on a clean runner. Independent of whoever wrote the change — but it runs **after** the commit is pushed, not before |
 | Gate 3 (human) | reading the diff, and it is the **last** gate |
 | Gate 4 (progressive delivery) | **absent** — no canary, no feature flags, no monitoring, no rollback path |
-| Spec | none yet; `docs/mdlc.md` proposes the format |
+| Spec | the checked format is active under `docs/specs/`; no behavior spec has been required yet |
 | Agent attribution | **3 commits of 46** carry a `Co-Authored-By` trailer |
 
 Two of those rows are the whole risk profile of this project.
@@ -34,7 +34,7 @@ Two of those rows are the whole risk profile of this project.
 No PR, so no `REVIEW_QUEUE`, no `AUTO_MERGE`, no `CANARY`. What is left is short:
 
 ```
-INTENT ──▶ AGENT_BUILD ──▶ bin/ci ──▶ HUMAN_READS_DIFF ──▶ COMMIT
+INTENT ──▶ AGENT_BUILD ──▶ bin/verify ──▶ HUMAN_READS_DIFF ──▶ COMMIT
               │  ▲            │              │
               │  └────────────┘              └──▶ REWORK ──┘
               ▼
@@ -45,15 +45,15 @@ Three rules hold this shape, and only the third is currently automatic:
 
 1. **Nothing reaches `COMMIT` without a human reading the diff.** With Gate 4 absent this is not a preference.
 2. **`AGENT_BLOCKED` never times out into a guess.** See §6.
-3. **Repeated Gate 1 failure is a spec problem, not a code problem.** An agent that cannot get `bin/ci` green in a few passes is usually being asked for something under-specified — the fix is upstream, in what was asked for, not another attempt.
+3. **Repeated Gate 1 failure is a spec problem, not a code problem.** An agent that cannot get `bin/verify` green in a few passes is usually being asked for something under-specified — the fix is upstream, in what was asked for, not another attempt.
 
 ## 3. Gate 2 is independent now, but it runs late
 
-`bin/ci` and `.github/workflows/ci.yml` run the same steps, and the difference between them is the whole point: an agent that runs the local one is reporting on itself, and the workflow is a machine that did not write the code checking the code on a clean runner. That closes the hole where an agent could decide not to run `bin/ci`, or run it and paraphrase the result.
+`bin/verify` (which delegates to `bin/ci`) and `.github/workflows/ci.yml` enforce the same policy, and the difference between them is the whole point: an agent that runs the local one is reporting on itself, and the workflow is a machine that did not write the code checking the code on a clean runner. That closes the hole where an agent could decide not to run the local gate, or run it and paraphrase the result.
 
 **What it does not close is the ordering.** With no branches and no pull requests, the workflow fires on `push` — so it verifies a commit that is already on `main`. It catches a red build; it cannot prevent one. Two things follow:
 
-- **The human still runs `bin/ci` themselves before committing anything in Tier B or C.** One command, and it is what keeps `main` green rather than merely observed.
+- **The human still runs `bin/verify` themselves before committing anything in Tier B or C.** One command, and it is what keeps `main` green rather than merely observed.
 - **A red run on `main` is owned by whoever pushed it**, immediately — there is no branch to leave it on. `docs/slack.md` is why one message goes to a channel when that happens, and why nothing is posted when a run is green.
 
 This is the strongest argument in this document for eventually working on a branch: a workflow that runs on a pull request is a gate, and the same workflow on `push` is a smoke alarm.
@@ -81,7 +81,7 @@ Tiering is not ceremony here; it is how one person decides where to spend the at
 
 | Tier | Paths | What the reader owes it |
 | --- | --- | --- |
-| **C — critical** | `app/controllers/concerns/authentication.rb`, `authorization.rb`, `app/models/user.rb`, `session.rb`, `app/models/lesson_content.rb` (the grading key and `CHECKS`), `app/controllers/admin_controller.rb`, `db/migrate/**`, `config/initializers/**`, `config/deploy.yml`, `render.yaml`, `Dockerfile` | read every line; run `bin/ci` yourself; re-read the matching invariant in `CLAUDE.md` before agreeing |
+| **C — critical** | `app/controllers/concerns/authentication.rb`, `authorization.rb`, `app/models/user.rb`, `session.rb`, `app/models/lesson_content.rb` (the grading key and `CHECKS`), `app/controllers/admin_controller.rb`, `db/migrate/**`, `config/initializers/**`, `config/deploy.yml`, `render.yaml`, `Dockerfile` | read every line; run `bin/verify` yourself; re-read the matching invariant in `CLAUDE.md` before agreeing |
 | **B — standard** | everything else under `app/`, `lib/`, `config/routes.rb`, `db/seeds.rb`, **and `config/locales/*.yml`** | read the diff; run the affected test file |
 | **A — low** | `docs/**`, `README.md`, `*.md`, screenshots | skim; correctness here is a claim about the repo, so check the claims |
 

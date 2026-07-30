@@ -27,6 +27,16 @@ on:
     branches: [ main ]
 
 jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Validate backlog and lifecycle documents
+        run: bin/docs
+
   scan_ruby:
     runs-on: ubuntu-latest
 
@@ -189,7 +199,7 @@ jobs:
   # configured, so a fork or a repo without the secret still gets a green run.
   notify:
     runs-on: ubuntu-latest
-    needs: [ scan_ruby, scan_js, lint, test, system-test ]
+    needs: [ docs, scan_ruby, scan_js, lint, test, system-test ]
     if: failure() && github.ref == 'refs/heads/main'
 
     steps:
@@ -213,6 +223,8 @@ jobs:
                   text: "*<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>*\nby ${{ github.event.head_commit.author.name }} · `${{ github.sha }}`"
               - type: section
                 fields:
+                  - type: mrkdwn
+                    text: "*Documentation:*\n${{ needs.docs.result }}"
                   - type: mrkdwn
                     text: "*Security (Ruby):*\n${{ needs.scan_ruby.result }}"
                   - type: mrkdwn

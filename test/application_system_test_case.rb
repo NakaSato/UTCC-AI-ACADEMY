@@ -34,5 +34,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     # By selector, not label: the sign-in tab above the form carries the same
     # "เข้าสู่ระบบ" as the submit.
     find("input[type=submit]").click
+
+    # Turbo changes the URL before Edge always exposes the replacement document.
+    # Waiting for both keeps callers from querying an outgoing, stale document.
+    assert_current_path root_path, wait: 10
+    assert_selector "h1", text: I18n.t("catalog.title"), wait: 10
   end
 end

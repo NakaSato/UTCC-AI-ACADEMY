@@ -29,6 +29,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 - [CLAUDE.md](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/CLAUDE.md)
 - [README](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/README.md)
+- [Coding Standard](coding-standard.md)
 - [Performance](performance.md)
 - [Explore Codebase skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/explore-codebase/SKILL.md)
 
@@ -52,6 +53,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Conventions
 
 - [CLAUDE.md](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/CLAUDE.md)
+- [Coding Standard](coding-standard.md)
 
 ## Database
 
@@ -64,6 +66,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Decisions
 
 - [Markdown Development Life Cycle](mdlc.md)
+- [ADR-0001: Adopt a Markdown development flow](decisions/adr-0001-adopt-markdown-development-flow.md)
 
 ## Design
 
@@ -74,12 +77,17 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 - [CLAUDE.md](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/CLAUDE.md)
 - [README](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/README.md)
 - [Development Status](index.md)
+- [Project Development Flow](development-flow.md)
+- [Coding Standard](coding-standard.md)
+- [Test Strategy](test-strategy.md)
+- [Build and Release Policy](build-release.md)
 - [Run App skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/run-app/SKILL.md)
 
 ## Documentation
 
 - [Documentation Tags](tags.md)
 - [Markdown Development Life Cycle](mdlc.md)
+- [Project Development Flow](development-flow.md)
 
 ## Features
 
@@ -92,6 +100,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Governance
 
 - [Markdown Development Life Cycle](mdlc.md)
+- [Project Development Flow](development-flow.md)
 - [Team Process](process.md)
 
 ## Internationalization
@@ -102,6 +111,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 - [Development Status](index.md)
 - [Documentation Tags](tags.md)
+- [Project Development Flow](development-flow.md)
 
 ## Monitoring
 
@@ -110,6 +120,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Operations
 
 - [README](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/README.md)
+- [Build and Release Policy](build-release.md)
 - [Slack Policy](slack.md)
 
 ## Performance
@@ -124,6 +135,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Process
 
 - [Working with agents on this repo](agent-flow.md)
+- [Project Development Flow](development-flow.md)
 - [Team Process](process.md)
 
 ## Product
@@ -154,6 +166,9 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Security
 
 - [CLAUDE.md](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/CLAUDE.md)
+- [Coding Standard](coding-standard.md)
+- [Test Strategy](test-strategy.md)
+- [Build and Release Policy](build-release.md)
 
 ## Slack
 
@@ -175,6 +190,9 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Verification
 
 - [Working with agents on this repo](agent-flow.md)
+- [Project Development Flow](development-flow.md)
+- [Test Strategy](test-strategy.md)
+- [Build and Release Policy](build-release.md)
 - [Debug Issue skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/debug-issue/SKILL.md)
 - [Refactor Safely skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/refactor-safely/SKILL.md)
 - [Review Changes skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/review-changes/SKILL.md)

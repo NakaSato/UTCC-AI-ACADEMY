@@ -18,7 +18,7 @@ errors << "items must be an array" unless items.is_a?(Array)
 errors << "updates must be an array" unless updates.is_a?(Array)
 
 if allowed_statuses.is_a?(Array) && items.is_a?(Array)
-  ids = items.filter_map { |item| item["id"] }
+  ids = items.map { |item| item["id"] }.compact
   errors << "item IDs must be unique" unless ids.uniq.length == ids.length
 
   items.each do |item|
