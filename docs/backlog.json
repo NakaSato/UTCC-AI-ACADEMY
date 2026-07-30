@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-30T22:03:28+07:00",
+  "updated_at": "2026-07-30T22:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -27,52 +27,6 @@
     "blocked"
   ],
   "items": [
-    {
-      "id": "FLOW-001",
-      "title": "Apply the Markdown-based development lifecycle to this repository",
-      "status": "verification",
-      "priority": 1,
-      "owner": "Repository owner",
-      "milestone": "M1",
-      "depends_on": [],
-      "blocker": null,
-      "evidence": [
-        {
-          "label": "Project development flow",
-          "url": "development-flow.html"
-        },
-        {
-          "label": "Adoption decision",
-          "url": "decisions/adr-0001-adopt-markdown-development-flow.html"
-        },
-        {
-          "label": "Lifecycle validator",
-          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/bin/docs"
-        }
-      ],
-      "updated_at": "2026-07-30T22:00:40+07:00"
-    },
-    {
-      "id": "TEST-001",
-      "title": "Stabilize the shared post-sign-in system-test synchronization",
-      "status": "verification",
-      "priority": 2,
-      "owner": "Unassigned",
-      "milestone": "M1",
-      "depends_on": [],
-      "blocker": null,
-      "evidence": [
-        {
-          "label": "Shared system-test sign-in helper",
-          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/application_system_test_case.rb#L30"
-        },
-        {
-          "label": "Flaky-test policy",
-          "url": "test-strategy.html#flaky-test-policy"
-        }
-      ],
-      "updated_at": "2026-07-30T22:03:28+07:00"
-    },
     {
       "id": "DOCS-001",
       "title": "Publish the development dashboard with GitHub Pages",
@@ -159,6 +113,24 @@
     }
   ],
   "recently_completed": [
+    {
+      "id": "FLOW-001",
+      "title": "Applied the Markdown-based development lifecycle",
+      "completed_at": "2026-07-30T22:10:00+07:00",
+      "evidence": {
+        "label": "Live project development flow",
+        "url": "https://utcc-ai-academy.vercel.app/development-flow"
+      }
+    },
+    {
+      "id": "TEST-001",
+      "title": "Stabilized system-test sign-in synchronization",
+      "completed_at": "2026-07-30T22:10:00+07:00",
+      "evidence": {
+        "label": "Verified implementation commit",
+        "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/7e3e12a306a22254c3c8c243000b8b882687da9d"
+      }
+    },
     {
       "id": "DOCS-002",
       "title": "Published JSON-driven development dashboard on Vercel",
@@ -308,6 +280,22 @@
       "to": "verification",
       "summary": "Full local verification passed: lifecycle checks, RuboCop, dependency audits, Brakeman, 473 Rails tests with 4,002 assertions, seed replanting, and both system tests.",
       "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-30T22:10:00+07:00",
+      "item_id": "FLOW-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Published and verified the repository-native development flow, policy pages, templates, and live monitor on Vercel revision 7e3e12a.",
+      "evidence_url": "https://utcc-ai-academy.vercel.app/development-flow"
+    },
+    {
+      "at": "2026-07-30T22:10:00+07:00",
+      "item_id": "TEST-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Closed the shared sign-in synchronization defect after repeated system-suite passes, a green full local gate, and publication of commit 7e3e12a.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/7e3e12a306a22254c3c8c243000b8b882687da9d"
     }
   ]
 }
