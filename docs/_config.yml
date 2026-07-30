@@ -28,3 +28,6 @@ titles_from_headings:
 
 exclude:
   - .DS_Store
+  - Gemfile
+  - Gemfile.lock
+  - tmp

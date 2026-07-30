@@ -1,3 +1,6 @@
+---
+---
+
 # UTCC AI Academy — UI Design System
 
 **Tags:** [#design](tags.md#design) [#frontend](tags.md#frontend) [#accessibility](tags.md#accessibility)

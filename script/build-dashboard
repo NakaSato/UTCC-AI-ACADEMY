@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source_dir="$(mktemp -d "${TMPDIR:-/tmp}/utcc-dashboard.XXXXXX")"
+
+cleanup() {
+  rm -rf "${source_dir}"
+}
+trap cleanup EXIT
+
+cd "${repository_root}"
+
+ruby script/validate-backlog
+
+mkdir -p "${source_dir}/_data"
+cp -R docs/. "${source_dir}/"
+cp docs/backlog.json "${source_dir}/_data/backlog.json"
+
+BUNDLE_GEMFILE=docs/Gemfile bundle exec jekyll build \
+  --source "${source_dir}" \
+  --destination "${repository_root}/_site"

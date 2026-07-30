@@ -1,3 +1,6 @@
+---
+---
+
 # Slack, and what it is allowed to carry
 
 **Tags:** [#communication](tags.md#communication) [#slack](tags.md#slack) [#operations](tags.md#operations)

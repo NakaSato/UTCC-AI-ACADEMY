@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "BUNDLE_GEMFILE=docs/Gemfile bundle install",
+  "buildCommand": "script/build-dashboard",
+  "outputDirectory": "_site",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/refresh",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-30T19:44:00+07:00",
+  "updated_at": "2026-07-30T20:51:14+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -28,10 +28,35 @@
   ],
   "items": [
     {
+      "id": "DOCS-002",
+      "title": "Publish the development dashboard with Vercel",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": {
+        "summary": "The repository has not been authorized and linked to a Vercel project.",
+        "decision_owner": "Repository owner",
+        "next_action": "Authorize and import the GitHub repository, then configure the main-branch deploy hook, VERCEL_DEPLOY_HOOK_URL, and CRON_SECRET."
+      },
+      "evidence": [
+        {
+          "label": "Vercel configuration",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/vercel.json"
+        },
+        {
+          "label": "Dashboard build script",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/build-dashboard"
+        }
+      ],
+      "updated_at": "2026-07-30T20:51:14+07:00"
+    },
+    {
       "id": "DOCS-001",
       "title": "Publish the development dashboard with GitHub Pages",
       "status": "blocked",
-      "priority": 1,
+      "priority": 5,
       "owner": "Repository owner",
       "milestone": "M1",
       "depends_on": [],
@@ -173,6 +198,22 @@
       "to": "blocked",
       "summary": "Moved the execution backlog into validated JSON and made the HTML dashboard derive its current state from that ledger.",
       "evidence_url": "backlog.json"
+    },
+    {
+      "at": "2026-07-30T20:46:38+07:00",
+      "item_id": "DOCS-002",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started an independent Vercel deployment path for the JSON-driven Jekyll dashboard.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/vercel.json"
+    },
+    {
+      "at": "2026-07-30T20:51:14+07:00",
+      "item_id": "DOCS-002",
+      "from": "in_progress",
+      "to": "blocked",
+      "summary": "Completed and verified the Vercel build and daily refresh function; production remains blocked until the repository is authorized and imported into Vercel.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/vercel.json"
     }
   ]
 }

@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+require "json"
+
+path = ARGV.fetch(0, "docs/backlog.json")
+backlog = JSON.parse(File.read(path))
+errors = []
+
+errors << "schema_version must equal 1" unless backlog["schema_version"] == 1
+errors << "updated_at must be a string" unless backlog["updated_at"].is_a?(String)
+
+allowed_statuses = backlog["allowed_statuses"]
+items = backlog["items"]
+updates = backlog["updates"]
+
+errors << "allowed_statuses must be an array" unless allowed_statuses.is_a?(Array)
+errors << "items must be an array" unless items.is_a?(Array)
+errors << "updates must be an array" unless updates.is_a?(Array)
+
+if allowed_statuses.is_a?(Array) && items.is_a?(Array)
+  ids = items.filter_map { |item| item["id"] }
+  errors << "item IDs must be unique" unless ids.uniq.length == ids.length
+
+  items.each do |item|
+    id = item["id"] || "(missing ID)"
+    errors << "#{id}: invalid status" unless allowed_statuses.include?(item["status"])
+
+    %w[owner priority updated_at].each do |field|
+      errors << "#{id}: missing #{field}" unless item.key?(field)
+    end
+
+    if item["status"] == "blocked" && item["blocker"].nil?
+      errors << "#{id}: blocked items require a blocker"
+    end
+  end
+end
+
+if updates.is_a?(Array)
+  updates.each_with_index do |update, index|
+    %w[at item_id summary].each do |field|
+      errors << "update #{index}: missing #{field}" unless update.key?(field)
+    end
+  end
+end
+
+abort(errors.join("\n")) unless errors.empty?
+
+puts "#{path} is valid."

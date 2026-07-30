@@ -1,3 +1,6 @@
+---
+---
+
 # Performance: what was measured, and what it cost
 
 **Tags:** [#performance](tags.md#performance) [#architecture](tags.md#architecture) [#database](tags.md#database)
