@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#8f1830">
+    <title>{{ page.title | default: site.title }} · {{ site.title }}</title>
+    <meta name="description" content="{{ page.description | default: site.description | escape }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="{{ '/' | relative_url }}">
+          <span class="brand-mark" aria-hidden="true">AI</span>
+          <span>
+            <strong>UTCC AI Academy</strong>
+            <small>Development monitor</small>
+          </span>
+        </a>
+
+        <nav aria-label="Documentation">
+          <a href="{{ '/' | relative_url }}">Status</a>
+          <a href="{{ '/roadmap.html' | relative_url }}">Roadmap</a>
+          <a href="{{ '/feature-inventory.html' | relative_url }}">Features</a>
+          <a href="{{ '/process.html' | relative_url }}">Process</a>
+          <a href="{{ '/tags.html' | relative_url }}">Tags</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="page-shell">
+      <aside class="document-context" aria-label="Project context">
+        <p class="context-label">Single source</p>
+        <p>Current execution state lives on the status page. Supporting documents explain direction, scope, and evidence.</p>
+
+        <dl>
+          <div>
+            <dt>Direction</dt>
+            <dd><a href="{{ '/roadmap.html' | relative_url }}">Product roadmap</a></dd>
+          </div>
+          <div>
+            <dt>Implemented</dt>
+            <dd><a href="{{ '/feature-inventory.html' | relative_url }}">Feature inventory</a></dd>
+          </div>
+          <div>
+            <dt>Done means</dt>
+            <dd><a href="{{ '/process.html' | relative_url }}">Team process</a></dd>
+          </div>
+        </dl>
+
+        <a class="repository-link" href="{{ site.github.repository_url }}">View repository ↗</a>
+      </aside>
+
+      <main id="content" class="document">
+        {{ content }}
+      </main>
+    </div>
+
+    <footer>
+      <p>Generated from repository Markdown by GitHub Actions. Git remains the audit trail.</p>
+    </footer>
+  </body>
+</html>

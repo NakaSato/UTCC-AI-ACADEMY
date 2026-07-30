@@ -5,6 +5,8 @@ description: Plan and execute safe refactoring using dependency analysis
 
 ## Refactor Safely
 
+**Tags:** [#skills](../../../docs/tags.md#skills) [#refactoring](../../../docs/tags.md#refactoring) [#verification](../../../docs/tags.md#verification)
+
 Use the knowledge graph to plan and execute refactoring with confidence.
 
 ### Steps

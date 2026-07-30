@@ -1,5 +1,7 @@
 # The landing page CMS
 
+**Tags:** [#cms](tags.md#cms) [#content](tags.md#content) [#internationalization](tags.md#internationalization)
+
 `/` for a signed-out visitor is the one screen an admin can change without a deploy, and **the only content in the app that is fully a CMS** — not just reworded but added to, reordered and deleted from, at `/admin?tab=landing`.
 
 `CLAUDE.md` keeps the two invariants this file explains (9 and 10) and the rule that `Landing` is a read model rather than a placeholder module. Everything else about how the copy resolves lives here. **Read it before touching `Landing`, `LandingCard`, `LandingText` or `AdminController#update_landing`** — the ladder in §2 is subtle and silently degrades rather than failing.

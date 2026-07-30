@@ -2,6 +2,8 @@
 
 # UTCC AI Academy by Upperclassman
 
+**Tags:** [#project](docs/tags.md#project) [#development](docs/tags.md#development) [#architecture](docs/tags.md#architecture) [#operations](docs/tags.md#operations)
+
 A learning platform for UTCC students getting started with AI — a course catalog, lessons that grade an exercise and a coding task as you go, and progress that follows you across the app. Thai-first interface with an English toggle.
 
 Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
@@ -14,6 +16,7 @@ Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
 
 - [Getting started](#getting-started)
 - [Everyday commands](#everyday-commands)
+- [Development dashboard](#development-dashboard)
 - [The screens](#the-screens)
 - [Accounts and roles](#accounts-and-roles)
 - [Language](#language)
@@ -69,6 +72,10 @@ bin/rubocop -a                             # autocorrect style
 bin/rails admin:create                     # create or promote an admin
 bin/rails instructor:create                # create or promote an instructor
 ```
+
+## Development dashboard
+
+[The development dashboard](docs/index.md) is the single source of truth for current execution status. GitHub Actions converts the tagged documents in `docs/` to HTML and deploys them to GitHub Pages after changes reach `main`.
 
 ## The screens
 

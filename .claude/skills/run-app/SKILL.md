@@ -5,6 +5,8 @@ description: Launch the app and drive it in a real browser — sign in, navigate
 
 ## Run the app and look at it
 
+**Tags:** [#skills](../../../docs/tags.md#skills) [#development](../../../docs/tags.md#development) [#verification](../../../docs/tags.md#verification)
+
 The proven path on this machine, cold-started and verified. Use it whenever a
 change needs to be *seen* working rather than only tested.
 

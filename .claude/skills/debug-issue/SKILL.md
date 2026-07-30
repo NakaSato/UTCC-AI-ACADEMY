@@ -5,6 +5,8 @@ description: Systematically debug issues using graph-powered code navigation
 
 ## Debug Issue
 
+**Tags:** [#skills](../../../docs/tags.md#skills) [#debugging](../../../docs/tags.md#debugging) [#verification](../../../docs/tags.md#verification)
+
 Use the knowledge graph to systematically trace and debug issues.
 
 ### Steps

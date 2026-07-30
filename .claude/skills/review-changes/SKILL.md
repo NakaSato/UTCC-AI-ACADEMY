@@ -5,6 +5,8 @@ description: Perform a structured code review using change detection and impact
 
 ## Review Changes
 
+**Tags:** [#skills](../../../docs/tags.md#skills) [#review](../../../docs/tags.md#review) [#verification](../../../docs/tags.md#verification)
+
 Perform a thorough, risk-aware code review using the knowledge graph.
 
 ### Steps

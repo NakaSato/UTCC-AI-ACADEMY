@@ -5,6 +5,8 @@ description: Navigate and understand codebase structure using the knowledge grap
 
 ## Explore Codebase
 
+**Tags:** [#skills](../../../docs/tags.md#skills) [#architecture](../../../docs/tags.md#architecture) [#agents](../../../docs/tags.md#agents)
+
 Use the code-review-graph MCP tools to explore and understand the codebase.
 
 ### Steps

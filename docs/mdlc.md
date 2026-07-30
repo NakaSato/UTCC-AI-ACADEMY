@@ -1,5 +1,7 @@
 # Markdown as the development life cycle
 
+**Tags:** [#documentation](tags.md#documentation) [#governance](tags.md#governance) [#decisions](tags.md#decisions)
+
 **Docs-as-code, sized to this repo.** Every document that influences an engineering decision lives in this repository, changes in the same commit as the code it describes, and is reviewed under the same rules. The point is not that Markdown is readable — it is that **documentation inherits the governance already built for code**: git history, `git blame`, review on a diff, and a pipeline that can be made to fail.
 
 > **Most of this file is a proposal, not a decision** — the same way sprint length is a proposal in `docs/process.md`. Section 1 is what the repo already does. Sections 3–6 are what it would do next, and nothing in them is wired up yet. Agree them as a team and edit this file; do not cite an unadopted section as though it were the rule.

@@ -1,5 +1,7 @@
 # Performance: what was measured, and what it cost
 
+**Tags:** [#performance](tags.md#performance) [#architecture](tags.md#architecture) [#database](tags.md#database)
+
 Sized for a classroom, not a public site, and the design leans on that throughout. `CLAUDE.md` holds the rules that follow from this file — one query per learner folded in Ruby, a cohort loaded once, one writer. **This is the working underneath them:** the numbers, the regressions that produced each rule, and the reasoning that will be needed again the first time one of these screens gets slow.
 
 Read it before changing how any screen loads its data. Nothing here is a rule on its own; the rules are in `CLAUDE.md` under "Performance and scale", and they are short precisely because the evidence lives here.

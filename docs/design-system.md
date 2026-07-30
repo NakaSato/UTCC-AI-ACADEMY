@@ -1,5 +1,7 @@
 # UTCC AI Academy — UI Design System
 
+**Tags:** [#design](tags.md#design) [#frontend](tags.md#frontend) [#accessibility](tags.md#accessibility)
+
 The app UI's tokens were ported from the **"UTCC AI Fundamental App UI" design** (claude.ai/design project `7a17af7d`): crimson on cream, near-black chrome, IBM Plex Sans Thai. An earlier system, extracted from <https://eng.utcc.ac.th>, preceded it — see "History: the eng.utcc.ac.th port" at the end for what it was and what survives from it.
 
 **The single source of truth is the `@theme` block in `app/assets/tailwind/application.css`.** This document explains the values and the conventions around them; where the two ever disagree, the CSS wins. Values below were read from that file (as of 2026-07-27).

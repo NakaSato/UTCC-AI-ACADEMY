@@ -1,0 +1,30 @@
+title: UTCC AI Academy Development
+description: Live development status, roadmap, features, and engineering documentation
+lang: en
+repository: NakaSato/UTCC-AI-ACADEMY
+
+markdown: kramdown
+highlighter: rouge
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-titles-from-headings
+
+relative_links:
+  enabled: true
+  collections: true
+
+titles_from_headings:
+  enabled: true
+  strip_title: false
+  collections: true
+
+exclude:
+  - .DS_Store

@@ -1,5 +1,7 @@
 # Slack, and what it is allowed to carry
 
+**Tags:** [#communication](tags.md#communication) [#slack](tags.md#slack) [#operations](tags.md#operations)
+
 **Slack is a system of engagement, not a system of record.** Anything that has to be retrievable later has a real home elsewhere — a decision goes in `docs/decisions/` (see `docs/mdlc.md`), the process goes in `docs/process.md`, and the code is the code. Slack carries a link and a sentence saying who does what next.
 
 The test: **if the workspace vanished tomorrow, the development system still works.** That is trivially true of this project today, and the purpose of this file is to keep it true as things get wired up.

@@ -1,5 +1,7 @@
 # Working with agents on this repo
 
+**Tags:** [#agents](tags.md#agents) [#process](tags.md#process) [#verification](tags.md#verification)
+
 **The scarce resource is verification, not implementation.** This project is already built this way — 46 commits, every one on `main`, one human, and an agent doing most of the typing. Nothing below is a plan to adopt agents; it is the operating discipline for a repo that already runs on them, and the honest account of which parts of it are load-bearing and which are missing.
 
 > **What is written down here is what is true or immediately doable.** Where the canonical design calls for machinery this repo has no place to put — an admission controller, auto-merge tiers, a Slack review queue, canary analysis — it is listed in §8 as *not adopted*, with the reason. A gate described but not enforced is worse than no gate, because it is cited as though it ran.

@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Tags:** [#architecture](docs/tags.md#architecture) [#development](docs/tags.md#development) [#conventions](docs/tags.md#conventions) [#security](docs/tags.md#security)
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What this app is

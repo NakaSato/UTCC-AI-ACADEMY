@@ -1,5 +1,7 @@
 # How this team works
 
+**Tags:** [#process](tags.md#process) [#scrum](tags.md#scrum) [#governance](tags.md#governance)
+
 We use **Scrum**: an agile framework for solving complex problems through short work cycles called sprints, a small set of roles, and a fixed rhythm of meetings. The point is not the ceremony — it is that every sprint ends with something that actually works, and with an honest look at how the sprint went.
 
 > **Two things in this document are proposals, not decisions:** the sprint length and the roster in [Roles](#roles). Agree them as a team and edit this file.
