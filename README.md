@@ -75,7 +75,7 @@ bin/rails instructor:create                # create or promote an instructor
 
 ## Development dashboard
 
-[The development dashboard](docs/index.md) is the single source of truth for current execution status. GitHub Actions converts the tagged documents in `docs/` to HTML and deploys them to GitHub Pages after changes reach `main`.
+[The development dashboard](docs/index.md) renders its current execution status from the machine-readable [`docs/backlog.json`](docs/backlog.json). Agents update that JSON and append its update history in the same change as implementation. GitHub Actions validates it, converts the tagged documents in `docs/` to HTML, and deploys them to GitHub Pages after changes reach `main`.
 
 ## The screens
 

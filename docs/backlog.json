@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-30T19:44:00+07:00",
+  "timezone": "Asia/Bangkok",
+  "tags": [
+    "development",
+    "backlog",
+    "monitoring",
+    "status"
+  ],
+  "delivery_state": "planning",
+  "current_milestone": {
+    "id": "M1",
+    "name": "Reliable account recovery",
+    "roadmap_url": "roadmap.html#milestone-1--reliable-account-recovery"
+  },
+  "refresh_schedule": {
+    "cron": "0 8 * * *",
+    "timezone": "Asia/Bangkok",
+    "label": "Every day at 08:00 Asia/Bangkok"
+  },
+  "allowed_statuses": [
+    "queued",
+    "in_progress",
+    "verification",
+    "complete",
+    "blocked"
+  ],
+  "items": [
+    {
+      "id": "DOCS-001",
+      "title": "Publish the development dashboard with GitHub Pages",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": {
+        "summary": "GitHub refused to start every workflow job because the account is locked over a billing issue.",
+        "decision_owner": "Repository owner",
+        "next_action": "Resolve the GitHub billing lock, then rerun the blocked deployment workflow."
+      },
+      "evidence": [
+        {
+          "label": "Blocked deployment run",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/actions/runs/30543163008"
+        },
+        {
+          "label": "Pages workflow",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.github/workflows/pages.yml"
+        }
+      ],
+      "updated_at": "2026-07-30T19:44:00+07:00"
+    },
+    {
+      "id": "MAIL-001",
+      "title": "Select the production email provider and credential owner",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": {
+        "summary": "No email provider or production credentials have been selected.",
+        "decision_owner": "Product Owner",
+        "next_action": "Select the provider, sending domain, and credential owner."
+      },
+      "evidence": [
+        {
+          "label": "Roadmap decision 1",
+          "url": "roadmap.html#product-decisions-required-before-scheduling"
+        }
+      ],
+      "updated_at": "2026-07-30T19:35:00+07:00"
+    },
+    {
+      "id": "MAIL-002",
+      "title": "Configure authenticated production email delivery",
+      "status": "queued",
+      "priority": 3,
+      "owner": "Unassigned",
+      "milestone": "M1",
+      "depends_on": [
+        "MAIL-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Milestone 1",
+          "url": "roadmap.html#milestone-1--reliable-account-recovery"
+        }
+      ],
+      "updated_at": "2026-07-30T19:35:00+07:00"
+    },
+    {
+      "id": "MAIL-003",
+      "title": "Verify password reset with a real mailbox",
+      "status": "queued",
+      "priority": 4,
+      "owner": "Unassigned",
+      "milestone": "M1",
+      "depends_on": [
+        "MAIL-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Milestone 1 success criteria",
+          "url": "roadmap.html#success-criteria"
+        }
+      ],
+      "updated_at": "2026-07-30T19:35:00+07:00"
+    }
+  ],
+  "recently_completed": [
+    {
+      "id": "BASE-001",
+      "title": "Persisted platform baseline",
+      "completed_at": "2026-07-30T19:35:00+07:00",
+      "evidence": {
+        "label": "Feature inventory",
+        "url": "feature-inventory.html"
+      }
+    },
+    {
+      "id": "PLAN-001",
+      "title": "Ordered product milestones",
+      "completed_at": "2026-07-30T19:35:00+07:00",
+      "evidence": {
+        "label": "Product roadmap",
+        "url": "roadmap.html"
+      }
+    },
+    {
+      "id": "TAGS-001",
+      "title": "Connected documentation tags",
+      "completed_at": "2026-07-30T19:35:00+07:00",
+      "evidence": {
+        "label": "Tag index",
+        "url": "tags.html"
+      }
+    }
+  ],
+  "updates": [
+    {
+      "at": "2026-07-30T19:35:00+07:00",
+      "item_id": "DOCS-001",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented the tagged Markdown dashboard, Jekyll HTML build, GitHub Pages workflow, and local verification.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/70b7087"
+    },
+    {
+      "at": "2026-07-30T19:36:34+07:00",
+      "item_id": "DOCS-001",
+      "from": "verification",
+      "to": "blocked",
+      "summary": "Recorded GitHub's account-level billing lock after every Actions job was refused before execution.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/3456c00"
+    },
+    {
+      "at": "2026-07-30T19:39:14+07:00",
+      "item_id": "DOCS-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Scheduled the dashboard to rebuild every morning at 08:00 Asia/Bangkok.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/104b3c8"
+    },
+    {
+      "at": "2026-07-30T19:44:00+07:00",
+      "item_id": "DOCS-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Moved the execution backlog into validated JSON and made the HTML dashboard derive its current state from that ledger.",
+      "evidence_url": "backlog.json"
+    }
+  ]
+}

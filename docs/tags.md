@@ -29,6 +29,11 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 - [Performance](performance.md)
 - [Explore Codebase skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/explore-codebase/SKILL.md)
 
+## Backlog
+
+- [Development Status](index.md)
+- [JSON backlog](backlog.json)
+
 ## CMS
 
 - [Landing Page CMS](landing-cms.md)

@@ -310,6 +310,41 @@ input[type="checkbox"] {
   accent-color: var(--brand);
 }
 
+.status {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-complete {
+  background: #def0e7;
+  color: var(--success);
+}
+
+.status-in_progress,
+.status-verification {
+  background: #f8ebce;
+  color: #7b540c;
+}
+
+.status-blocked {
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+}
+
+.update-history {
+  padding-left: 1.3rem;
+}
+
+.update-history li {
+  margin-bottom: 1rem;
+}
+
 footer {
   width: min(1180px, calc(100% - 2rem));
   margin: -2rem auto 2.5rem;

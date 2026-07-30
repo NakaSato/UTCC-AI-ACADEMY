@@ -4,6 +4,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development monitoring
+
+`docs/backlog.json` is the single source of truth for current execution status; `docs/index.md` renders the HTML dashboard from it. For every development task:
+
+1. Read the JSON backlog before starting.
+2. Work on the highest-priority unblocked queued item unless the user explicitly changes priority.
+3. Update the item's status, owner, evidence, blocker, and `updated_at` as they change.
+4. Update the root `updated_at` and append an `updates` entry for every status transition or material backlog change. Existing update entries are append-only.
+5. Move work to `complete` only after its verification evidence is recorded.
+6. Commit backlog changes with the implementation they describe.
+
+The Pages workflow validates the JSON before rendering or deployment. Do not hand-edit the generated status tables in `docs/index.md`; change the backlog instead.
+
 ## What this app is
 
 A learning platform for UTCC students getting started with AI. Rails 8.1, Ruby 3.4.10, module `UtccAiFundamental`.
