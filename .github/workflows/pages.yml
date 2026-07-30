@@ -6,6 +6,11 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/pages.yml"
+  schedule:
+    # Rebuild every morning in the academy's local timezone, even when no
+    # documentation commit landed overnight.
+    - cron: "0 8 * * *"
+      timezone: "Asia/Bangkok"
   workflow_dispatch:
 
 permissions:

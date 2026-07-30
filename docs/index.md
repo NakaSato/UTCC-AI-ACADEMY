@@ -8,9 +8,10 @@ title: Development Status
 
 This page is the single source of truth for current development execution. The [product roadmap](roadmap.md) controls priority, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
 
-- **Status updated:** 2026-07-30 19:40 ICT
+- **Status updated:** 2026-07-30 19:45 ICT
 - **Delivery state:** Planning
 - **Current milestone:** Reliable account recovery
+- **Scheduled refresh:** Every day at 08:00 Asia/Bangkok
 
 ## Current work
 
