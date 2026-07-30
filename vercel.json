@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "BUNDLE_GEMFILE=docs/Gemfile bundle install",
+  "installCommand": "BUNDLE_GEMFILE=docs/Gemfile bundle install && npm ci",
   "buildCommand": "script/build-dashboard",
   "outputDirectory": "_site",
   "cleanUrls": true,

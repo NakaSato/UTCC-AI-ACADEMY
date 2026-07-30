@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "json"
+require "open3"
+require "time"
+
+def git(*arguments)
+  output, status = Open3.capture2("git", *arguments)
+  status.success? ? output.strip : nil
+end
+
+target = ARGV.fetch(0)
+owner = ENV.fetch("VERCEL_GIT_REPO_OWNER", "NakaSato")
+repository = ENV.fetch("VERCEL_GIT_REPO_SLUG", "UTCC-AI-ACADEMY")
+sha = ENV["VERCEL_GIT_COMMIT_SHA"] || git("rev-parse", "HEAD")
+message = ENV["VERCEL_GIT_COMMIT_MESSAGE"] || git("log", "-1", "--pretty=%B")
+branch = ENV["VERCEL_GIT_COMMIT_REF"] || git("branch", "--show-current")
+repository_url = "https://github.com/#{owner}/#{repository}"
+
+metadata = {
+  "provider" => ENV["VERCEL"] ? "Vercel" : (ENV["GITHUB_ACTIONS"] ? "GitHub Pages" : "Local build"),
+  "repository" => "#{owner}/#{repository}",
+  "repository_url" => repository_url,
+  "branch" => branch.to_s.empty? ? "detached" : branch,
+  "commit_sha" => sha,
+  "commit_short_sha" => sha&.slice(0, 7),
+  "commit_message" => message,
+  "commit_url" => sha ? "#{repository_url}/commit/#{sha}" : repository_url,
+  "generated_at" => Time.now.utc.iso8601
+}
+
+data_directory = File.join(target, "_data")
+FileUtils.mkdir_p(data_directory)
+File.write(File.join(data_directory, "build.json"), JSON.pretty_generate(metadata))

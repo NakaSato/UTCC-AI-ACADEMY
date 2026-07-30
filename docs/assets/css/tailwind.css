@@ -1,5 +1,6 @@
----
----
+@import "tailwindcss" source(none);
+@source "../../_layouts";
+@source "../../*.md";
 
 :root {
   --canvas: #f7f3ec;
@@ -35,6 +36,7 @@ body {
 
 a {
   color: var(--brand);
+  text-decoration: underline;
   text-underline-offset: 0.18em;
 }
 
@@ -209,6 +211,7 @@ h2,
 h3,
 h4 {
   color: var(--ink);
+  font-weight: 700;
   line-height: 1.25;
   text-wrap: balance;
 }
@@ -234,6 +237,19 @@ h3 {
 p,
 li {
   max-width: 78ch;
+}
+
+.document ul,
+.document ol {
+  padding-left: 1.5rem;
+}
+
+.document ul {
+  list-style: disc;
+}
+
+.document ol {
+  list-style: decimal;
 }
 
 strong {
@@ -308,6 +324,60 @@ hr {
 
 input[type="checkbox"] {
   accent-color: var(--brand);
+}
+
+.status-overview > div {
+  min-width: 0;
+}
+
+.status-overview span,
+.status-overview strong {
+  display: block;
+}
+
+.status-overview > div > span {
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.status-overview > div > strong {
+  overflow-wrap: anywhere;
+  font-size: 1.15rem;
+}
+
+.status-overview .status {
+  display: inline-block;
+}
+
+.status-timestamp {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.revision-summary {
+  margin: 1rem 0 2rem;
+}
+
+.revision-summary dl,
+.revision-summary dd {
+  margin: 0;
+}
+
+.revision-summary dt {
+  margin-bottom: 0.2rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.revision-summary dd {
+  overflow-wrap: anywhere;
 }
 
 .status {
@@ -400,4 +470,5 @@ footer {
   .document-context {
     border-radius: 0.8rem;
   }
+
 }

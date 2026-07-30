@@ -1,0 +1,11 @@
+{
+  "name": "utcc-ai-academy-development-dashboard",
+  "private": true,
+  "scripts": {
+    "build:dashboard-css": "tailwindcss -i docs/assets/css/tailwind.css -o _site/assets/css/style.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

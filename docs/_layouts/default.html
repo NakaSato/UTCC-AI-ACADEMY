@@ -9,7 +9,7 @@
     <meta name="description" content="{{ page.description | default: site.description | escape }}">
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   </head>
-  <body>
+  <body class="min-h-screen bg-stone-100 text-stone-900 antialiased">
     <a class="skip-link" href="#content">Skip to content</a>
 
     <header class="site-header">
@@ -52,7 +52,7 @@
           </div>
         </dl>
 
-        <a class="repository-link" href="{{ site.github.repository_url }}">View repository ↗</a>
+        <a class="repository-link" href="{{ site.data.build.repository_url }}">View repository ↗</a>
       </aside>
 
       <main id="content" class="document">
@@ -62,7 +62,7 @@
 
     <footer>
       <p>
-        Generated from repository Markdown by GitHub Actions.
+        Generated from repository Markdown by {{ site.data.build.provider }}.
         Published {{ site.time | date: "%Y-%m-%d %H:%M UTC" }}.
         Git remains the audit trail.
       </p>

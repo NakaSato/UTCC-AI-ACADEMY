@@ -31,3 +31,4 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - tmp
+  - assets/css/tailwind.css

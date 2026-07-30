@@ -5,6 +5,9 @@ on:
     branches: [ main ]
     paths:
       - "docs/**"
+      - "package.json"
+      - "package-lock.json"
+      - "script/write-build-metadata"
       - ".github/workflows/pages.yml"
   schedule:
     # Rebuild every morning in the academy's local timezone, even when no
@@ -31,6 +34,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Tailwind CSS
+        run: npm ci
+
       - name: Validate JSON backlog
         run: |
           jq -e '
@@ -53,6 +65,11 @@ jobs:
           mkdir -p tmp/pages-source/_data
           cp -R docs/. tmp/pages-source/
           cp docs/backlog.json tmp/pages-source/_data/backlog.json
+          ruby script/write-build-metadata tmp/pages-source
+          npx tailwindcss \
+            -i docs/assets/css/tailwind.css \
+            -o tmp/pages-source/assets/css/style.css \
+            --minify
 
       - name: Configure GitHub Pages
         id: pages

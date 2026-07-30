@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 5. Move work to `complete` only after its verification evidence is recorded.
 6. Commit backlog changes with the implementation they describe.
 
-The Vercel build and Pages workflow validate the JSON before rendering or deployment. Do not hand-edit the generated status tables in `docs/index.md`; change the backlog instead. Run `script/build-dashboard` to reproduce the Vercel dashboard build locally.
+The Vercel build and Pages workflow validate the JSON before rendering or deployment. Do not hand-edit the generated status tables in `docs/index.md`; change the backlog instead. Run `npm ci` once, then `script/build-dashboard` to reproduce the Tailwind and Jekyll dashboard build locally.
 
 ## What this app is
 

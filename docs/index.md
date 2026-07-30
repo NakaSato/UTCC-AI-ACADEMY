@@ -1,17 +1,69 @@
 ---
-title: Development Status
+title: Current Development Update
 ---
 
-# Development Status
+# Current Development Update
 
 **Tags:** [#development](tags.md#development) [#backlog](tags.md#backlog) [#status](tags.md#status) [#monitoring](tags.md#monitoring) [#planning](tags.md#planning)
 
-The machine-readable [JSON backlog](backlog.json) is the single source of truth for current development execution. This HTML page is generated from it. The [product roadmap](roadmap.md) controls priority, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
+This is the current project status page. It is generated from the machine-readable [JSON backlog](backlog.json), which remains the single source of truth for development execution. The [product roadmap](roadmap.md) controls priority, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
 
-- **Status updated:** {{ site.data.backlog.updated_at }}
-- **Delivery state:** {{ site.data.backlog.delivery_state | capitalize }}
-- **Current milestone:** [{{ site.data.backlog.current_milestone.name }}]({{ site.data.backlog.current_milestone.roadmap_url }})
-- **Scheduled refresh:** {{ site.data.backlog.refresh_schedule.label }}
+{% assign current_items = site.data.backlog.items | sort: "priority" %}
+{% assign blocked_items = current_items | where: "status", "blocked" %}
+{% assign in_progress_items = current_items | where: "status", "in_progress" %}
+{% assign verification_items = current_items | where: "status", "verification" %}
+{% assign queued_items = current_items | where: "status", "queued" %}
+
+<div class="status-overview my-7 grid grid-cols-2 gap-3 lg:grid-cols-3" aria-label="Current project summary">
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>Delivery state</span>
+    <strong><span class="status status-{{ site.data.backlog.delivery_state }}">{{ site.data.backlog.delivery_state | replace: "_", " " | capitalize }}</span></strong>
+  </div>
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>Current milestone</span>
+    <strong><a href="{{ site.data.backlog.current_milestone.roadmap_url }}">{{ site.data.backlog.current_milestone.name | escape }}</a></strong>
+  </div>
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>In progress</span>
+    <strong>{{ in_progress_items.size }}</strong>
+  </div>
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>Verification</span>
+    <strong>{{ verification_items.size }}</strong>
+  </div>
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>Queued</span>
+    <strong>{{ queued_items.size }}</strong>
+  </div>
+  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+    <span>Blocked</span>
+    <strong><a href="#blockers-and-decisions">{{ blocked_items.size }}</a></strong>
+  </div>
+</div>
+
+<p class="status-timestamp">
+  <strong>Last updated:</strong> {{ site.data.backlog.updated_at }} ·
+  <strong>Automatic refresh:</strong> {{ site.data.backlog.refresh_schedule.label }}
+</p>
+
+## Deployed revision
+
+<div class="revision-summary rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+  <dl class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <dt>Repository</dt>
+      <dd><a href="{{ site.data.build.repository_url }}">{{ site.data.build.repository | escape }}</a></dd>
+    </div>
+    <div>
+      <dt>Commit</dt>
+      <dd><a href="{{ site.data.build.commit_url }}"><code>{{ site.data.build.commit_short_sha }}</code></a> on <code>{{ site.data.build.branch | escape }}</code></dd>
+    </div>
+    <div class="sm:col-span-2">
+      <dt>Commit message</dt>
+      <dd>{{ site.data.build.commit_message | escape | newline_to_br }}</dd>
+    </div>
+  </dl>
+</div>
 
 ## Current work
 
@@ -27,7 +79,7 @@ The machine-readable [JSON backlog](backlog.json) is the single source of truth 
     </tr>
   </thead>
   <tbody>
-    {% for item in site.data.backlog.items %}
+    {% for item in current_items %}
       <tr>
         <td><code>{{ item.id }}</code></td>
         <td>{{ item.title | escape }}</td>

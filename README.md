@@ -75,9 +75,9 @@ bin/rails instructor:create                # create or promote an instructor
 
 ## Development dashboard
 
-[The development dashboard](docs/index.md) renders its current execution status from the machine-readable [`docs/backlog.json`](docs/backlog.json). Agents update that JSON and append its update history in the same change as implementation. Vercel validates the backlog, converts the tagged documents in `docs/` to HTML, and deploys them after changes reach `main`. The GitHub Pages workflow remains available as a fallback.
+[The live development dashboard](https://utcc-ai-academy.vercel.app) renders its current execution status from the machine-readable [`docs/backlog.json`](docs/backlog.json). Agents update that JSON and append its update history in the same change as implementation. Vercel validates the backlog, converts the tagged documents in `docs/` to HTML, and deploys them after changes reach `main`. The GitHub Pages workflow remains available as a fallback.
 
-The Vercel project uses the repository-level [`vercel.json`](vercel.json). Its build is deliberately isolated from the Rails bundle: `docs/Gemfile` contains the Jekyll dependencies, and `script/build-dashboard` validates and stages the documentation before generating `_site`.
+The Vercel project uses the repository-level [`vercel.json`](vercel.json). Its build is deliberately isolated from the Rails bundle: `docs/Gemfile` contains the Jekyll dependencies, Tailwind CSS v4 compiles the dashboard stylesheet, and `script/build-dashboard` validates and stages the documentation before generating `_site`. The rendered homepage also records the exact repository, branch, commit SHA, and commit message supplied by Vercel's Git environment.
 
 For the daily 08:00 Asia/Bangkok refresh, create a `main`-branch Vercel Deploy Hook and add its URL as the encrypted `VERCEL_DEPLOY_HOOK_URL` environment variable. Also set a random `CRON_SECRET` of at least 16 characters. Vercel invokes `api/refresh.js` at 01:00 UTC, and that authenticated function requests a fresh production build without creating an empty Git commit.
 

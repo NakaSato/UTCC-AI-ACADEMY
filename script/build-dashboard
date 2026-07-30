@@ -17,6 +17,11 @@ ruby script/validate-backlog
 mkdir -p "${source_dir}/_data"
 cp -R docs/. "${source_dir}/"
 cp docs/backlog.json "${source_dir}/_data/backlog.json"
+ruby script/write-build-metadata "${source_dir}"
+npx tailwindcss \
+  -i docs/assets/css/tailwind.css \
+  -o "${source_dir}/assets/css/style.css" \
+  --minify
 
 BUNDLE_GEMFILE=docs/Gemfile bundle exec jekyll build \
   --source "${source_dir}" \
