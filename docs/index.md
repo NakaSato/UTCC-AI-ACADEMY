@@ -8,15 +8,15 @@ title: Development Status
 
 This page is the single source of truth for current development execution. The [product roadmap](roadmap.md) controls priority, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
 
-**Status updated:** 2026-07-30 19:36 ICT  
-**Delivery state:** Planning  
-**Current milestone:** Reliable account recovery
+- **Status updated:** 2026-07-30 19:40 ICT
+- **Delivery state:** Planning
+- **Current milestone:** Reliable account recovery
 
 ## Current work
 
 | ID | Work item | Status | Owner | Dependency | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| DOCS-001 | Publish the development dashboard with GitHub Pages | Verification | Agent | None | [Pages workflow](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.github/workflows/pages.yml) |
+| DOCS-001 | Publish the development dashboard with GitHub Pages | Blocked | Repository owner | Restore GitHub Actions access | [Blocked deployment run](https://github.com/NakaSato/UTCC-AI-ACADEMY/actions/runs/30543163008) |
 | MAIL-001 | Select the production email provider and credential owner | Blocked | Product Owner | Institutional decision | [Roadmap decision 1](roadmap.md#product-decisions-required-before-scheduling) |
 | MAIL-002 | Configure authenticated production email delivery | Queued | Unassigned | MAIL-001 | [Milestone 1](roadmap.md#milestone-1--reliable-account-recovery) |
 | MAIL-003 | Verify password reset with a real mailbox | Queued | Unassigned | MAIL-002 | [Success criteria](roadmap.md#success-criteria) |
@@ -34,6 +34,7 @@ Only these five states may appear in the current-work table.
 
 | Work item | Blocker | Decision owner | Next action |
 | --- | --- | --- | --- |
+| DOCS-001 | GitHub refused to start every workflow job because the account is locked over a billing issue | Repository owner | Resolve the GitHub billing lock, then rerun the blocked deployment workflow |
 | MAIL-001 | No email provider or production credentials have been selected | Product Owner | Select the provider, sending domain, and credential owner |
 
 ## Verification
