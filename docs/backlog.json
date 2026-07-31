@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T01:45:54+07:00",
+  "updated_at": "2026-08-01T02:25:51+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -239,9 +239,9 @@
       "milestone": "M1",
       "depends_on": [],
       "blocker": {
-        "summary": "No email provider or production credentials have been selected.",
+        "summary": "The Product Owner rejected ADR-0002; no production email provider or credentials are authorized.",
         "decision_owner": "Product Owner",
-        "next_action": "Review ADR-0002, then select the provider, sending domain, credential owner, privacy terms, and operating owner."
+        "next_action": "The Product Owner must provide a new direction before production email work can resume."
       },
       "evidence": [
         {
@@ -253,7 +253,7 @@
           "url": "decisions/adr-0002-select-production-email-provider.html"
         }
       ],
-      "updated_at": "2026-07-31T23:54:23+07:00"
+      "updated_at": "2026-08-01T02:25:51+07:00"
     },
     {
       "id": "MAIL-002",
@@ -923,6 +923,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the Tier C diff after reviewing the verified repository-local Codex skill router, its project-only scope, minimum-skill selection, and non-delegable human decision boundaries; AGENT-001 is complete.",
       "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.agents/skills/use-project-skill-library/SKILL.md"
+    },
+    {
+      "at": "2026-08-01T02:25:51+07:00",
+      "item_id": "MAIL-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Product Owner rejected ADR-0002 without selecting a production email provider or providing a replacement direction; MAIL-001 remains blocked and MAIL-002 is not authorized to start.",
+      "evidence_url": "decisions/adr-0002-select-production-email-provider.html"
     }
   ]
 }

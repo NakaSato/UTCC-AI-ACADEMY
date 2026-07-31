@@ -2,10 +2,10 @@
 id: ADR-0002
 type: adr
 title: Select the production transactional-email provider
-status: draft
+status: rejected
 owners: ["@product-owner"]
 created: 2026-07-31
-updated: 2026-07-31
+updated: 2026-08-01
 review_by: 2026-08-07
 supersedes: []
 superseded_by: []
@@ -157,7 +157,13 @@ Official evidence:
 
 ## Decision
 
-Pending human completion:
+The Product Owner rejected this proposal on 2026-08-01. No production email
+provider was selected, and no production SMTP implementation or credential
+provisioning is authorized. No rejection rationale was provided, so this
+record does not infer one.
+
+If the Product Owner later requests a replacement proposal, the following
+inputs remain unresolved:
 
 ```text
 Selected provider and plan:

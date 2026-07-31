@@ -11,5 +11,5 @@ deprecate it.
 ## Records
 
 - [ADR-0001 — Adopt a repository-native Markdown development flow](adr-0001-adopt-markdown-development-flow.md) — accepted
-- [ADR-0002 — Select the production transactional-email provider](adr-0002-select-production-email-provider.md) — draft; human decision pending
+- [ADR-0002 — Select the production transactional-email provider](adr-0002-select-production-email-provider.md) — rejected; no provider selected
 - [ADR-0003 — Use Mailpit for local email capture](adr-0003-use-mailpit-for-local-email-capture.md) — accepted and implemented; Tier C verification and human review complete
