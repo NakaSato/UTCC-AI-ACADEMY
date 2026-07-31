@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-30T22:10:00+07:00",
+  "updated_at": "2026-08-01T01:45:54+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -27,6 +27,184 @@
     "blocked"
   ],
   "items": [
+    {
+      "id": "SLACK-001",
+      "title": "Mirror validated lifecycle status transitions to Slack",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Platform Owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Status-transition detector",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/slack-status-update"
+        },
+        {
+          "label": "Independent CI workflow",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.github/workflows/ci.yml"
+        },
+        {
+          "label": "Status mirror tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/scripts/slack_status_update_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-01T01:26:24+07:00"
+    },
+    {
+      "id": "DOCS-011",
+      "title": "Create a worked development-flow example from Roadmap Milestone 1",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Reliable account recovery worked example",
+          "url": "examples/milestone-1-reliable-account-recovery.html"
+        }
+      ],
+      "updated_at": "2026-07-31T23:41:47+07:00"
+    },
+    {
+      "id": "DOCS-010",
+      "title": "Cross-link every skill with every development-flow guide",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Phase skill routes",
+          "url": "development-flow.html#phase-skill-routes"
+        }
+      ],
+      "updated_at": "2026-07-31T23:00:27+07:00"
+    },
+    {
+      "id": "DOCS-009",
+      "title": "Link every documented skill to the project development flow",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Skill directory",
+          "url": "skills/README.html"
+        }
+      ],
+      "updated_at": "2026-07-31T22:55:39+07:00"
+    },
+    {
+      "id": "DOCS-008",
+      "title": "Enforce one connected graph across all project Markdown documents",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Markdown graph validator",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
+        }
+      ],
+      "updated_at": "2026-07-31T22:34:20+07:00"
+    },
+    {
+      "id": "DOCS-007",
+      "title": "Document the roadmap methodology in the project development flow",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Roadmap methodology",
+          "url": "development-flow.html#roadmap-methodology"
+        }
+      ],
+      "updated_at": "2026-07-31T22:28:17+07:00"
+    },
+    {
+      "id": "DOCS-006",
+      "title": "Create an external feature proposal template",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "External feature proposal template",
+          "url": "templates/external-feature-proposal.html"
+        }
+      ],
+      "updated_at": "2026-07-31T19:15:15+07:00"
+    },
+    {
+      "id": "DOCS-005",
+      "title": "Create an all-roles guide for the system development workflow",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Workflow guide for all roles",
+          "url": "system-development-flow-role-guide.html"
+        }
+      ],
+      "updated_at": "2026-07-31T12:31:42+07:00"
+    },
+    {
+      "id": "AGENT-002",
+      "title": "Reduce AGENTS.md to the canonical master-flow reference",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Minimal agent instructions",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
+        }
+      ],
+      "updated_at": "2026-07-31T12:22:18+07:00"
+    },
+    {
+      "id": "AGENT-001",
+      "title": "Apply the development skill library as a repository-local Codex skill",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Repository owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Repository-local skill",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.agents/skills/use-project-skill-library/SKILL.md"
+        }
+      ],
+      "updated_at": "2026-08-01T01:45:54+07:00"
+    },
     {
       "id": "DOCS-001",
       "title": "Publish the development dashboard with GitHub Pages",
@@ -63,15 +241,19 @@
       "blocker": {
         "summary": "No email provider or production credentials have been selected.",
         "decision_owner": "Product Owner",
-        "next_action": "Select the provider, sending domain, and credential owner."
+        "next_action": "Review ADR-0002, then select the provider, sending domain, credential owner, privacy terms, and operating owner."
       },
       "evidence": [
         {
           "label": "Roadmap decision 1",
           "url": "roadmap.html#product-decisions-required-before-scheduling"
+        },
+        {
+          "label": "Provider decision options",
+          "url": "decisions/adr-0002-select-production-email-provider.html"
         }
       ],
-      "updated_at": "2026-07-30T19:35:00+07:00"
+      "updated_at": "2026-07-31T23:54:23+07:00"
     },
     {
       "id": "MAIL-002",
@@ -113,6 +295,51 @@
     }
   ],
   "recently_completed": [
+    {
+      "id": "DOCS-012",
+      "title": "Added Slack engagement routes to the development flow",
+      "completed_at": "2026-08-01T00:39:29+07:00",
+      "evidence": {
+        "label": "Slack engagement and lifecycle-status flow",
+        "url": "development-flow.html#slack-engagement-layer"
+      }
+    },
+    {
+      "id": "MAIL-004",
+      "title": "Added a loopback-only Mailpit inbox for local SMTP testing",
+      "completed_at": "2026-08-01T00:27:15+07:00",
+      "evidence": {
+        "label": "Accepted and verified local Mailpit decision",
+        "url": "decisions/adr-0003-use-mailpit-for-local-email-capture.html"
+      }
+    },
+    {
+      "id": "DOCS-004",
+      "title": "Made the connected documentation graph publish-safe",
+      "completed_at": "2026-07-30T22:53:25+07:00",
+      "evidence": {
+        "label": "Rendered documentation build",
+        "url": "system-development-flow-master.html"
+      }
+    },
+    {
+      "id": "DOCS-003",
+      "title": "Connected the master development flow and English skill library",
+      "completed_at": "2026-07-30T22:41:41+07:00",
+      "evidence": {
+        "label": "Validated skill library",
+        "url": "skills-library-README.html"
+      }
+    },
+    {
+      "id": "OBS-001",
+      "title": "Defined the monitoring and tracing application in the system development flow",
+      "completed_at": "2026-07-30T22:20:27+07:00",
+      "evidence": {
+        "label": "Monitoring and tracing application flow",
+        "url": "system-development-flow-master.html"
+      }
+    },
     {
       "id": "FLOW-001",
       "title": "Applied the Markdown-based development lifecycle",
@@ -296,6 +523,406 @@
       "to": "complete",
       "summary": "Closed the shared sign-in synchronization defect after repeated system-suite passes, a green full local gate, and publication of commit 7e3e12a.",
       "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/7e3e12a306a22254c3c8c243000b8b882687da9d"
+    },
+    {
+      "at": "2026-07-30T22:20:27+07:00",
+      "item_id": "OBS-001",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Added a vendor-neutral monitoring and tracing application to the lifecycle, including signal flow, required views, correlation and privacy contracts, and the Operate exit gate.",
+      "evidence_url": "system-development-flow-en.html"
+    },
+    {
+      "at": "2026-07-30T22:24:06+07:00",
+      "item_id": "OBS-001",
+      "from": "complete",
+      "to": "complete",
+      "summary": "Renamed the canonical system development flow as the master file and updated its current backlog evidence link.",
+      "evidence_url": "system-development-flow-master.html"
+    },
+    {
+      "at": "2026-07-30T22:32:40+07:00",
+      "item_id": "DOCS-003",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started connecting the master lifecycle, skill indexes, authoring template, and all declared skill relationships into one validated documentation graph.",
+      "evidence_url": "skills-library-README.html"
+    },
+    {
+      "at": "2026-07-30T22:41:41+07:00",
+      "item_id": "DOCS-003",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "Connected all 41 current Markdown documents, linked all 34 skills and their declared relationships, translated the canonical skill library to English, added persistent validation, and passed the rendered documentation build and full local CI gate.",
+      "evidence_url": "skills-library-README.html"
+    },
+    {
+      "at": "2026-07-30T22:51:29+07:00",
+      "item_id": "DOCS-004",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started correcting publish-time link failures found during the pre-apply audit and adding rendered-site link validation.",
+      "evidence_url": "system-development-flow-master.html"
+    },
+    {
+      "at": "2026-07-30T22:53:25+07:00",
+      "item_id": "DOCS-004",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "Restored unrelated lifecycle documents, made all new navigation targets publish-safe, retained the legacy flow URL as a compatibility redirect, verified 1,146 local links across 61 rendered pages, and passed the full local CI gate.",
+      "evidence_url": "system-development-flow-master.html"
+    },
+    {
+      "at": "2026-07-30T22:58:51+07:00",
+      "item_id": "AGENT-001",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started exposing the documentation skill library to Codex through a repository-local routing skill without installing anything globally.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.agents/skills/use-project-skill-library/SKILL.md"
+    },
+    {
+      "at": "2026-07-30T23:02:40+07:00",
+      "item_id": "AGENT-001",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Created the repository-local skill router, connected it to project guidance, and passed both the official skill structure check and the project documentation gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.agents/skills/use-project-skill-library/SKILL.md"
+    },
+    {
+      "at": "2026-07-30T23:05:07+07:00",
+      "item_id": "AGENT-001",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Passed the rendered documentation build, 1,147 local-link checks, and the full local CI gate; repository-owner diff review remains before completion.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T12:20:17+07:00",
+      "item_id": "AGENT-002",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started reducing AGENTS.md to a single canonical master-flow reference and aligning its documentation validation.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
+    },
+    {
+      "at": "2026-07-31T12:21:08+07:00",
+      "item_id": "AGENT-002",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Reduced AGENTS.md to the canonical master-flow reference, aligned README and CLAUDE guidance, and passed source and rendered documentation checks.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
+    },
+    {
+      "at": "2026-07-31T12:22:18+07:00",
+      "item_id": "AGENT-002",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Passed the full local CI gate after the AGENTS.md cleanup; repository-owner diff review remains before completion.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T12:29:17+07:00",
+      "item_id": "DOCS-005",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started creating a role-by-role operating guide for lifecycle entry, ownership, skills, delegation, gates, and handoffs.",
+      "evidence_url": "system-development-flow-role-guide.html"
+    },
+    {
+      "at": "2026-07-31T12:29:57+07:00",
+      "item_id": "DOCS-005",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Created and connected the all-roles workflow guide, covering 14 roles, all 9 phases, all 34 skills, delegation rules, gates, and handoffs; source and rendered documentation checks pass.",
+      "evidence_url": "system-development-flow-role-guide.html"
+    },
+    {
+      "at": "2026-07-31T12:31:42+07:00",
+      "item_id": "DOCS-005",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Passed the full local CI gate for the all-roles workflow guide; repository-owner content review remains before completion.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T12:37:25+07:00",
+      "item_id": "DOCS-006",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started creating a privacy-safe external proposal template for new-feature and feature-improvement requests with human product triage.",
+      "evidence_url": "templates/external-feature-proposal.html"
+    },
+    {
+      "at": "2026-07-31T12:38:30+07:00",
+      "item_id": "DOCS-006",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Created and connected the external feature proposal and template directory; source validation and 1,309 rendered local-link checks pass across 64 pages.",
+      "evidence_url": "templates/external-feature-proposal.html"
+    },
+    {
+      "at": "2026-07-31T18:31:45+07:00",
+      "item_id": "DOCS-006",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Passed the full local CI gate for the external feature proposal template; repository-owner content review remains before completion.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T19:15:15+07:00",
+      "item_id": "DOCS-006",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Rechecked the proposal documentation and full local CI gate: 64 rendered pages, 1,310 links, 473 Rails tests, and 2 system tests pass.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T20:17:51+07:00",
+      "item_id": "DOCS-004",
+      "from": "complete",
+      "to": "complete",
+      "summary": "Connected the six lifecycle directory indexes and five existing Claude skills to their project entry points; all 79 project Markdown files now form one connected local-link graph.",
+      "evidence_url": "system-development-flow-master.html"
+    },
+    {
+      "at": "2026-07-31T22:26:03+07:00",
+      "item_id": "DOCS-007",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started documenting an outcome-driven, dual-track roadmap method with explicit problem, metric, priority, capacity, and human-decision boundaries.",
+      "evidence_url": "development-flow.html#roadmap-methodology"
+    },
+    {
+      "at": "2026-07-31T22:26:04+07:00",
+      "item_id": "DOCS-007",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added the roadmap methodology, decision cycle, dependency-aware prioritization, capacity heuristic, milestone sequencing, and agent delegation boundaries to the project development flow.",
+      "evidence_url": "development-flow.html#roadmap-methodology"
+    },
+    {
+      "at": "2026-07-31T22:28:17+07:00",
+      "item_id": "DOCS-007",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified the roadmap methodology through source validation, 1,324 rendered local-link checks across 64 pages, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T22:31:18+07:00",
+      "item_id": "DOCS-008",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the one-time all-document connectivity audit with a persistent project Markdown graph gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
+    },
+    {
+      "at": "2026-07-31T22:31:19+07:00",
+      "item_id": "DOCS-008",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added repository-wide local-link and connected-component validation for root documentation, docs, and hidden project skills, and made bin/docs enforce it.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
+    },
+    {
+      "at": "2026-07-31T22:34:20+07:00",
+      "item_id": "DOCS-008",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified one connected component across 79 Markdown files and 620 local source links, 1,324 rendered links across 64 pages, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T22:53:13+07:00",
+      "item_id": "DOCS-009",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started adding skill-first navigation from every documented skill to the project development flow and master flow.",
+      "evidence_url": "skills/README.html"
+    },
+    {
+      "at": "2026-07-31T22:53:14+07:00",
+      "item_id": "DOCS-009",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Updated all 34 skills, the authoring template, and both skill indexes with ordered skill-to-development-flow navigation and added persistent order validation.",
+      "evidence_url": "skills/README.html"
+    },
+    {
+      "at": "2026-07-31T22:55:39+07:00",
+      "item_id": "DOCS-009",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified all 35 detailed skill and template navigation blocks, 657 source links, 1,364 rendered links, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T22:58:29+07:00",
+      "item_id": "DOCS-010",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started making skill-to-flow navigation and flow-to-skill phase routing complete and bidirectional.",
+      "evidence_url": "development-flow.html#phase-skill-routes"
+    },
+    {
+      "at": "2026-07-31T22:58:30+07:00",
+      "item_id": "DOCS-010",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Linked every detailed skill to all three flow guides, added all 34 phase-routed skills to the project flow, and made validation enforce every flow-to-skill edge.",
+      "evidence_url": "development-flow.html#phase-skill-routes"
+    },
+    {
+      "at": "2026-07-31T23:00:27+07:00",
+      "item_id": "DOCS-010",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified bidirectional links between all 34 skills and all three flow guides, 754 source links, 1,464 rendered links, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T23:38:50+07:00",
+      "item_id": "DOCS-011",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started turning Roadmap Milestone 1 into a concrete Plan-to-Measure example without inventing its blocked human decision.",
+      "evidence_url": "examples/milestone-1-reliable-account-recovery.html"
+    },
+    {
+      "at": "2026-07-31T23:38:51+07:00",
+      "item_id": "DOCS-011",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Created and connected a worked reliable-account-recovery example with phase artifacts, skill routes, gates, candidate invariants, verification evidence, operational guidance, and the current human handoff.",
+      "evidence_url": "examples/milestone-1-reliable-account-recovery.html"
+    },
+    {
+      "at": "2026-07-31T23:41:47+07:00",
+      "item_id": "DOCS-011",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified the worked roadmap example across 80 source Markdown files, 1 connected graph, 65 rendered pages, 1,517 rendered links, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T23:51:04+07:00",
+      "item_id": "MAIL-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Prepared draft ADR-0002 with current Postmark, Amazon SES, Resend, and no-change options; selection rules; security and privacy trade-offs; proposed fitness functions; and the human decision checklist.",
+      "evidence_url": "decisions/adr-0002-select-production-email-provider.html"
+    },
+    {
+      "at": "2026-07-31T23:54:23+07:00",
+      "item_id": "MAIL-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Verified ADR-0002 across 81 source Markdown files, 1 connected graph, 66 rendered pages, 1,542 rendered links, 2 lifecycle records, and the complete local CI gate.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-07-31T23:57:45+07:00",
+      "item_id": "MAIL-004",
+      "from": "queued",
+      "to": "blocked",
+      "summary": "Prepared proposed ADR-0003 for a pinned, loopback-only, ephemeral Mailpit development inbox while withholding the container dependency until human acceptance.",
+      "evidence_url": "decisions/adr-0003-use-mailpit-for-local-email-capture.html"
+    },
+    {
+      "at": "2026-08-01T00:15:45+07:00",
+      "item_id": "MAIL-004",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "Started implementing the human-accepted Mailpit decision with pinned, loopback-only, ephemeral local capture while leaving production SMTP unchanged.",
+      "evidence_url": "decisions/adr-0003-use-mailpit-for-local-email-capture.html"
+    },
+    {
+      "at": "2026-08-01T00:20:18+07:00",
+      "item_id": "MAIL-004",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Verified the pinned Mailpit container, loopback-only ports, ephemeral storage, Rails development SMTP capture, unchanged test adapter, and absence from production configuration; human Tier C diff review remains required.",
+      "evidence_url": "decisions/adr-0003-use-mailpit-for-local-email-capture.html"
+    },
+    {
+      "at": "2026-08-01T00:23:18+07:00",
+      "item_id": "MAIL-004",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Passed the complete local CI pipeline with the documented machine-specific Mailpit port overrides: setup, documentation validation, style, security audits, 473 Rails tests, seed replant, and two system tests.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-08-01T00:27:15+07:00",
+      "item_id": "MAIL-004",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the Tier C diff after reviewing the verified loopback-only, ephemeral Mailpit implementation; MAIL-004 is complete while production SMTP remains separately blocked on MAIL-001.",
+      "evidence_url": "decisions/adr-0003-use-mailpit-for-local-email-capture.html"
+    },
+    {
+      "at": "2026-08-01T00:29:28+07:00",
+      "item_id": "DOCS-012",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started integrating the existing Slack signal, channel, governance, and async-handoff policy into the canonical, project, and all-role development flows.",
+      "evidence_url": "development-flow.html#slack-engagement-layer"
+    },
+    {
+      "at": "2026-08-01T00:33:44+07:00",
+      "item_id": "DOCS-012",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added Slack routes across the master, project, and all-role flows, including repository-first lifecycle status notifications such as proposed-to-accepted, message contracts, CI/release/incident routing, privacy boundaries, and explicit non-ChatOps controls; source, rendered, and complete local CI gates passed.",
+      "evidence_url": "development-flow.html#slack-engagement-layer"
+    },
+    {
+      "at": "2026-08-01T00:39:29+07:00",
+      "item_id": "DOCS-012",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the Slack development-flow documentation, including repository-first lifecycle status messages such as accepted; DOCS-012 is complete.",
+      "evidence_url": "development-flow.html#slack-engagement-layer"
+    },
+    {
+      "at": "2026-08-01T00:43:52+07:00",
+      "item_id": "SLACK-001",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started implementing an outbound-only, default-branch Slack mirror for validated backlog and lifecycle status transitions, using the human-approved DOCS-012 policy as acceptance intent.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/slack-status-update"
+    },
+    {
+      "at": "2026-08-01T00:51:37+07:00",
+      "item_id": "SLACK-001",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented and verified a non-blocking main-only Slack status mirror that waits for all six independent jobs, detects append-only backlog and lifecycle transitions including accepted, excludes backlog titles, escapes dynamic fields, and never reads Slack; 479 Rails tests, 4,107 assertions, two system tests, rendered links, and the complete local CI gate passed.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/scripts/slack_status_update_test.rb"
+    },
+    {
+      "at": "2026-08-01T00:55:08+07:00",
+      "item_id": "SLACK-001",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Reverified the missing-owner safety path and complete local CI pipeline: seven focused detector tests with 121 assertions, 480 Rails tests with 4,123 assertions, two system tests with 20 assertions, documentation validation, style, security audits, and seed replant all passed; human Tier C diff review remains required.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/ci.rb"
+    },
+    {
+      "at": "2026-08-01T01:26:24+07:00",
+      "item_id": "SLACK-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the Tier C diff after reviewing the verified outbound-only, main-branch lifecycle status mirror; SLACK-001 is complete while live delivery remains credential-gated by SLACK_BOT_TOKEN and SLACK_STATUS_CHANNEL.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.github/workflows/ci.yml"
+    },
+    {
+      "at": "2026-08-01T01:45:54+07:00",
+      "item_id": "AGENT-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the Tier C diff after reviewing the verified repository-local Codex skill router, its project-only scope, minimum-skill selection, and non-delegable human decision boundaries; AGENT-001 is complete.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.agents/skills/use-project-skill-library/SKILL.md"
     }
   ]
 }

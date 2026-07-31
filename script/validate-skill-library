@@ -1,0 +1,406 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "pathname"
+require "set"
+require "yaml"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+SKILLS_DIRECTORY = ROOT.join("docs/skills")
+MASTER_PATH = ROOT.join("docs/system-development-flow-master.md")
+PROJECT_FLOW_PATH = ROOT.join("docs/development-flow.md")
+ROLE_GUIDE_PATH = ROOT.join("docs/system-development-flow-role-guide.md")
+LIBRARY_PATH = ROOT.join("docs/skills-library-README.md")
+DIRECTORY_PATH = SKILLS_DIRECTORY.join("README.md")
+TEMPLATE_PATH = SKILLS_DIRECTORY.join("template.md")
+DOCUMENT_TEMPLATE_INDEX_PATH = ROOT.join("docs/templates/README.md")
+EXTERNAL_PROPOSAL_PATH = ROOT.join("docs/templates/external-feature-proposal.md")
+LIFECYCLE_DIRECTORY_PATHS = %w[
+  decisions specs releases runbooks postmortems outcomes
+].to_h do |directory|
+  [ directory, ROOT.join("docs/#{directory}/README.md") ]
+end.freeze
+PROJECT_SKILL_PATH = ROOT.join(".agents/skills/use-project-skill-library/SKILL.md")
+PROJECT_SKILL_METADATA_PATH = ROOT.join(".agents/skills/use-project-skill-library/agents/openai.yaml")
+AGENTS_PATH = ROOT.join("AGENTS.md")
+EXPECTED_AGENTS_BODY = <<~MARKDOWN
+  # Repository Instructions
+
+  Follow the [System Development Flow Master](docs/system-development-flow-master.md).
+MARKDOWN
+ROOT_GUIDE_PATHS = [
+  ROOT.join("CLAUDE.md"),
+  ROOT.join("README.md")
+].freeze
+
+REQUIRED_FIELDS = %w[
+  id name category phases roles required_level agent_delegable agent_trend
+  related review_by
+].freeze
+REQUIRED_HEADINGS = [
+  "## นิยาม",
+  "## ทำไมสำคัญตอนนี้",
+  "## ระดับ",
+  "### Foundation",
+  "### Proficient",
+  "### Expert",
+  "## วิธีประเมิน",
+  "## เส้นทางพัฒนา",
+  "## ความสัมพันธ์กับ Agent",
+  "## สัญญาณว่าทีมขาดทักษะนี้"
+].freeze
+VALID_CATEGORIES = %w[
+  product architecture specification coding testing build operations ai-era
+  human
+].freeze
+VALID_LEVELS = %w[foundation proficient expert].freeze
+VALID_DELEGATION = [ true, false, "assisted" ].freeze
+VALID_TRENDS = %w[new rising-critical rising stable declining].freeze
+LEVEL_SYMBOLS = {
+  "F" => "foundation",
+  "P" => "proficient",
+  "E" => "expert"
+}.freeze
+DELEGATION_SYMBOLS = {
+  "✅" => true,
+  "⚠️" => "assisted",
+  "❌" => false
+}.freeze
+SKILL_NAVIGATION_TARGETS = [
+  [ "library", "../skills-library-README.md" ],
+  [ "directory", "README.md" ],
+  [ "development flow", "../development-flow.md" ],
+  [ "role guide", "../system-development-flow-role-guide.md" ],
+  [ "master", "../system-development-flow-master.md" ]
+].freeze
+LIBRARY_NAVIGATION = <<~MARKDOWN
+  > [Skill Directory](skills/README.md) ·
+  > [Project Development Flow](development-flow.md) ·
+  > [System Development Flow Master](system-development-flow-master.md) ·
+  > [Workflow Guide for All Roles](system-development-flow-role-guide.md) ·
+  > [Skill Authoring Template](skills/template.md)
+MARKDOWN
+DIRECTORY_NAVIGATION = <<~MARKDOWN
+  > [Canonical Skill Library](../skills-library-README.md) ·
+  > [Project Development Flow](../development-flow.md) ·
+  > [Workflow Guide for All Roles](../system-development-flow-role-guide.md) ·
+  > [System Development Flow Master](../system-development-flow-master.md) ·
+  > [Skill Authoring Template](template.md)
+MARKDOWN
+
+errors = []
+warnings = []
+skills = {}
+
+validate_skill_navigation = lambda do |relative_path, body|
+  positions = SKILL_NAVIGATION_TARGETS.map do |label, target|
+    position = body.index("](#{target})")
+    errors << "#{relative_path}: missing #{label} link" unless position
+    position
+  end
+
+  if positions.all? && positions != positions.sort
+    errors << "#{relative_path}: skill navigation must lead to indexes, project flow, role guide, then master"
+  end
+end
+
+SKILLS_DIRECTORY.glob("skill-*.md").sort.each do |path|
+  relative_path = path.relative_path_from(ROOT).to_s
+  body = path.read
+  frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
+
+  unless frontmatter_match
+    errors << "#{relative_path}: missing YAML frontmatter"
+    next
+  end
+
+  begin
+    metadata = YAML.safe_load(
+      frontmatter_match[1],
+      permitted_classes: [ Date ],
+      aliases: false
+    )
+  rescue Psych::Exception => error
+    errors << "#{relative_path}: invalid YAML frontmatter (#{error.message.lines.first.strip})"
+    next
+  end
+
+  unless metadata.is_a?(Hash)
+    errors << "#{relative_path}: frontmatter must be a mapping"
+    next
+  end
+
+  id = metadata["id"].to_s
+  missing_fields = REQUIRED_FIELDS.reject { |field| metadata.key?(field) }
+  errors << "#{relative_path}: missing #{missing_fields.join(', ')}" unless missing_fields.empty?
+  errors << "#{relative_path}: invalid id #{id.inspect}" unless id.match?(/\ASKILL-[A-Z]+-\d{3}\z/)
+  errors << "#{relative_path}: duplicate id #{id}" if skills.key?(id)
+  errors << "#{relative_path}: invalid category" unless VALID_CATEGORIES.include?(metadata["category"])
+  errors << "#{relative_path}: phases must be an array" unless metadata["phases"].is_a?(Array)
+  errors << "#{relative_path}: roles must be a non-empty array" unless metadata["roles"].is_a?(Array) && metadata["roles"].any?
+  errors << "#{relative_path}: invalid required_level" unless VALID_LEVELS.include?(metadata["required_level"])
+  errors << "#{relative_path}: invalid agent_delegable" unless VALID_DELEGATION.include?(metadata["agent_delegable"])
+  errors << "#{relative_path}: invalid agent_trend" unless VALID_TRENDS.include?(metadata["agent_trend"])
+  errors << "#{relative_path}: related must be an array" unless metadata["related"].is_a?(Array)
+
+  if metadata["phases"].is_a?(Array) && !metadata["phases"].all? { |phase| (0..8).include?(phase) }
+    errors << "#{relative_path}: phases must contain only 0 through 8"
+  end
+
+  begin
+    review_by = Date.iso8601(metadata["review_by"].to_s)
+    warnings << "#{relative_path}: review_by is past due" if review_by < Date.today
+  rescue Date::Error
+    errors << "#{relative_path}: review_by must be an ISO 8601 date"
+  end
+
+  errors << "#{relative_path}: heading must match name" unless body.include?("# #{metadata['name']}")
+  REQUIRED_HEADINGS.each do |heading|
+    errors << "#{relative_path}: missing heading #{heading.inspect}" unless body.include?(heading)
+  end
+
+  skills[id] = {
+    path: path,
+    relative_path: relative_path,
+    body: body,
+    metadata: metadata
+  }
+end
+
+known_ids = skills.keys.to_set
+
+skills.each_value do |skill|
+  metadata = skill[:metadata]
+
+  metadata.fetch("related", []).each do |related_id|
+    unless known_ids.include?(related_id)
+      errors << "#{skill[:relative_path]}: related references unknown id #{related_id}"
+      next
+    end
+
+    errors << "#{skill[:relative_path]}: related cannot reference itself" if related_id == metadata["id"]
+    related_path = skills.fetch(related_id)[:path].basename.to_s
+    expected_link = "](#{related_path})"
+    unless skill[:body].include?(expected_link)
+      errors << "#{skill[:relative_path]}: missing body link for related skill #{related_id}"
+    end
+  end
+
+  validate_skill_navigation.call(skill[:relative_path], skill[:body])
+end
+
+if TEMPLATE_PATH.file?
+  validate_skill_navigation.call(TEMPLATE_PATH.relative_path_from(ROOT), TEMPLATE_PATH.read)
+end
+
+index_rows = {}
+if LIBRARY_PATH.file?
+  LIBRARY_PATH.each_line do |line|
+    next unless line.start_with?("| SKILL-")
+
+    cells = line.split("|").map(&:strip)
+    id = cells[1]
+    link_match = cells[2].match(/\A\[([^\]]+)\]\(([^)]+)\)\z/)
+
+    unless link_match
+      errors << "docs/skills-library-README.md: #{id} name must link to its skill file"
+      next
+    end
+
+    index_rows[id] = {
+      name: link_match[1],
+      target: link_match[2],
+      phases: cells[3],
+      level: LEVEL_SYMBOLS[cells[4]],
+      delegation: DELEGATION_SYMBOLS[cells[5]]
+    }
+  end
+else
+  errors << "missing docs/skills-library-README.md"
+end
+
+errors << "skill index IDs do not match skill files" unless index_rows.keys.to_set == known_ids
+
+skills.each do |id, skill|
+  row = index_rows[id]
+  next unless row
+
+  metadata = skill[:metadata]
+  expected_target = skill[:path].relative_path_from(LIBRARY_PATH.dirname).to_s
+  expected_phases = metadata["phases"] == (0..8).to_a ? "Every phase" : metadata["phases"].join(", ")
+
+  errors << "skill index: #{id} has the wrong name" unless row[:name] == metadata["name"]
+  errors << "skill index: #{id} links to #{row[:target]} instead of #{expected_target}" unless row[:target] == expected_target
+  errors << "skill index: #{id} has the wrong phases" unless row[:phases] == expected_phases
+  errors << "skill index: #{id} has the wrong level" unless row[:level] == metadata["required_level"]
+  errors << "skill index: #{id} has the wrong delegation" unless row[:delegation] == metadata["agent_delegable"]
+
+  directory_target = skill[:path].relative_path_from(DIRECTORY_PATH.dirname).to_s
+  errors << "docs/skills/README.md: missing #{id}" unless DIRECTORY_PATH.read.include?("](#{directory_target})")
+  [ MASTER_PATH, PROJECT_FLOW_PATH, ROLE_GUIDE_PATH ].each do |flow_path|
+    target = skill[:path].relative_path_from(flow_path.dirname).to_s
+    unless flow_path.read.include?("](#{target})")
+      errors << "#{flow_path.relative_path_from(ROOT)}: missing #{id}"
+    end
+  end
+end
+
+ROOT_GUIDE_PATHS.each do |path|
+  body = path.read
+  errors << "#{path.basename}: missing master flow link" unless body.include?("](docs/system-development-flow-master.md)")
+  errors << "#{path.basename}: missing all-roles workflow guide link" unless body.include?("](docs/system-development-flow-role-guide.md)")
+  errors << "#{path.basename}: missing documentation templates link" unless body.include?("](docs/templates/README.md)")
+  errors << "#{path.basename}: missing skill library link" unless body.include?("](docs/skills-library-README.md)")
+  unless body.include?("](.agents/skills/use-project-skill-library/SKILL.md)")
+    errors << "#{path.basename}: missing project skill router link"
+  end
+end
+
+unless MASTER_PATH.read.include?("](system-development-flow-role-guide.md)")
+  errors << "docs/system-development-flow-master.md: missing all-roles workflow guide link"
+end
+
+LIFECYCLE_DIRECTORY_PATHS.each do |directory, path|
+  master_target = path.relative_path_from(MASTER_PATH.dirname).to_s
+  unless MASTER_PATH.read.include?("](#{master_target})")
+    errors << "docs/system-development-flow-master.md: missing #{directory} directory link"
+  end
+
+  unless path.read.include?("](../system-development-flow-master.md)")
+    errors << "#{path.relative_path_from(ROOT)}: missing master flow link"
+  end
+end
+
+unless LIBRARY_PATH.read.include?("](system-development-flow-role-guide.md)")
+  errors << "docs/skills-library-README.md: missing all-roles workflow guide link"
+end
+
+unless LIBRARY_PATH.read.include?(LIBRARY_NAVIGATION)
+  errors << "docs/skills-library-README.md: skill-first development-flow navigation is missing or out of order"
+end
+
+unless DIRECTORY_PATH.read.include?(DIRECTORY_NAVIGATION)
+  errors << "docs/skills/README.md: skill-first development-flow navigation is missing or out of order"
+end
+
+unless ROOT.join("docs/development-flow.md").read.include?("](system-development-flow-role-guide.md)")
+  errors << "docs/development-flow.md: missing all-roles workflow guide link"
+end
+
+{
+  MASTER_PATH => "](templates/external-feature-proposal.md)",
+  ROLE_GUIDE_PATH => "](templates/external-feature-proposal.md)",
+  ROOT.join("docs/development-flow.md") => "](templates/external-feature-proposal.md)",
+  ROOT.join("docs/mdlc.md") => "](templates/README.md)",
+  DOCUMENT_TEMPLATE_INDEX_PATH => "](external-feature-proposal.md)"
+}.each do |path, expected_link|
+  errors << "#{path.relative_path_from(ROOT)}: missing external proposal workflow link" unless path.read.include?(expected_link)
+end
+
+if EXTERNAL_PROPOSAL_PATH.file?
+  [
+    "# External Request",
+    "## 2. Problem and Affected Users",
+    "## 4. Desired Outcome",
+    "# Internal Triage — Maintainers Only",
+    "## 12. Product Decision",
+    "## 14. Ready-for-Backlog Gate"
+  ].each do |heading|
+    errors << "#{EXTERNAL_PROPOSAL_PATH.relative_path_from(ROOT)}: missing heading #{heading.inspect}" unless EXTERNAL_PROPOSAL_PATH.read.include?(heading)
+  end
+else
+  errors << "missing #{EXTERNAL_PROPOSAL_PATH.relative_path_from(ROOT)}"
+end
+
+unless AGENTS_PATH.read == EXPECTED_AGENTS_BODY
+  errors << "AGENTS.md: must contain only the system development flow master reference"
+end
+
+if PROJECT_SKILL_PATH.file?
+  body = PROJECT_SKILL_PATH.read
+  frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
+
+  if frontmatter_match
+    begin
+      metadata = YAML.safe_load(frontmatter_match[1], aliases: false)
+      expected_fields = %w[name description].to_set
+
+      unless metadata.is_a?(Hash) && metadata.keys.to_set == expected_fields
+        errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: frontmatter must contain only name and description"
+      end
+      unless metadata.is_a?(Hash) && metadata["name"] == "use-project-skill-library"
+        errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: wrong skill name"
+      end
+      unless metadata.is_a?(Hash) && !metadata["description"].to_s.strip.empty?
+        errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: description is required"
+      end
+    rescue Psych::Exception => error
+      errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: invalid YAML frontmatter (#{error.message.lines.first.strip})"
+    end
+  else
+    errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: missing YAML frontmatter"
+  end
+
+  [
+    "../../../AGENTS.md",
+    "../../../docs/backlog.json",
+    "../../../CLAUDE.md",
+    "../../../docs/system-development-flow-master.md",
+    "../../../docs/development-flow.md",
+    "../../../docs/skills-library-README.md",
+    "../../../docs/skills/README.md"
+  ].each do |target|
+    unless body.include?("](#{target})")
+      errors << "#{PROJECT_SKILL_PATH.relative_path_from(ROOT)}: missing project reference #{target}"
+    end
+  end
+else
+  errors << "missing #{PROJECT_SKILL_PATH.relative_path_from(ROOT)}"
+end
+
+if PROJECT_SKILL_METADATA_PATH.file?
+  begin
+    metadata = YAML.safe_load(PROJECT_SKILL_METADATA_PATH.read, aliases: false)
+    prompt = metadata.dig("interface", "default_prompt") if metadata.is_a?(Hash)
+    implicit = metadata.dig("policy", "allow_implicit_invocation") if metadata.is_a?(Hash)
+
+    unless prompt.to_s.include?("$use-project-skill-library")
+      errors << "#{PROJECT_SKILL_METADATA_PATH.relative_path_from(ROOT)}: default_prompt must invoke $use-project-skill-library"
+    end
+    unless implicit == true
+      errors << "#{PROJECT_SKILL_METADATA_PATH.relative_path_from(ROOT)}: implicit invocation must be enabled"
+    end
+  rescue Psych::Exception => error
+    errors << "#{PROJECT_SKILL_METADATA_PATH.relative_path_from(ROOT)}: invalid YAML (#{error.message.lines.first.strip})"
+  end
+else
+  errors << "missing #{PROJECT_SKILL_METADATA_PATH.relative_path_from(ROOT)}"
+end
+
+graph_paths = ROOT_GUIDE_PATHS +
+  [
+    AGENTS_PATH, MASTER_PATH, PROJECT_FLOW_PATH, ROLE_GUIDE_PATH, LIBRARY_PATH, DIRECTORY_PATH,
+    TEMPLATE_PATH, DOCUMENT_TEMPLATE_INDEX_PATH, EXTERNAL_PROPOSAL_PATH,
+    PROJECT_SKILL_PATH, *LIFECYCLE_DIRECTORY_PATHS.values
+  ] +
+  skills.values.map { |skill| skill[:path] }
+
+(graph_paths - ROOT_GUIDE_PATHS).each do |path|
+  unless path.file?
+    errors << "missing #{path.relative_path_from(ROOT)}"
+    next
+  end
+
+  path.read.scan(/\[[^\]]+\]\(([^)]+\.md(?:#[^)]+)?)\)/).flatten.each do |target|
+    next if target.match?(/\A[a-z][a-z0-9+.-]*:/i)
+
+    target_path = target.split("#", 2).first
+    candidate = path.dirname.join(target_path).cleanpath
+    errors << "#{path.relative_path_from(ROOT)}: broken Markdown link #{target}" unless candidate.file?
+  end
+end
+
+warnings.each { |warning| warn("warning: #{warning}") }
+abort(errors.uniq.join("\n")) unless errors.empty?
+
+puts "Skill library is valid (#{skills.length} skills, #{graph_paths.length} linked skill-graph files)."

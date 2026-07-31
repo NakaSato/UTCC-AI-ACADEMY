@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+require "pathname"
+
+site_path = Pathname.new(ARGV.fetch(0, "_site")).expand_path
+abort("#{site_path} is not a rendered site directory") unless site_path.directory?
+
+html_paths = site_path.glob("**/*.html").sort
+errors = []
+links_checked = 0
+
+html_paths.each do |page_path|
+  page_directory = page_path.dirname.relative_path_from(site_path)
+
+  page_path.read.scan(/(?:href|src)=["']([^"']+)["']/).flatten.each do |target|
+    next if target.empty? || target.start_with?("#", "//")
+    next if target.match?(/\A[a-z][a-z0-9+.-]*:/i)
+
+    target_path = target.split("#", 2).first.split("?", 2).first
+    next if target_path.empty?
+
+    web_path = if target_path.start_with?("/")
+      Pathname.new(target_path.delete_prefix("/")).cleanpath
+    else
+      page_directory.join(target_path).cleanpath
+    end
+
+    candidate = site_path.join(web_path).cleanpath
+    unless candidate.to_s.start_with?("#{site_path}/") || candidate == site_path
+      errors << "#{page_path.relative_path_from(site_path)}: link escapes rendered site: #{target}"
+      next
+    end
+
+    candidate = candidate.join("index.html") if candidate.directory? || target_path.end_with?("/")
+    links_checked += 1
+    unless candidate.file?
+      errors << "#{page_path.relative_path_from(site_path)}: missing rendered target #{target}"
+    end
+  end
+end
+
+abort(errors.uniq.join("\n")) unless errors.empty?
+
+puts "Rendered documentation links are valid (#{html_paths.length} pages, #{links_checked} local links)."

@@ -1,0 +1,97 @@
+#!/usr/bin/env ruby
+
+require "pathname"
+require "set"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+EXCLUDED_DIRECTORIES = Set.new(%w[
+  .git _site node_modules tmp vendor
+]).freeze
+
+markdown_paths = ROOT.glob("**/*.md", File::FNM_DOTMATCH).select do |path|
+  relative_path = path.relative_path_from(ROOT)
+  relative_path.each_filename.none? { |part| EXCLUDED_DIRECTORIES.include?(part) }
+end.sort
+
+known_paths = markdown_paths.to_set
+graph = markdown_paths.to_h { |path| [ path, Set.new ] }
+errors = []
+links_checked = 0
+
+markdown_paths.each do |path|
+  body = path.read
+  targets = body.scan(/\[[^\]]*\]\(([^)]+)\)/).flatten
+  targets.concat(body.scan(/href=["']([^"']+)["']/).flatten)
+
+  targets.each do |raw_target|
+    target = raw_target.strip.sub(/\A<([^>]+)>\z/, "\\1").split(/\s+["']/).first
+    next if target.nil? || target.empty?
+    next if target.include?("{{") || target.include?("{%")
+    next if target.start_with?("#", "//")
+    next if target.match?(/\A[a-z][a-z0-9+.-]*:/i)
+
+    target_path = target.split("#", 2).first.split("?", 2).first
+    next if target_path.empty?
+
+    candidate = if target_path.start_with?("/")
+      ROOT.join(target_path.delete_prefix("/")).cleanpath
+    else
+      path.dirname.join(target_path).cleanpath
+    end
+
+    unless candidate == ROOT || candidate.to_s.start_with?("#{ROOT}/")
+      errors << "#{path.relative_path_from(ROOT)}: link escapes repository: #{target}"
+      next
+    end
+
+    source_candidate = if candidate.extname == ".html"
+      candidate.sub_ext(".md")
+    elsif candidate.directory?
+      candidate.join("README.md")
+    else
+      candidate
+    end
+
+    links_checked += 1
+    unless candidate.exist? || source_candidate.exist?
+      errors << "#{path.relative_path_from(ROOT)}: missing local target #{target}"
+      next
+    end
+
+    next unless known_paths.include?(source_candidate)
+
+    graph[path] << source_candidate
+    graph[source_candidate] << path
+  end
+end
+
+remaining = known_paths.dup
+components = []
+
+until remaining.empty?
+  queue = [ remaining.first ]
+  remaining.delete(queue.first)
+  component = Set.new
+
+  until queue.empty?
+    current = queue.shift
+    component << current
+    graph.fetch(current).each do |neighbor|
+      queue << neighbor if remaining.delete?(neighbor)
+    end
+  end
+
+  components << component
+end
+
+if components.length > 1
+  errors << "Markdown graph has #{components.length} disconnected components"
+  components.sort_by(&:length).each do |component|
+    files = component.map { |path| path.relative_path_from(ROOT).to_s }.sort
+    errors << "disconnected component (#{files.length}): #{files.join(', ')}"
+  end
+end
+
+abort(errors.uniq.join("\n")) unless errors.empty?
+
+puts "Markdown graph is valid (#{markdown_paths.length} files, #{links_checked} local links, 1 connected component)."

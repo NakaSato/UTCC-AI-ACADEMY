@@ -192,8 +192,67 @@ jobs:
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
 
-  # One message for a whole failed run, not one per job — five red jobs must not
-  # become five notifications. See docs/slack.md: failure only (success is the
+  # Mirror human-owned lifecycle transitions only after every independent gate
+  # passes on main. Detection and delivery are both non-blocking because Slack
+  # is an engagement surface, not the record or a release gate. The script reads
+  # repository history only; it never accepts commands or infers decisions from
+  # Slack content.
+  notify_status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: [ docs, scan_ruby, scan_js, lint, test, system-test ]
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.docs.result == 'success' &&
+      needs.scan_ruby.result == 'success' &&
+      needs.scan_js.result == 'success' &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success' &&
+      needs.system-test.result == 'success'
+
+    steps:
+      - name: Checkout status history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+
+      - name: Detect validated lifecycle status transitions
+        id: transitions
+        continue-on-error: true
+        run: >-
+          ruby script/slack-status-update
+          --before "${{ github.event.before }}"
+          --after "${{ github.sha }}"
+          --channel "${{ vars.SLACK_STATUS_CHANNEL }}"
+          --repository-url "${{ github.server_url }}/${{ github.repository }}"
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          --github-output "$GITHUB_OUTPUT"
+
+      - name: Warn when status detection fails
+        if: steps.transitions.outcome == 'failure'
+        run: echo "::warning::Lifecycle status detection failed; Slack status delivery remains non-blocking."
+
+      - name: Post lifecycle status transitions to Slack
+        id: post_status
+        if: steps.transitions.outcome == 'success' && steps.transitions.outputs.has_updates == 'true' && vars.SLACK_STATUS_CHANNEL != ''
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: ${{ steps.transitions.outputs.payload }}
+
+      - name: Warn when Slack status delivery fails
+        if: steps.post_status.outcome == 'failure'
+        run: echo "::warning::Lifecycle status delivery to Slack failed; repository status remains authoritative."
+
+  # One message for a whole failed run, not one per job — six red jobs must not
+  # become six notifications. See docs/slack.md: failure only (success is the
   # default state, not news), main only (a pull request's author is already
   # looking), and no @channel. Skipped silently when the workspace is not
   # configured, so a fork or a repo without the secret still gets a green run.

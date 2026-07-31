@@ -55,6 +55,11 @@ This baseline is considered successful because a student can register, sign in, 
 
 **Status: Now**
 
+See the [worked development-flow example](examples/milestone-1-reliable-account-recovery.md)
+for the phase-by-phase artifacts, skills, gates, and current human handoff.
+The current provider alternatives and unresolved human inputs are recorded in
+[draft ADR-0002](decisions/adr-0002-select-production-email-provider.md).
+
 ### Goal
 
 A student who has added an email address can request and receive a password-reset message in production.

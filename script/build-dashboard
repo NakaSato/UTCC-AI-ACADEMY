@@ -26,3 +26,5 @@ npx tailwindcss \
 BUNDLE_GEMFILE=docs/Gemfile bundle exec jekyll build \
   --source "${source_dir}" \
   --destination "${repository_root}/_site"
+
+ruby script/validate-rendered-doc-links "${repository_root}/_site"

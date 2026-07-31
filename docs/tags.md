@@ -67,6 +67,8 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 - [Markdown Development Life Cycle](mdlc.md)
 - [ADR-0001: Adopt a Markdown development flow](decisions/adr-0001-adopt-markdown-development-flow.md)
+- [ADR-0002: Select the production transactional-email provider](decisions/adr-0002-select-production-email-provider.md)
+- [ADR-0003: Use Mailpit for local email capture](decisions/adr-0003-use-mailpit-for-local-email-capture.md)
 
 ## Design
 
@@ -77,6 +79,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 - [CLAUDE.md](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/CLAUDE.md)
 - [README](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/README.md)
 - [Development Status](index.md)
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Project Development Flow](development-flow.md)
 - [Coding Standard](coding-standard.md)
 - [Test Strategy](test-strategy.md)
@@ -86,7 +89,10 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Documentation
 
 - [Documentation Tags](tags.md)
+- [Documentation Templates](templates/README.md)
+- [External Feature Proposal](templates/external-feature-proposal.md)
 - [Markdown Development Life Cycle](mdlc.md)
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Project Development Flow](development-flow.md)
 
 ## Features
@@ -99,7 +105,9 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 ## Governance
 
+- [External Feature Proposal](templates/external-feature-proposal.md)
 - [Markdown Development Life Cycle](mdlc.md)
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Project Development Flow](development-flow.md)
 - [Team Process](process.md)
 
@@ -111,6 +119,8 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 - [Development Status](index.md)
 - [Documentation Tags](tags.md)
+- [Documentation Templates](templates/README.md)
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Project Development Flow](development-flow.md)
 
 ## Monitoring
@@ -130,16 +140,22 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Planning
 
 - [Development Status](index.md)
+- [External Feature Proposal](templates/external-feature-proposal.md)
+- [Milestone 1 Development-Flow Example](examples/milestone-1-reliable-account-recovery.md)
 - [Product Roadmap](roadmap.md)
 
 ## Process
 
+- [Documentation Templates](templates/README.md)
+- [External Feature Proposal](templates/external-feature-proposal.md)
 - [Working with agents on this repo](agent-flow.md)
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Project Development Flow](development-flow.md)
 - [Team Process](process.md)
 
 ## Product
 
+- [External Feature Proposal](templates/external-feature-proposal.md)
 - [Feature Inventory](feature-inventory.md)
 - [Product Roadmap](roadmap.md)
 
@@ -150,6 +166,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Roadmap
 
 - [Product Roadmap](roadmap.md)
+- [Milestone 1 Development-Flow Example](examples/milestone-1-reliable-account-recovery.md)
 
 ## Refactoring
 
@@ -176,6 +193,7 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 
 ## Skills
 
+- [Workflow Guide for All Roles](system-development-flow-role-guide.md)
 - [Debug Issue skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/debug-issue/SKILL.md)
 - [Explore Codebase skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/explore-codebase/SKILL.md)
 - [Refactor Safely skill](https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/.claude/skills/refactor-safely/SKILL.md)

@@ -72,6 +72,14 @@ unless system(ROOT.join("script/validate-backlog").to_s)
   abort("Backlog validation failed.")
 end
 
+unless system(ROOT.join("script/validate-markdown-graph").to_s)
+  abort("Markdown graph validation failed.")
+end
+
+unless system(ROOT.join("script/validate-skill-library").to_s)
+  abort("Skill library validation failed.")
+end
+
 TYPE_CONFIG.each do |type, config|
   directory = ROOT.join(config[:directory])
   next unless directory.directory?

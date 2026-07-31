@@ -7,7 +7,7 @@
 
 **Docs-as-code, sized to this repo.** Every document that influences an engineering decision lives in this repository, changes in the same commit as the code it describes, and is reviewed under the same rules. The point is not that Markdown is readable — it is that **documentation inherits the governance already built for code**: git history, `git blame`, review on a diff, and a pipeline that can be made to fail.
 
-> **This lifecycle is adopted.** [ADR-0001](decisions/adr-0001-adopt-markdown-development-flow.md) records the decision, `docs/templates/` supplies the starting artifacts, and `bin/docs` enforces the machine-readable subset. The application-specific routing and gates live in [development-flow.md](development-flow.md).
+> **This lifecycle is adopted.** [ADR-0001](decisions/adr-0001-adopt-markdown-development-flow.md) records the decision, the [template directory](templates/README.md) supplies the starting artifacts, and `bin/docs` enforces the machine-readable subset. The application-specific routing and gates live in [development-flow.md](development-flow.md).
 
 ## 1. What is already true
 
@@ -18,7 +18,7 @@
 | `docs/process.md` | the Scrum process and the definition of done | cadence, and what "done" means |
 | `docs/design-system.md` | the tokens, in prose, with the earlier port kept as history | anything visual |
 | `docs/agent-flow.md` | the gates, the risk tiers and the trust boundary for agent-written work | how a change gets verified |
-| `docs/slack.md` | a notification policy written before there is an integration | what Slack may carry |
+| `docs/slack.md` | the notification policy and outbound CI/status routing contract | what Slack may carry and what remains repository-authoritative |
 | `.claude/skills/` | five executable procedures | how to explore, debug, refactor, review and run |
 
 Three rules already operate here, and they are the whole of the current life cycle:

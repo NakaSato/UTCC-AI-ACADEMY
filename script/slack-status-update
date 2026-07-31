@@ -1,0 +1,290 @@
+#!/usr/bin/env ruby
+
+require "cgi"
+require "date"
+require "json"
+require "open3"
+require "optparse"
+require "uri"
+require "yaml"
+
+module SlackStatusUpdate
+  class Error < StandardError; end
+
+  Event = Data.define(:id, :from, :to, :owner, :path)
+
+  LIFECYCLE_DIRECTORIES = %w[
+    docs/decisions
+    docs/specs
+    docs/releases
+    docs/runbooks
+    docs/postmortems
+    docs/outcomes
+  ].freeze
+
+  class Collector
+    def initialize(root:, before:, after:)
+      @root = root
+      @before = before
+      @after = after
+    end
+
+    def call
+      return [] if @before.match?(/\A0+\z/)
+
+      (backlog_events + lifecycle_events)
+        .uniq { [ _1.id, _1.from, _1.to, _1.path ] }
+        .sort_by { [ _1.path, _1.id ] }
+    end
+
+    private
+
+    def backlog_events
+      before = parse_json(git_show(@before, "docs/backlog.json"))
+      after = parse_json(git_show(@after, "docs/backlog.json"))
+      return [] unless before && after
+
+      old_updates = before.fetch("updates")
+      new_updates = after.fetch("updates")
+      unless new_updates.first(old_updates.length) == old_updates
+        raise Error, "docs/backlog.json updates must remain append-only"
+      end
+
+      items = after.fetch("items") + before.fetch("items")
+      appended = new_updates.drop(old_updates.length)
+
+      # A squash or direct push may contain several intermediate transitions for
+      # one item. Slack mirrors the latest handoff for each item, not its entire
+      # repository history.
+      appended.reverse.uniq { _1["item_id"] }.reverse.filter_map do |update|
+        next if update["from"].nil? || update["to"].nil? || update["from"] == update["to"]
+
+        id = update.fetch("item_id")
+        item = items.find { _1["id"] == id }
+        owner = item&.fetch("owner", nil)
+        if owner.to_s.empty?
+          warn "#{id}: skipped Slack status update because no accountable owner is present in either revision"
+          next
+        end
+
+        Event.new(
+          id: id,
+          from: update.fetch("from"),
+          to: update.fetch("to"),
+          owner: owner,
+          path: "docs/backlog.json"
+        )
+      end
+    end
+
+    def lifecycle_events
+      changed_paths.filter_map do |path|
+        before = parse_frontmatter(git_show(@before, path))
+        after = parse_frontmatter(git_show(@after, path))
+        next unless before && after
+        next if before["status"] == after["status"]
+
+        owners = Array(after["owners"])
+        raise Error, "#{path}: status update has no accountable owner" if owners.empty?
+
+        Event.new(
+          id: after.fetch("id"),
+          from: before.fetch("status"),
+          to: after.fetch("status"),
+          owner: owners.join(", "),
+          path: path
+        )
+      end
+    end
+
+    def changed_paths
+      output = git(
+        "diff", "--name-only", "--diff-filter=AMR", @before, @after, "--",
+        "docs/backlog.json", *LIFECYCLE_DIRECTORIES
+      )
+
+      output.lines(chomp: true).select do |path|
+        path.end_with?(".md") && LIFECYCLE_DIRECTORIES.any? { path.start_with?("#{_1}/") }
+      end
+    end
+
+    def parse_json(body)
+      JSON.parse(body) if body
+    rescue JSON::ParserError => error
+      raise Error, "invalid backlog JSON: #{error.message}"
+    end
+
+    def parse_frontmatter(body)
+      return unless body
+
+      match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
+      return unless match
+
+      YAML.safe_load(match[1], permitted_classes: [ Date ], aliases: false)
+    rescue Psych::Exception => error
+      raise Error, "invalid lifecycle frontmatter: #{error.message}"
+    end
+
+    def git_show(ref, path)
+      output, = Open3.capture3("git", "show", "#{ref}:#{path}", chdir: @root)
+      output unless output.empty?
+    end
+
+    def git(*arguments)
+      output, error, status = Open3.capture3("git", *arguments, chdir: @root)
+      raise Error, error.strip unless status.success?
+
+      output
+    end
+  end
+
+  class Payload
+    MAX_EVENTS = 40
+
+    def initialize(events:, channel:, repository_url:, after:, run_url:)
+      raise Error, "one Slack message supports at most #{MAX_EVENTS} transitions" if events.length > MAX_EVENTS
+
+      @events = events
+      @channel = channel
+      @repository_url = repository_url.delete_suffix("/")
+      @after = after
+      @run_url = run_url
+    end
+
+    def result
+      return { "has_updates" => false, "payload" => {} } if @events.empty?
+
+      {
+        "has_updates" => true,
+        "payload" => {
+          "channel" => @channel,
+          "text" => fallback_text,
+          "blocks" => blocks
+        }
+      }
+    end
+
+    private
+
+    def fallback_text
+      transitions = @events.map do |event|
+        "#{escape(event.id)} #{escape(event.from)} -> #{escape(event.to)}"
+      end.join(", ")
+      "Validated lifecycle status update: #{transitions}"
+    end
+
+    def blocks
+      [
+        {
+          "type" => "header",
+          "text" => { "type" => "plain_text", "text" => "Lifecycle status updated" }
+        },
+        *@events.map { event_block(_1) },
+        {
+          "type" => "context",
+          "elements" => [
+            {
+              "type" => "plain_text",
+              "text" => "Mirrored after repository validation; Slack did not create or approve these transitions."
+            }
+          ]
+        },
+        {
+          "type" => "actions",
+          "elements" => [
+            {
+              "type" => "button",
+              "text" => { "type" => "plain_text", "text" => "View verification run" },
+              "url" => @run_url
+            }
+          ]
+        }
+      ]
+    end
+
+    def event_block(event)
+      {
+        "type" => "section",
+        "text" => {
+          "type" => "mrkdwn",
+          "text" => "*<#{artifact_url(event.path)}|#{escape(event.id)}>*\n" \
+                    "`#{escape(event.from)}` → `#{escape(event.to)}`\n" \
+                    "Owner: #{escape(event.owner)}\n#{escape(next_action(event.to))}"
+        }
+      }
+    end
+
+    def artifact_url(path)
+      encoded_path = path.split("/").map { URI.encode_www_form_component(_1) }.join("/")
+      "#{@repository_url}/blob/#{@after}/#{encoded_path}"
+    end
+
+    def next_action(status)
+      case status
+      when "accepted" then "Next: implement the accepted decision or unblock its dependent work."
+      when "verification" then "Next: the named human reviews the recorded evidence."
+      when "complete" then "Next: start the next unblocked backlog item."
+      when "approved" then "Next: the Release Owner follows the recorded release plan."
+      when "released" then "Next: the On-call Owner performs post-release checks."
+      when "blocked" then "Next: the decision owner resolves the recorded blocker."
+      else "Next: open the artifact and follow its recorded handoff."
+      end
+    end
+
+    def escape(value)
+      normalized = value.to_s.gsub(/[\r\n\t]+/, " ").slice(0, 200)
+      CGI.escapeHTML(normalized)
+    end
+  end
+
+  class CLI
+    def initialize(arguments)
+      @options = { root: Dir.pwd }
+      parser.parse!(arguments)
+    end
+
+    def run
+      required = %i[before after channel repository_url run_url]
+      missing = required.reject { @options[_1] }
+      raise Error, "missing options: #{missing.join(', ')}" unless missing.empty?
+
+      events = Collector.new(
+        root: @options.fetch(:root),
+        before: @options.fetch(:before),
+        after: @options.fetch(:after)
+      ).call
+      result = Payload.new(
+        events: events,
+        channel: @options.fetch(:channel),
+        repository_url: @options.fetch(:repository_url),
+        after: @options.fetch(:after),
+        run_url: @options.fetch(:run_url)
+      ).result
+
+      if @options[:github_output]
+        File.open(@options[:github_output], "a") do |output|
+          output.puts "has_updates=#{result.fetch('has_updates')}"
+          output.puts "payload=#{JSON.generate(result.fetch('payload'))}"
+        end
+      else
+        puts JSON.generate(result)
+      end
+    end
+
+    private
+
+    def parser
+      OptionParser.new do |options|
+        options.on("--root PATH") { @options[:root] = _1 }
+        options.on("--before SHA") { @options[:before] = _1 }
+        options.on("--after SHA") { @options[:after] = _1 }
+        options.on("--channel ID") { @options[:channel] = _1 }
+        options.on("--repository-url URL") { @options[:repository_url] = _1 }
+        options.on("--run-url URL") { @options[:run_url] = _1 }
+        options.on("--github-output PATH") { @options[:github_output] = _1 }
+      end
+    end
+  end
+end
+
+SlackStatusUpdate::CLI.new(ARGV).run if $PROGRAM_NAME == __FILE__

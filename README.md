@@ -8,6 +8,16 @@ A learning platform for UTCC students getting started with AI — a course catal
 
 Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
 
+[System Development Flow Master](docs/system-development-flow-master.md) ·
+[Workflow Guide for All Roles](docs/system-development-flow-role-guide.md) ·
+[Documentation Templates](docs/templates/README.md) ·
+[Project Development Flow](docs/development-flow.md) ·
+[Slack Policy](docs/slack.md) ·
+[Skill Library](docs/skills-library-README.md) ·
+[Project Skill Router](.agents/skills/use-project-skill-library/SKILL.md) ·
+[Agent Instructions](AGENTS.md) ·
+[Architecture and invariants](CLAUDE.md)
+
 ![The course catalog — the first screen a signed-in student sees](docs/screenshots/catalog.png)
 
 ---
@@ -17,6 +27,7 @@ Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
 - [Getting started](#getting-started)
 - [Everyday commands](#everyday-commands)
 - [Development dashboard](#development-dashboard)
+- [System development flow](#system-development-flow)
 - [The screens](#the-screens)
 - [Accounts and roles](#accounts-and-roles)
 - [Language](#language)
@@ -42,16 +53,18 @@ Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
 
 ## Getting started
 
-You need Ruby 3.4.10 and **Docker**, which is where the database runs — there is nothing to install and no Postgres to configure on your machine.
+You need Ruby 3.4.10 and **Docker**, which runs the database and disposable local email inbox — there is no Postgres or SMTP server to install on your machine.
 
 ```bash
-bin/setup      # start the database, install gems, prepare it, then start the server
+bin/setup      # start local infrastructure, install gems, prepare the database, then start the app
 bin/dev        # start the server on http://localhost:3000
 ```
 
 Use `bin/dev` rather than `bin/rails server` — it runs the Tailwind watcher alongside Puma, so CSS changes actually rebuild.
 
-The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/setup` brings up for you; `docker compose up -d` and `docker compose down` start and stop it by hand, and `docker compose down -v` throws the data away. It listens on **5433**, not the usual 5432, so it cannot collide with another project's Postgres — `config/database.yml` defaults to the same port, and every value in it can be overridden with `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` if you would rather point at a server of your own.
+The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/setup` brings up for you; `docker compose up -d` and `docker compose down` start and stop the local services by hand, and `docker compose down -v` also throws the database data away. PostgreSQL listens on **5433**, not the usual 5432, so it cannot collide with another project's Postgres — `config/database.yml` defaults to the same port, and every value in it can be overridden with `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` if you would rather point at a server of your own.
+
+Development email is delivered over SMTP to the pinned, disposable `mailpit` service. Open [http://127.0.0.1:8025](http://127.0.0.1:8025) to inspect captured messages; SMTP listens only on `127.0.0.1:1025`. Override those host-side ports with `MAILPIT_UI_PORT` and `MAILPIT_SMTP_PORT`, and keep Rails aligned with a custom SMTP port by setting `SMTP_PORT` to the same value. `SMTP_HOST` defaults to `127.0.0.1`. Mailpit has no volume, authentication, or public interface: recreating its container clears captured addresses and reset links. It verifies local application-to-SMTP behavior only; it does not prove production delivery or real-mailbox receipt.
 
 `bin/setup` seeds four demo accounts (development and test only). Password `utcc2026` for all of them:
 
@@ -67,16 +80,42 @@ The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/se
 ```bash
 bin/rails test                             # run the tests
 bin/rails test test/models/user_test.rb:12 # run one test
-bin/docs                                   # validate backlog and lifecycle documents
+bin/docs                                   # validate backlog, Markdown/skill graphs, and lifecycle documents
 bin/verify                                 # full local gate; delegates to bin/ci
 bin/rubocop -a                             # autocorrect style
 bin/rails admin:create                     # create or promote an admin
 bin/rails instructor:create                # create or promote an instructor
+docker compose up -d --wait mailpit        # start the disposable local email inbox
 ```
 
 ## Development dashboard
 
 [The live development dashboard](https://utcc-ai-academy.vercel.app) renders its current execution status from the machine-readable [`docs/backlog.json`](docs/backlog.json). Agents update that JSON and append its update history in the same change as implementation. Vercel validates the backlog, converts the tagged documents in `docs/` to HTML, and deploys them after changes reach `main`. The GitHub Pages workflow remains available as a fallback.
+
+## System development flow
+
+The [System Development Flow Master](docs/system-development-flow-master.md)
+defines the lifecycle, gates, accountable roles, monitoring and tracing
+requirements, and skill expectations. The
+[Workflow Guide for All Roles](docs/system-development-flow-role-guide.md)
+turns that policy into entry, ownership, action, delegation, gate, and handoff
+instructions for every role. The
+[Project Development Flow](docs/development-flow.md) applies that lifecycle to
+this repository's current controls and gaps, including the
+[Slack engagement layer](docs/development-flow.md#slack-engagement-layer) for
+human handoffs, CI failures, releases, incidents, and outcome signals. The
+[Slack Policy](docs/slack.md) keeps those messages as links and next actions
+while lifecycle artifacts remain in the repository. The
+[Documentation Templates](docs/templates/README.md) include an
+[External Feature Proposal](docs/templates/external-feature-proposal.md) for
+new-feature and improvement requests before human product triage. The
+[Skill Library](docs/skills-library-README.md) maps those expectations to 34
+individually linked skill documents, while the
+[Skill Directory](docs/skills/README.md) provides a compact file-oriented
+index. Codex applies that library only inside this repository through the
+[project skill router](.agents/skills/use-project-skill-library/SKILL.md). The
+router selects a small task-relevant set and respects the human-review boundary
+declared by each skill; it does not install the library globally.
 
 The Vercel project uses the repository-level [`vercel.json`](vercel.json). Its build is deliberately isolated from the Rails bundle: `docs/Gemfile` contains the Jekyll dependencies, Tailwind CSS v4 compiles the dashboard stylesheet, and `script/build-dashboard` validates and stages the documentation before generating `_site`. The rendered homepage also records the exact repository, branch, commit SHA, and commit message supplied by Vercel's Git environment.
 
@@ -181,7 +220,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | Tests | Minitest (**not** RSpec), parallel | Capybara + selenium drive the system tests |
 | Lint / security | `rubocop-rails-omakase`, Brakeman, bundler-audit, `importmap audit` | all wired into `bin/ci` |
 
-There is **no Redis, no Memcached and no separate job runner** — every piece of infrastructure is a Postgres database.
+There is **no Redis, no Memcached and no separate job runner** — deployed application infrastructure is Postgres-backed. Development additionally has a loopback-only, disposable Mailpit inbox.
 
 Every response carries a **Content-Security-Policy** (`config/initializers/content_security_policy.rb`). The directive that matters is `script-src 'self'` plus a per-request nonce — no `unsafe-inline`, no remote script origin — so injected markup cannot execute. Two consequences to know before editing it: `SchemaHelper#json_ld` has to pass the nonce by hand or the site's JSON-LD is silently dropped, and `style-src` allows `unsafe-inline` on purpose, because the progress bars are computed `style="width: …%"` attributes and CSP has no nonce for style attributes. The browser also loads webfonts from Google, which is why `fonts.googleapis.com` and `fonts.gstatic.com` appear in the policy.
 
@@ -218,7 +257,7 @@ docs/design-system.md               the visual tokens and conventions, explained
 docs/performance.md                 the query budget per screen, and the regressions behind each rule
 docs/landing-cms.md                 how the editable landing page resolves its copy
 docs/mdlc.md                        lifecycle document schema enforced by bin/docs
-docs/slack.md                       what Slack may carry — policy only; there is no integration
+docs/slack.md                       Slack policy; credential-gated CI failure and lifecycle-status senders
 docs/agent-flow.md                  how work gets verified when an agent writes most of it
 ```
 
@@ -498,7 +537,7 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 
 - **There is one database, and the solid_* adapters keep their tables in it** — migrated from `db/migrate` and dumped into `db/schema.rb` alongside the app's own, which is why the schema below has thirteen `solid_*` tables in it. They used to have a database each, and the reason they no longer do is the **connection budget**: Rails holds one pool per database *per process*, and with `SOLID_QUEUE_IN_PUMA` an instance is Puma plus a Solid Queue dispatcher plus a worker. Four databases meant four pools in each of them — up to twenty connections from one instance, against a managed Postgres that allows twenty in total and whose provider already holds eleven. One database is one pool.
 - **Four settings hold that together, and any one of them re-opens a pool**: no `solid_queue.connects_to` in `config/environments/production.rb`, no `database:` key in `config/cache.yml`, no `connects_to` in `config/cable.yml`, and no `db/{queue,cache,cable}_schema.rb`. `pool` in `config/database.yml` is the ceiling on what one process takes — keep it at or below Puma's thread count, with headroom for the job supervisor.
-- **Development and production get their database from different places.** Locally it is the `postgres:18-alpine` container in `compose.yml` — `utcc_ai_academy_development` and `_test`, configured by the `DB_*` defaults in `config/database.yml`. `bin/setup` runs `docker compose up -d --wait` before `db:prepare`, and skips it when docker is not installed so that pointing `DB_HOST` at your own Postgres still works. Production is an **external managed Postgres reached through `DATABASE_URL`** — one value carrying host, port, database, credentials and `sslmode=require`, and the only thing the production block reads. Neither deploy target runs a database of its own: there is no Kamal `db` accessory and no Render `databases:` block.
+- **Development and production get their database from different places.** Locally it is the `postgres:18-alpine` container in `compose.yml` — `utcc_ai_academy_development` and `_test`, configured by the `DB_*` defaults in `config/database.yml`. The same Compose file runs the loopback-only, ephemeral Mailpit inbox used by development Action Mailer. `bin/setup` runs `docker compose up -d --wait` before `db:prepare`, and skips containers when docker is not installed so that pointing `DB_HOST` at your own Postgres still works. Production is an **external managed Postgres reached through `DATABASE_URL`** — one value carrying host, port, database, credentials and `sslmode=require`, and the only thing the production block reads. Neither deploy target runs PostgreSQL or Mailpit: there is no Kamal `db` accessory and no Render `databases:` block.
 - **`DATABASE_URL` is a credential and is never committed.** Kamal reads it from the environment via `.kamal/secrets`; Render holds it as a `sync: false` dashboard value. If it ever appears in a diff, a log or a chat window, rotate it at the provider rather than hoping.
 - **`gssencmode: disable` in `config/database.yml` is load-bearing, not tuning.** The precompiled `pg` gem bundles a libpq built with GSSAPI, and on macOS a connection opened from a *forked* child segfaults inside `connect_start`. The suite forks one worker per core, so without it every worker crashes and `bin/rails test` wedges instead of failing. It turns off GSSAPI encryption negotiation only — not `sslmode` — and nothing in the deploy path authenticates with Kerberos.
 - Workers run **in-process**: `config/puma.rb` loads `plugin :solid_queue` when `SOLID_QUEUE_IN_PUMA` is set, which `config/deploy.yml` sets. `bin/jobs` runs the supervisor standalone; recurring jobs go in `config/recurring.yml`.
@@ -507,7 +546,7 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 - `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`, and `secret_key_base` is in there — so the variable is not optional in production, it is what lets the app boot at all. `config/master.key` is gitignored and therefore never in the image; the target has to supply the value. `config/deploy.yml` still carries the placeholder server `192.168.0.1` and registry `localhost:5555`.
 - **`config.assume_ssl` and `config.force_ssl` are on in production**, which makes `proxy: ssl: true` in `deploy.yml` part of the same decision rather than an option. Kamal's proxy terminates TLS and speaks http to Thruster, so without `assume_ssl` Rails believes every request arrived unencrypted — and `request.base_url` is what builds every canonical, hreflang and sitemap URL the app publishes. `/up` is excluded from the https redirect so the proxy and uptime monitors can still reach it.
 - **The production site is `https://academy.boring9.dev`**, and that name is written down in three places that have to agree: `config.hosts` (what the app will answer to), `config.action_mailer.default_url_options` (the only URLs not built from a request — the password-reset link) and `domains:` in `render.yaml` (what Render issues a certificate for). A mismatch between the first and the third is a 403 on your own domain, not a redirect.
-- Still to fill in: **SMTP**. `config.action_mailer.smtp_settings` is commented out, so the password-reset mail is composed and enqueued and then goes nowhere — the one user-facing feature that is not actually working in production. `ApplicationMailer`'s `from:` is `no-reply@academy.boring9.dev`, which will need to be an address the eventual provider is allowed to send as.
+- Still to fill in: **production SMTP**. Development delivers to local Mailpit, but production settings remain unconfigured, so a deployed password-reset mail is composed and enqueued and then goes nowhere — the one user-facing feature that is not actually working in production. `ApplicationMailer`'s `from:` is `no-reply@academy.boring9.dev`, which will need to be an address the eventual provider is allowed to send as.
 - Kamal's own placeholders are untouched — `servers.web` is still `192.168.0.1`, the registry `localhost:5555`, and the `proxy` block still commented. That is fine while Render is the live target; it does mean `config/deploy.yml` is not a description of where the site runs.
 
 ### Render
@@ -560,7 +599,7 @@ Assertions compare against `I18n.t(...)` rather than literal strings, and are sc
 Setup → Docs → Style: Ruby → Gem audit → Importmap audit → Brakeman → Tests: Rails → Tests: Seeds → Tests: System
 ```
 
-A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. What `bin/setup` does locally that the runner still needs is start Postgres; there that is a **service container on the `test` and `system-test` jobs**, the only two that touch a database, with the `DB_*` values declared once at workflow level so the service and the client connecting to it cannot drift apart. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
+A green local run is still the definition of done — the workflow is what catches the pass that only happened on one machine, and it posts a single message to Slack when a run fails on `main`. After all six independent jobs pass, a separate non-blocking job mirrors validated backlog and lifecycle status transitions to `SLACK_STATUS_CHANNEL`; it reads repository history, not Slack, and posts nothing without `SLACK_BOT_TOKEN`. What `bin/setup` does locally that the runner still needs is start Postgres; there that is a **service container on the `test` and `system-test` jobs**, the only two that touch a database, with the `DB_*` values declared once at workflow level so the service and the client connecting to it cannot drift apart. The seeds step runs `db:seed:replant` against the test database, so `db/seeds.rb` must stay runnable against a fresh one. The system-test step runs `test/system/` in headless Edge — two tests. One walks the definition-of-done path: sign in, fail then pass the graded exercise, see it counted. The other covers the failure only a browser can show: a Turbo frame fetched after its page has been signed out from, which without `app/javascript/frame_recovery.js` writes "Content missing" into the header instead of taking you to the landing page. Both wait for a selector after signing in — `visit` does not queue behind a form submission, so a navigation issued immediately after goes out with no cookie.
 
 ---
 

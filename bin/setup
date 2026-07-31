@@ -20,18 +20,18 @@ FileUtils.chdir APP_ROOT do
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
   # end
 
-  # The database is the container in compose.yml, and db:prepare below has
-  # nothing to connect to without it. Bringing it up here rather than in a README
-  # step means a fresh clone is one command, and `up -d --wait` blocks on the
-  # healthcheck so db:prepare does not race the server's first boot.
+  # Development infrastructure is declared in compose.yml. Bringing it up here
+  # rather than in a README step means a fresh clone is one command, and
+  # `up -d --wait` blocks on the Postgres healthcheck so db:prepare does not race
+  # the server's first boot. Mailpit starts alongside it as a disposable inbox.
   #
   # Skipped when docker is not on PATH: a developer pointing DB_HOST at a
   # Postgres of their own is a supported setup, and failing here would break it.
   if system("docker compose version", out: File::NULL, err: File::NULL)
-    puts "\n== Starting the database =="
+    puts "\n== Starting development infrastructure =="
     system! "docker compose up -d --wait"
   else
-    puts "\n== Skipping the database container (docker not found) =="
+    puts "\n== Skipping development containers (docker not found) =="
     puts "   Expecting Postgres at #{ENV.fetch("DB_HOST", "localhost")}:#{ENV.fetch("DB_PORT", 5433)}"
   end
 

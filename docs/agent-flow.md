@@ -130,7 +130,7 @@ The first three become live the moment production data is pulled onto a laptop f
 | | Why not |
 | --- | --- |
 | **Admission controller / WIP limits** | The mechanism it implements already holds by convention: one commit, one stated purpose, 1–8 files. `Little's Law` over three reviewers describes a team that does not exist. Revisit when a second person reviews |
-| **A Slack review queue, `#agent-blocked`, `/agent kill-switch`** | There is no Slack integration and no inbound endpoint — `docs/slack.md` §5 argues against building one. With one human, the queue is the terminal in front of them and the kill switch is `Ctrl-C` |
+| **A Slack review queue, `#agent-blocked`, `/agent kill-switch`** | There is no inbound Slack integration or command endpoint — the two outbound workflow senders cannot receive instructions, and `docs/slack.md` §5 argues against building ChatOps. With one human, the queue is the terminal in front of them and the kill switch is `Ctrl-C` |
 | **Auto-merge for Tier A** | Nothing to merge — commits land on `main` directly, and the only PRs the repo has seen are Dependabot's |
 | **Progressive delivery, canary, auto-rollback** | No deploy target yet — `config/deploy.yml` still names `192.168.0.1`. This is the largest genuine gap, and it is what makes Gate 3 final |
 | **CODEOWNERS, branch protection, read-only acceptance files** | One human owns every path; a CODEOWNERS file naming them for all of it is a file that enforces nothing |

@@ -1,10 +1,10 @@
-# The development and test database, and nothing else. The app itself is not in
-# here — it runs on the host under `bin/dev`, the way it always has; this file
-# exists only so that "install Postgres" is a container rather than a machine.
+# Development-only infrastructure: the development/test database and a local
+# SMTP capture inbox. The app itself is not here — it runs on the host under
+# `bin/dev`. Neither service is deployed with the application.
 #
-#   docker compose up -d      # start it (bin/setup does this for you)
-#   docker compose down       # stop it, keeping the data
-#   docker compose down -v    # stop it and throw the data away
+#   docker compose up -d      # start both (bin/setup does this for you)
+#   docker compose down       # stop both, keeping only Postgres data
+#   docker compose down -v    # stop both and throw Postgres data away
 #
 # The port is 5433 rather than 5432 on purpose: 5432 is what every other Postgres
 # on this machine will also want, and a port clash surfaces as a connection
@@ -35,6 +35,16 @@ services:
       interval: 2s
       timeout: 3s
       retries: 15
+
+  # Disposable local inbox for development email. SMTP and the browser UI are
+  # intentionally loopback-only because neither endpoint has authentication.
+  # There is no volume: recreating the container removes captured reset links
+  # and addresses instead of retaining development mail indefinitely.
+  mailpit:
+    image: axllent/mailpit:v1.30.0
+    ports:
+      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
 
 volumes:
   postgres_data:

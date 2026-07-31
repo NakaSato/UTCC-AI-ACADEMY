@@ -5,23 +5,32 @@
 
 **Tags:** [#communication](tags.md#communication) [#slack](tags.md#slack) [#operations](tags.md#operations)
 
+> [System Development Flow Master](system-development-flow-master.md) ·
+> [Project Slack Engagement Layer](development-flow.md#slack-engagement-layer) ·
+> [Workflow Guide for All Roles](system-development-flow-role-guide.md)
+
 **Slack is a system of engagement, not a system of record.** Anything that has to be retrievable later has a real home elsewhere — a decision goes in `docs/decisions/` (see `docs/mdlc.md`), the process goes in `docs/process.md`, and the code is the code. Slack carries a link and a sentence saying who does what next.
 
 The test: **if the workspace vanished tomorrow, the development system still works.** That is trivially true of this project today, and the purpose of this file is to keep it true as things get wired up.
 
-> **This is a policy written before there is anything to enforce it on**, and that is deliberate — it is the one part of a Slack design that is cheap while the channel list is empty and expensive once forty bot messages a day have taught everyone to mute. Nothing here is wired up. Section 1 is the honest inventory; section 7 is the order to unlock the rest in.
+> **Implementation state:** GitHub Actions has two outbound Slack senders: one
+> failed-`main` CI alert and one validated lifecycle-status mirror. Each remains
+> dormant until its repository channel variable and `SLACK_BOT_TOKEN` exist.
+> Everything else in this document is policy or a blocked adoption step.
+> Section 1 is the honest inventory; section 7 is the order to unlock the rest.
 
 ## 1. What there is to notify from
 
 | Would notify about | Source in this repo | State today |
 | --- | --- | --- |
-| Test/lint/security failures | `.github/workflows/ci.yml` | **Wired.** One message per failed run on `main`, from a `notify` job that needs all five others |
+| Test/lint/security failures | `.github/workflows/ci.yml` | **Wired but credential-gated.** One message per failed run on `main`, from a `notify` job that needs all six verification jobs |
+| Lifecycle status transitions | `script/slack-status-update`, `.github/workflows/ci.yml` | **Wired but credential-gated.** After all six verification jobs pass on `main`, one non-blocking message mirrors validated backlog and lifecycle transitions to `SLACK_STATUS_CHANNEL` |
 | Dependency CVEs | Dependabot | Available, and needs no code — GitHub's own Slack app delivers it. Read the note below on why its `github-actions` half used to be noise |
 | Deploys | Kamal (`config/deploy.yml`) or Render (`render.yaml`) | Kamal's server is still the placeholder `192.168.0.1`; Render can post natively once it is the chosen target |
 | Site down | — | No monitor. `/up` exists and is excluded from both the https redirect and host authorization precisely so something outside can reach it |
 | Errors | — | No Sentry, no APM, no log aggregation |
 | Incidents | — | No on-call, no pager, and no production incident has happened |
-| Work items | — | No Jira, no Azure Boards. The backlog is prose at the end of `docs/process.md` |
+| Work items | `docs/backlog.json` | The JSON backlog is the record; human handoff links may be posted to `squad-academy`, but no work-item bot is wired |
 
 **Dependabot was a partly false source until the workflow came back.** `.github/dependabot.yml` declares a `github-actions` ecosystem, and the workflow it was written for was deleted in `5b510e6` — so three of the four pull requests this repo has ever received bumped the versions of actions that nothing here ran, and the fourth bumped a gem that is no longer in the Gemfile. All four were closed unmerged, correctly. Restoring `.github/workflows/ci.yml` makes that ecosystem entry honest again: the actions it watches are now actions this repo really runs. **The `bundler` half is the one worth routing** — a gem CVE is a P1 nobody would otherwise see until they next ran `bin/ci`.
 
@@ -35,7 +44,7 @@ The convention is `<scope>-<domain>-<purpose>`, and the hard rule survives at an
 
 | Channel | Type | Holds | Create when |
 | --- | --- | --- | --- |
-| `squad-academy` | human | the team talking; blockers named at the Daily Scrum and chased afterwards; **the only channel `@Claude` is invited to** | now |
+| `squad-academy` | human + low-volume status mirror | the team talking; blockers named at the Daily Scrum and chased afterwards; validated lifecycle status handoffs; **the only channel `@Claude` is invited to** | now |
 | `academy-alerts` | bot-only, no conversation, replies in-thread | CI failures on `main`, Dependabot, and later the uptime monitor and deploys | it has a source |
 | `inc-YYYYMMDD-NN` | ephemeral | one incident, exported before archiving | the first incident |
 
@@ -43,7 +52,9 @@ The convention is `<scope>-<domain>-<purpose>`, and the hard rule survives at an
 
 ### `@Claude` is a third Slack surface, and the only inbound one
 
-Two of the three things called "Slack" here only ever send: the CI `notify` job, and GitHub's app for Dependabot. **`@Claude` reads**, which makes it a different kind of decision.
+Three Slack surfaces only ever send: the CI `notify` job, the lifecycle-status
+mirror, and GitHub's app for Dependabot. **`@Claude` reads**, which makes it a
+different kind of decision.
 
 - **Channel membership is the access control.** It is added to nothing on install and responds only where it has been `/invite`d, so which channels it is in *is* the permission model — not a convenience. It does not work in DMs at all.
 - **It is invited to `squad-academy` only.** Mentioning it hands over the surrounding thread or the recent channel messages, and Claude may act on directions found in them. `academy-alerts` carries build output, dependency release notes and, later, deploy and monitor messages — text written by systems and strangers, which is the last thing that should be able to address an agent with commit access. `docs/agent-flow.md` §7 counts this as the fourth untrusted input surface in the project.
@@ -52,6 +63,23 @@ Two of the three things called "Slack" here only ever send: the CI `notify` job,
 - **Slack is still not the record.** What comes back is a summary plus buttons; the transcript lives in the session on the web and the change lives in the commit. A decision reached in that thread is subject to `docs/mdlc.md` like any other.
 
 ## 3. Signal classes
+
+### Lifecycle status transitions
+
+Use `squad-academy` for a status transition that creates a human handoff, such
+as `proposed → accepted`, `in_progress → verification`, `verification →
+complete`, or `approved → released`. The human-owned repository transition must
+happen and pass its gate first; Slack mirrors it afterward. Include the artifact
+ID and link, old and new status, accountable human, evidence link, and one next
+action.
+
+No Slack message, reaction, button, slash command, or agent response can accept
+an ADR, approve a release, or mutate `docs/backlog.json`. The outbound
+`notify_status` job reads only repository transitions already committed to
+`main`, runs only after all six independent verification jobs pass, and never
+reads channel text. It posts nothing unless `SLACK_STATUS_CHANNEL` is set. Its
+detector and delivery steps are non-blocking: repository status remains
+authoritative when Slack or the detector is unavailable.
 
 | Class | Means | Delivery | Mentions | Here that would be |
 | --- | --- | --- | --- | --- |
@@ -108,10 +136,11 @@ Two of those need their reason stated, because both look like easy wins:
 1. **This file.** Costs nothing and is the only step that gets harder later.
 2. **`squad-academy`.** People, no bots.
 3. **`academy-alerts`, with the CI `notify` job pointed at it** — set `SLACK_BOT_TOKEN` as a repository secret and `SLACK_CI_CHANNEL` as a repository variable, and the workflow does the rest. Nothing is posted until both exist, so a fork stays quiet.
-4. **GitHub's Slack app, subscribed to Dependabot alerts**, into the same channel. Costs no code.
-5. **An uptime monitor on `/up`** once the site is actually deployed. The first P0 that can exist.
-6. **Deploy notifications** from whichever target is chosen.
-7. **Stop.** Everything past this needs an inbound endpoint, and §5 is why that is a bad trade here.
+4. **Lifecycle status mirroring into `squad-academy`** — set `SLACK_STATUS_CHANNEL`; the validated default-branch sender is already implemented and uses the same bot token.
+5. **GitHub's Slack app, subscribed to Dependabot alerts**, into `academy-alerts`. Costs no code.
+6. **An uptime monitor on `/up`** once the site is actually deployed. The first P0 that can exist.
+7. **Deploy notifications** from whichever target is chosen.
+8. **Stop.** Everything past this needs an inbound endpoint, and §5 is why that is a bad trade here.
 
 Do not jump to 6. A team that wires deploy tooling before writing a notification policy ends up able to deploy production from a channel nobody reads.
 
@@ -122,7 +151,7 @@ Do not jump to 6. A team that wires deploy tooling before writing a notification
 | Notifying on every event | mute → the P0 is missed | classify P0/P1/P2, digest the P2s |
 | Deciding something in a channel | unfindable in three months | the decision is an ADR; Slack carries the link |
 | Posting a local `bin/ci` result | a gate that is not a gate | only the workflow posts; `config/ci.rb` stays silent |
-| One message per failed job | five red jobs, five notifications | the `notify` job needs all five and posts once |
+| One message per failed job | six red jobs, six notifications | the `notify` job needs all six and posts once |
 | Assigning work by DM | no trail, and the team loses the context | a channel and a thread |
 | A channel with no source yet | learned as ignorable, permanently | create it the day it has something to say |
 | Inviting `@Claude` to a bot channel | build output and release notes become instructions to an agent | `squad-academy` only; `academy-alerts` stays send-only |
