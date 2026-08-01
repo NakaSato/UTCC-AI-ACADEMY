@@ -59,7 +59,7 @@ jobs:
 
       - name: Configure GitHub Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Convert Markdown to HTML with Jekyll
         uses: actions/jekyll-build-pages@v1
