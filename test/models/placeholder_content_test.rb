@@ -387,4 +387,23 @@ class PlaceholderContentTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "the first scikit-learn topic has its own bilingual content and grading" do
+    content = LessonContent.for("3-1")
+
+    assert_predicate content, :real?
+    assert_equal 4, content.options.size
+    assert_equal 3, content.checks.size
+    assert_not_equal LessonContent.for("2-4").translate("theory.heading"), content.translate("theory.heading")
+    assert content.grade_quiz(content.correct_option)[:passed]
+    assert content.grade_code(content.solution)[:passed]
+    assert_not content.grade_code(content.starter_code)[:passed]
+
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        assert_equal 4, content.translate("quiz.options").size
+        assert_equal 4, content.translate("theory.blocks").size
+      end
+    end
+  end
 end

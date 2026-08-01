@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3 2-4].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3 2-4 3-1].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -120,6 +120,15 @@ module LessonContent
         /\.fit\s*\(\s*X_train\s*,\s*y_train\s*\)/
       ],
       solution: "model = Ridge(alpha=1.0)\nmodel.fit(X_train, y_train)"
+    },
+    "3-1" => {
+      correct_option: 2,
+      checks: [
+        /pd\.read_csv\s*\(/,
+        /dropna\s*\(/,
+        /df\.columns/
+      ],
+      solution: "df = pd.read_csv(\"customers.csv\")\ndf = df.dropna(subset=[\"age\"])\nprint(df.columns)"
     }
   }.freeze
 

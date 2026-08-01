@@ -638,6 +638,62 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use Ridge(alpha=1.0) and fit the training data"
+      topic_3_1:
+        theory:
+          eyebrow: "Topic 3-1 · 10 min"
+          heading: "Prepare data with pandas"
+          p1: "Data preparation turns a raw file into a dataset you can inspect and model. Load it deliberately, inspect its columns and types, then make missing-value decisions visible in code."
+          p2: "Keep the preparation steps reproducible: a teammate should be able to run the same script and understand which rows were removed or transformed before training."
+          sup_title: "Inspect first"
+          sup_desc: "Read the file, list columns, check types, and look for missing values before choosing a cleaning rule."
+          sup_eg: "pd.read_csv → df.columns → df.dtypes"
+          unsup_title: "Clean deliberately"
+          unsup_desc: "Drop, fill, or flag missing values according to the meaning of the field and the model's requirements."
+          unsup_eg: "e.g. drop rows missing required age"
+          code_comment: "# load, clean, and inspect"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the pandas getting-started docs →"
+          blocks:
+            - "Never hide a cleaning decision in a manual spreadsheet edit: keep the transformation in the reproducible pipeline."
+            - "raw file → inspect → clean → validate → model"
+            - "df = pd.read_csv(\"customers.csv\")\ndf = df.dropna(subset=[\"age\"])\nprint(df.columns)"
+            - "pandas docs · getting started"
+        quiz:
+          eyebrow: "Exercise · choose the preparation order"
+          question: "Which sequence is the safest first pass when preparing a new tabular dataset?"
+          options:
+            - "Train immediately, then inspect only failed predictions."
+            - "Delete every row with any missing value without checking meaning."
+            - "Load, inspect columns and missingness, then choose a documented cleaning rule."
+            - "Copy values into a spreadsheet and skip the script."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — inspect the data before choosing a cleaning rule and keep that rule reproducible."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the sequence that makes the data's shape and missingness visible before transforming it."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Load and clean a customer file"
+          task: "Complete the code so it loads customers.csv, removes rows missing the required age field, and prints the columns."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            df = ___("customers.csv")
+            df = df.___(subset=["age"])
+            print(df.___)
+          checks:
+            - "Load the CSV with pandas"
+            - "Remove missing age values"
+            - "Inspect the dataframe columns"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use pd.read_csv(), dropna(), and df.columns"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
