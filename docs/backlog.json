@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:21:34+07:00",
+  "updated_at": "2026-08-01T11:23:55+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -140,7 +140,7 @@
     {
       "id": "DOCS-006",
       "title": "Create an external feature proposal template",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -152,7 +152,7 @@
           "url": "templates/external-feature-proposal.html"
         }
       ],
-      "updated_at": "2026-07-31T19:15:15+07:00"
+      "updated_at": "2026-08-01T11:23:55+07:00"
     },
     {
       "id": "DOCS-005",
@@ -987,6 +987,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the roadmap methodology after reviewing outcome-driven dual-track Agile, WSJF/Cost of Delay prioritization, vertical slices, governance gates, capacity guidance, and outcome measurement; DOCS-007 is complete.",
       "evidence_url": "development-flow.html#roadmap-methodology"
+    },
+    {
+      "at": "2026-08-01T11:23:55+07:00",
+      "item_id": "DOCS-006",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the external feature proposal template after reviewing requester intake, privacy and confidentiality safeguards, untrusted external content handling, internal triage, ownership, prioritization, and acceptance criteria; DOCS-006 is complete.",
+      "evidence_url": "templates/external-feature-proposal.html"
     }
   ]
 }
