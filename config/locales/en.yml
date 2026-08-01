@@ -583,6 +583,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use n_clusters=3 and random_state=42"
+      topic_2_4:
+        theory:
+          eyebrow: "Topic 2-4 · 10 min"
+          heading: "Overfitting and regularization"
+          p1: "Overfitting happens when a model learns noise or quirks in the training examples instead of a pattern that generalizes. It can score well on training data and poorly on new data."
+          p2: "Regularization adds a cost for overly complex parameters, encouraging a simpler model. Compare training and validation results to decide whether complexity is helping or memorizing."
+          sup_title: "Overfitting"
+          sup_desc: "The model memorizes the training set and its error rises on unseen examples. More training alone may make the gap worse."
+          sup_eg: "train score 98% · validation score 61%"
+          unsup_title: "Regularization"
+          unsup_desc: "A penalty such as alpha discourages extreme parameters. Tune it with validation data rather than choosing it from the test set."
+          unsup_eg: "e.g. Ridge(alpha=1.0)"
+          code_comment: "# penalize overly large coefficients"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the scikit-learn Ridge docs →"
+          blocks:
+            - "The test set is for the final check. Use a validation split or cross-validation while choosing regularization strength."
+            - "objective = prediction\_loss + alpha × complexity\_penalty"
+            - "model = Ridge(alpha=1.0)\nmodel.fit(X_train, y_train)"
+            - "scikit-learn docs · Ridge regression"
+        quiz:
+          eyebrow: "Exercise · diagnose generalization"
+          question: "Which practice most directly helps reduce overfitting while choosing a model?"
+          options:
+            - "Use validation data to tune complexity and regularization."
+            - "Train on the test set repeatedly."
+            - "Add more model parameters without checking new data."
+            - "Report only the training score."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — validation data helps choose complexity without spending the final test set."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the practice that measures generalization while you tune the model, not just memorization."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Add a regularization penalty"
+          task: "Complete the code so a Ridge model uses alpha=1.0 and is fitted on the training data."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            model = Ridge(alpha=___)
+            model.fit(X_train, y_train)
+          checks:
+            - "Create a Ridge model"
+            - "Set alpha to 1.0"
+            - "Fit on X_train and y_train"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use Ridge(alpha=1.0) and fit the training data"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

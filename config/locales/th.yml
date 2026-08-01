@@ -590,6 +590,61 @@ th:
           console_idle: "  พร้อมรัน — กดปุ่ม “รันและตรวจ”"
           console_pass: "✓ ผ่านทั้ง 3 เกณฑ์ · +10 เพชร"
           console_fail: "✗ ยังไม่ผ่าน — ใช้ n_clusters=3 และ random_state=42"
+      topic_2_4:
+        theory:
+          eyebrow: "หัวข้อ 2-4 · 10 นาที"
+          heading: "Overfitting และ regularization"
+          p1: "Overfitting เกิดเมื่อโมเดลจำ noise หรือรายละเอียดเฉพาะของตัวอย่างฝึก แทนที่จะเรียนรู้รูปแบบที่ใช้กับข้อมูลใหม่ได้ โมเดลจึงทำคะแนนดีกับข้อมูลฝึกแต่แย่กับข้อมูลใหม่"
+          p2: "Regularization เพิ่มต้นทุนให้พารามิเตอร์ที่ซับซ้อนเกินไปและส่งเสริมโมเดลที่เรียบง่ายขึ้น เปรียบเทียบผลฝึกกับ validation เพื่อดูว่าความซับซ้อนช่วยหรือทำให้จำ"
+          sup_title: "Overfitting"
+          sup_desc: "โมเดลจำชุดฝึกและมีความผิดพลาดสูงขึ้นกับตัวอย่างที่ไม่เคยเห็น การฝึกเพิ่มอย่างเดียวอาจทำให้ช่องว่างแย่ลง"
+          sup_eg: "คะแนนฝึก 98% · คะแนน validation 61%"
+          unsup_title: "Regularization"
+          unsup_desc: "ค่าปรับ เช่น alpha จะไม่สนับสนุนพารามิเตอร์ที่มีขนาดสุดโต่ง ควรปรับค่าด้วย validation ไม่ใช่เลือกจาก test set"
+          unsup_eg: "เช่น Ridge(alpha=1.0)"
+          code_comment: "# ลงโทษค่าสัมประสิทธิ์ที่ใหญ่เกินไป"
+          to_quiz: "ตรวจความเข้าใจ →"
+          open_link: "อ่านเอกสาร Ridge ของ scikit-learn →"
+          blocks:
+            - "ใช้ test set ตรวจครั้งสุดท้าย ใช้ validation split หรือ cross-validation ตอนเลือกความแรงของ regularization"
+            - "objective = prediction\_loss + alpha × complexity\_penalty"
+            - "model = Ridge(alpha=1.0)\nmodel.fit(X_train, y_train)"
+            - "เอกสาร scikit-learn · Ridge regression"
+        quiz:
+          eyebrow: "แบบฝึกหัด · วิเคราะห์การใช้กับข้อมูลใหม่"
+          question: "วิธีใดช่วยลด overfitting ได้โดยตรงที่สุดระหว่างเลือกโมเดล?"
+          options:
+            - "ใช้ validation ปรับความซับซ้อนและ regularization"
+            - "ฝึกซ้ำบน test set"
+            - "เพิ่มพารามิเตอร์โดยไม่ตรวจข้อมูลใหม่"
+            - "รายงานเฉพาะคะแนนชุดฝึก"
+          keys: [ "ก", "ข", "ค", "ง" ]
+          check: "ตรวจคำตอบ"
+          to_code: "ลองทำโจทย์ประยุกต์ →"
+          correct_title: "ถูกต้อง · +5 เพชร"
+          correct_body: "ถูกต้อง — validation ช่วยเลือกความซับซ้อนโดยไม่ใช้ test set สุดท้ายจนหมด"
+          wrong_title: "ลองอีกครั้ง · −1 หัวใจ"
+          wrong_body: "มองหาวิธีที่วัดการใช้กับข้อมูลใหม่ระหว่างปรับโมเดล ไม่ใช่แค่วัดการจำข้อมูลฝึก"
+        code:
+          eyebrow: "โจทย์ประยุกต์ · Python"
+          title: "เพิ่มค่า regularization"
+          task: "เติมโค้ดให้โมเดล Ridge ใช้ alpha=1.0 และฝึกด้วยข้อมูล train"
+          criteria: "เกณฑ์ผ่าน"
+          run: "รันและตรวจ"
+          reset: "รีเซ็ต"
+          finish: "จบหัวข้อ →"
+          editor_label: "โค้ด Python สำหรับโจทย์นี้"
+          starter: |
+            model = Ridge(alpha=___)
+            model.fit(X_train, y_train)
+          checks:
+            - "สร้างโมเดล Ridge"
+            - "กำหนด alpha เป็น 1.0"
+            - "ฝึกด้วย X_train และ y_train"
+          console_running: "  กำลังรัน…"
+          console_idle: "  พร้อมรัน — กดปุ่ม “รันและตรวจ”"
+          console_pass: "✓ ผ่านทั้ง 3 เกณฑ์ · +10 เพชร"
+          console_fail: "✗ ยังไม่ผ่าน — ใช้ Ridge(alpha=1.0) และฝึกด้วยข้อมูล train"
     # แสดงเป็น toast ไม่ใช่ flash เพราะไม่มีการโหลดหน้าใหม่มารองรับ flash
     # และทั้งแบบฝึกหัดและโจทย์เขียนโค้ดล้มเหลวแบบเดียวกัน
     grading_unreachable: "ติดต่อเซิร์ฟเวอร์ไม่ได้ ระบบยังไม่ได้ตรวจคำตอบ กรุณาลองใหม่อีกครั้ง"

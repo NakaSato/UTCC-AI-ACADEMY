@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3 2-4].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -111,6 +111,15 @@ module LessonContent
         /random_state\s*=\s*42/
       ],
       solution: "model = KMeans(n_clusters=3, random_state=42)\nlabels = model.fit_predict(X)"
+    },
+    "2-4" => {
+      correct_option: 0,
+      checks: [
+        /Ridge\s*\(/,
+        /alpha\s*=\s*1\.0/,
+        /\.fit\s*\(\s*X_train\s*,\s*y_train\s*\)/
+      ],
+      solution: "model = Ridge(alpha=1.0)\nmodel.fit(X_train, y_train)"
     }
   }.freeze
 
