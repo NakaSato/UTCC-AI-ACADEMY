@@ -46,13 +46,33 @@ class InstructorGradesTest < ActionDispatch::IntegrationTest
     assert_equal 0, response.body.bytesize
   end
 
-  test "staff with no section are sent back to the notice, not a broken file" do
-    Enrollment.delete_all
-    Section.delete_all
+  test "an unassigned instructor sees the empty state, not another section's roster" do
+    instructor = unassigned_instructor
 
-    sign_in_as users(:instructor)
+    sign_in_as instructor
+    get instructor_url
+
+    assert_response :success
+    assert_includes response.body, I18n.t("instructor.no_section.title")
+    assert_not_includes response.body, users(:one).student_id
+    assert_not_includes response.body, I18n.t("instructor.export_csv")
+  end
+
+  test "an unassigned instructor cannot export another section's roster" do
+    instructor = unassigned_instructor
+
+    sign_in_as instructor
     get instructor_grades_url
 
     assert_redirected_to instructor_path
+    follow_redirect!
+    assert_includes response.body, I18n.t("instructor.no_section.title")
+    assert_not_includes response.body, users(:one).student_id
   end
+
+  private
+    def unassigned_instructor
+      User.create!(name: "Unassigned Instructor", student_id: "2011071730993",
+                   password: "securePass1", role: :instructor)
+    end
 end

@@ -45,5 +45,11 @@ class Section < ApplicationRecord
   # The section a staff member's Teaching console is about. An instructor with
   # several teaches the one they were given first; there is no picker yet, and
   # inventing one before the screen has somewhere to put it would be guessing.
-  def self.for_staff(user) = taught_by(user).order(:id).first || order(:id).first
+  #
+  # Admins may inspect any section as part of the role's institution-wide
+  # access. Instructors must never inherit that fallback: returning somebody
+  # else's section exposes its roster on both the screen and the CSV export.
+  def self.for_staff(user)
+    taught_by(user).order(:id).first || (order(:id).first if user.admin?)
+  end
 end

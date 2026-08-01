@@ -21,10 +21,20 @@ class SectionTest < ActiveSupport::TestCase
     I18n.with_locale(:en) { assert_equal "1/2026", section.term_text }
   end
 
-  test "for_staff prefers a section the user teaches, then falls back to any" do
+  test "for_staff returns a section the instructor teaches" do
     assert_equal sections(:ba_2), Section.for_staff(users(:instructor))
+  end
+
+  test "for_staff does not expose another instructor's section" do
+    unassigned = User.create!(name: "Unassigned Instructor", student_id: "2011071730993",
+                              password: "securePass1", role: :instructor)
+
+    assert_nil Section.for_staff(unassigned)
+  end
+
+  test "for_staff permits an admin to inspect any section" do
     assert_equal sections(:ba_2), Section.for_staff(users(:admin)),
-                 "an admin teaches nothing but still gets a console to look at"
+                 "admins retain institution-wide access"
   end
 
   test "a duplicate code in the same course and term is rejected" do
