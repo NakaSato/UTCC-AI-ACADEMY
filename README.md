@@ -2,52 +2,7 @@
 
 # UTCC AI Academy by Upperclassman
 
-**Tags:** [#project](docs/tags.md#project) [#development](docs/tags.md#development) [#architecture](docs/tags.md#architecture) [#operations](docs/tags.md#operations)
-
-A learning platform for UTCC students getting started with AI — a course catalog, lessons that grade an exercise and a coding task as you go, and progress that follows you across the app. Thai-first interface with an English toggle.
-
-Rails 8.1 · Ruby 3.4.10 · PostgreSQL · Hotwire (importmap, no Node)
-
-[System Development Flow Master](docs/system-development-flow-master.md) ·
-[Workflow Guide for All Roles](docs/system-development-flow-role-guide.md) ·
-[Documentation Templates](docs/templates/README.md) ·
-[Project Development Flow](docs/development-flow.md) ·
-[Slack Policy](docs/slack.md) ·
-[Skill Library](docs/skills-library-README.md) ·
-[Project Skill Router](.agents/skills/use-project-skill-library/SKILL.md) ·
-[Agent Instructions](AGENTS.md) ·
-[Architecture and invariants](CLAUDE.md)
-
 ![The course catalog — the first screen a signed-in student sees](docs/screenshots/catalog.png)
-
----
-
-## Contents
-
-- [Getting started](#getting-started)
-- [Everyday commands](#everyday-commands)
-- [Development dashboard](#development-dashboard)
-- [System development flow](#system-development-flow)
-- [The screens](#the-screens)
-- [Accounts and roles](#accounts-and-roles)
-- [Language](#language)
-- [Design](#design)
-- [How we work](#how-we-work)
-- [Technical overview](#technical-overview)
-  - [Stack](#stack)
-  - [Repository layout](#repository-layout)
-  - [Request path](#request-path)
-  - [Data model](#data-model)
-  - [Progress: the one thing that is recorded](#progress-the-one-thing-that-is-recorded)
-  - [Placeholder content: the app's central pattern](#placeholder-content-the-apps-central-pattern)
-  - [Authentication and authorization](#authentication-and-authorization)
-  - [Routing](#routing)
-  - [Views and layouts](#views-and-layouts)
-  - [Frontend](#frontend)
-  - [Internationalisation](#internationalisation)
-  - [Infrastructure](#infrastructure)
-  - [Tests and CI](#tests-and-ci)
-- [What is real, and what is not](#what-is-real-and-what-is-not)
 
 ---
 
@@ -66,13 +21,13 @@ The database is the `postgres:18-alpine` service in `compose.yml`, which `bin/se
 
 Development email is delivered over SMTP to the pinned, disposable `mailpit` service. Open [http://127.0.0.1:8025](http://127.0.0.1:8025) to inspect captured messages; SMTP listens only on `127.0.0.1:1025`. Override those host-side ports with `MAILPIT_UI_PORT` and `MAILPIT_SMTP_PORT`, and keep Rails aligned with a custom SMTP port by setting `SMTP_PORT` to the same value. `SMTP_HOST` defaults to `127.0.0.1`. Mailpit has no volume, authentication, or public interface: recreating its container clears captured addresses and reset links. It verifies local application-to-SMTP behavior only; it does not prove production delivery or real-mailbox receipt.
 
-`bin/setup` seeds four demo accounts (development and test only). Password `utcc2026` for all of them:
+`bin/setup` seeds nine demo accounts (development and test only) — one per role, plus a five-student roster so the Teaching console and the leaderboard have a cohort to be about. Password `utcc2026` for all of them; these are the four worth signing in as:
 
 | Student ID | Who |
 | --- | --- |
 | `2011071730001` | student, with a few topics already finished |
 | `2011071730002` | student, further along |
-| `2011071730801` | instructor |
+| `2011071730801` | instructor, teaching section `BA-2` |
 | `2011071730802` | admin |
 
 ## Everyday commands
@@ -146,7 +101,7 @@ The landing page is public; everything else requires an account, because `Applic
 
 `users.role` is `student`, `instructor` or `admin`, and admin is a superset of instructor. Sign-up always produces a student. `/instructor` needs staff, `/admin` needs admin, and `/admin` is the only place in the app a role can be granted — so the **first** admin comes from `bin/rails admin:create`. `bin/rails instructor:create` is its counterpart for teaching staff, useful when you would rather not sign in to grant one; it refuses to touch an admin, since admin already includes instructor and writing the role would be a demotion. An admin's home is `/admin`, not the catalog.
 
-No mail delivery is configured in development (`raise_delivery_errors = false`), so reset emails go nowhere. Preview the template at `/rails/mailers`, or grab the reset URL from `log/development.log`.
+Development delivers reset mail over SMTP to the local Mailpit container — read it at [http://127.0.0.1:8025](http://127.0.0.1:8025), or preview the template without sending at `/rails/mailers`. **Production SMTP is still unconfigured**, so a deployed reset email is composed, enqueued and then goes nowhere.
 
 ## Language
 
@@ -207,7 +162,7 @@ Full detail, including roles and the time-boxes, is in `docs/process.md`.
 | --- | --- | --- |
 | Framework | Rails 8.1, module `UtccAiFundamental` | `config.load_defaults 8.1` |
 | Language | Ruby 3.4.10 | `Data.define`, endless methods, `it` block param, pattern matching |
-| Database | PostgreSQL 18 (`pg` ~> 1.6) | one database in development and test, from `compose.yml`; four in production |
+| Database | PostgreSQL 18 (`pg` ~> 1.6) | **one** database everywhere — `compose.yml` locally, external managed Postgres in production; the `solid_*` tables share it |
 | Web server | Puma, fronted by Thruster in the container | |
 | Assets | Propshaft | no Sprockets manifest, no `app/assets/config/` |
 | CSS | Tailwind v4 via `tailwindcss-rails` | standalone binary, no npm, no PostCSS |
@@ -234,7 +189,7 @@ app/
     concerns/authorization.rb       the allow_only macro
   helpers/application_helper.rb     nav items per role, footer columns per session
   javascript/controllers/           Stimulus, auto-registered by filename
-  models/                           six Active Record classes; the rest are placeholder modules
+  models/                           fourteen Active Record classes; the rest are placeholder modules
   views/
     layouts/application.html.erb    app chrome
     layouts/auth.html.erb           split-screen sign-in/sign-up/reset
@@ -244,10 +199,11 @@ config/
   locales/{th,en}.yml               every word a human reads
   routes.rb                         one line per verb, plain-English URLs
 db/
-  schema.rb                         users, sessions, courses, course_modules, topics, topic_completions
-  {queue,cache,cable}_schema.rb     the solid_* databases, kept separate on purpose
+  schema.rb                         the app's fourteen tables plus the solid_* ones, in one database
   seeds.rb                          fenced to Rails.env.local?; must stay idempotent
 lib/tasks/roles.rake                bin/rails admin:create, bin/rails instructor:create
+docs/system-development-flow-master.md  the canonical lifecycle, gates and roles
+docs/system-development-flow-role-guide.md  that lifecycle, role by role
 docs/process.md                     the Scrum process, and what "done" means here
 docs/development-flow.md            the Plan-to-Measure lifecycle and its gates
 docs/coding-standard.md             implementation rules a linter cannot enforce
@@ -278,7 +234,7 @@ end
 
 `progress` is `Current.user&.progress || LearnerProgress.new(nil)` — a null-object fallback so the helper is safe on the one screen that renders without a user.
 
-Controllers below it are deliberately tiny: read a param, validate it against a whitelist, ask a module, assign. `ProgressController` is 238 bytes. **A param is never trusted and never raises** — each controller falls back to a default (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold.
+Controllers below it are deliberately tiny: read a param, validate it against a whitelist, ask a module, assign. `ProgressController` is four assignments and nothing else. **A param is never trusted and never raises** — each controller falls back to a default (`CourseCatalog::FILTERS.include?`, `LessonContent.step_for`, `Leaderboard.tab_for`, `AdminConsole.tab_for`). `AdminConsole.tab_for` matters twice over: the tab name is interpolated into a `render` path, so anything but a whitelisted value would be a template-injection foothold.
 
 **One screen answers twice, and it is the only one.** `/leaderboard` renders a shell — heading, tabs, column header — around a lazy Turbo frame whose `src` is that same URL, so the browser comes straight back for it with a `Turbo-Frame` header and `LeaderboardsController#show` branches on `turbo_frame_request?`:
 
@@ -356,6 +312,14 @@ LandingText.for(key) || default(key).presence || LandingText.any(key).to_s
 ```
 
 The last step is what keeps an admin-made card visible on both pages instead of blank in one; the middle one comes first so a Thai-only rewrite never displaces the English the repo ships. `key` is the path under `landing.` — `"topics.prompting.title"` — and is checked against a whitelist `Landing` derives from the cards, so an override for a string the page does not render cannot be written.
+
+**`notifications`** — `user_id`, `kind`, `params` (json), `read_at`. What the app has to tell a learner.
+
+The row stores a **kind and its interpolations, never a sentence**, so the line reads in whichever language it is read in rather than in the language of whoever triggered it. Every `Notification.notify` call is in `AdminController`, acting *on* a student — which is why the bell has to redraw itself rather than wait for the reader's next page load (see [Request path](#request-path)).
+
+**`proctor_events`** — `user_id`, `course_id`, `topic_id`, `kind`, `occurred_at`, `reviewed_at`. What the lesson's proctor saw.
+
+The browser reports evidence against itself, fire-and-forget to `POST /lesson/incident` — the one post the topic lock deliberately does not guard. `Proctoring.cases` derives a case from a learner's **unreviewed** events, and closing one from the admin Integrity tab stamps `reviewed_at` across them.
 
 **`audit_events`** — `user_id` (the actor), `action`, `params` (json). Who did what on `/admin`.
 
@@ -511,6 +475,7 @@ Add JS dependencies with `bin/importmap pin <pkg>` — never npm or yarn. It wri
 | `quiz`, `code_task` | in-browser lesson grading |
 | `rewards` | listens for the reward events those two emit, POSTs the completion |
 | `proctor` | lesson integrity monitoring |
+| `toast` | transient messages, for feedback with no page load behind it |
 | `to_top` | back-to-top button |
 
 Accordions are native `<details>` — no controller.
@@ -519,7 +484,9 @@ Accordions are native `<details>` — no controller.
 
 `proctor_controller` mounts only for `Current.user.student?`; staff get the same bar with the controls inert. The sidebar score is per-page, but every incident is posted to `lesson/incident` and kept in `proctor_events` — the admin Integrity tab reads the record, and closing a case stamps the events reviewed. The log row is a `<template>` in the view, cloned per incident, so no markup lives in JS.
 
-**Lesson grading runs on the server.** The `quiz` and `code_task` controllers send what the student did to `POST /lesson/submit` and render the verdict they get back; neither knows the answer key. They share the posting helper in `app/javascript/grading.js`, which sits outside `controllers/` because `pin_all_from` would otherwise register it as a Stimulus controller. The coding task's criteria light up when the run answers rather than as you type — live ticking would need the patterns in the page.
+**Lesson grading runs on the server.** The `quiz` and `code_task` controllers send what the student did to `POST /lesson/submit` and render the verdict they get back; neither knows the answer key. They share the posting helper in `app/javascript/grading.js`, which sits outside `controllers/` because `pin_all_from` would otherwise register it as a Stimulus controller. `app/javascript/frame_recovery.js` is the only other file there for the same reason — one document-level `turbo:frame-missing` listener rather than a behaviour attached to an element; see [Tests and CI](#tests-and-ci) for the failure it exists to prevent. Both are pinned by name in `config/importmap.rb`.
+
+The coding task's criteria light up when the run answers rather than as you type — live ticking would need the patterns in the page.
 
 ## Internationalisation
 
@@ -535,7 +502,7 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 
 ## Infrastructure
 
-- **There is one database, and the solid_* adapters keep their tables in it** — migrated from `db/migrate` and dumped into `db/schema.rb` alongside the app's own, which is why the schema below has thirteen `solid_*` tables in it. They used to have a database each, and the reason they no longer do is the **connection budget**: Rails holds one pool per database *per process*, and with `SOLID_QUEUE_IN_PUMA` an instance is Puma plus a Solid Queue dispatcher plus a worker. Four databases meant four pools in each of them — up to twenty connections from one instance, against a managed Postgres that allows twenty in total and whose provider already holds eleven. One database is one pool.
+- **There is one database, and the solid_* adapters keep their tables in it** — migrated from `db/migrate` and dumped into `db/schema.rb` alongside the app's own, which is why the schema carries thirteen `solid_*` tables beside the fourteen under [Data model](#data-model). They used to have a database each, and the reason they no longer do is the **connection budget**: Rails holds one pool per database *per process*, and with `SOLID_QUEUE_IN_PUMA` an instance is Puma plus a Solid Queue dispatcher plus a worker. Four databases meant four pools in each of them — up to twenty connections from one instance, against a managed Postgres that allows twenty in total and whose provider already holds eleven. One database is one pool.
 - **Four settings hold that together, and any one of them re-opens a pool**: no `solid_queue.connects_to` in `config/environments/production.rb`, no `database:` key in `config/cache.yml`, no `connects_to` in `config/cable.yml`, and no `db/{queue,cache,cable}_schema.rb`. `pool` in `config/database.yml` is the ceiling on what one process takes — keep it at or below Puma's thread count, with headroom for the job supervisor.
 - **Development and production get their database from different places.** Locally it is the `postgres:18-alpine` container in `compose.yml` — `utcc_ai_academy_development` and `_test`, configured by the `DB_*` defaults in `config/database.yml`. The same Compose file runs the loopback-only, ephemeral Mailpit inbox used by development Action Mailer. `bin/setup` runs `docker compose up -d --wait` before `db:prepare`, and skips containers when docker is not installed so that pointing `DB_HOST` at your own Postgres still works. Production is an **external managed Postgres reached through `DATABASE_URL`** — one value carrying host, port, database, credentials and `sslmode=require`, and the only thing the production block reads. Neither deploy target runs PostgreSQL or Mailpit: there is no Kamal `db` accessory and no Render `databases:` block.
 - **`DATABASE_URL` is a credential and is never committed.** Kamal reads it from the environment via `.kamal/secrets`; Render holds it as a `sync: false` dashboard value. If it ever appears in a diff, a log or a chat window, rotate it at the provider rather than hoping.
@@ -544,7 +511,7 @@ config.i18n.fallbacks = [ :en ]        # a key missing from th.yml renders Engli
 - **Kamal runs no database of its own.** There is deliberately no `db` accessory: the app connects to the external managed Postgres through `DATABASE_URL`, so backing it up is the provider's job rather than a Docker volume's. `storage/` is still a persistent volume, but now only for local Active Storage files. Adding an accessory back would stand up an empty database nothing connects to.
 - `assets:precompile` builds Tailwind first, so the Dockerfile needs no extra step.
 - `RAILS_MASTER_KEY` decrypts `config/credentials.yml.enc`, and `secret_key_base` is in there — so the variable is not optional in production, it is what lets the app boot at all. `config/master.key` is gitignored and therefore never in the image; the target has to supply the value. `config/deploy.yml` still carries the placeholder server `192.168.0.1` and registry `localhost:5555`.
-- **`config.assume_ssl` and `config.force_ssl` are on in production**, which makes `proxy: ssl: true` in `deploy.yml` part of the same decision rather than an option. Kamal's proxy terminates TLS and speaks http to Thruster, so without `assume_ssl` Rails believes every request arrived unencrypted — and `request.base_url` is what builds every canonical, hreflang and sitemap URL the app publishes. `/up` is excluded from the https redirect so the proxy and uptime monitors can still reach it.
+- **`config.assume_ssl` and `config.force_ssl` are on in production**, which makes `proxy: ssl: true` in `deploy.yml` part of the same decision rather than an option — it is commented out there today (see below) and has to be uncommented before Kamal ever becomes the live target. Kamal's proxy terminates TLS and speaks http to Thruster, so without `assume_ssl` Rails believes every request arrived unencrypted — and `request.base_url` is what builds every canonical, hreflang and sitemap URL the app publishes. `/up` is excluded from the https redirect so the proxy and uptime monitors can still reach it.
 - **The production site is `https://academy.boring9.dev`**, and that name is written down in three places that have to agree: `config.hosts` (what the app will answer to), `config.action_mailer.default_url_options` (the only URLs not built from a request — the password-reset link) and `domains:` in `render.yaml` (what Render issues a certificate for). A mismatch between the first and the third is a 403 on your own domain, not a redirect.
 - Still to fill in: **production SMTP**. Development delivers to local Mailpit, but production settings remain unconfigured, so a deployed password-reset mail is composed and enqueued and then goes nowhere — the one user-facing feature that is not actually working in production. `ApplicationMailer`'s `from:` is `no-reply@academy.boring9.dev`, which will need to be an address the eventual provider is allowed to send as.
 - Kamal's own placeholders are untouched — `servers.web` is still `192.168.0.1`, the registry `localhost:5555`, and the `proxy` block still commented. That is fine while Render is the live target; it does mean `config/deploy.yml` is not a description of where the site runs.
@@ -589,9 +556,9 @@ Minitest, run in parallel (`parallelize(workers: :number_of_processors)`), loadi
 
 Assertions compare against `I18n.t(...)` rather than literal strings, and are scoped (`assert_select "main h2"`) because the header nav links to AI1101 on every page — a copy change in a locale file should not break a test.
 
-**`test/fixtures/topic_completions.yml`, `submissions.yml`, `notifications.yml` and `landing_texts.yml` are deliberately empty and must stay present.** Tests that need progress, an attempt or a copy override write it themselves; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users they point at. `landing_texts.yml` earns its keep twice over: an empty table *is* the landing page as shipped, which is what lets `landing_test.rb`, `structured_data_test.rb` and `crawlers_test.rb` go on asserting against the locale files.
+**`test/fixtures/topic_completions.yml`, `submissions.yml`, `notifications.yml`, `proctor_events.yml`, `landing_texts.yml` and `audit_events.yml` are deliberately empty and must stay present.** Tests that need progress, an attempt, an incident or a copy override write it themselves; the files exist so fixtures clear the tables, because `bin/ci` seeds into the test database and those rows would otherwise outlive the users they point at. `landing_texts.yml` earns its keep twice over: an empty table *is* the landing page as shipped, which is what lets `landing_test.rb`, `structured_data_test.rb` and `crawlers_test.rb` go on asserting against the locale files.
 
-**`courses.yml`, `course_modules.yml` and `topics.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the `CreateCourses` migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` asserts the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
+**`courses.yml`, `course_modules.yml`, `topics.yml` and `landing_cards.yml` are the opposite** — they carry the taxonomy, because `db:test:prepare` loads the schema and a schema holds no data. That makes three copies of the same rows that must agree: the migration (what production has), `db/seeds.rb` (what restores them after `db:seed:replant` truncates every table) and these fixtures. `test/models/taxonomy_test.rb` and `landing_card_test.rb` assert the shape they all have to produce, so a row added to one copy and not the others fails a test rather than quietly shortening a syllabus.
 
 `bin/verify` is the shared pipeline entry point you run before committing (it delegates to `bin/ci`), and `.github/workflows/ci.yml` runs the same policy on every push to `main` and every pull request:
 
