@@ -694,6 +694,62 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use pd.read_csv(), dropna(), and df.columns"
+      topic_3_2:
+        theory:
+          eyebrow: "Topic 3-2 · 10 min"
+          heading: "Train, evaluate, tune"
+          p1: "A useful model workflow separates training from evaluation: fit on training data, measure on held-out data, and tune choices with validation rather than guessing from the test score."
+          p2: "Treat the test set as a final check. If you repeatedly change the model because of its test score, it stops being an honest estimate of how the finished model will generalize."
+          sup_title: "Train"
+          sup_desc: "Fit the model on X_train and y_train so it can learn parameters from known examples."
+          sup_eg: "model.fit(X_train, y_train)"
+          unsup_title: "Evaluate and tune"
+          unsup_desc: "Score on held-out data, then use validation or cross-validation to compare settings before one final test."
+          unsup_eg: "validation → tune → final test"
+          code_comment: "# evaluate on data the model did not fit"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the scikit-learn model-selection docs →"
+          blocks:
+            - "A score is evidence about a dataset split, not a permanent property of the model. Record which split produced it."
+            - "fit(train) → validate(tune) → test(final)"
+            - "model.fit(X_train, y_train)\nscore = model.score(X_test, y_test)\nprint(score)"
+            - "scikit-learn docs · model evaluation"
+        quiz:
+          eyebrow: "Exercise · protect the test set"
+          question: "What is the safest way to use a test set while tuning a model?"
+          options:
+            - "Keep it untouched until the final evaluation."
+            - "Use it after every parameter change and choose the best score."
+            - "Train on it so the final score is higher."
+            - "Replace it with the training set."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — keeping the test set untouched preserves it as an honest final check."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the option that prevents tuning decisions from leaking information from the final evaluation set."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Train and score a model"
+          task: "Complete the code so the model fits on training data, scores on held-out test data, and prints the score."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            model.___(X_train, y_train)
+            score = model.___(X_test, y_test)
+            print(score)
+          checks:
+            - "Fit on X_train and y_train"
+            - "Score on X_test and y_test"
+            - "Store the evaluation score"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — fit on train data and score on held-out test data"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
