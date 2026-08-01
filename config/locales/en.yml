@@ -473,6 +473,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — subtract learning_rate * gradient"
+      topic_2_2:
+        theory:
+          eyebrow: "Topic 2-2 · 10 min"
+          heading: "Loss and metrics"
+          p1: "A loss function turns prediction error into a number the training algorithm can minimize. A metric is a human-facing measure used to compare performance for a decision."
+          p2: "The loss used to train a model and the metric used to report success can be related but do not have to be identical. Choose each one for its purpose and data."
+          sup_title: "Loss during training"
+          sup_desc: "Loss provides a signal for parameter updates. Lower training loss usually means the model is fitting the examples more closely."
+          sup_eg: "e.g. mean squared error"
+          unsup_title: "Metrics during evaluation"
+          unsup_desc: "Metrics summarize performance in terms people can interpret, such as mean absolute error or accuracy on held-out data."
+          unsup_eg: "e.g. MAE = 4.2 units"
+          code_comment: "# mean absolute error"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the scikit-learn metrics docs →"
+          blocks:
+            - "A useful metric names the cost of being wrong in the same units as the decision when possible."
+            - "MAE = mean(|actual - predicted|)"
+            - "mae = np.abs(y_true - y_pred).mean()\nprint(mae)"
+            - "scikit-learn docs · mean absolute error"
+        quiz:
+          eyebrow: "Exercise · separate loss from metric"
+          question: "Which statement about a loss function is correct?"
+          options:
+            - "It is only used after deployment."
+            - "It cannot be used to compare models."
+            - "It provides a signal that training can minimize by updating parameters."
+            - "It is the same thing as the number of training rows."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — training uses loss as a signal for parameter updates."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the statement that connects loss to prediction error and parameter updates during training."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Calculate mean absolute error"
+          task: "Complete the code so MAE is the mean of the absolute differences between actual and predicted values."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            mae = ___(y_true - y_pred).___()
+            print(mae)
+          checks:
+            - "Assign the MAE result"
+            - "Take absolute differences with NumPy"
+            - "Average the differences with mean"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use np.abs() and mean()"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

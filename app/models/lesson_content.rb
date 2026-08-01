@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -93,6 +93,15 @@ module LessonContent
         /\*\s*gradient/
       ],
       solution: "weight = weight - learning_rate * gradient\nprint(weight)"
+    },
+    "2-2" => {
+      correct_option: 2,
+      checks: [
+        /mae\s*=/,
+        /np\.abs\s*\(/,
+        /\.mean\s*\(\s*\)/
+      ],
+      solution: "mae = np.abs(y_true - y_pred).mean()\nprint(mae)"
     }
   }.freeze
 
