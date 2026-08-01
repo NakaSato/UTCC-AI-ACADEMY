@@ -241,7 +241,7 @@ jobs:
         id: post_status
         if: steps.transitions.outcome == 'success' && steps.transitions.outputs.has_updates == 'true' && vars.SLACK_STATUS_CHANNEL != ''
         continue-on-error: true
-        uses: slackapi/slack-github-action@v2
+        uses: slackapi/slack-github-action@v4
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -264,7 +264,7 @@ jobs:
     steps:
       - name: Post the failure to Slack
         if: ${{ vars.SLACK_CI_CHANNEL != '' }}
-        uses: slackapi/slack-github-action@v2
+        uses: slackapi/slack-github-action@v4
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
