@@ -21,7 +21,8 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEY = "1-1"
+  REAL_TOPIC_KEYS = %w[1-1 1-2].freeze
+  REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
   STEP_PERCENT = { theory: 12, exercise: 42, code: 74, summary: 100 }.freeze
@@ -55,6 +56,27 @@ module LessonContent
     /test_size\s*=\s*0\.2/,
     /random_state\s*=\s*42/
   ].freeze
+
+  TOPIC_GRADING = {
+    "1-1" => {
+      correct_option: 1,
+      checks: [
+        /def\s+classify_risk/,
+        /score\s*>=\s*0\.7/,
+        /return\s+["']high["']/
+      ],
+      solution: "def classify_risk(score):\n    if score >= 0.7:\n        return \"high\"\n    return \"low\""
+    },
+    "1-2" => {
+      correct_option: 0,
+      checks: [
+        /df\s*\[\s*[\"']age[\"']\s*\]/,
+        /astype\s*\(\s*[\"']float[\"']\s*\)/,
+        /df\.dtypes/
+      ],
+      solution: "df[\"age\"] = df[\"age\"].astype(\"float\")\nprint(df.dtypes)"
+    }
+  }.freeze
 
   # The starter code ships with blanks in it. Leaving one in is a fail however
   # well the rest matches, so a student cannot pass by pasting the criteria
@@ -95,7 +117,7 @@ module LessonContent
   end
 
   TopicDefinition = Data.define(:key) do
-    def real? = key.to_s == REAL_TOPIC_KEY
+    def real? = LessonContent::REAL_TOPIC_KEYS.include?(key.to_s)
 
     def step_for(param) = LessonContent.step_for(param)
     def step_number(step) = LessonContent.step_number(step)
@@ -104,7 +126,7 @@ module LessonContent
     def rewards = LessonContent.rewards
 
     def translate(path)
-      scoped = "lesson.topics.topic_1_1.#{path}"
+      scoped = "lesson.topics.topic_#{key.tr('-', '_')}.#{path}"
       I18n.exists?(scoped) ? I18n.t(scoped) : I18n.t("lesson.#{path}")
     end
 
@@ -124,8 +146,8 @@ module LessonContent
 
     def checks = real? ? translate("code.checks") : LessonContent.checks
     def starter_code = real? ? translate("code.starter") : STARTER_CODE
-    def correct_option = real? ? 1 : CORRECT_OPTION
-    def solution = real? ? translate("code.solution") : "train_test_split(X, y, test_size=0.2, random_state=42)"
+    def correct_option = real? ? TOPIC_GRADING.fetch(key).fetch(:correct_option) : CORRECT_OPTION
+    def solution = real? ? TOPIC_GRADING.fetch(key).fetch(:solution) : "train_test_split(X, y, test_size=0.2, random_state=42)"
 
     def grade_quiz(answer)
       passed = answer.to_s == correct_option.to_s
@@ -135,11 +157,7 @@ module LessonContent
     def grade_code(source)
       return LessonContent.grade_code(source) unless real?
 
-      results = [
-        source.to_s.match?(/def\s+classify_risk/),
-        source.to_s.match?(/score\s*>=\s*0\.7/),
-        source.to_s.match?(/return\s+["']high["']/)
-      ]
+      results = TOPIC_GRADING.fetch(key).fetch(:checks).map { source.to_s.match?(it) }
 
       { passed: results.all? && source.to_s.exclude?(BLANK),
         score: (results.count(true) * 100.0 / results.size).round,

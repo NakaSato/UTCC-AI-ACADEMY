@@ -308,6 +308,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — replace ___ with 0.7 and high"
+      topic_1_2:
+        theory:
+          eyebrow: "Topic 1-2 · 8 min"
+          heading: "Types of data"
+          p1: "The kind of data determines which questions you can ask and which transformations a model needs. Numerical, categorical, temporal, and text data each carry different meaning."
+          p2: "Before modelling, name the type of every important field and check whether its values are stored in a form your tools can use safely."
+          sup_title: "Numerical data"
+          sup_desc: "Measured quantities such as age, income, or temperature. They can be ordered and used in arithmetic."
+          sup_eg: "e.g. age = 21.0"
+          unsup_title: "Categorical and text data"
+          unsup_desc: "Labels, names, and free-form language describe groups or meaning; they need deliberate encoding before many models can use them."
+          unsup_eg: "e.g. plan = \"student\""
+          code_comment: "# make a numeric column explicit"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the pandas docs →"
+          blocks:
+            - "A column's type is a modelling decision, not just a display detail."
+            - "numeric + categorical + time + text → usable features"
+            - "df[\"age\"] = df[\"age\"].astype(\"float\")\nprint(df.dtypes)"
+            - "pandas docs · dtypes"
+        quiz:
+          eyebrow: "Exercise · identify the type"
+          question: "A customer record stores age as 21. Which data type best describes this field?"
+          options:
+            - "Numerical"
+            - "Categorical"
+            - "Free-form text"
+            - "Image"
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — age is a measured quantity, so it is numerical data."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the option that represents a measured quantity you can order or calculate with."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Make a numeric field explicit"
+          task: "Complete the code so the age column is converted to float and the resulting data types are printed."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            df["age"] = df["age"].astype(___)
+            print(df.___)
+          checks:
+            - "Select the age column"
+            - "Convert age to float"
+            - "Print the data types"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use float and dtypes"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

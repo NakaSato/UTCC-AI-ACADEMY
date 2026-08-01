@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T14:00:21+07:00",
+  "updated_at": "2026-08-01T14:21:44+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -329,7 +329,7 @@
     {
       "id": "M3-001",
       "title": "Complete the AI1101 foundation course content",
-      "status": "queued",
+      "status": "verification",
       "priority": 1,
       "owner": "Product Owner and Instructor",
       "milestone": "M3",
@@ -337,17 +337,25 @@
         "M2-001"
       ],
       "blocker": {
-        "summary": "Implementation may proceed under accepted SPEC-0002; topic owners and learner-review evidence remain required for completion.",
+        "summary": "Topic 1-2 is implemented and verified; instructor/content-owner review and learner evidence remain required before M3 completion.",
         "decision_owner": "Product Owner and Instructor",
-        "next_action": "Assign topic content owners and begin the first vertical topic slice."
+        "next_action": "Review the topic 1-2 content and record instructor/learner evidence."
       },
       "evidence": [
         {
           "label": "M3 foundation-course specification",
           "url": "specs/spec-m3-foundation-course.html"
+        },
+        {
+          "label": "Full Rails test suite",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/placeholder_content_test.rb"
+        },
+        {
+          "label": "Browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/learning_walk_test.rb"
         }
       ],
-      "updated_at": "2026-08-01T14:00:21+07:00"
+      "updated_at": "2026-08-01T14:21:44+07:00"
     }
   ],
   "recently_completed": [
@@ -1130,6 +1138,14 @@
       "from": "queued",
       "to": "in_progress",
       "summary": "Product Owner and instructor approved SPEC-0002; M3 implementation is authorized to begin with topic-owner assignment and the first vertical slice.",
+      "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-01T14:21:44+07:00",
+      "item_id": "M3-001",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented the first M3 vertical slice for topic 1-2 with unique Thai/English content, topic-specific quiz and coding grading, focused tests, full Rails tests, and browser walkthrough; human content review remains required.",
       "evidence_url": "specs/spec-m3-foundation-course.html"
     }
   ]

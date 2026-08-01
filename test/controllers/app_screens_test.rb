@@ -112,10 +112,11 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     get lesson_url
 
     assert_response :success
-    LessonContent.blocks.each do |block|
+    content = LessonContent.for(Syllabus.topic_keys.first)
+    content.blocks.each do |block|
       assert_select "[data-panel=theory]", text: /#{Regexp.escape(block.value.lines.first.strip)}/
     end
-    assert_select "a[href=?]", LessonContent.blocks.find { it.type == :link }.extra
+    assert_select "a[href=?]", content.blocks.find { it.type == :link }.extra
   end
 
   test "a student gets the proctor controller and staff get the exempt notice" do

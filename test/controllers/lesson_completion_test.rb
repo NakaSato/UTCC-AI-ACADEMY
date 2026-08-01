@@ -131,11 +131,12 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
   test "finishing a module opens the next one" do
     Syllabus.keys_in(1).each do |key|
       post submit_lesson_url,
-           params: { kind: "quiz", answer: RIGHT_ANSWER, course: topic_params[:course], topic: key }, as: :json
+           params: { kind: "quiz", answer: LessonContent.for(key).correct_option,
+                     course: topic_params[:course], topic: key }, as: :json
     end
 
     post submit_lesson_url,
-         params: { kind: "quiz", answer: RIGHT_ANSWER,
+         params: { kind: "quiz", answer: LessonContent.for(Syllabus.keys_in(2).first).correct_option,
                    course: topic_params[:course], topic: Syllabus.keys_in(2).first }, as: :json
 
     assert_response :success
