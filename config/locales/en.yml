@@ -860,6 +860,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — include task, context, and output format"
+      topic_5_1:
+        theory:
+          eyebrow: "Topic 5-1 · 10 min"
+          heading: "Assessing the business case"
+          p1: "An AI idea becomes a business case when it names the decision or workflow to improve, the people affected, and a measurable result such as time saved, revenue gained, or errors avoided."
+          p2: "Estimate the benefit and the full operating cost, then test feasibility and risk. A small, measurable pilot is usually stronger evidence than a large promise based only on model accuracy."
+          sup_title: "Value and measurement"
+          sup_desc: "Define a baseline, a target metric, and who benefits. Convert expected improvement into an annual value without counting the same benefit twice."
+          sup_eg: "hours saved × cost per hour"
+          unsup_title: "Feasibility and risk"
+          unsup_desc: "Check data availability, workflow integration, human oversight, privacy, and the cost of wrong outputs before approving a pilot."
+          unsup_eg: "valuable + feasible + responsible"
+          code_comment: "# compare recurring benefit with recurring cost"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the AI risk management overview →"
+          blocks:
+            - "Start with the business outcome, not the model: state what should improve, for whom, and how the change will be measured against today's baseline."
+            - "annual net value = annual benefit − annual cost"
+            - "annual_net_value = annual_benefit - annual_cost\nprint(annual_net_value)"
+            - "NIST · AI Risk Management Framework"
+        quiz:
+          eyebrow: "Exercise · choose a testable case"
+          question: "Which proposal is the strongest starting point for an AI business case?"
+          options:
+            - "Pilot invoice review to cut average handling time by 20%, with a baseline, cost estimate, and human check for flagged cases."
+            - "Buy an AI tool because competitors mention AI in their reports."
+            - "Automate every customer decision before checking the available data or failure cost."
+            - "Judge success only by whether the model produces impressive demonstrations."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — the proposal identifies a workflow, measurable target, costs, and a control for consequential errors."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for a bounded proposal with a baseline, measurable outcome, realistic costs, and risk controls."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Calculate annual net value"
+          task: "Complete the calculation so annual net value subtracts the recurring annual cost from the recurring annual benefit."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            annual_net_value = ___ - ___
+            print(annual_net_value)
+          checks:
+            - "Assign annual_net_value"
+            - "Start with annual_benefit"
+            - "Subtract annual_cost"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — subtract annual_cost from annual_benefit"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
