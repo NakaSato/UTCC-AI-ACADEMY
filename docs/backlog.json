@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:39:08+07:00",
+  "updated_at": "2026-08-01T13:49:02+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -304,23 +304,27 @@
     {
       "id": "M2-001",
       "title": "Deliver the first real bilingual AI1101 topic (1-1)",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner and Instructor",
       "milestone": "M2",
       "depends_on": [],
-      "blocker": {
-        "summary": "Implementation and automated verification pass; instructor and small student-group content review remain outstanding.",
-        "decision_owner": "Instructor",
-        "next_action": "Review the bilingual lesson, objectives, exercise, feedback, and applied task with an instructor and small student group; record findings before completion."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M2 first real topic specification",
           "url": "specs/spec-m2-first-real-topic.html"
+        },
+        {
+          "label": "Focused lesson tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/lesson_completion_test.rb"
+        },
+        {
+          "label": "Browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/learning_walk_test.rb"
         }
       ],
-      "updated_at": "2026-08-01T13:39:08+07:00"
+      "updated_at": "2026-08-01T13:49:02+07:00"
     }
   ],
   "recently_completed": [
@@ -1080,6 +1084,14 @@
       "to": "verification",
       "summary": "Implemented topic 1-1 bilingual content, topic-scoped quiz and coding grading, locale-aware lesson rendering, focused tests, browser system tests, documentation validation, and focused style checks; instructor and student content review remain required.",
       "evidence_url": "specs/spec-m2-first-real-topic.html"
+    },
+    {
+      "at": "2026-08-01T13:49:02+07:00",
+      "item_id": "M2-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the verified topic 1-1 implementation after reviewing the bilingual lesson, topic-specific assessments, server-side grading, focused tests, and browser walkthrough; M2-001 is complete.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/commit/8cf9dc3"
     }
   ]
 }

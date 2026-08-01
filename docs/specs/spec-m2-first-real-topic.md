@@ -10,7 +10,7 @@ review_by: 2026-08-08
 supersedes: []
 superseded_by: []
 depends_on: []
-implemented_by: []
+implemented_by: [8cf9dc3]
 touches:
   - app/models/lesson_content.rb
   - app/controllers/lessons_controller.rb
