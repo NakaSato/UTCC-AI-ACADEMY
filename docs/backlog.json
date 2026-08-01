@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:18:53+07:00",
+  "updated_at": "2026-08-01T11:21:34+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -123,7 +123,7 @@
     {
       "id": "DOCS-007",
       "title": "Document the roadmap methodology in the project development flow",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -135,7 +135,7 @@
           "url": "development-flow.html#roadmap-methodology"
         }
       ],
-      "updated_at": "2026-07-31T22:28:17+07:00"
+      "updated_at": "2026-08-01T11:21:34+07:00"
     },
     {
       "id": "DOCS-006",
@@ -979,6 +979,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the connected Markdown graph enforcement after reviewing the validator's repository-wide link resolution and single-component result; DOCS-008 is complete.",
       "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
+    },
+    {
+      "at": "2026-08-01T11:21:34+07:00",
+      "item_id": "DOCS-007",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the roadmap methodology after reviewing outcome-driven dual-track Agile, WSJF/Cost of Delay prioritization, vertical slices, governance gates, capacity guidance, and outcome measurement; DOCS-007 is complete.",
+      "evidence_url": "development-flow.html#roadmap-methodology"
     }
   ]
 }
