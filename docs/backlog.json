@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T10:44:36+07:00",
+  "updated_at": "2026-08-01T11:08:11+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -55,7 +55,7 @@
     {
       "id": "DOCS-011",
       "title": "Create a worked development-flow example from Roadmap Milestone 1",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -67,7 +67,7 @@
           "url": "examples/milestone-1-reliable-account-recovery.html"
         }
       ],
-      "updated_at": "2026-07-31T23:41:47+07:00"
+      "updated_at": "2026-08-01T11:08:11+07:00"
     },
     {
       "id": "DOCS-010",
@@ -947,6 +947,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the all-roles workflow guide after reviewing its role playbooks, lifecycle handoffs, skill packs, delegation rules, Slack handoff rules, and repository handoff template; DOCS-005 is complete.",
       "evidence_url": "system-development-flow-role-guide.html"
+    },
+    {
+      "at": "2026-08-01T11:08:11+07:00",
+      "item_id": "DOCS-011",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the worked Milestone 1 development-flow example after reviewing its roadmap framing, lifecycle artifacts, role handoffs, skill routes, verification evidence, and outcome measures; DOCS-011 is complete.",
+      "evidence_url": "examples/milestone-1-reliable-account-recovery.html"
     }
   ]
 }
