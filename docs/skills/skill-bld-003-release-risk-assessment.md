@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-BLD-004 — Database Operations](skill-bld-004-database-operations.md) · [SKILL-OPS-002 — Incident Response](skill-ops-002-incident-response.md)
 
-## นิยาม
-ความสามารถในการประเมินก่อน deploy ว่าอะไรอาจพัง พังแล้วกระทบใครแค่ไหน จะรู้ได้เร็วแค่ไหน และถอยกลับได้จริงหรือไม่
+## Definition
+The ability to assess, before deploying, what might break, who it would affect and how badly, how quickly we would find out, and whether we could really roll back.
 
-## ทำไมสำคัญตอนนี้
-เมื่อจำนวนการเปลี่ยนแปลงต่อ release สูงขึ้นมาก การอ่าน diff ทั้งหมดก่อนปล่อยกลายเป็นไปไม่ได้ ทักษะนี้จึงเปลี่ยนจาก "อ่านให้ครบ" เป็น "รู้ว่าต้องอ่านตรงไหน" และ Change Failure Rate กลายเป็นตัวชี้วัดที่สำคัญที่สุดในชุด DORA
+## Why It Matters Now
+As the number of changes per release rises sharply, reading every diff before shipping becomes impossible. The skill shifts from "read all of it" to "know where to read", and Change Failure Rate becomes the most important metric in the DORA set.
 
-## ระดับ
+## Levels
 ### Foundation
-- ทำตาม release checklist ที่มีอยู่
-- รู้ว่าต้องแจ้งใครก่อน deploy
+- Follows the existing release checklist
+- Knows who to notify before deploying
 
 ### Proficient
-- ระบุได้ว่าการเปลี่ยนแปลงไหนใน release นี้เสี่ยงที่สุดและเพราะอะไร
-- ตรวจสอบว่า rollback plan ใช้ได้จริง ไม่ใช่แค่เขียนไว้
-- กำหนดเกณฑ์ verify หลัง deploy ที่ชัดเจน
+- Can identify which change in this release is riskiest, and why
+- Verifies that the rollback plan actually works rather than merely existing on paper
+- Defines clear post-deploy verification criteria
 
 ### Expert
-- ประเมินความเสี่ยงจากปฏิสัมพันธ์ระหว่างการเปลี่ยนแปลงหลายชิ้น ไม่ใช่ทีละชิ้น
-- ตัดสินใจได้ว่าเมื่อไหร่ควรแยก release และเมื่อไหร่รวมได้
-- รู้ว่าความเสี่ยงข้อไหนควรยอมรับ
+- Assesses risk from the interaction between several changes, not one at a time
+- Decides when to split a release and when changes can ship together
+- Knows which risks are worth accepting
 
-## วิธีประเมิน
-ให้ release ที่มี 12 PR รวม migration หนึ่งตัวและการเปลี่ยน config หนึ่งจุด ถามว่า:
-1. ตัวไหนเสี่ยงที่สุด เพราะอะไร
-2. ถ้าพัง จะรู้ภายในกี่นาที และรู้ได้จากอะไร
-3. rollback ตัวไหนที่ทำไม่ได้จริง
+## How to Assess
+Give a release of 12 PRs including one migration and one config change, then ask:
+1. Which is riskiest, and why?
+2. If it breaks, how many minutes until we know, and what tells us?
+3. Which of these cannot actually be rolled back?
 
-คนที่ไม่ระบุว่า migration rollback ไม่ได้ = ยังไม่ถึง Proficient
+Anyone who does not flag that the migration cannot be rolled back = not yet Proficient.
 
-## เส้นทางพัฒนา
-1. ทำ pre-mortem ก่อน release ใหญ่: สมมติว่าพังแล้ว มาจากอะไรได้บ้าง
-2. ทดสอบ rollback จริงในสภาพแวดล้อม staging อย่างน้อยไตรมาสละครั้ง
-3. ทบทวน incident ที่เกิดจาก release ย้อนหลัง — สัญญาณอะไรที่มองข้ามไป
-4. ฝึกเขียน release doc ที่มี verify criteria เป็นตัวเลข ไม่ใช่ "ดูว่าปกติไหม"
+## Development Path
+1. Run a pre-mortem before a large release: assume it has already broken — what could have caused it?
+2. Test a real rollback in staging at least once a quarter
+3. Review past release-caused incidents — what signals were missed?
+4. Practise writing release docs whose verification criteria are numbers, not "check that it looks normal"
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สรุปการเปลี่ยนแปลงใน release, สร้าง changelog, ตรวจว่ามี migration หรือ config change ไหม
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าปล่อยหรือไม่ปล่อย — เป็นการรับความเสี่ยงซึ่งต้องมีมนุษย์รับผิดชอบ
+## Relationship with Agents
+- **Agents can do:** Summarise the changes in a release, generate the changelog, check whether there are migrations or config changes
+- **Agents cannot do:** Decide whether to ship — that is accepting risk, and a human has to own it
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Change Failure Rate สูงกว่า 15%
-- rollback plan เขียนว่า "revert commit" กับ release ที่มี migration
-- ไม่มีเกณฑ์ verify หลัง deploy ที่เป็นตัวเลข
+## Signals the Team Lacks This Skill
+- Change Failure Rate above 15%
+- A rollback plan that says "revert the commit" for a release containing a migration
+- No numeric post-deploy verification criteria

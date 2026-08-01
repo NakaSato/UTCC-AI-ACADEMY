@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-HUM-001 — Written Communication](skill-hum-001-written-communication.md) · [SKILL-HUM-002 — Decision Documentation](skill-hum-002-decision-documentation.md)
 
-## นิยาม
-ความสามารถในการทำงานร่วมกับคนอื่นโดยไม่ต้องอยู่พร้อมกัน — เขียนให้ครบพอที่อีกฝ่ายทำงานต่อได้ รู้ว่าเรื่องไหนต้องคุยสด และไม่ปล่อยให้คนอื่นรอโดยไม่จำเป็น
+## Definition
+The ability to work with others without being present at the same time — writing completely enough that the other side can carry on, knowing which topics need a live conversation, and not leaving people waiting unnecessarily.
 
-## ทำไมสำคัญตอนนี้
-เมื่อ agent ทำงานตลอดเวลาและอาจติดคำถามตอนตีสอง กระบวนการที่ต้องรอให้คนมาประชุมพร้อมกันจะกลายเป็นคอขวดที่ชัดเจนกว่าเดิมมาก ทีมที่ทำงาน async ไม่เป็นจะได้ประโยชน์จาก agent น้อยกว่าที่ควร
+## Why It Matters Now
+When agents work around the clock and may get stuck on a question at two in the morning, any process that waits for everyone to be in a meeting becomes a far more visible bottleneck than before. Teams that cannot work asynchronously get less out of agents than they should.
 
-## ระดับ
+## Levels
 ### Foundation
-- ตอบข้อความในเวลาที่เหมาะสม
-- อัปเดตสถานะงานของตัวเองให้คนอื่นเห็น
+- Replies to messages in reasonable time
+- Keeps their own work status visible to others
 
 ### Proficient
-- เขียนคำถามที่ตอบได้ในครั้งเดียว (มีบริบท มีตัวเลือก มีสิ่งที่ลองแล้ว)
-- แยกได้ว่าเรื่องไหน async ได้ เรื่องไหนต้องคุยสด
-- ไม่บล็อกคนอื่น — ส่งมอบสิ่งที่พอให้เขาเดินต่อได้ก่อนที่ตัวเองจะเสร็จสมบูรณ์
+- Writes questions that can be answered in one round (with context, options, and what has already been tried)
+- Distinguishes what can be async from what needs a live conversation
+- Does not block others — hands over enough for them to proceed before their own work is fully finished
 
 ### Expert
-- ออกแบบกระบวนการของทีมให้ decision เกิดได้แบบ async
-- จัดการความต่างของเขตเวลาโดยไม่ให้ใครฝ่ายใดฝ่ายหนึ่งเสียเปรียบตลอด
-- รู้ว่าเมื่อไหร่ async กำลังทำให้เรื่องยืดเยื้อและควรเปลี่ยนเป็นการคุย
+- Designs team processes so decisions can be made asynchronously
+- Handles time zone differences without one side always being disadvantaged
+- Knows when async is dragging something out and it should become a conversation
 
-## วิธีประเมิน
-ดูคำถามที่เขาถามในแชท 10 ข้อล่าสุด นับว่ากี่ข้อที่:
-- มีบริบทพอให้ตอบได้ทันที
-- ระบุสิ่งที่ลองมาแล้ว
-- เสนอตัวเลือกให้เลือกแทนที่จะถามปลายเปิด
+## How to Assess
+Look at their last 10 questions in chat and count how many:
+- had enough context to be answered immediately
+- stated what had already been tried
+- offered options to choose from rather than asking open-ended
 
-น้อยกว่าครึ่ง = ยังเป็น Foundation
+Fewer than half = still Foundation.
 
-## เส้นทางพัฒนา
-1. ก่อนถามทุกครั้ง เขียนสามอย่าง: กำลังทำอะไร, ติดตรงไหน, ลองอะไรมาแล้ว
-2. ฝึกเสนอตัวเลือกพร้อม default ที่จะทำถ้าไม่มีใครตอบใน X ชั่วโมง
-3. เปลี่ยนการประชุมสถานะเป็นการเขียนหนึ่งครั้ง แล้วดูว่าเสียอะไรไปจริงไหม
-4. ทบทวนว่าสัปดาห์นี้บล็อกใครไว้บ้างโดยไม่จำเป็น
+## Development Path
+1. Before asking anything, write three things: what you are doing, where you are stuck, what you have tried
+2. Practise proposing options along with the default you will take if nobody replies within X hours
+3. Replace a status meeting with a single written update, then check whether anything was actually lost
+4. Review who you blocked unnecessarily this week
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สรุปสถานะ, ร่างคำถามให้ครบบริบท, แจ้งเตือนเรื่องที่ค้าง
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าเรื่องนี้ต้องคุยสด, สร้างความเข้าใจร่วมในเรื่องที่ละเอียดอ่อน
+## Relationship with Agents
+- **Agents can do:** Summarise status, draft questions with full context, flag outstanding items
+- **Agents cannot do:** Decide that something needs a live conversation, build shared understanding on sensitive topics
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ทุกอย่างต้องรอประชุม
-- คำถามในแชทต้องถามกลับ 3 รอบก่อนจะตอบได้
-- คนในเขตเวลาที่ต่างกันรู้เรื่องช้ากว่าเสมอ
+## Signals the Team Lacks This Skill
+- Everything has to wait for a meeting
+- Chat questions take 3 rounds of clarification before they can be answered
+- People in other time zones always find out last

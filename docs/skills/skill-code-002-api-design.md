@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-002 — Boundary & Module Design](skill-arch-002-boundary-design.md) · [SKILL-TEST-004 — Contract Testing](skill-test-004-contract-testing.md)
 
-## นิยาม
-ความสามารถในการออกแบบ interface ที่ใช้ง่าย ใช้ผิดยาก และเปลี่ยนแปลงได้โดยไม่ทำลายผู้ใช้เดิม — ทั้ง API ภายนอกและ interface ระหว่าง module ภายใน
+## Definition
+The ability to design interfaces that are easy to use, hard to misuse, and changeable without breaking existing consumers — both external APIs and interfaces between internal modules.
 
-## ทำไมสำคัญตอนนี้
-คงเดิมในแง่ความสำคัญ แต่บริบทเปลี่ยน: เมื่อ agent เขียนโค้ดที่เรียก API เหล่านี้ interface ที่ใช้ผิดง่ายจะถูกใช้ผิดในหลายที่พร้อมกันภายในวันเดียว แทนที่จะค่อยๆ ผิดทีละจุด
+## Why It Matters Now
+Its importance is unchanged, but the context is not: when agents write the code calling these APIs, an interface that is easy to misuse gets misused in many places at once within a day, rather than going wrong gradually one site at a time.
 
-## ระดับ
+## Levels
 ### Foundation
-- ทำตาม convention ของ REST/gRPC ที่ทีมใช้อยู่ได้
-- ตั้งชื่อ endpoint และ field ได้สื่อความหมาย
+- Follows the REST/gRPC conventions the team already uses
+- Names endpoints and fields meaningfully
 
 ### Proficient
-- ออกแบบให้ "ใช้ผิดยาก" — type ที่บังคับความถูกต้อง, ค่า default ที่ปลอดภัย
-- จัดการ versioning และ backward compatibility ได้
-- ออกแบบ error response ที่ผู้เรียกจัดการต่อได้จริง
+- Designs for "hard to misuse" — types that enforce correctness, safe defaults
+- Handles versioning and backward compatibility
+- Designs error responses that callers can genuinely act on
 
 ### Expert
-- ออกแบบ API ที่สะท้อน domain ไม่ใช่สะท้อนโครงสร้างตาราง
-- คาดการณ์ทิศทางการเปลี่ยนแปลงแล้วเผื่อไว้โดยไม่ over-engineer
-- จัดการ idempotency, pagination, partial failure อย่างถูกต้อง
+- Designs APIs that reflect the domain rather than the table structure
+- Anticipates the direction of change and leaves room without over-engineering
+- Handles idempotency, pagination, and partial failure correctly
 
-## วิธีประเมิน
-ให้ออกแบบ endpoint สำหรับ "ยกเลิก order" แล้วดูว่าเขาพูดถึง:
-- idempotency key หรือไม่
-- จะเกิดอะไรถ้าเรียกซ้ำ / เรียกพร้อมกันสองครั้ง
-- error case แยกกี่แบบ และผู้เรียกจะแยกแยะได้อย่างไร
+## How to Assess
+Ask them to design an endpoint for "cancel an order", and see whether they mention:
+- an idempotency key
+- what happens on a repeated call / two simultaneous calls
+- how many distinct error cases there are, and how a caller tells them apart
 
-ไม่พูดถึง idempotency เลย = ยังไม่ถึง Proficient สำหรับงานที่แตะเงิน
+Never mentioning idempotency = not yet Proficient for work that touches money.
 
-## เส้นทางพัฒนา
-1. อ่าน API ของบริการที่ออกแบบดี (Stripe, GitHub) และสังเกตวิธีจัดการ error กับ versioning
-2. ฝึกเขียน OpenAPI spec ก่อนเขียน implementation
-3. ทดลองใช้ API ของตัวเองในฐานะ client ภายนอกจริงๆ
-4. ทบทวน breaking change ที่เคยทำ — เกิดจากการออกแบบพลาดตรงไหน
+## Development Path
+1. Read the APIs of well-designed services (Stripe, GitHub) and note how they handle errors and versioning
+2. Practise writing the OpenAPI spec before the implementation
+3. Use your own API as a genuine external client
+4. Review breaking changes you have made — where did the design go wrong?
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สร้าง OpenAPI จากโค้ด, generate client, เขียน handler ตาม contract
-- **Agent ทำแทนไม่ได้:** ตัดสินว่า resource ควรแบ่งอย่างไรตาม domain
+## Relationship with Agents
+- **Agents can do:** Generate OpenAPI from code, generate clients, write handlers against a contract
+- **Agents cannot do:** Decide how resources should be divided along domain lines
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Breaking change บ่อย
-- ทุก error ตอบ 500 หรือ 400 เหมือนกันหมด
-- Client ทุกตัวต้องเขียน workaround เดียวกัน
+## Signals the Team Lacks This Skill
+- Frequent breaking changes
+- Every error comes back as the same 500 or 400
+- Every client has to write the same workaround

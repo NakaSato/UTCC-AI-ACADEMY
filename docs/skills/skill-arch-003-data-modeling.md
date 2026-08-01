@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-002 — Invariant Identification](skill-spec-002-invariant-identification.md) · [SKILL-BLD-004 — Database Operations](skill-bld-004-database-operations.md)
 
-## นิยาม
-ความสามารถในการออกแบบโครงสร้างข้อมูลที่สะท้อนกฎของ domain จริง และบังคับความถูกต้องที่ระดับ schema ไม่ใช่ที่ระดับโค้ด
+## Definition
+The ability to design data structures that reflect the real rules of the domain, and to enforce correctness at the schema level rather than in code.
 
-## ทำไมสำคัญตอนนี้
-โค้ดผิดแก้ได้ ข้อมูลผิดกู้ไม่ได้ — และ agent เขียนโค้ดที่ข้าม validation ได้ง่ายมาก (`update_column`, `insert_all`, raw SQL) constraint ที่ระดับฐานข้อมูลจึงกลายเป็นแนวป้องกันสุดท้ายที่แท้จริง
+## Why It Matters Now
+Bad code can be fixed; bad data cannot be recovered — and agents very easily write code that bypasses validation (`update_column`, `insert_all`, raw SQL). Database-level constraints have therefore become the real last line of defence.
 
-## ระดับ
+## Levels
 ### Foundation
-- ออกแบบตารางจาก entity ที่ชัดเจนได้
-- ใช้ foreign key และ index พื้นฐานเป็น
+- Can design tables from clearly defined entities
+- Can use foreign keys and basic indexes
 
 ### Proficient
-- normalize/denormalize อย่างมีเหตุผล ไม่ใช่ตามสูตร
-- ใส่ constraint (unique, check, not null) ที่สะท้อนกฎธุรกิจ
-- ออกแบบให้รองรับการเปลี่ยนแปลงโดยไม่ต้อง migration ใหญ่ทุกครั้ง
+- Normalises/denormalises for a reason rather than by formula
+- Adds constraints (unique, check, not null) that reflect business rules
+- Designs for change without needing a large migration every time
 
 ### Expert
-- ออกแบบ state machine ที่บังคับได้ที่ระดับข้อมูล
-- จัดการกับ temporal data, soft delete, audit trail อย่างถูกต้อง
-- คาดการณ์ปัญหา performance จากรูปแบบ query ก่อนที่จะเกิด
+- Designs state machines that can be enforced at the data level
+- Handles temporal data, soft deletes, and audit trails correctly
+- Anticipates performance problems from query patterns before they occur
 
-## วิธีประเมิน
-ให้ requirement: "order ยกเลิกได้เฉพาะตอนที่ยังไม่ถูก capture" แล้วถามว่าจะบังคับกฎนี้อย่างไร
-- ตอบว่า "validate ใน service layer" = Foundation
-- ตอบว่า "check constraint + state column + unique index บน idempotency key" = Proficient ขึ้นไป
-- อธิบายได้ว่าถ้ามี concurrent request สองอันจะเกิดอะไร = Expert
+## How to Assess
+Give the requirement: "an order can only be cancelled while it has not yet been captured", then ask how they would enforce it.
+- Answering "validate in the service layer" = Foundation
+- Answering "check constraint + state column + unique index on the idempotency key" = Proficient or above
+- Being able to explain what happens with two concurrent requests = Expert
 
-## เส้นทางพัฒนา
-1. หยิบ business rule ในระบบปัจจุบัน 5 ข้อ แล้วดูว่ามีกี่ข้อที่บังคับที่ DB จริง
-2. ฝึกเขียน check constraint และ partial unique index
-3. ศึกษา isolation level และทดลองสร้าง race condition ให้เกิดจริงในเครื่อง
-4. อ่าน *Designing Data-Intensive Applications* บทที่เกี่ยวกับ transaction
+## Development Path
+1. Take 5 business rules in the current system and check how many are actually enforced in the DB
+2. Practise writing check constraints and partial unique indexes
+3. Study isolation levels and reproduce a real race condition locally
+4. Read the transaction chapters of *Designing Data-Intensive Applications*
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน migration จาก schema ที่ออกแบบแล้ว, เสนอ index จาก query pattern, ตรวจ schema กับ model ให้ตรงกัน
-- **Agent ทำแทนไม่ได้:** ตัดสินว่ากฎธุรกิจข้อไหนต้องเป็น constraint, ประเมินผลกระทบของ schema change ต่อข้อมูลที่มีอยู่
+## Relationship with Agents
+- **Agents can do:** Write migrations from an already-designed schema, suggest indexes from query patterns, check that schema and models agree
+- **Agents cannot do:** Decide which business rules must become constraints, assess the impact of a schema change on existing data
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ข้อมูลในฐานข้อมูลมี state ที่ "เป็นไปไม่ได้" ตามกฎธุรกิจ
-- validation อยู่แต่ในโค้ด ไม่มีที่ schema เลย
-- ต้องเขียน script ซ่อมข้อมูลเป็นประจำ
+## Signals the Team Lacks This Skill
+- The database contains states that are "impossible" under the business rules
+- Validation exists only in code, never in the schema
+- Data-repair scripts have to be written regularly

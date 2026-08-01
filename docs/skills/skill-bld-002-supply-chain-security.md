@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-004 — Threat Modeling](skill-arch-004-threat-modeling.md) · [SKILL-BLD-001 — CI/CD Engineering](skill-bld-001-cicd-engineering.md)
 
-## นิยาม
-ความสามารถในการควบคุมและตรวจสอบทุกอย่างที่เข้ามาอยู่ใน artifact สุดท้าย — dependency, base image, build tool — และพิสูจน์ได้ว่าสิ่งที่ deploy คือสิ่งที่ตั้งใจสร้าง
+## Definition
+The ability to control and audit everything that ends up in the final artifact — dependencies, base images, build tools — and to prove that what is deployed is what was meant to be built.
 
-## ทำไมสำคัญตอนนี้
-Agent เพิ่ม dependency ได้เร็วกว่าที่มนุษย์ตรวจทัน และมักเสนอ package ใหม่ทุกครั้งที่เจอปัญหา ทำให้ attack surface โตเร็วกว่ายุคก่อนมาก SBOM เปลี่ยนจากเอกสาร compliance เป็นเครื่องมือปฏิบัติการที่ตอบได้ภายในไม่กี่นาทีว่า "เรามีเวอร์ชันที่มีช่องโหว่อยู่ตรงไหนบ้าง"
+## Why It Matters Now
+Agents add dependencies faster than humans can review them, and tend to propose a new package every time they hit a problem, so the attack surface grows far faster than it used to. The SBOM has gone from a compliance document to an operational tool that can answer, within minutes, "where do we have the vulnerable version?"
 
-## ระดับ
+## Levels
 ### Foundation
-- รัน dependency scanner และเข้าใจผลลัพธ์
-- อัปเดต dependency ที่มี CVE ได้
+- Runs a dependency scanner and understands the results
+- Can update a dependency that has a CVE
 
 ### Proficient
-- สร้างและใช้ SBOM ใน pipeline
-- ตั้ง policy ว่า severity ระดับไหนบล็อก build
-- ใช้ lockfile และ pin เวอร์ชันอย่างถูกต้อง
+- Produces and uses an SBOM in the pipeline
+- Sets policy on which severity level blocks a build
+- Uses lockfiles and pins versions correctly
 
 ### Expert
-- เซ็นและ verify artifact (cosign, SLSA provenance)
-- ประเมินความเสี่ยงของ dependency ก่อนรับเข้า (maintainer, ความถี่การอัปเดต, จำนวน transitive dep)
-- ออกแบบกระบวนการตอบสนองเมื่อพบ CVE ระดับวิกฤตใน dependency ที่ใช้ทั่วระบบ
+- Signs and verifies artifacts (cosign, SLSA provenance)
+- Assesses the risk of a dependency before adopting it (maintainers, update cadence, number of transitive deps)
+- Designs the response process for a critical CVE in a dependency used across the whole system
 
-## วิธีประเมิน
-ถาม: "ถ้าพรุ่งนี้มี CVE ระดับ 10 ใน library ที่ใช้กันทั่วไป เราจะรู้ภายในกี่นาทีว่าระบบไหนของเราได้รับผลกระทบ และแก้ได้ภายในเท่าไหร่"
-ตอบไม่ได้ = ยังไม่มี SBOM ที่ใช้งานจริง
+## How to Assess
+Ask: "if tomorrow there is a severity-10 CVE in a widely used library, how many minutes until we know which of our systems are affected, and how long to fix it?"
+No answer = there is no SBOM in real use.
 
-## เส้นทางพัฒนา
-1. สร้าง SBOM ของโปรเจกต์ปัจจุบันด้วย syft แล้วดูว่ามี dependency กี่ตัวจริงๆ
-2. ตั้ง gate ที่บล็อก CVE ระดับ Critical ใน CI
-3. ทำ policy ว่าการเพิ่ม dependency ใหม่ต้องมีเหตุผลบันทึกไว้ (Gemfile/package.json เป็น Tier C)
-4. ทดลองเซ็น artifact ด้วย cosign และ verify ก่อน deploy
+## Development Path
+1. Generate an SBOM of the current project with syft and see how many dependencies there really are
+2. Add a gate that blocks Critical CVEs in CI
+3. Adopt a policy that every new dependency needs a recorded rationale (Gemfile/package.json are Tier C)
+4. Try signing artifacts with cosign and verifying before deploy
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สร้าง SBOM, สรุป CVE, เสนอเวอร์ชันที่ปลอดภัย, ตั้งค่า scanner
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าจะรับ dependency ตัวใหม่หรือไม่ — และ agent เองคือแหล่งที่มาของ dependency ใหม่ที่ต้องถูกควบคุม
+## Relationship with Agents
+- **Agents can do:** Generate SBOMs, summarise CVEs, propose safe versions, configure scanners
+- **Agents cannot do:** Decide whether to take on a new dependency — and agents are themselves the source of new dependencies that needs controlling
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ไม่มีใครรู้ว่ามี dependency กี่ตัว
-- Lockfile ไม่ถูก commit
-- ตอบไม่ได้ว่า artifact ที่ deploy สร้างจาก commit ไหน
+## Signals the Team Lacks This Skill
+- Nobody knows how many dependencies there are
+- Lockfiles are not committed
+- Nobody can say which commit the deployed artifact was built from

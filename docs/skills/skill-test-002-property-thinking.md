@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-002 — Invariant Identification](skill-spec-002-invariant-identification.md) · [SKILL-TEST-001 — Test Design](skill-test-001-test-design.md)
 
-## นิยาม
-ความสามารถในการคิดเป็น **คุณสมบัติที่ต้องจริงสำหรับ input ทุกตัว** แทนที่จะคิดเป็นตัวอย่างทีละกรณี
+## Definition
+The ability to think in terms of **properties that must hold for every input** rather than in terms of one example at a time.
 
-## ทำไมสำคัญตอนนี้
-Example-based test ทดสอบเฉพาะกรณีที่คนเขียนคิดถึง — ซึ่งเป็นเซตเดียวกับที่ agent คิดถึงตอนเขียนโค้ด ผลคือ test ผ่านครบแต่ระบบยังผิดในกรณีที่ไม่มีใครนึกออก property test เป็นเครื่องมือเดียวที่หลุดออกจากกับดักนี้ได้
+## Why It Matters Now
+Example-based tests only test the cases the author thought of — the same set the agent thought of while writing the code. The result is a fully passing suite over a system that is still wrong in the cases nobody imagined. Property tests are the only tool that escapes this trap.
 
-## ระดับ
+## Levels
 ### Foundation
-- เข้าใจความต่างระหว่าง example test กับ property test
+- Understands the difference between an example test and a property test
 
 ### Proficient
-- ระบุ property ที่ตรวจได้ เช่น round-trip (encode แล้ว decode ได้ค่าเดิม), idempotency, commutativity, invariant หลังทำงาน
-- เขียน property test ด้วย library ที่ทีมใช้ (proptest, QuickCheck, Hypothesis, jqwik)
-- ออกแบบ generator ที่สร้าง input ที่มีความหมาย
+- Identifies checkable properties: round-trip (encode then decode returns the original), idempotency, commutativity, invariants that hold after an operation
+- Writes property tests with the library the team uses (proptest, QuickCheck, Hypothesis, jqwik)
+- Designs generators that produce meaningful inputs
 
 ### Expert
-- หา property ในโดเมนที่ไม่ชัดเจนว่ามี property อะไร
-- ใช้ shrinking เพื่อลดกรณีที่ล้มให้เหลือตัวอย่างเล็กที่สุด แล้วตีความ
-- ใช้ property test ตรวจ concurrency และ state machine
+- Finds properties in domains where it is not obvious there are any
+- Uses shrinking to reduce a failing case to the smallest example, then interprets it
+- Uses property tests to check concurrency and state machines
 
-## วิธีประเมิน
-ให้ฟังก์ชัน `merge_orders(a, b)` แล้วถามว่า property มีอะไรบ้าง
-- ตอบเป็นตัวอย่าง input/output = Foundation
-- ตอบว่า "merge(a,b) = merge(b,a)" และ "merge(a, empty) = a" = Proficient
-- เพิ่ม "ผลรวมของ item หลัง merge = ผลรวมก่อน merge" และเห็น property ที่เกี่ยวกับ invariant ทางธุรกิจ = Expert
+## How to Assess
+Give the function `merge_orders(a, b)` and ask what the properties are.
+- Answering with example inputs/outputs = Foundation
+- Answering "merge(a,b) = merge(b,a)" and "merge(a, empty) = a" = Proficient
+- Adding "the sum of items after merging = the sum before merging" and seeing properties tied to business invariants = Expert
 
-## เส้นทางพัฒนา
-1. หยิบฟังก์ชันบริสุทธิ์ในระบบ 5 ตัว เขียน property ให้ได้ตัวละ 3 ข้อ
-2. ฝึกมองหา property มาตรฐาน: round-trip, idempotent, invariant, oracle (เทียบกับ implementation ที่ช้าแต่ถูกแน่)
-3. ใช้ property test กับ business logic ที่แตะเงินก่อนเป็นอันดับแรก
-4. อ่านตัวอย่าง property test ของ library ที่ใช้ในโปรเจกต์จริง
+## Development Path
+1. Take 5 pure functions in the system and write 3 properties for each
+2. Practise looking for the standard properties: round-trip, idempotent, invariant, oracle (comparison against a slow but certainly correct implementation)
+3. Apply property tests to business logic that touches money first
+4. Read the property tests of the libraries used in real projects
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน property test เมื่อบอก property ให้แล้ว, สร้าง generator, ปรับ shrinking
-- **Agent ทำแทนไม่ได้:** ระบุว่า property คืออะไร — เป็นความรู้ domain ไม่ใช่ pattern
+## Relationship with Agents
+- **Agents can do:** Write property tests once the properties are given, build generators, tune shrinking
+- **Agents cannot do:** Identify what the properties are — that is domain knowledge, not pattern matching
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Test ทั้ง repo เป็น example-based ทั้งหมด
-- Bug ที่พบบ่อยคือ "ลืมคิดถึงกรณีนี้"
+## Signals the Team Lacks This Skill
+- Every test in the repo is example-based
+- The most common bug report is "we didn't think of this case"

@@ -21,41 +21,41 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-003 — Data Modeling](skill-arch-003-data-modeling.md) · [SKILL-CODE-004 — Production Debugging](skill-code-004-production-debugging.md)
 
-## นิยาม
-ความสามารถในการเขียนและตรวจสอบโค้ดที่ทำงานพร้อมกันหลายเส้นทาง หรือกระจายข้ามเครื่อง โดยเข้าใจว่าอะไรที่รับประกันไม่ได้บ้าง
+## Definition
+The ability to write and review code that runs along several paths at once, or is distributed across machines, with an understanding of what cannot be guaranteed.
 
-## ทำไมสำคัญตอนนี้
-เป็นพื้นที่ที่ agent พลาดบ่อยและพลาดแบบมองไม่เห็น — โค้ดที่มี race condition ผ่าน test ทุกครั้งในเครื่อง dev แล้วพังเฉพาะตอนมี load จริง ไม่มี static analysis ตัวไหนจับได้ครบ ทำให้ต้องพึ่งการตรวจสอบของมนุษย์ที่มีทักษะนี้เท่านั้น
+## Why It Matters Now
+This is an area where agents fail often and invisibly — code with a race condition passes every test on a dev machine and only breaks under real load. No static analysis catches all of it, which leaves human review by someone with this skill as the only defence.
 
-## ระดับ
+## Levels
 ### Foundation
-- เข้าใจความต่างระหว่าง concurrency กับ parallelism
-- ใช้ primitive พื้นฐาน (mutex, channel, async/await) ได้ตามตัวอย่าง
+- Understands the difference between concurrency and parallelism
+- Uses basic primitives (mutex, channel, async/await) by following examples
 
 ### Proficient
-- ระบุ critical section และเลือกกลไกป้องกันได้เหมาะสม
-- เข้าใจ transaction isolation level และผลของแต่ละระดับ
-- ออกแบบ retry ที่ปลอดภัย (idempotent + backoff + jitter)
+- Identifies critical sections and picks appropriate protection mechanisms
+- Understands transaction isolation levels and what each one implies
+- Designs safe retries (idempotent + backoff + jitter)
 
 ### Expert
-- วิเคราะห์ failure mode ของระบบกระจายได้ (partial failure, network partition, clock skew)
-- ออกแบบ consistency model ที่เหมาะกับความต้องการจริง ไม่ใช่เลือก strong ทุกกรณี
-- อ่านโค้ดแล้วเห็น race condition ที่ยังไม่เคยเกิด
+- Analyses the failure modes of distributed systems (partial failure, network partition, clock skew)
+- Designs a consistency model that fits the actual requirement rather than reaching for strong consistency every time
+- Reads code and sees race conditions that have not happened yet
 
-## วิธีประเมิน
-ให้โค้ดที่มี race condition ฝังอยู่ (เช่น check-then-act บนยอดคงเหลือ) แล้วให้หาภายใน 10 นาที
-คำถามต่อ: "ถ้ามีสอง request มาพร้อมกัน จะเกิดอะไร และแก้อย่างไรโดยไม่ใช้ lock ทั้งตาราง"
+## How to Assess
+Give code with a planted race condition (for example check-then-act on a balance) and ask them to find it within 10 minutes.
+Follow up: "if two requests arrive at once, what happens, and how would you fix it without locking the whole table?"
 
-## เส้นทางพัฒนา
-1. สร้าง race condition ให้เกิดจริงในเครื่องด้วย load test — ต้องเห็นกับตาถึงจะเข้าใจ
-2. ศึกษา isolation level ของ DB ที่ใช้ และทดลองแต่ละระดับ
-3. อ่าน *Designing Data-Intensive Applications* บทที่ 7–9
-4. ฝึกเขียน property test ที่รันโค้ดเดียวกันแบบขนานแล้วตรวจ invariant
+## Development Path
+1. Reproduce a real race condition locally with a load test — you have to see it to understand it
+2. Study the isolation levels of the DB you use, and experiment with each
+3. Read *Designing Data-Intensive Applications*, chapters 7–9
+4. Practise writing property tests that run the same code in parallel and check invariants
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียนโค้ด async ตามรูปแบบมาตรฐาน, ใส่ retry/backoff, แปลง sync เป็น async
-- **Agent ทำแทนไม่ได้:** ตรวจว่าโค้ดที่มันเขียนปลอดภัยภายใต้ concurrency — ต้องมีมนุษย์ที่มีทักษะนี้อ่านทุกครั้งสำหรับงาน Tier C
+## Relationship with Agents
+- **Agents can do:** Write async code following standard patterns, add retry/backoff, convert sync to async
+- **Agents cannot do:** Verify that the code they wrote is safe under concurrency — a human with this skill must read it every time for Tier C work
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Bug ที่ "เกิดบ้างไม่เกิดบ้าง" และปิดด้วยการ retry
-- ไม่มีใครตอบได้ว่าใช้ isolation level อะไรอยู่
+## Signals the Team Lacks This Skill
+- Bugs that "happen sometimes" and get closed by adding a retry
+- Nobody can say which isolation level is in use

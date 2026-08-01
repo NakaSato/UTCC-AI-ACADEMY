@@ -21,43 +21,43 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-BLD-002 — Supply Chain Security](skill-bld-002-supply-chain-security.md) · [SKILL-AI-004 — Agent Orchestration](skill-ai-004-agent-orchestration.md)
 
-## นิยาม
-ความสามารถในการมองระบบจากมุมของผู้โจมตี ระบุได้ว่าอะไรมีค่าพอให้ถูกโจมตี ทางเข้ามีที่ไหนบ้าง และสิ่งที่เราถือว่า "เชื่อถือได้" นั้นเชื่อได้จริงหรือไม่
+## Definition
+The ability to look at a system from an attacker's point of view — identifying what is valuable enough to be attacked, where the ways in are, and whether the things we treat as "trusted" really are.
 
-## ทำไมสำคัญตอนนี้
-ระบบที่มี AI agent เพิ่ม attack surface ใหม่ทั้งชุด — prompt injection ผ่าน ticket/PR comment, credential ที่ agent เข้าถึงได้, dependency ที่ agent เพิ่มเอง, egress ที่ไม่มีใครจำกัด ทักษะนี้จึงไม่ใช่เรื่องของทีม security อย่างเดียวอีกต่อไป
+## Why It Matters Now
+Systems with AI agents add a whole new attack surface — prompt injection via ticket/PR comments, credentials the agent can reach, dependencies the agent adds on its own, egress nobody restricts. This is no longer only the security team's concern.
 
-## ระดับ
+## Levels
 ### Foundation
-- รู้จัก OWASP Top 10 และตรวจได้ว่าโค้ดมีรูปแบบเสี่ยงที่รู้จักหรือไม่
+- Knows the OWASP Top 10 and can spot known risky patterns in code
 
 ### Proficient
-- ทำ STRIDE หรือกรอบเทียบเท่ากับ feature ใหม่ได้
-- ระบุ trust boundary ในระบบได้ชัดเจน
-- แยก authentication ออกจาก authorization ในการออกแบบ
+- Can run STRIDE or an equivalent framework over a new feature
+- Can clearly identify the trust boundaries in the system
+- Separates authentication from authorization in the design
 
 ### Expert
-- มองเห็นช่องโหว่ที่เกิดจากการต่อกันของส่วนที่แต่ละส่วนปลอดภัยดี
-- ประเมินได้ว่าการควบคุมไหนคุ้มค่าและไหนเป็นพิธีกรรม
-- ออกแบบระบบที่จำกัดความเสียหายเมื่อถูกเจาะแล้ว ไม่ใช่แค่กันไม่ให้ถูกเจาะ
+- Sees vulnerabilities that arise from the composition of parts that are each individually secure
+- Assesses which controls are worth the cost and which are ritual
+- Designs systems that limit the damage after a breach, not just prevent one
 
-## วิธีประเมิน
-ให้ออกแบบ: "agent อ่าน ticket จาก Jira แล้วเขียนโค้ดตามนั้น" แล้วถามว่ามีความเสี่ยงอะไรบ้าง
-- ไม่พูดถึง prompt injection เลย = Foundation
-- พูดถึง injection และเสนอให้แยก instruction ออกจาก data = Proficient
-- พูดถึง egress control, credential scope, และการจำกัดความเสียหายหลังถูกเจาะ = Expert
+## How to Assess
+Ask them to design: "an agent reads a ticket from Jira and writes code accordingly", then ask what the risks are.
+- Never mentions prompt injection = Foundation
+- Mentions injection and proposes separating instructions from data = Proficient
+- Mentions egress control, credential scope, and limiting post-breach damage = Expert
 
-## เส้นทางพัฒนา
-1. ทำ threat model ให้ feature ที่กำลังจะทำ ใช้เวลา 30 นาที ด้วยกรอบ STRIDE
-2. วาด trust boundary ของระบบปัจจุบัน แล้วถามทีละเส้นว่า "ถ้าฝั่งนั้นถูกยึด เกิดอะไร"
-3. อ่าน incident report ของบริษัทอื่นเดือนละหนึ่งฉบับ
-4. ฝึกโจมตีระบบตัวเองในสภาพแวดล้อมทดสอบ
+## Development Path
+1. Threat-model the feature you are about to build, in 30 minutes, using STRIDE
+2. Draw the trust boundaries of the current system, then ask of each line: "if that side is taken over, what happens?"
+3. Read one other company's incident report every month
+4. Practise attacking your own system in a test environment
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ตรวจหา pattern ที่รู้จัก, สรุป CVE, ร่าง threat model เบื้องต้นจาก architecture diagram
-- **Agent ทำแทนไม่ได้:** ประเมินว่าอะไรมีค่าพอให้ถูกโจมตีในบริบทธุรกิจของเรา, ตัดสินว่าความเสี่ยงระดับไหนที่ยอมรับได้
+## Relationship with Agents
+- **Agents can do:** Detect known patterns, summarise CVEs, draft a first-pass threat model from an architecture diagram
+- **Agents cannot do:** Judge what is valuable enough to be attacked in our business context, decide what level of risk is acceptable
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Security เข้ามาเกี่ยวข้องครั้งแรกตอนก่อน release
-- ไม่มีใครตอบได้ว่า agent เข้าถึงอะไรได้บ้าง
-- คิดว่า "ระบบภายใน" แปลว่าปลอดภัย
+## Signals the Team Lacks This Skill
+- Security first gets involved just before release
+- Nobody can say what the agents have access to
+- People assume "internal system" means safe

@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-003 — Data Modeling](skill-arch-003-data-modeling.md) · [SKILL-BLD-003 — Release Risk Assessment](skill-bld-003-release-risk-assessment.md)
 
-## นิยาม
-ความสามารถในการเปลี่ยนแปลง schema และข้อมูลบนระบบที่ทำงานอยู่จริง โดยไม่ทำให้เกิด downtime และไม่ทำข้อมูลเสียหาย
+## Definition
+The ability to change schema and data on a live system without causing downtime and without corrupting data.
 
-## ทำไมสำคัญตอนนี้
-Migration เป็น **สิ่งเดียวในระบบส่วนใหญ่ที่ rollback ไม่ได้จริง** และเป็นสิ่งที่ agent เขียนได้เร็วมากแต่เขียนผิดบ่อย เช่น `add_index` โดยไม่ใช้ `concurrently` ซึ่งล็อกทั้งตารางบน production นี่คือเหตุผลที่ migration ควรเป็น Tier C โดยอัตโนมัติทุกครั้ง
+## Why It Matters Now
+Migrations are **the one thing in most systems that genuinely cannot be rolled back**, and they are something agents write very quickly and often get wrong — for example `add_index` without `concurrently`, which locks the whole table in production. This is why migrations should automatically be Tier C every time.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียน migration พื้นฐานและรันบน dev ได้
-- เข้าใจว่า index คืออะไร
+- Writes basic migrations and runs them on dev
+- Understands what an index is
 
 ### Proficient
-- แยก schema change ออกจาก code change (expand → migrate → contract)
-- ใช้ `concurrently` และเข้าใจว่า operation ไหนล็อกอะไร
-- อ่าน explain plan และประเมินผลกระทบก่อนรัน
+- Separates schema changes from code changes (expand → migrate → contract)
+- Uses `concurrently` and understands which operations lock what
+- Reads explain plans and assesses impact before running
 
 ### Expert
-- ทำ backfill ข้อมูลปริมาณมากแบบทยอยโดยไม่กระทบ production
-- ประเมินผลของ migration บนตารางขนาดใหญ่จากข้อมูลจริง ไม่ใช่จาก dev
-- ออกแบบ schema change ที่ deploy ได้แม้มีโค้ดสองเวอร์ชันทำงานพร้อมกัน
+- Backfills large volumes of data incrementally without affecting production
+- Assesses the impact of a migration on a large table from real data, not from dev
+- Designs schema changes that can be deployed while two versions of the code run side by side
 
-## วิธีประเมิน
-ให้โจทย์: "ต้องเปลี่ยนชื่อคอลัมน์ `amount` เป็น `amount_cents` บนตารางที่มี 50 ล้านแถว และระบบห้ามหยุด"
-- ตอบว่า `rename_column` = อันตราย ยังไม่ถึง Proficient
-- ตอบเป็นหลายเฟส (เพิ่มคอลัมน์ใหม่ → เขียนสองที่ → backfill ทยอย → อ่านจากที่ใหม่ → ลบเก่าใน release ถัดไป) = Proficient ขึ้นไป
-- ระบุด้วยว่าจะ backfill เป็น batch ขนาดเท่าไหร่และตรวจ replication lag = Expert
+## How to Assess
+Give the problem: "rename the column `amount` to `amount_cents` on a table with 50 million rows, and the system must not go down."
+- Answering `rename_column` = dangerous, not yet Proficient
+- Answering with multiple phases (add the new column → write to both → backfill incrementally → read from the new one → drop the old one in a later release) = Proficient or above
+- Also specifying the backfill batch size and checking replication lag = Expert
 
-## เส้นทางพัฒนา
-1. ติดตั้งเครื่องมือที่บล็อก migration อันตราย (strong_migrations หรือเทียบเท่า)
-2. ทดลองรัน migration บน dataset ขนาดใกล้เคียง production
-3. ฝึกอ่าน explain plan และทดลองว่า operation ไหนล็อกอะไรบ้าง
-4. ศึกษา expand-migrate-contract pattern และทำจริงหนึ่งรอบเต็ม
+## Development Path
+1. Install tooling that blocks dangerous migrations (strong_migrations or equivalent)
+2. Practise running migrations against a dataset close to production size
+3. Practise reading explain plans and experiment with which operations lock what
+4. Study the expand-migrate-contract pattern and run through one full cycle for real
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ร่าง migration, เขียน backfill script, สร้าง rollback migration
-- **Agent ทำแทนไม่ได้:** ตัดสินว่า migration นี้ปลอดภัยบนข้อมูลจริง — ต้องมีมนุษย์อ่าน explain plan ทุกครั้ง
+## Relationship with Agents
+- **Agents can do:** Draft migrations, write backfill scripts, generate rollback migrations
+- **Agents cannot do:** Judge whether a migration is safe against real data — a human has to read the explain plan every time
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- เคยมี downtime จาก migration
-- Migration ถูก deploy พร้อมกับ code change เสมอ
-- ไม่มีใครรู้ขนาดของตารางที่กำลังจะแก้
+## Signals the Team Lacks This Skill
+- Downtime has been caused by a migration before
+- Migrations are always deployed together with code changes
+- Nobody knows the size of the table about to be changed

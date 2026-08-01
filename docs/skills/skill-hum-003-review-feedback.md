@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-AI-002 — Agent Output Verification](skill-ai-002-agent-output-verification.md) · [SKILL-HUM-001 — Written Communication](skill-hum-001-written-communication.md)
 
-## นิยาม
-ความสามารถในการให้ความเห็นต่องานของคนอื่นในแบบที่ทำให้งานดีขึ้นและคนอยากทำงานต่อ — แยกความเห็นที่ต้องแก้ ออกจากความเห็นที่เป็นรสนิยม
+## Definition
+The ability to comment on someone else's work in a way that makes the work better and leaves them wanting to keep working — separating comments that must be acted on from comments that are taste.
 
-## ทำไมสำคัญตอนนี้
-บทบาทเปลี่ยนไปสองอย่าง หนึ่ง: เวลาที่เคยใช้เขียนโค้ดย้ายมาอยู่ที่การรีวิว ทำให้ทักษะนี้กินสัดส่วนของงานมากขึ้น สอง: เมื่อคนส่ง diff ที่ agent เขียน การให้ feedback ต้องแยกให้ออกว่ากำลังวิจารณ์การตัดสินใจของคน หรือวิจารณ์ output ของเครื่อง — ซึ่งเปลี่ยนทั้งน้ำเสียงและเนื้อหาที่ควรพูด
+## Why It Matters Now
+The role has changed in two ways. First: time that used to go into writing code has moved into reviewing, so this skill takes up a larger share of the job. Second: when someone submits an agent-written diff, feedback has to distinguish between critiquing a person's decisions and critiquing a machine's output — which changes both the tone and the substance of what should be said.
 
-## ระดับ
+## Levels
 ### Foundation
-- ชี้จุดที่มีปัญหาได้ชัดเจน
-- ใช้ภาษาสุภาพ
+- Points out problems clearly
+- Uses polite language
 
 ### Proficient
-- แยกระดับความเห็น: ต้องแก้ / ควรพิจารณา / แค่ความเห็น (nit)
-- อธิบายเหตุผลไม่ใช่แค่บอกให้เปลี่ยน
-- ชมสิ่งที่ทำได้ดีด้วย ไม่ใช่ชี้แต่ปัญหา
+- Distinguishes levels of comment: must fix / worth considering / just an opinion (nit)
+- Explains the reasoning instead of just asking for a change
+- Also praises what was done well rather than only flagging problems
 
 ### Expert
-- ให้ feedback ที่สอนหลักการ ไม่ใช่แก้เฉพาะกรณี
-- รู้ว่าเมื่อไหร่ควรคุยด้วยเสียงแทนการพิมพ์ (เมื่อมีความเห็นต่างเชิงโครงสร้าง)
-- สร้างวัฒนธรรมที่คนกล้าส่งงานที่ยังไม่สมบูรณ์มาให้ดู
+- Gives feedback that teaches a principle rather than fixing one case
+- Knows when to switch to a voice conversation instead of typing (when the disagreement is structural)
+- Builds a culture where people feel safe showing unfinished work
 
-## วิธีประเมิน
-ดู review comment ย้อนหลัง 20 ข้อ แล้วนับ:
-- กี่ % ที่ระบุระดับความสำคัญ
-- กี่ % ที่อธิบายเหตุผล
-- กี่ % ที่เป็นเรื่องรสนิยมล้วนแต่เขียนเหมือนเป็นข้อบังคับ
+## How to Assess
+Look back at 20 review comments and count:
+- what % state a level of importance
+- what % explain the reasoning
+- what % are pure taste but are written as though mandatory
 
-## เส้นทางพัฒนา
-1. ใช้ prefix ทุกความเห็น: `[must]` `[consider]` `[nit]`
-2. บังคับตัวเองให้เขียนเหตุผลอย่างน้อยหนึ่งประโยคต่อความเห็น
-3. ทบทวน: ความเห็นที่ให้ไปทำให้งานดีขึ้นจริงกี่ข้อ
-4. ถามคนที่รับ feedback ว่าข้อไหนมีประโยชน์ที่สุดและข้อไหนกวนใจ
+## Development Path
+1. Prefix every comment: `[must]` `[consider]` `[nit]`
+2. Force yourself to write at least one sentence of reasoning per comment
+3. Review afterwards: how many of your comments actually made the work better?
+4. Ask the people receiving feedback which comments were most useful and which were noise
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ชี้ปัญหาทางเทคนิคที่ตรวจได้อัตโนมัติ (ควรย้ายไปเป็น linter แทนที่จะเป็น comment)
-- **Agent ทำแทนไม่ได้:** สอน, สร้างความไว้ใจ, ตัดสินว่าเรื่องนี้คุ้มที่จะยืนกรานหรือไม่
+## Relationship with Agents
+- **Agents can do:** Flag technical problems that can be checked automatically (which should become linter rules rather than comments)
+- **Agents cannot do:** Teach, build trust, decide whether a point is worth insisting on
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Review comment ส่วนใหญ่เป็นเรื่อง format ที่ linter ควรจับ
-- คนกลัวการส่ง PR
-- ความเห็นเรื่องรสนิยมทำให้ PR ค้างหลายวัน
+## Signals the Team Lacks This Skill
+- Most review comments are about formatting a linter should catch
+- People are afraid to open a PR
+- Taste-based comments leave PRs stalled for days

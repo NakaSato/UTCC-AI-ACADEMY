@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-TEST-001 — Test Design](skill-test-001-test-design.md) · [SKILL-ARCH-004 — Threat Modeling](skill-arch-004-threat-modeling.md)
 
-## นิยาม
-ความสามารถในการจัดหาและจัดการข้อมูลสำหรับทดสอบที่ **สมจริงพอที่จะเชื่อถือได้** และ **deterministic พอที่จะทำซ้ำได้** โดยไม่ละเมิดความเป็นส่วนตัว
+## Definition
+The ability to source and manage test data that is **realistic enough to trust** and **deterministic enough to reproduce**, without violating privacy.
 
-## ทำไมสำคัญตอนนี้
-Agent รัน test suite ซ้ำหลายรอบใน self-verify loop ถ้าข้อมูลทดสอบไม่ deterministic จะเกิด flaky test ซึ่งทำให้ agent วนแก้โค้ดที่ไม่ได้ผิด และเผาทั้งเวลาและงบประมาณไปเรื่อยๆ
+## Why It Matters Now
+Agents run the test suite repeatedly in a self-verify loop. If the test data is not deterministic, tests turn flaky, which sends the agent round in circles fixing code that was never wrong, burning both time and budget.
 
-## ระดับ
+## Levels
 ### Foundation
-- ใช้ factory/fixture ที่มีอยู่ได้
-- สร้างข้อมูลทดสอบสำหรับกรณีง่ายๆ
+- Uses the existing factories/fixtures
+- Creates test data for simple cases
 
 ### Proficient
-- ออกแบบ factory ที่ประกอบกันได้และ deterministic (fixed seed)
-- แยกข้อมูลระหว่าง test ไม่ให้รั่วถึงกัน
-- จัดการ data สำหรับ integration test ที่ต้องใช้ DB จริง
+- Designs composable, deterministic factories (fixed seed)
+- Isolates data between tests so nothing leaks across
+- Manages data for integration tests that need a real DB
 
 ### Expert
-- ออกแบบกลยุทธ์ข้อมูลสำหรับทั้งระบบ รวมถึงการ anonymize ข้อมูลจริง
-- จัดการข้อมูลสำหรับทดสอบ migration และ backward compatibility
-- ทำให้ test suite รันขนานได้โดยไม่ชนกัน
+- Designs a system-wide data strategy, including anonymising real data
+- Manages data for testing migrations and backward compatibility
+- Makes the suite runnable in parallel without collisions
 
-## วิธีประเมิน
-ถาม: "test ตัวนี้ผ่านตอนรันเดี่ยว แต่ล้มตอนรันทั้ง suite เพราะอะไรได้บ้าง"
-คำตอบที่ดีจะพูดถึง: shared state, ลำดับการรัน, ข้อมูลที่ไม่ถูกล้าง, เวลา/random ที่ไม่ถูก freeze, autoincrement id ที่ถูก assume
+## How to Assess
+Ask: "this test passes on its own but fails when the whole suite runs — what could cause that?"
+A good answer covers: shared state, run order, data not being cleaned up, time/randomness not frozen, assumptions about autoincrement ids.
 
-## เส้นทางพัฒนา
-1. ตรวจ test suite ปัจจุบันหา test ที่พึ่งพาลำดับการรัน
-2. Freeze เวลาและ random seed ในทุก test
-3. ทำให้ suite รันขนานได้ แล้วดูว่าอะไรพัง — สิ่งที่พังคือ shared state ที่ซ่อนอยู่
-4. ตั้ง policy ว่าห้ามใช้ข้อมูล production ที่มี PII แม้ mask แล้ว
+## Development Path
+1. Audit the current suite for tests that depend on run order
+2. Freeze time and the random seed in every test
+3. Make the suite run in parallel and see what breaks — what breaks is the hidden shared state
+4. Adopt a policy against using production data containing PII, even masked
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สร้าง factory, generate ข้อมูลสังเคราะห์, หา test ที่พึ่งพา shared state
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าข้อมูลแบบไหนสมจริงพอ, นโยบายเรื่อง PII
+## Relationship with Agents
+- **Agents can do:** Build factories, generate synthetic data, find tests that depend on shared state
+- **Agents cannot do:** Judge what data is realistic enough, set PII policy
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Test flaky ที่แก้ด้วยการ retry
-- ต้องรัน test เรียงลำดับเท่านั้นถึงจะผ่าน
-- ข้อมูลจาก production ถูก copy มาใช้ทดสอบ
+## Signals the Team Lacks This Skill
+- Flaky tests fixed by adding retries
+- Tests that only pass when run in a specific order
+- Production data copied over for testing

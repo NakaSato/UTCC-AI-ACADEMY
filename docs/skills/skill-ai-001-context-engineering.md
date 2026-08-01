@@ -21,45 +21,45 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-001 — Spec Writing](skill-spec-001-spec-writing.md) · [SKILL-AI-002 — Agent Output Verification](skill-ai-002-agent-output-verification.md)
 
-## นิยาม
-ความสามารถในการจัดเตรียมบริบทให้ agent ทำงานได้ถูกต้อง — เลือกว่าอะไรควรอยู่ในบริบท อะไรไม่ควร ลำดับการทำงานที่ให้ผลดีที่สุด และการแบ่งงานให้อยู่ในขนาดที่ agent ทำได้ดี
+## Definition
+The ability to prepare the context an agent needs to do the work correctly — deciding what belongs in context and what does not, the sequence that produces the best results, and how to size the work so the agent handles it well.
 
-## ทำไมสำคัญตอนนี้
-ทักษะใหม่ทั้งหมด และเป็นตัวคูณของทุกอย่างที่ agent ทำ ความต่างระหว่างคนที่มีทักษะนี้กับไม่มีอยู่ที่ผลลัพธ์ต่างกันหลายเท่าจาก agent ตัวเดียวกัน
+## Why It Matters Now
+An entirely new skill, and a multiplier on everything an agent does. The gap between someone who has it and someone who does not shows up as a several-fold difference in output from the very same agent.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียนคำสั่งที่ชัดเจน ระบุสิ่งที่ต้องการและรูปแบบผลลัพธ์
-- แนบไฟล์ที่เกี่ยวข้องให้
+- Writes clear instructions that state the desired outcome and output format
+- Attaches the relevant files
 
 ### Proficient
-- **แบ่งงานให้เล็กพอที่ตรวจสอบได้** — เป็นตัวชี้วัดสำคัญที่สุดของระดับนี้
-- เลือก context ที่เกี่ยวข้องจริงแทนที่จะโยนทั้ง repo (ลด token cost และลดโอกาสสับสน)
-- ใช้ลำดับที่ถูกต้อง: ให้หาช่องว่างก่อน → ยืนยัน → ค่อยให้ implement
-- ให้ตัวอย่างของสิ่งที่ต้องการและสิ่งที่ไม่ต้องการ
+- **Breaks work down small enough to be verifiable** — the single most important indicator at this level
+- Selects genuinely relevant context instead of dumping the whole repo (lowers token cost and reduces confusion)
+- Uses the right sequence: find the gaps first → confirm → then implement
+- Provides examples of what is wanted and what is not
 
 ### Expert
-- ออกแบบ `AGENTS.md` / working agreement ที่ทำให้ทั้งทีมได้ผลดีขึ้น ไม่ใช่แค่ตัวเอง
-- รู้ว่างานประเภทไหนควรให้ agent ทำ และประเภทไหนทำเองเร็วกว่า
-- จัดโครงสร้าง repo และเอกสารให้ agent ทำงานได้ดีตั้งแต่ต้น (frontmatter, boundary, naming)
+- Designs an `AGENTS.md` / working agreement that improves results for the whole team, not just themselves
+- Knows which kinds of work to hand to an agent and which are faster to do by hand
+- Structures the repo and its documentation so agents work well from the start (frontmatter, boundaries, naming)
 
-## วิธีประเมิน
-ให้งานเดียวกันกับสองคน ให้ใช้ agent ตัวเดียวกัน แล้ววัด:
-- จำนวนรอบที่ต้องแก้ก่อนได้ผลที่ใช้ได้
-- ขนาดของ diff ที่ได้ (ใหญ่เกินไป = แบ่งงานไม่เป็น)
-- จำนวนคำถามที่ agent ถามกลับ (ศูนย์ในงานที่ซับซ้อน = บริบทไม่พอจนมันเดา)
+## How to Assess
+Give the same task to two people, using the same agent, then measure:
+- Number of correction rounds before the result is usable
+- Size of the resulting diff (too large = poor decomposition)
+- Number of questions the agent asked back (zero on complex work = not enough context, so it guessed)
 
-## เส้นทางพัฒนา
-1. เริ่มทุกงานด้วย "อ่าน spec นี้แล้วบอกว่ามีอะไรที่ยังไม่ตอบ" ก่อนสั่ง implement เสมอ
-2. ฝึกแบ่งงานให้ diff ไม่เกิน 300 บรรทัดต่อครั้ง
-3. เขียน `AGENTS.md` ให้โปรเจกต์ตัวเอง แล้ววัดว่า rework ลดลงไหม
-4. เก็บสถิติว่างานประเภทไหนที่ agent ทำแล้วต้องแก้เยอะที่สุด แล้วเลิกให้มันทำ
+## Development Path
+1. Start every task with "read this spec and tell me what is still unanswered" before ever asking for an implementation
+2. Practise splitting work so no diff exceeds 300 lines at a time
+3. Write an `AGENTS.md` for your own project, then measure whether rework drops
+4. Track which kinds of work need the most correction after an agent does them, then stop delegating those
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ไม่มี — นี่คือทักษะในการใช้ agent
-- **หมายเหตุ:** agent ช่วยปรับปรุง prompt ของตัวเองได้ แต่การตัดสินว่าผลลัพธ์ดีขึ้นจริงไหมยังเป็นของมนุษย์
+## Relationship with Agents
+- **Agents can do:** Nothing — this is the skill of using agents
+- **Note:** an agent can help improve its own prompts, but judging whether the result actually got better remains a human call
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Diff จาก agent ใหญ่จนไม่มีใครอยากรีวิว
-- ต้องแก้งานเดิมซ้ำหลายรอบ
-- Rework rate สูงกว่า 25%
+## Signals the Team Lacks This Skill
+- Agent diffs so large nobody wants to review them
+- The same work has to be redone over several rounds
+- Rework rate above 25%

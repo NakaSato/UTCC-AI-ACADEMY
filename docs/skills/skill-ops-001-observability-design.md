@@ -21,49 +21,49 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-CODE-004 — Production Debugging](skill-code-004-production-debugging.md) · [SKILL-PROD-002 — Metric Design](skill-prod-002-metric-design.md)
 
-## นิยาม
-ความสามารถในการออกแบบระบบให้ตอบคำถามที่ยังไม่ได้ถูกถามได้ — ผ่าน metric, log และ trace ที่วางไว้ตั้งแต่ตอนออกแบบ ไม่ใช่ตอนเกิดเหตุ
+## Definition
+The ability to design a system so it can answer questions that have not been asked yet — through metrics, logs, and traces put in place at design time, not during an incident.
 
-## ทำไมสำคัญตอนนี้
-เมื่อโค้ดส่วนใหญ่เขียนโดย agent และความเข้าใจของทีมที่มีต่อระบบลดลง observability กลายเป็นช่องทางหลักในการทำความเข้าใจระบบตัวเอง แทนที่จะเป็นความรู้ในหัวคน
+## Why It Matters Now
+When most of the code is written by agents and the team's understanding of the system declines, observability becomes the primary way of understanding your own system, in place of knowledge held in people's heads.
 
-## ระดับ
+## Levels
 ### Foundation
-- เพิ่ม log และ metric ตามรูปแบบที่ทีมใช้อยู่
-- ใช้ dashboard ที่มีอยู่ได้
+- Adds logs and metrics following the team's existing patterns
+- Can use the existing dashboards
 
 ### Proficient
-- ออกแบบ metric ตาม RED/USE method
-- ใส่ structured log ที่มี correlation id ตลอดเส้นทาง
-- ตั้ง alert ที่ผูกกับอาการที่ผู้ใช้รู้สึก ไม่ใช่กับสาเหตุ
-- เชื่อม metric, log และ trace ด้วย service, environment, version, release,
-  trace และ correlation identifier เดียวกัน
-- กำหนด owner และลิงก์ไปยัง runbook ให้ alert ที่ต้องลงมือทำทุกตัว
+- Designs metrics using the RED/USE method
+- Emits structured logs carrying a correlation id along the whole path
+- Sets alerts tied to symptoms users feel, not to causes
+- Links metrics, logs, and traces through the same service, environment, version, release,
+  trace, and correlation identifiers
+- Assigns an owner and a runbook link to every alert that requires action
 
 ### Expert
-- ออกแบบ SLO ที่สะท้อนประสบการณ์ผู้ใช้จริง และใช้ error budget ในการตัดสินใจ
-- ออกแบบ trace ที่ตอบคำถามข้ามระบบได้
-- ลด alert noise อย่างเป็นระบบโดยไม่ลดความปลอดภัย
-- ออกแบบ sampling, redaction, access control และ retention โดยไม่บันทึก
-  credential, request body, ข้อมูลผู้เรียน หรือ direct identifier ลง telemetry
+- Designs SLOs that reflect real user experience, and uses the error budget in decisions
+- Designs traces that can answer cross-system questions
+- Reduces alert noise systematically without reducing safety
+- Designs sampling, redaction, access control, and retention so that no credentials,
+  request bodies, student data, or direct identifiers are written to telemetry
 
-## วิธีประเมิน
-ถาม: "ถ้าผู้ใช้บอกว่าหน้าชำระเงินช้า คุณจะตอบภายใน 5 นาทีได้ไหมว่าช้าจริงไหม ช้าที่ไหน และกระทบผู้ใช้กี่คน"
-ตอบไม่ได้ = observability ยังไม่พอ ไม่ว่าจะมี dashboard กี่อัน
+## How to Assess
+Ask: "if a user says the payment page is slow, can you answer within 5 minutes whether it really is slow, where it is slow, and how many users are affected?"
+No answer = observability is insufficient, no matter how many dashboards exist.
 
-## เส้นทางพัฒนา
-1. เขียน SLO หนึ่งข้อสำหรับ service ที่ดูแล แล้ววัดจริงหนึ่งเดือน
-2. ตรวจ alert ทั้งหมด: อันไหนที่ยิงแล้วไม่มีใครทำอะไร ให้ลบทิ้ง
-3. ฝึกใส่ correlation id ตลอด request path แล้วลอง trace ปัญหาจริง
-4. ทำ game day แล้วดูว่าข้อมูลที่มีพอหาสาเหตุไหม
-5. ทำ controlled failure แล้วตรวจว่า dashboard แยก release ได้, trace เชื่อม
-   ไปยัง log ได้ และ alert ไปถึง on-call พร้อม runbook
+## Development Path
+1. Write one SLO for a service you own, then measure it for real for a month
+2. Audit all alerts: delete any that fire and nobody acts on
+3. Practise carrying a correlation id along the request path, then trace a real problem with it
+4. Run a game day and see whether the available data is enough to find the cause
+5. Run a controlled failure and verify that dashboards can split by release, traces link
+   through to logs, and alerts reach on-call together with a runbook
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ใส่ instrumentation ตามมาตรฐาน, สร้าง dashboard, เขียน query, สร้าง alert rule
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าอะไรคือ "ประสบการณ์ที่ดี" สำหรับผู้ใช้ของเรา ซึ่งเป็นฐานของ SLO
+## Relationship with Agents
+- **Agents can do:** Add standard instrumentation, build dashboards, write queries, create alert rules
+- **Agents cannot do:** Decide what counts as "a good experience" for our users, which is the basis of any SLO
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- รู้ว่าระบบพังจากผู้ใช้แจ้ง ไม่ใช่จาก alert
-- Alert เยอะจนคนปิดการแจ้งเตือน
-- มี log เยอะแต่ค้นหาอะไรไม่เจอเวลาต้องใช้
+## Signals the Team Lacks This Skill
+- You learn the system is broken from users, not from alerts
+- So many alerts that people mute notifications
+- Plenty of logs, but nothing findable when you need it

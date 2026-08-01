@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-BLD-002 — Supply Chain Security](skill-bld-002-supply-chain-security.md) · [SKILL-BLD-003 — Release Risk Assessment](skill-bld-003-release-risk-assessment.md)
 
-## นิยาม
-ความสามารถในการสร้าง pipeline ที่ทำให้ทุกการเปลี่ยนแปลงถูกตรวจสอบและส่งมอบได้อย่างสม่ำเสมอ เร็วพอที่จะไม่มีใครอยากข้าม และเชื่อถือได้พอที่จะไม่มีใครสงสัยผลลัพธ์
+## Definition
+The ability to build a pipeline that checks and delivers every change consistently — fast enough that nobody wants to skip it, and reliable enough that nobody doubts its results.
 
-## ทำไมสำคัญตอนนี้
-บริบทเปลี่ยนไปข้อหนึ่งอย่างมีนัยสำคัญ: agent รัน pipeline ซ้ำหลายรอบต่อหนึ่งงาน ดังนั้น **ความเร็วของ CI เปลี่ยนจากเรื่องความสะดวก เป็นตัวคูณของต้นทุนโดยตรง** pipeline ที่ใช้เวลา 15 นาทีจะทำให้ agent iteration แพงขึ้นหลายเท่า
+## Why It Matters Now
+One thing about the context has changed significantly: agents run the pipeline many times over for a single task, so **CI speed has gone from a convenience to a direct multiplier on cost**. A pipeline that takes 15 minutes makes every agent iteration several times more expensive.
 
-## ระดับ
+## Levels
 ### Foundation
-- แก้ไข pipeline ที่มีอยู่ได้
-- อ่าน log แล้วเข้าใจว่า step ไหนล้ม
+- Can modify an existing pipeline
+- Can read the log and understand which step failed
 
 ### Proficient
-- ออกแบบ pipeline ใหม่พร้อม caching, parallelization, และ fail-fast
-- แยก stage ที่เร็วออกจากที่ช้าอย่างมีเหตุผล
-- จัดการ secret ใน pipeline อย่างปลอดภัย
+- Designs new pipelines with caching, parallelisation, and fail-fast
+- Separates fast stages from slow ones for a reason
+- Handles secrets in the pipeline safely
 
 ### Expert
-- ทำ build ให้ reproducible จริง
-- ออกแบบ pipeline ที่ scale ตามขนาดทีมโดยไม่ต้องรื้อ
-- วัดและปรับปรุงเวลา CI อย่างเป็นระบบ
+- Makes builds genuinely reproducible
+- Designs pipelines that scale with team size without needing to be torn down
+- Measures and improves CI time systematically
 
-## วิธีประเมิน
-ให้ pipeline ที่ใช้เวลา 20 นาที แล้วถามว่าจะลดเหลือ 5 นาทีอย่างไร
-คำตอบที่ดี: แยก job ที่ขนานได้, cache dependency, รัน test เฉพาะที่กระทบ, ย้าย job ที่ช้าไปทำหลัง merge, ตรวจว่าอะไรคือคอขวดจริงก่อนแก้
+## How to Assess
+Give them a pipeline that takes 20 minutes and ask how they would get it to 5.
+A good answer: split jobs that can run in parallel, cache dependencies, run only the affected tests, move slow jobs to post-merge, and find the real bottleneck before changing anything.
 
-## เส้นทางพัฒนา
-1. วัดเวลาแต่ละ step ใน pipeline ปัจจุบัน แล้วหาคอขวดจริง
-2. ทดลองทำ build ซ้ำสองครั้งแล้วเทียบ hash — reproducible หรือไม่
-3. ตั้ง cache layer แล้ววัดว่าประหยัดจริงเท่าไหร่
-4. ศึกษา pipeline ของโปรเจกต์ open source ขนาดใหญ่
+## Development Path
+1. Measure the time of each step in the current pipeline, then find the real bottleneck
+2. Run the build twice and compare hashes — is it reproducible?
+3. Add a cache layer, then measure how much it actually saves
+4. Study the pipelines of large open source projects
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน YAML config, เพิ่ม step, แก้ syntax, เสนอ cache strategy
-- **Agent ทำแทนไม่ได้:** ตัดสินว่า gate ไหนควรบล็อกและไหนควรแค่เตือน — เป็นเรื่องของความเสี่ยงที่องค์กรยอมรับได้
+## Relationship with Agents
+- **Agents can do:** Write YAML config, add steps, fix syntax, propose cache strategies
+- **Agents cannot do:** Decide which gates should block and which should merely warn — that is a question of the risk the organisation accepts
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- CI ใช้เวลาเกิน 10 นาทีและไม่มีใครพยายามแก้
-- มีคน rerun job เพราะ "บางทีมันก็ผ่าน"
-- Secret อยู่ใน environment variable ที่ log ออกมาได้
+## Signals the Team Lacks This Skill
+- CI takes over 10 minutes and nobody is trying to fix it
+- People rerun jobs because "sometimes it passes"
+- Secrets live in environment variables that can end up in logs

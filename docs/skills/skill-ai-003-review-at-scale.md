@@ -21,43 +21,43 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-AI-002 — Agent Output Verification](skill-ai-002-agent-output-verification.md) · [SKILL-BLD-003 — Release Risk Assessment](skill-bld-003-release-risk-assessment.md)
 
-## นิยาม
-ความสามารถในการจัดการการตรวจสอบเมื่อปริมาณงานที่ต้องตรวจมากกว่าความสามารถในการอ่านทั้งหมด — คือการตัดสินว่า **จะอ่านตรงไหนอย่างละเอียด และตรงไหนพอเชื่อ automation ได้**
+## Definition
+The ability to manage review when the volume of work exceeds anyone's capacity to read all of it — deciding **where to read closely and where automation is trustworthy enough**.
 
-## ทำไมสำคัญตอนนี้
-เมื่อ throughput เพิ่ม 5–10 เท่า การอ่านทุก diff อย่างละเอียดเป็นไปไม่ได้ ทีมส่วนใหญ่จึงเปลี่ยนเป็น rubber-stamp โดยไม่มีใครตัดสินใจให้มันเกิด ทักษะนี้คือการทำให้การจัดสรรความสนใจเป็นเรื่องที่ตั้งใจ ไม่ใช่เรื่องที่ยอมแพ้
+## Why It Matters Now
+Once throughput rises 5–10×, reading every diff closely becomes impossible. Most teams drift into rubber-stamping without anyone deciding to. This skill makes the allocation of human attention deliberate rather than an act of surrender.
 
-## ระดับ
+## Levels
 ### Foundation
-- รีวิวทีละ PR ตามลำดับที่เข้ามา
+- Reviews PRs one at a time in arrival order
 
 ### Proficient
-- จัดลำดับตามความเสี่ยง ไม่ใช่ตามเวลาที่ส่งเข้ามา
-- ใช้ผลของ gate ที่ผ่านมาแล้วเพื่อไม่ตรวจซ้ำสิ่งที่ automation ตรวจไปแล้ว
-- ขอให้แตกงานเมื่อ diff ใหญ่เกินกว่าจะตรวจได้จริง
+- Prioritises by risk rather than by submission time
+- Uses the results of upstream gates so as not to re-check what automation already checked
+- Asks for work to be split when a diff is too large to review meaningfully
 
 ### Expert
-- ออกแบบ risk tier และ policy ที่ทำให้ความสนใจของมนุษย์ไปตกที่จุดที่คุ้มที่สุด
-- จัดการ capacity: รู้ว่าทีมตรวจได้กี่ชิ้นต่อวัน แล้วตั้ง WIP limit จากตัวเลขนั้น
-- ตรวจจับสัญญาณ rubber-stamp ในทีมและแก้ที่ระบบ ไม่ใช่ที่คน
+- Designs risk tiers and policies that put human attention where it pays off most
+- Manages capacity: knows how many items the team can actually review per day, and sets WIP limits from that number
+- Detects rubber-stamping signals in the team and fixes the system rather than the people
 
-## วิธีประเมิน
-ให้สถานการณ์: มี 25 PR รอรีวิว ทีมมีเวลารวม 4 ชั่วโมงวันนี้ ถามว่าจะจัดการอย่างไร
-- รีวิวเรียงตามลำดับ = Foundation
-- จัดลำดับตามความเสี่ยงและขอแตกงานที่ใหญ่เกิน = Proficient
-- ตั้งคำถามว่าทำไมถึงมี 25 PR ทั้งที่ capacity คือ 9 และเสนอ backpressure = Expert
+## How to Assess
+Give the scenario: 25 PRs are waiting, and the team has 4 hours total today. Ask how they would handle it.
+- Reviews them in order = Foundation
+- Prioritises by risk and asks for oversized work to be split = Proficient
+- Asks why there are 25 PRs when capacity is 9, and proposes backpressure = Expert
 
-## เส้นทางพัฒนา
-1. วัดว่าทีมรีวิวได้จริงกี่ชิ้นต่อวัน แล้วตั้งเพดาน PR เปิดค้างจากตัวเลขนั้น
-2. จัด risk tier ให้ repo ปัจจุบันจาก path ที่แตะ
-3. วัด review depth (เวลา ÷ ขนาด diff) รายสัปดาห์ ดูแนวโน้ม
-4. ทดลอง auto-merge กับ Tier A พร้อม audit sampling แล้ววัด escaped defect
+## Development Path
+1. Measure how many items the team really reviews per day, then cap open PRs at that number
+2. Assign risk tiers for the current repo based on the paths touched
+3. Measure review depth (time ÷ diff size) weekly and watch the trend
+4. Try auto-merge for Tier A with audit sampling, then measure escaped defects
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สรุป diff, ชี้จุดที่น่าสงสัย, จัดกลุ่ม PR ตามความเสี่ยง, ตรวจ policy อัตโนมัติ
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าอะไรพอเชื่อได้ — เพราะนั่นคือการรับความเสี่ยง
+## Relationship with Agents
+- **Agents can do:** Summarise diffs, flag suspicious spots, group PRs by risk, check policy automatically
+- **Agents cannot do:** Decide what is trustworthy enough — because that is accepting risk
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- PR ค้างเกิน capacity อย่างต่อเนื่อง
-- Review depth ลดลงทุกเดือน
-- ทุก PR ได้รับความสนใจเท่ากันไม่ว่าจะแตะอะไร
+## Signals the Team Lacks This Skill
+- PRs persistently backed up beyond capacity
+- Review depth falling every month
+- Every PR gets equal attention regardless of what it touches

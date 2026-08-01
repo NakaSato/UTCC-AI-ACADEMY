@@ -38,16 +38,16 @@ REQUIRED_FIELDS = %w[
   related review_by
 ].freeze
 REQUIRED_HEADINGS = [
-  "## นิยาม",
-  "## ทำไมสำคัญตอนนี้",
-  "## ระดับ",
+  "## Definition",
+  "## Why It Matters Now",
+  "## Levels",
   "### Foundation",
   "### Proficient",
   "### Expert",
-  "## วิธีประเมิน",
-  "## เส้นทางพัฒนา",
-  "## ความสัมพันธ์กับ Agent",
-  "## สัญญาณว่าทีมขาดทักษะนี้"
+  "## How to Assess",
+  "## Development Path",
+  "## Relationship with Agents",
+  "## Signals the Team Lacks This Skill"
 ].freeze
 VALID_CATEGORIES = %w[
   product architecture specification coding testing build operations ai-era

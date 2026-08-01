@@ -21,41 +21,41 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-001 — Spec Writing](skill-spec-001-spec-writing.md) · [SKILL-AI-001 — Context Engineering](skill-ai-001-context-engineering.md)
 
-## นิยาม
-ความสามารถในการอ่านเอกสารแล้วเห็น **สิ่งที่ยังไม่ได้ถูกเขียน** — เงื่อนไขขอบ กรณีว่าง กรณีขัดแย้ง และจุดที่คนสองคนจะตีความต่างกัน
+## Definition
+The ability to read a document and see **what has not been written** — edge conditions, empty cases, conflicting cases, and the points where two people will read it differently.
 
-## ทำไมสำคัญตอนนี้
-ความคลุมเครือที่ไหลลงไปถึงชั้น implementation มีต้นทุนแพงขึ้นแบบทวีคูณ และตอนนี้แพงกว่าเดิมเพราะ agent จะแปลงความคลุมเครือเป็นโค้ดที่ดูดีได้ภายในไม่กี่นาที ทำให้ตรวจจับยากกว่าตอนที่มนุษย์เขียนช้าๆ แล้วเดินมาถาม
+## Why It Matters Now
+Ambiguity that reaches the implementation layer costs exponentially more, and it costs more now than it used to, because an agent will turn ambiguity into good-looking code within minutes. That makes it harder to catch than when a human wrote slowly and came over to ask.
 
-## ระดับ
+## Levels
 ### Foundation
-- ถามคำถามเมื่อเจอสิ่งที่ไม่เข้าใจ
+- Asks questions when something is not understood
 
 ### Proficient
-- ตรวจสอบอย่างเป็นระบบ: กรณีว่าง, ค่าลบ, ค่าซ้ำ, timeout, concurrent, สิทธิ์
-- เห็นความขัดแย้งระหว่างสองย่อหน้าในเอกสารเดียวกัน
+- Checks systematically: empty cases, negative values, duplicates, timeouts, concurrency, permissions
+- Spots contradictions between two paragraphs of the same document
 
 ### Expert
-- เห็นสิ่งที่ไม่ได้เขียนเลยและควรมี (missing requirement ไม่ใช่แค่ unclear requirement)
-- จัดลำดับความคลุมเครือตามผลกระทบต่อ scope ไม่ใช่ตามลำดับที่เจอ
-- รู้ว่าความคลุมเครือข้อไหนควรแก้ตอนนี้ และข้อไหนปล่อยไว้ได้จนกว่าจะเจอจริง
+- Spots what was never written at all and should have been (missing requirements, not just unclear ones)
+- Ranks ambiguities by impact on scope rather than by the order they were found
+- Knows which ambiguities to resolve now and which can wait until they actually come up
 
-## วิธีประเมิน
-ให้ spec ที่มีช่องโหว่ฝังไว้ 8 จุด (บางจุดเป็น missing requirement) ให้เวลา 15 นาที
-- เจอ 3–4 จุด = Proficient
-- เจอ 6+ จุด และจัดลำดับตามผลกระทบได้ = Expert
-- เจอเฉพาะจุดที่เขียนกำกวม แต่ไม่เห็นสิ่งที่หายไป = ยังไม่ถึง Expert
+## How to Assess
+Give a spec with 8 planted holes (some of them missing requirements) and allow 15 minutes.
+- Finds 3–4 = Proficient
+- Finds 6+ and ranks them by impact = Expert
+- Finds only the ambiguously worded parts and misses what is absent = not yet Expert
 
-## เส้นทางพัฒนา
-1. ทำ checklist ส่วนตัว: null/empty, boundary, duplicate, concurrent, timeout, permission, i18n, migration ของข้อมูลเดิม
-2. ทุกครั้งที่เกิด bug จาก requirement ให้เพิ่มรูปแบบนั้นเข้า checklist
-3. **ใช้ agent เป็นคู่ซ้อม** — ให้มันหาช่องว่างใน spec ของคุณ แล้วดูว่ามันเห็นอะไรที่คุณไม่เห็น
-4. ฝึกอ่าน spec ของคนอื่นโดยตั้งเป้าหาช่องว่างให้ได้ 5 จุดก่อนแสดงความเห็น
+## Development Path
+1. Build a personal checklist: null/empty, boundaries, duplicates, concurrency, timeouts, permissions, i18n, migration of existing data
+2. Every time a bug comes from a requirement, add that pattern to the checklist
+3. **Use an agent as a sparring partner** — have it find gaps in your spec, and see what it spots that you did not
+4. Practise reading other people's specs with a target of finding 5 gaps before commenting
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** **ข้อนี้ agent ทำได้ดีมากและควรใช้เต็มที่** — prompt ที่ให้ผลตอบแทนสูงสุดคือ "อ่าน spec นี้ แล้วบอกว่ามีอะไรที่ยังไม่ตอบ เรียงตามผลกระทบต่อ scope โดยยังไม่ต้องเขียนโค้ด"
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าความคลุมเครือข้อไหนสำคัญพอที่จะหยุดงานเพื่อแก้
+## Relationship with Agents
+- **Agents can do:** **This is something agents do very well and should be used for fully** — the highest-return prompt is "read this spec and tell me what is still unanswered, ordered by impact on scope, without writing any code yet"
+- **Agents cannot do:** Decide which ambiguity matters enough to stop work over
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- คำถามส่วนใหญ่เกิดตอน implement ไม่ใช่ตอน review spec
-- Agent block rate ต่ำมาก (มันเดาแทนที่จะถาม เพราะไม่มีอะไรให้สังเกตว่าคลุมเครือ)
+## Signals the Team Lacks This Skill
+- Most questions arise during implementation rather than during spec review
+- Very low agent block rate (it guesses instead of asking, because nothing signals ambiguity)

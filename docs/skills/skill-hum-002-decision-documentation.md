@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-001 — Trade-off Analysis](skill-arch-001-tradeoff-analysis.md) · [SKILL-HUM-001 — Written Communication](skill-hum-001-written-communication.md)
 
-## นิยาม
-ความสามารถในการบันทึกการตัดสินใจให้คนในอนาคต (รวมถึงตัวเองในหกเดือนข้างหน้า) เข้าใจว่า **ทำไม** ถึงเลือกแบบนั้น ภายใต้บริบทและข้อจำกัดอะไร
+## Definition
+The ability to record a decision so that someone in the future (including yourself in six months) understands **why** it was made that way, and under what context and constraints.
 
-## ทำไมสำคัญตอนนี้
-สองเหตุผลที่แยกกัน หนึ่ง: เมื่อโค้ดถูกผลิตเร็วขึ้นมาก บริบทของการตัดสินใจสูญหายเร็วขึ้นตาม สอง: agent อ่านเอกสารเหล่านี้เป็นบริบท — การตัดสินใจที่ไม่ถูกบันทึกคือการตัดสินใจที่ agent จะละเมิดโดยไม่รู้ตัว
+## Why It Matters Now
+Two separate reasons. First: as code gets produced far faster, the context behind decisions is lost just as fast. Second: agents read these documents as context — an unrecorded decision is a decision the agent will unknowingly violate.
 
-## ระดับ
+## Levels
 ### Foundation
-- บันทึกว่าตัดสินใจอะไรไป
+- Records what was decided
 
 ### Proficient
-- บันทึกทางเลือกที่พิจารณาและเหตุผลที่ไม่เลือก
-- ระบุข้อจำกัดและบริบท ณ เวลานั้น
-- ระบุผลที่ตามมาทั้งด้านบวกและต้นทุนที่ยอมรับ
+- Records the options considered and why they were not chosen
+- States the constraints and context at the time
+- States the consequences, both the benefits and the costs accepted
 
 ### Expert
-- เชื่อมการตัดสินใจกับ fitness function ที่บังคับใช้จริง
-- เขียนให้คนที่ไม่ได้อยู่ในตอนนั้นตัดสินได้ว่าเมื่อไหร่ควรทบทวนใหม่
-- จัดการ ADR ที่ถูก supersede อย่างเป็นระบบ โดยไม่ลบประวัติ
+- Links decisions to fitness functions that are actually enforced
+- Writes so that someone who was not there can tell when the decision should be revisited
+- Manages superseded ADRs systematically, without deleting history
 
-## วิธีประเมิน
-เอา ADR ที่เขาเขียนไว้ 6 เดือนก่อน ให้คนใหม่อ่าน แล้วถามว่า
-1. เข้าใจไหมว่าทำไมถึงเลือกแบบนี้
-2. รู้ไหมว่าเงื่อนไขอะไรเปลี่ยนแล้วควรทบทวนใหม่
+## How to Assess
+Take an ADR they wrote 6 months ago, give it to someone new, and ask:
+1. Do you understand why this was chosen?
+2. Do you know what would have to change for it to be revisited?
 
-ตอบไม่ได้ทั้งสองข้อ = ยังเป็น Foundation
+Unable to answer either = still Foundation.
 
-## เส้นทางพัฒนา
-1. เขียน ADR ย้อนหลังสำหรับการตัดสินใจที่กลับยาก 5 เรื่อง
-2. บังคับ section Alternatives ในทุก ADR — ADR ที่ไม่มีคือบันทึกการประชุม
-3. ผูก ADR แต่ละฉบับกับ test ที่บังคับใช้จริง
-4. ทบทวน ADR เก่าทุกไตรมาส ดูว่าอันไหนควร supersede
+## Development Path
+1. Write retrospective ADRs for 5 hard-to-reverse decisions
+2. Require an Alternatives section in every ADR — an ADR without one is just meeting notes
+3. Tie each ADR to a test that actually enforces it
+4. Review old ADRs every quarter to see which should be superseded
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ร่าง ADR จากบทสนทนา, จัดโครงสร้าง, ค้นหา prior art, ตรวจว่ามี section ครบ
-- **Agent ทำแทนไม่ได้:** ระบุเหตุผลที่แท้จริงของการเลือก โดยเฉพาะเหตุผลเชิงองค์กรที่ไม่ปรากฏในเอกสาร
+## Relationship with Agents
+- **Agents can do:** Draft ADRs from a conversation, structure them, find prior art, check that all sections are present
+- **Agents cannot do:** State the real reason behind a choice, especially organisational reasons that never appear in writing
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ถามว่า "ทำไมถึงทำแบบนี้" แล้วไม่มีใครตอบได้
-- ตัดสินใจเรื่องเดิมซ้ำทุก 6 เดือน
-- ADR มีแต่ Decision ไม่มี Context และ Alternatives
+## Signals the Team Lacks This Skill
+- Asking "why was it done this way?" and nobody can answer
+- The same decision gets remade every 6 months
+- ADRs contain only a Decision, with no Context or Alternatives

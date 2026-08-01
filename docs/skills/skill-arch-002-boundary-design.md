@@ -21,43 +21,43 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-001 — Trade-off Analysis](skill-arch-001-tradeoff-analysis.md) · [SKILL-ARCH-003 — Data Modeling](skill-arch-003-data-modeling.md) · [SKILL-CODE-002 — API Design](skill-code-002-api-design.md)
 
-## นิยาม
-ความสามารถในการแบ่งระบบเป็นส่วนที่มีขอบเขตชัด เปลี่ยนแปลงแยกกันได้ และบังคับขอบเขตนั้นด้วยเครื่องมือ ไม่ใช่ด้วยข้อตกลง
+## Definition
+The ability to divide a system into parts with clear boundaries that can change independently, and to enforce those boundaries with tooling rather than with agreements.
 
-## ทำไมสำคัญตอนนี้
-นี่คือทักษะที่ค่าขึ้นเร็วที่สุดในกลุ่ม architecture — เพราะ agent ทำงานได้ดีมากในขอบเขตที่แคบและ interface ชัด แต่จะแพร่ pattern ผิดไปทั้ง repo ภายในวันเดียวถ้าขอบเขตหลวม ต้นทุนของ boundary ที่ออกแบบผิดแพงกว่ายุคก่อนหลายเท่า
+## Why It Matters Now
+This is the fastest-appreciating skill in the architecture group — agents work very well within narrow boundaries and clear interfaces, but will spread the wrong pattern across an entire repo within a day if the boundaries are loose. A badly designed boundary now costs several times what it used to.
 
-## ระดับ
+## Levels
 ### Foundation
-- ทำงานภายในโครงสร้างที่มีอยู่ได้โดยไม่ทำลายมัน
-- รู้ว่า layer แต่ละชั้นควรทำอะไร
+- Works within the existing structure without breaking it
+- Knows what each layer is supposed to do
 
 ### Proficient
-- แบ่ง module ตาม domain ไม่ใช่ตามชนิดทางเทคนิค
-- ออกแบบ public interface ที่ซ่อนรายละเอียดภายในได้จริง
-- ตั้ง fitness function (ArchUnit / NetArchTest / Packwerk) ให้บังคับขอบเขต
+- Divides modules by domain rather than by technical type
+- Designs public interfaces that genuinely hide internal detail
+- Sets up fitness functions (ArchUnit / NetArchTest / Packwerk) to enforce boundaries
 
 ### Expert
-- มองเห็นว่าขอบเขตควรอยู่ตรงไหนจากรูปแบบการเปลี่ยนแปลงในอดีต ไม่ใช่จากทฤษฎี
-- ตัดสินใจได้ว่าเมื่อไหร่ควรรวม module และเมื่อไหร่ควรแยก
-- ออกแบบทางย้ายจากโครงสร้างเดิมโดยไม่ต้องหยุดพัฒนา
+- Sees where boundaries should sit from historical change patterns rather than from theory
+- Decides when modules should be merged and when they should be split
+- Designs a migration path off the old structure without halting development
 
-## วิธีประเมิน
-ให้ codebase จริงแล้วถาม: "ถ้าเราต้องเปลี่ยนวิธีคิดค่าธรรมเนียม ต้องแตะกี่ไฟล์และกี่ module"
-คนที่ตอบได้ทันทีและตอบว่า "หนึ่ง module" = ระบบมีขอบเขตดีและเขาเข้าใจมัน
-คนที่ต้องไปไล่ดูก่อน = ขอบเขตหลวมหรือเขายังไม่เห็นภาพ
+## How to Assess
+Give a real codebase and ask: "if we had to change how fees are calculated, how many files and how many modules would we touch?"
+Someone who answers immediately with "one module" = the system has good boundaries and they understand it.
+Someone who has to go and look = the boundaries are loose, or they cannot yet see the shape of the system.
 
-## เส้นทางพัฒนา
-1. ตั้ง fitness function หนึ่งข้อในโปรเจกต์ปัจจุบัน แล้วดูว่ามี violation กี่จุด
-2. วิเคราะห์ git log: ไฟล์ไหนที่มักถูกแก้พร้อมกันเสมอ — นั่นคือขอบเขตที่แท้จริง ไม่ใช่ที่วาดไว้
-3. อ่านเรื่อง Domain-Driven Design โดยเน้น bounded context ไม่ใช่ tactical pattern
-4. ฝึกเขียน `package.yml` / module descriptor พร้อมเหตุผลของแต่ละ dependency
+## Development Path
+1. Set up one fitness function in the current project, then see how many violations exist
+2. Analyse the git log: which files are always changed together — that is the real boundary, not the drawn one
+3. Read up on Domain-Driven Design, focusing on bounded contexts rather than tactical patterns
+4. Practise writing a `package.yml` / module descriptor with the rationale for every dependency
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ตรวจหา violation, refactor ให้เข้าขอบเขตที่กำหนดแล้ว, สร้าง adapter
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าขอบเขตควรอยู่ตรงไหน — เพราะต้องรู้ว่าธุรกิจจะเปลี่ยนไปทางไหน
+## Relationship with Agents
+- **Agents can do:** Detect violations, refactor code to fit already-defined boundaries, build adapters
+- **Agents cannot do:** Decide where a boundary should sit — because that requires knowing where the business is heading
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- เปลี่ยนอะไรนิดเดียวต้องแก้ 15 ไฟล์ข้าม 5 module
-- ไม่มี fitness function ใดๆ ในโปรเจกต์
-- โครงสร้างโฟลเดอร์แบ่งตามชนิด (controllers/, services/, models/) ในระบบที่ใหญ่แล้ว
+## Signals the Team Lacks This Skill
+- A tiny change requires editing 15 files across 5 modules
+- No fitness functions of any kind in the project
+- Folder structure divided by type (controllers/, services/, models/) in an already-large system

@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-PROD-001 — Problem Framing](skill-prod-001-problem-framing.md) · [SKILL-OPS-001 — Observability Design](skill-ops-001-observability-design.md)
 
-## นิยาม
-ความสามารถในการออกแบบตัววัดที่ (1) สะท้อนผลลัพธ์ที่ต้องการจริง (2) เก็บข้อมูลได้จริงในระบบที่มีอยู่ (3) ไม่ถูกบิดเบือนได้ง่ายเมื่อคนรู้ว่ากำลังถูกวัด
+## Definition
+The ability to design measures that (1) reflect the outcome actually wanted, (2) can genuinely be collected from the systems that exist, and (3) are not easily distorted once people know they are being measured.
 
-## ทำไมสำคัญตอนนี้
-เมื่อ throughput ของการสร้างสูงขึ้นมาก การวัดผลกลายเป็นเบรกเพียงอย่างเดียวที่เหลืออยู่ ทีมที่วัดไม่เป็นจะเร่งไปผิดทางได้เร็วกว่าเดิมหลายเท่า
+## Why It Matters Now
+As build throughput rises sharply, measurement becomes the only brake left. A team that cannot measure will accelerate in the wrong direction many times faster than before.
 
-## ระดับ
+## Levels
 ### Foundation
-- แยก output (จำนวนที่ทำ) ออกจาก outcome (ผลที่เกิด) ได้
-- อ่าน dashboard ที่มีอยู่แล้วเข้าใจ
+- Distinguishes output (how much was done) from outcome (what resulted)
+- Reads and understands existing dashboards
 
 ### Proficient
-- ออกแบบ metric ใหม่พร้อมระบุ baseline, target และวิธีเก็บข้อมูล
-- รู้จัก counter-metric (ตัววัดที่คอยกันไม่ให้ optimize ตัวหลักจนเสียอย่างอื่น)
-- ตรวจสอบได้ว่า metric ที่เสนอ instrument ได้จริงก่อนเขียนลง PRD
+- Designs new metrics complete with baseline, target, and collection method
+- Knows about counter-metrics (measures that stop you optimising the main one at the expense of everything else)
+- Verifies that a proposed metric can actually be instrumented before it goes into a PRD
 
 ### Expert
-- มองเห็นล่วงหน้าว่า metric นี้จะถูก game อย่างไร แล้วออกแบบกันไว้
-- แยกความสัมพันธ์เชิงสหสัมพันธ์ออกจากเชิงสาเหตุได้
-- ตัดสินใจได้ว่าเมื่อไหร่ metric ควรถูกเลิกใช้
+- Foresees how a metric will be gamed and designs against it
+- Distinguishes correlation from causation
+- Can decide when a metric should be retired
 
-## วิธีประเมิน
-ให้โจทย์: "เราอยากให้ผู้ใช้มีส่วนร่วมมากขึ้น" แล้วดูว่าเขา:
-1. เสนอ metric อะไร และเสนอ counter-metric ด้วยไหม
-2. ตอบได้ไหมว่าเก็บข้อมูลจากไหน มีอยู่แล้วหรือต้องสร้าง
-3. ตอบได้ไหมว่าถ้าทีมอยากปั่นตัวเลขนี้ ทำได้ยังไง
+## How to Assess
+Give the problem: "we want users to be more engaged", and watch whether they:
+1. Propose a metric — and a counter-metric with it
+2. Can say where the data comes from, and whether it already exists or must be built
+3. Can say how the team would inflate this number if it wanted to
 
-คนที่เสนอ "จำนวน DAU" โดยไม่มี counter-metric = Foundation
+Proposing "DAU" with no counter-metric = Foundation.
 
-## เส้นทางพัฒนา
-1. หยิบ metric ที่ทีมใช้อยู่ ลองหาวิธี game ให้ได้ 3 วิธีต่อ metric
-2. ฝึกเขียน metric spec: นิยาม, สูตร, แหล่งข้อมูล, baseline, counter-metric
-3. อ่านเรื่อง Goodhart's Law และตัวอย่าง metric ที่พังในอุตสาหกรรม
-4. จับคู่กับ Data Engineer ทำ instrumentation จริงหนึ่งรอบเต็ม
+## Development Path
+1. Take the metrics your team uses and find 3 ways to game each one
+2. Practise writing a metric spec: definition, formula, data source, baseline, counter-metric
+3. Read about Goodhart's Law and industry examples of metrics that broke
+4. Pair with a Data Engineer through one full instrumentation cycle
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน query, สร้าง dashboard, ตรวจว่าข้อมูลมีอยู่ไหม, เสนอ metric ที่คนอื่นในอุตสาหกรรมใช้
-- **Agent ทำแทนไม่ได้:** ตัดสินว่า metric ไหนสะท้อนคุณค่าจริงในบริบทของเรา, ตีความว่าตัวเลขที่ได้แปลว่าอะไร
+## Relationship with Agents
+- **Agents can do:** Write queries, build dashboards, check whether the data exists, suggest metrics used elsewhere in the industry
+- **Agents cannot do:** Decide which metric reflects real value in our context, interpret what the numbers mean
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- PRD มีคำว่า "ผู้ใช้จะพอใจขึ้น" โดยไม่มีตัวเลข
-- ตัวเลขที่รายงานสวยขึ้นทุกไตรมาสแต่ธุรกิจไม่ดีขึ้น
-- ไม่มีใครรู้ว่า metric ตัวนี้คำนวณจากอะไรกันแน่
+## Signals the Team Lacks This Skill
+- PRDs that say "users will be happier" with no numbers
+- Reported numbers improving every quarter while the business does not
+- Nobody knows exactly how this metric is calculated

@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-002 — Invariant Identification](skill-spec-002-invariant-identification.md) · [SKILL-TEST-002 — Property-Based Thinking](skill-test-002-property-thinking.md)
 
-## นิยาม
-ความสามารถในการออกแบบชุดทดสอบที่ **พิสูจน์ว่าระบบถูก** ไม่ใช่แค่ **แสดงว่าระบบทำงาน** และเลือกได้ว่าอะไรควรทดสอบที่ระดับไหน
+## Definition
+The ability to design a test suite that **proves the system is correct** rather than merely **showing that it runs**, and to choose what should be tested at which level.
 
-## ทำไมสำคัญตอนนี้
-เมื่อ agent เขียน implementation ส่วนใหญ่ test กลายเป็นนิยามเดียวของคำว่า "ถูก" ที่มนุษย์ควบคุมอยู่ ถ้า agent เขียน test เองด้วย ระบบจะกลายเป็นการรับรองตัวเองโดยสมบูรณ์ — นี่คือเหตุผลที่ acceptance test ต้องอยู่ใน CODEOWNERS ของมนุษย์เสมอ
+## Why It Matters Now
+When agents write most of the implementation, tests become the only definition of "correct" still under human control. If agents write the tests as well, the system becomes entirely self-certifying — which is why acceptance tests must always sit under human CODEOWNERS.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียน test ตามกรณีที่ระบุใน AC ได้
-- เข้าใจ test pyramid
+- Writes tests for the cases stated in the ACs
+- Understands the test pyramid
 
 ### Proficient
-- ออกแบบ test case จากเทคนิคที่เป็นระบบ (equivalence partitioning, boundary value, decision table)
-- เลือกระดับทดสอบที่คุ้มค่า ไม่ทดสอบทุกอย่างที่ระดับ E2E
-- ออกแบบ test ที่ล้มเหลวแล้วบอกได้ทันทีว่าอะไรพัง
+- Designs test cases using systematic techniques (equivalence partitioning, boundary values, decision tables)
+- Chooses the level of testing that pays off, rather than testing everything at E2E
+- Designs tests that, on failure, say immediately what broke
 
 ### Expert
-- ออกแบบชุดทดสอบที่จับ bug ประเภทที่ไม่ได้คิดถึงได้
-- ประเมินคุณภาพของ test suite เอง (mutation testing, ไม่ใช่แค่ coverage)
-- ตัดสินได้ว่าส่วนไหนไม่คุ้มที่จะทดสอบ
+- Designs suites that catch classes of bug nobody thought of
+- Assesses the quality of the test suite itself (mutation testing, not just coverage)
+- Judges which parts are not worth testing
 
-## วิธีประเมิน
-ให้ฟังก์ชันคำนวณส่วนลดที่มีเงื่อนไขซ้อนกัน 4 ชั้น แล้วให้ออกแบบ test case
-- เขียนตามตัวอย่างใน spec = Foundation
-- ใช้ boundary value และ decision table ครอบคลุมทุกสาขา = Proficient
-- เพิ่ม property test และระบุว่าอะไรที่ example test จับไม่ได้ = Expert
+## How to Assess
+Give a discount calculation function with 4 levels of nested conditions and have them design test cases.
+- Writes what the spec's examples show = Foundation
+- Uses boundary values and a decision table covering every branch = Proficient
+- Adds property tests and states what the example tests cannot catch = Expert
 
-ทดสอบเพิ่ม: ให้ mutation testing รันบน test suite ที่เขาเขียน — mutation score บอกความจริงมากกว่า coverage
+Additional check: run mutation testing against the suite they wrote — the mutation score tells more truth than coverage.
 
-## เส้นทางพัฒนา
-1. เรียนเทคนิคออกแบบ test case อย่างเป็นระบบ ไม่ใช่เขียนตามสัญชาตญาณ
-2. รัน mutation testing บน test suite ปัจจุบัน แล้วดูว่ามี mutant รอดกี่ตัว
-3. ทุกครั้งที่ bug หลุดถึง production ให้ถามว่า "test แบบไหนที่จะจับได้" แล้วเพิ่มเข้าไป
-4. ฝึกเขียน test ก่อนโค้ดสำหรับ logic ที่ซับซ้อน
+## Development Path
+1. Learn systematic test-case design techniques rather than writing by instinct
+2. Run mutation testing against the current suite and see how many mutants survive
+3. Every time a bug escapes to production, ask "what kind of test would have caught this?" and add it
+4. Practise writing tests before code for complex logic
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน unit test จำนวนมาก, สร้าง test data, แปลง test case เป็นโค้ด
-- **Agent ทำแทนไม่ได้:** **ออกแบบ acceptance test และ contract test** — เพราะมันคือนิยามว่า "ถูก" คืออะไร ถ้า agent เขียนเอง มันจะ optimize ให้ test ผ่าน ไม่ใช่ให้ระบบถูก
+## Relationship with Agents
+- **Agents can do:** Write large numbers of unit tests, build test data, turn test cases into code
+- **Agents cannot do:** **Design acceptance tests and contract tests** — because those are the definition of "correct". If an agent writes them, it optimises for the tests passing, not for the system being right
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Coverage สูงแต่ bug ยังหลุดเยอะ
-- Test ที่ล้มแล้วไม่มีใครรู้ว่าอะไรพัง
-- Test ทั้งหมดทดสอบ happy path
+## Signals the Team Lacks This Skill
+- High coverage but plenty of bugs still escaping
+- Failing tests that leave nobody any wiser about what broke
+- Every test covers the happy path

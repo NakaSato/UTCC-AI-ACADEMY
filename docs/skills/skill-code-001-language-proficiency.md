@@ -21,43 +21,43 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-CODE-002 — API Design](skill-code-002-api-design.md) · [SKILL-AI-002 — Agent Output Verification](skill-ai-002-agent-output-verification.md)
 
-## นิยาม
-ความคล่องในภาษาและ ecosystem ที่ใช้ — idiom, standard library, เครื่องมือ, รูปแบบที่ชุมชนยอมรับ และข้อจำกัดที่ต้องรู้
+## Definition
+Fluency in the language and ecosystem in use — its idioms, standard library, tooling, community-accepted patterns, and the constraints you have to know about.
 
-## ทำไมสำคัญตอนนี้
-**ทักษะนี้กำลังลดค่าลงในแง่ของการผลิต** แต่ **ยังตัดไม่ได้ในแง่ของการตรวจสอบ** — ถ้าอ่านโค้ดที่ agent เขียนไม่ออก ก็ verify ไม่ได้ และเมื่อ verify ไม่ได้ ทั้ง flow พังทันที
+## Why It Matters Now
+**This skill is losing value on the production side** but **remains non-negotiable on the verification side** — if you cannot read the code an agent wrote, you cannot verify it, and once verification fails the whole flow collapses.
 
-ข้อควรระวังที่สำคัญ: ทักษะ verification สร้างจากประสบการณ์การเขียนผิดด้วยตัวเองเท่านั้น คนที่ข้ามขั้นการเขียนโค้ดเองไปเลยจะไม่มีวันพัฒนา SKILL-AI-002 ได้
+An important caveat: verification skill is built only from the experience of getting it wrong yourself. Anyone who skips writing code entirely will never develop SKILL-AI-002.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียนโค้ดที่ทำงานได้ตามตัวอย่างที่มี
-- อ่านโค้ดของคนอื่นในภาษานั้นเข้าใจ
+- Writes working code by following available examples
+- Reads and understands other people's code in that language
 
 ### Proficient
-- เขียนโค้ดที่ idiomatic โดยไม่ต้องดูตัวอย่าง
-- รู้จักข้อจำกัดของ runtime (GC, GIL, memory model, async model)
-- เลือก data structure ได้เหมาะกับปัญหา
+- Writes idiomatic code without needing examples
+- Knows the runtime's constraints (GC, GIL, memory model, async model)
+- Chooses data structures that fit the problem
 
 ### Expert
-- เข้าใจว่าโค้ดถูกแปลและทำงานอย่างไรจริงๆ ในระดับล่าง
-- ปรับ performance บนพื้นฐานของการวัด ไม่ใช่การเดา
-- รู้ว่า idiom ข้อไหนควรละเมิดและเมื่อไหร่
+- Understands how the code is actually compiled and executed at a lower level
+- Tunes performance on the basis of measurement, not guesswork
+- Knows which idioms to break, and when
 
-## วิธีประเมิน
-ให้อ่านโค้ด 150 บรรทัดที่ agent เขียน แล้วให้ชี้จุดที่มีปัญหาภายใน 10 นาที
-วัดที่ **ความสามารถในการอ่าน** ไม่ใช่ความสามารถในการเขียน — นี่คือสิ่งที่เปลี่ยนไปจากเดิม
+## How to Assess
+Give them 150 lines of agent-written code and ask them to point out the problems within 10 minutes.
+Measure **reading ability**, not writing ability — that is what has changed.
 
-## เส้นทางพัฒนา
-1. อ่าน source code ของ library ที่ใช้บ่อย
-2. เขียนโค้ดเองโดยไม่ใช้ agent สัปดาห์ละครั้ง เพื่อรักษาความรู้สึกว่าอะไรยากอะไรง่าย
-3. ทำ code review ของคนอื่นให้มากกว่าเขียนเอง
-4. ศึกษา runtime ของภาษาที่ใช้อย่างน้อยหนึ่งชั้นลึกกว่าที่ใช้งานอยู่
+## Development Path
+1. Read the source of the libraries you use most
+2. Write code without an agent once a week, to keep a feel for what is hard and what is easy
+3. Review other people's code more than you write your own
+4. Study the runtime of your language at least one layer deeper than you currently work
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน implementation, refactor, แปลงภาษา, boilerplate, unit test — เกือบทั้งหมด
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าโค้ดที่มันเขียนถูกหรือไม่
+## Relationship with Agents
+- **Agents can do:** Write implementations, refactor, port between languages, boilerplate, unit tests — nearly all of it
+- **Agents cannot do:** Judge whether the code they wrote is correct
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Review ใช้เวลาสั้นผิดปกติเมื่อเทียบกับขนาด diff
-- ไม่มีใครอธิบายได้ว่าโค้ดส่วนนี้ทำงานอย่างไร
+## Signals the Team Lacks This Skill
+- Reviews take unusually little time relative to diff size
+- Nobody can explain how this part of the code works

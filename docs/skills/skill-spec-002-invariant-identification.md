@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-001 — Spec Writing](skill-spec-001-spec-writing.md) · [SKILL-TEST-002 — Property-Based Thinking](skill-test-002-property-thinking.md) · [SKILL-ARCH-003 — Data Modeling](skill-arch-003-data-modeling.md)
 
-## นิยาม
-ความสามารถในการระบุ **สิ่งที่ต้องเป็นจริงเสมอ** ไม่ว่าระบบจะอยู่ในสถานะไหน และเขียนมันในรูปแบบที่ทดสอบหรือบังคับได้
+## Definition
+The ability to identify **what must always be true**, whatever state the system is in, and to write it in a form that can be tested or enforced.
 
-## ทำไมสำคัญตอนนี้
-Acceptance criteria ทดสอบ "กรณีที่คิดถึง" แต่ invariant ครอบคลุม "กรณีที่ไม่ได้คิดถึง" — ซึ่งเป็นที่ที่ agent ทำพลาดมากที่สุด เพราะมันเก่งในการทำให้ตัวอย่างที่ให้ไปผ่าน แต่ไม่มีความเข้าใจ domain ที่จะรู้ว่าอะไรห้ามผิด
+## Why It Matters Now
+Acceptance criteria test "the cases we thought of", while invariants cover "the cases we did not" — which is exactly where agents fail most. They are very good at making the given examples pass, but have no domain understanding of what must never go wrong.
 
-## ระดับ
+## Levels
 ### Foundation
-- เข้าใจความต่างระหว่าง "ผลลัพธ์ที่คาดหวัง" กับ "สิ่งที่ต้องจริงเสมอ"
+- Understands the difference between "the expected result" and "what must always be true"
 
 ### Proficient
-- ระบุ invariant ระดับ entity ได้ เช่น ยอดคงเหลือห้ามติดลบ
-- แปลง invariant เป็น database constraint หรือ property test ได้
+- Identifies entity-level invariants, e.g. a balance must never go negative
+- Turns invariants into database constraints or property tests
 
 ### Expert
-- ระบุ invariant ที่ข้าม entity เช่น double-entry ledger ต้อง net เป็นศูนย์เสมอ
-- ระบุ invariant ภายใต้ concurrency และ partial failure
-- รู้ว่า invariant ข้อไหนควรบังคับที่ DB ข้อไหนที่ application ข้อไหนที่ test
+- Identifies cross-entity invariants, e.g. a double-entry ledger must always net to zero
+- Identifies invariants under concurrency and partial failure
+- Knows which invariants belong in the DB, which in the application, and which in tests
 
-## วิธีประเมิน
-ให้ระบบโอนเงินระหว่างบัญชี แล้วถามว่า invariant มีอะไรบ้าง
-- "ยอดต้องถูกต้อง" = ยังไม่ใช่ invariant เป็นความปรารถนา
-- "ผลรวมของทุกบัญชีก่อนและหลังโอนต้องเท่ากัน" = Proficient
-- เพิ่ม "แม้ transaction ล้มกลางคัน" และ "แม้มีสอง request พร้อมกันด้วย key เดียวกัน" = Expert
+## How to Assess
+Present a system that transfers money between accounts and ask what the invariants are.
+- "The balance must be correct" = not an invariant, that is a wish
+- "The sum across all accounts before and after a transfer must be equal" = Proficient
+- Adding "even if the transaction fails midway" and "even with two simultaneous requests using the same key" = Expert
 
-## เส้นทางพัฒนา
-1. หยิบ domain ที่คุ้นเคย เขียน invariant ให้ได้ 10 ข้อ แล้วให้คนอื่นหาทางละเมิดแต่ละข้อ
-2. ฝึกเขียน property-based test แทน example-based test สำหรับ logic ที่ซับซ้อน
-3. ทุกครั้งที่เกิด bug ให้ถามว่า "invariant ข้อไหนที่ถ้ามีอยู่จะจับ bug นี้ได้"
-4. ศึกษา double-entry bookkeeping — เป็นตัวอย่าง invariant ที่ออกแบบมาดีที่สุดในประวัติศาสตร์
+## Development Path
+1. Take a domain you know well, write 10 invariants, then have someone else try to violate each one
+2. Practise writing property-based tests instead of example-based ones for complex logic
+3. Every time a bug occurs, ask "which invariant, had it existed, would have caught this?"
+4. Study double-entry bookkeeping — the best-designed invariant in history
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** เขียน property test จาก invariant ที่ให้ไว้, แปลง invariant เป็น constraint SQL
-- **Agent ทำแทนไม่ได้:** ระบุว่า invariant คืออะไร — เพราะมันมาจากความเข้าใจ domain ไม่ใช่จากข้อความ
+## Relationship with Agents
+- **Agents can do:** Write property tests from given invariants, translate invariants into SQL constraints
+- **Agents cannot do:** Identify what the invariants are — because they come from domain understanding, not from the text
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Bug ประเภท "ข้อมูลอยู่ในสถานะที่เป็นไปไม่ได้" เกิดเป็นระยะ
-- Test ทั้งหมดเป็น example-based
-- Spec มี AC แต่ไม่มี section invariant เลย
+## Signals the Team Lacks This Skill
+- "Data in an impossible state" bugs occurring periodically
+- All tests are example-based
+- Specs have ACs but no invariants section at all

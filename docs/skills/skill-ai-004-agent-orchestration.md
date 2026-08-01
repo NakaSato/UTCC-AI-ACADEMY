@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-AI-001 — Context Engineering](skill-ai-001-context-engineering.md) · [SKILL-AI-003 — Review at Scale](skill-ai-003-review-at-scale.md) · [SKILL-ARCH-004 — Threat Modeling](skill-arch-004-threat-modeling.md)
 
-## นิยาม
-ความสามารถในการตั้งค่าและควบคุมการทำงานของ agent ในระดับระบบ — ขอบเขตเครื่องมือ สิทธิ์ งบประมาณ ความขนาน และกลไกหยุดฉุกเฉิน
+## Definition
+The ability to configure and control how agents operate at the system level — tool scope, permissions, budgets, concurrency, and emergency stop mechanisms.
 
-## ทำไมสำคัญตอนนี้
-เป็นทักษะใหม่ที่ยังไม่มีใครสอน แต่จำเป็นทันทีที่ agent ทำงานเกินหนึ่งตัวหรือทำงานโดยไม่มีคนนั่งดูตลอดเวลา — ซึ่งเป็นสภาพที่ทุกทีมจะไปถึงภายในไม่กี่เดือน
+## Why It Matters Now
+A new skill that nobody teaches yet, but one that becomes necessary the moment more than one agent is running, or an agent runs without someone watching it continuously — a state every team will reach within a few months.
 
-## ระดับ
+## Levels
 ### Foundation
-- ตั้งค่า agent ให้ทำงานกับ repo ได้
-- รู้ว่า agent เข้าถึงอะไรได้บ้าง
+- Can set an agent up to work with a repo
+- Knows what the agent has access to
 
 ### Proficient
-- กำหนด tool scope และ credential ที่จำกัดตามหลัก least privilege
-- ตั้งเพดานงบประมาณและความขนานที่ผูกกับ capacity ของการตรวจสอบ
-- ตั้ง identity แยกให้ agent เพื่อให้ audit trail แยกจากมนุษย์ได้
+- Defines tool scope and restricted credentials on least-privilege lines
+- Sets budget and concurrency ceilings tied to review capacity
+- Gives agents a separate identity so the audit trail can be distinguished from humans'
 
 ### Expert
-- ออกแบบ admission control และ backpressure ที่ทำงานจริง
-- ออกแบบ kill switch ที่ทำงานได้แม้ระบบอื่นล่ม และทดสอบสม่ำเสมอ
-- ป้องกัน prompt injection ในระดับสถาปัตยกรรม (แยก instruction ออกจาก data, egress allowlist)
+- Designs admission control and backpressure that actually work
+- Designs a kill switch that works even when other systems are down, and tests it regularly
+- Prevents prompt injection at the architectural level (separating instructions from data, egress allowlists)
 
-## วิธีประเมิน
-ถาม:
-1. "ถ้า agent เริ่มทำสิ่งที่ผิดตอนนี้ คุณหยุดมันได้ภายในกี่วินาที"
-2. "agent มี credential อะไรบ้าง และเข้าถึง production ได้ไหม"
-3. "ถ้ามีคนใส่ข้อความในไฟล์ที่ agent อ่าน สั่งให้มันทำอย่างอื่น จะเกิดอะไร"
+## How to Assess
+Ask:
+1. "If an agent started doing the wrong thing right now, how many seconds would it take you to stop it?"
+2. "What credentials do your agents hold, and can they reach production?"
+3. "If someone planted text in a file the agent reads, telling it to do something else, what happens?"
 
-ตอบข้อ 3 ไม่ได้ = ยังไม่ถึง Proficient สำหรับระบบที่ agent ทำงานอัตโนมัติ
+Unable to answer question 3 = not yet Proficient for systems where agents run autonomously.
 
-## เส้นทางพัฒนา
-1. ตรวจสอบว่า agent ในโปรเจกต์ปัจจุบันเข้าถึงอะไรได้บ้างจริงๆ
-2. ตั้ง identity และ credential แยกให้ agent
-3. ตั้งเพดาน PR เปิดค้าง แล้วดูว่าพฤติกรรมทีมเปลี่ยนไหม
-4. ทดสอบ kill switch เป็น game day ทุกไตรมาส
+## Development Path
+1. Audit what the agents on your current project can actually reach
+2. Set up separate identities and credentials for agents
+3. Cap the number of open PRs, then watch whether team behaviour changes
+4. Test the kill switch as a game day every quarter
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ไม่ควรให้ทำ — agent ที่กำหนดขอบเขตของตัวเองคือความเสี่ยงเชิงโครงสร้าง
-- **หมายเหตุ:** agent ช่วยเขียน config ได้ แต่การอนุมัติต้องเป็นของมนุษย์
+## Relationship with Agents
+- **Agents can do:** Should not be delegated — an agent that defines its own boundaries is a structural risk
+- **Note:** an agent can help write the config, but approval must be human
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ไม่มี kill switch หรือมีแต่ไม่เคยทดสอบ
-- agent ใช้ credential เดียวกับมนุษย์
-- ไม่มีเพดานงบประมาณ
+## Signals the Team Lacks This Skill
+- No kill switch, or one that has never been tested
+- Agents using the same credentials as humans
+- No budget ceiling

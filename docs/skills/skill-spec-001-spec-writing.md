@@ -21,48 +21,48 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-SPEC-002 — Invariant Identification](skill-spec-002-invariant-identification.md) · [SKILL-SPEC-003 — Ambiguity Detection](skill-spec-003-ambiguity-detection.md) · [SKILL-TEST-001 — Test Design](skill-test-001-test-design.md)
 
-## นิยาม
-ความสามารถในการแปลงความต้องการที่เขียนด้วยคำคุณศัพท์ ("ง่าย", "เร็ว", "เชื่อถือได้") ให้เป็นข้อความที่ **เครื่องตรวจสอบได้** และไม่เหลือช่องให้ตีความสองทาง
+## Definition
+The ability to turn requirements written in adjectives ("easy", "fast", "reliable") into statements a **machine can verify**, leaving no room for two readings.
 
-## ทำไมสำคัญตอนนี้
-นี่คือทักษะที่ให้ผลตอบแทนสูงที่สุดในทั้งคลัง เพราะคุณค่าของ agent แปรผันตรงกับคุณภาพของ spec — agent ที่เก่งที่สุดที่ได้รับ spec คลุมเครือ จะผลิตของที่ผิดได้เร็วกว่าเดิมเท่านั้นเอง การลงทุนที่นี่ให้ผลมากกว่าลงทุนที่ agent tooling หลายเท่า
+## Why It Matters Now
+This is the highest-return skill in the whole library, because an agent's value varies directly with the quality of the spec — the best agent in the world, given a vague spec, simply produces the wrong thing faster. Investment here pays off many times more than investment in agent tooling.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียน user story ตาม template ได้
-- แยก acceptance criteria ออกจากคำอธิบายทั่วไป
+- Writes user stories from a template
+- Separates acceptance criteria from general description
 
 ### Proficient
-- เขียน AC ที่ชี้ไปยัง test file ที่มีอยู่จริงได้ทุกข้อ
-- ระบุ non-goal ชัดเจน (สิ่งที่จงใจไม่ทำ)
-- ระบุ rollback plan และ observability ที่ต้องมี
+- Writes ACs that each point to a test file that actually exists
+- States non-goals clearly (what is deliberately not being done)
+- States the rollback plan and the observability required
 
 ### Expert
-- เขียน spec ที่คนอื่นอ่านแล้วทำได้โดยไม่ต้องถามกลับเลย
-- เขียน invariant ที่จับ bug ที่ตัวอย่างทดสอบจับไม่ได้
-- รู้ว่าเมื่อไหร่ควรเขียน spec ละเอียด และเมื่อไหร่การเขียนละเอียดคือการเสียเวลา
+- Writes specs someone else can execute without a single follow-up question
+- Writes invariants that catch bugs the test examples cannot
+- Knows when a detailed spec is warranted and when writing one is a waste of time
 
-## วิธีประเมิน
-ให้ requirement ที่คลุมเครือ เช่น "ผู้ใช้ควรยกเลิกคำสั่งซื้อได้ง่าย" แล้วให้เขียนเป็น spec ภายใน 20 นาที
-เกณฑ์ผ่าน:
-- ทุก AC ระบุ verified-by ที่เป็นไฟล์ test
-- มี non-goal อย่างน้อยหนึ่งข้อ
-- มี invariant ที่ไม่ใช่แค่ทวน AC
-- มี rollback plan
+## How to Assess
+Give a vague requirement, such as "users should be able to cancel an order easily", and have them write a spec within 20 minutes.
+Passing criteria:
+- Every AC names a verified-by test file
+- At least one non-goal
+- An invariant that is more than a restatement of the ACs
+- A rollback plan
 
-จากนั้นเอา spec นั้นให้ agent implement แล้วดูว่ามันติดคำถามกี่ข้อ — ยิ่งน้อยยิ่งแสดงว่า spec ดี
+Then give that spec to an agent to implement and see how many questions it gets stuck on — the fewer, the better the spec.
 
-## เส้นทางพัฒนา
-1. หยิบ requirement เก่าที่เคยเข้าใจผิดกันในทีม เขียนใหม่ให้มี invariant + AC ที่ชี้ไป test ทำซ้ำ 10 ครั้ง
-2. ก่อนเขียนโค้ดทุกครั้ง ให้ agent อ่าน spec แล้วถามว่า "มีอะไรที่ยังไม่ตอบ" — คำถามที่มันถามคือรูรั่วของคุณ
-3. ฝึกเขียน non-goal ให้ได้อย่างน้อยหนึ่งข้อเสมอ
-4. อ่าน spec ของ RFC หรือ standard จริง (เช่น RFC ของ HTTP) สังเกตวิธีใช้ MUST/SHOULD/MAY
+## Development Path
+1. Take an old requirement the team misread, rewrite it with invariants + ACs pointing to tests. Repeat 10 times
+2. Before writing any code, have an agent read the spec and ask "what is still unanswered?" — the questions it asks are your leaks
+3. Practise always producing at least one non-goal
+4. Read real RFCs or standards specs (the HTTP RFCs, for instance) and note how they use MUST/SHOULD/MAY
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ร่าง spec จาก PRD, สร้าง test skeleton จาก AC, **ชี้ช่องว่างที่ spec ยังไม่ตอบ (มีค่าที่สุด)**
-- **Agent ทำแทนไม่ได้:** นิยาม invariant, ตัดสินว่าอะไรอยู่ใน scope, รับผิดชอบเมื่อ spec ผิด
+## Relationship with Agents
+- **Agents can do:** Draft specs from a PRD, generate test skeletons from ACs, **point out the gaps a spec has not answered (the most valuable of these)**
+- **Agents cannot do:** Define invariants, decide what is in scope, be accountable when the spec is wrong
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Agent block rate ต่ำผิดปกติ (แปลว่ามันกำลังเดา ไม่ใช่ว่า spec ดี)
-- Rework rate สูงกว่า 25%
-- คำถามระหว่าง implement มีเยอะ และเป็นคำถามที่ควรตอบได้ตั้งแต่ต้น
+## Signals the Team Lacks This Skill
+- Unusually low agent block rate (meaning it is guessing, not that the spec is good)
+- Rework rate above 25%
+- Many questions during implementation, of a kind that should have been answered up front

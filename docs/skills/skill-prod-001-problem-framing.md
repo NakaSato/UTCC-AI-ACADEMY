@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-PROD-004 — Prioritization](skill-prod-004-prioritization.md) · [SKILL-SPEC-003 — Ambiguity Detection](skill-spec-003-ambiguity-detection.md)
 
-## นิยาม
-ความสามารถในการแปลงคำขอที่มาในรูป **solution** ให้กลับไปเป็น **problem** ที่วัดได้ และระบุได้ว่าใครเดือดร้อน เดือดร้อนแค่ไหน และรู้ได้อย่างไรว่าแก้แล้ว
+## Definition
+The ability to turn a request that arrives as a **solution** back into a measurable **problem**, identifying who is hurting, how badly, and how we will know it has been fixed.
 
-## ทำไมสำคัญตอนนี้
-เมื่อการสร้างของถูกลงมาก ความเสี่ยงย้ายจาก "สร้างไม่เสร็จ" ไปเป็น "สร้างของที่ไม่มีใครต้องการได้เร็วมาก" ทักษะนี้คือด่านแรกที่กันไม่ให้ทั้งสายโซ่วิ่งไปผิดทาง
+## Why It Matters Now
+As building gets much cheaper, the risk shifts from "not finishing" to "building something nobody wants, very fast". This skill is the first gate that keeps the whole chain from running in the wrong direction.
 
-## ระดับ
+## Levels
 ### Foundation
-- แยกออกว่าอะไรคือ problem อะไรคือ solution เมื่อมีคนชี้ให้ดู
-- ถามคำถาม "ทำไม" ต่อได้ 1–2 ชั้น
+- Can tell a problem from a solution once someone points it out
+- Can ask "why" one or two levels deep
 
 ### Proficient
-- แปลงคำขอเป็น problem statement ได้เองโดยไม่ต้องมีคนเตือน
-- หา baseline ปัจจุบันได้ก่อนเสนอทางแก้
-- ระบุ non-goal ได้ชัด
+- Turns requests into problem statements unprompted
+- Finds the current baseline before proposing a fix
+- States non-goals clearly
 
 ### Expert
-- ท้าทายคำขอจากผู้มีอำนาจได้อย่างสร้างสรรค์โดยไม่เสียความสัมพันธ์
-- มองเห็นว่าปัญหาที่ถูกเสนอมาเป็นอาการของปัญหาที่ลึกกว่า
-- ตัดสินใจได้ว่าปัญหาไหน **ไม่ควรแก้**
+- Constructively challenges requests from people with authority without damaging the relationship
+- Sees when the problem presented is a symptom of a deeper one
+- Can decide which problems **should not be solved**
 
-## วิธีประเมิน
-ให้คำขอจริงที่เคยได้รับ เช่น "อยากได้ dashboard สรุปยอดขาย" แล้วดูว่าเขา:
-1. ถามว่าใครจะใช้ ใช้ตัดสินใจอะไร — หรือเริ่มออกแบบ dashboard ทันที
-2. ถามว่าตอนนี้ตัดสินใจเรื่องนั้นด้วยอะไร แล้วมันพลาดตรงไหน
-3. เสนอทางแก้ที่ไม่ใช่ dashboard ได้อย่างน้อยหนึ่งทาง
+## How to Assess
+Give a real request the team has received — for example "we want a sales summary dashboard" — and watch whether they:
+1. Ask who will use it and what decision it supports, or start designing the dashboard immediately
+2. Ask how that decision is made today, and where it goes wrong
+3. Propose at least one solution that is not a dashboard
 
-คนที่ข้ามข้อ 1–2 ไปเลย = ยังไม่ถึง Proficient
+Anyone who skips 1–2 = not yet Proficient.
 
-## เส้นทางพัฒนา
-1. ฝึก "5 Whys" กับ requirement ที่เข้ามาทุกชิ้นเป็นเวลาหนึ่งเดือน
-2. ก่อนเริ่มงานทุกชิ้น เขียนสามบรรทัด: ใครเดือดร้อน / ตอนนี้เขาทำยังไง / รู้ได้ยังไงว่าดีขึ้น
-3. อ่าน *Continuous Discovery Habits* (Teresa Torres) — โดยเฉพาะ opportunity solution tree
-4. ทบทวนย้อนหลัง: ฟีเจอร์ที่ทีมทำไปปีที่แล้ว มีกี่ตัวที่แก้ปัญหาจริง
+## Development Path
+1. Practise "5 Whys" on every incoming requirement for a month
+2. Before starting any piece of work, write three lines: who is hurting / what they do today / how we will know it improved
+3. Read *Continuous Discovery Habits* (Teresa Torres) — especially the opportunity solution tree
+4. Look back: of the features the team shipped last year, how many solved a real problem?
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** สรุป interview, จัดกลุ่ม pain point พร้อมอ้างอิง, ค้นว่าคู่แข่งแก้ปัญหานี้อย่างไร
-- **Agent ทำแทนไม่ได้:** ตัดสินว่าปัญหาไหนสำคัญ, ท้าทายผู้มีอำนาจ, รับผลของการเลือกผิด
+## Relationship with Agents
+- **Agents can do:** Summarise interviews, cluster pain points with citations, research how competitors solve the problem
+- **Agents cannot do:** Decide which problems matter, challenge authority, live with the consequences of choosing wrong
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Backlog เต็มไปด้วยชื่อฟีเจอร์ ไม่มีปัญหาสักข้อ
-- ตอบไม่ได้ว่าฟีเจอร์ที่ปล่อยไปเมื่อไตรมาสที่แล้วช่วยอะไร
-- ทุก requirement เริ่มด้วย "อยากได้..." ไม่เคยเริ่มด้วย "ตอนนี้มีปัญหาว่า..."
+## Signals the Team Lacks This Skill
+- A backlog full of feature names and not a single problem
+- Nobody can say what last quarter's shipped feature achieved
+- Every requirement starts with "we want…" and never with "the problem right now is…"

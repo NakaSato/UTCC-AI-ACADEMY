@@ -21,42 +21,42 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-PROD-001 — Problem Framing](skill-prod-001-problem-framing.md) · [SKILL-BLD-003 — Release Risk Assessment](skill-bld-003-release-risk-assessment.md)
 
-## นิยาม
-ความสามารถในการเลือกว่า **จะไม่ทำอะไร** และอธิบายเหตุผลให้ผู้มีส่วนได้ส่วนเสียยอมรับได้ โดยตัดสินบนข้อมูลที่ไม่ครบเสมอ
+## Definition
+The ability to choose **what not to do** and explain the reasoning in a way stakeholders accept — always deciding on incomplete information.
 
-## ทำไมสำคัญตอนนี้
-เมื่อ capacity ในการสร้างเพิ่มขึ้นหลายเท่า แรงกดดันให้ "ทำทุกอย่างเพราะทำได้แล้ว" จะสูงมาก ทักษะนี้เปลี่ยนจากการจัดคิวงาน เป็นการปกป้องโฟกัสของทีม
+## Why It Matters Now
+When build capacity multiplies, the pressure to "do everything because now we can" becomes intense. This skill shifts from queueing work to protecting the team's focus.
 
-## ระดับ
+## Levels
 ### Foundation
-- เรียงลำดับงานตามเกณฑ์ที่คนอื่นกำหนดให้ได้
+- Can order work according to criteria someone else set
 
 ### Proficient
-- ใช้กรอบเช่น RICE / Cost of Delay ได้อย่างเข้าใจข้อจำกัดของมัน
-- ระบุ opportunity cost ของแต่ละตัวเลือกได้
-- ปฏิเสธงานได้พร้อมเหตุผลที่อ้างอิงเป้าหมาย
+- Uses frameworks such as RICE / Cost of Delay while understanding their limits
+- Can state the opportunity cost of each option
+- Can say no, with reasoning grounded in the goals
 
 ### Expert
-- ตัดสินใจได้ในสถานการณ์ที่ข้อมูลขัดแย้งกันและมีการเมืองเข้ามาเกี่ยว
-- กล้าหยุดโครงการที่ลงทุนไปแล้วมาก (ต้านทาน sunk cost)
-- จัดลำดับโดยคำนึงถึงลำดับที่ทำให้เรียนรู้เร็วที่สุด ไม่ใช่แค่คุณค่าสูงสุด
+- Decides in situations where the data conflicts and politics are involved
+- Has the nerve to stop projects with heavy prior investment (resisting sunk cost)
+- Orders work by what produces learning fastest, not only by highest value
 
-## วิธีประเมิน
-ให้ backlog 10 ชิ้นที่มีทั้งงานจากลูกค้ารายใหญ่ งานลดหนี้เทคนิค และงานที่ CEO ขอ แล้วให้เขาเลือก 3 ชิ้นสำหรับไตรมาสหน้า พร้อมอธิบายว่าจะบอกเจ้าของงานที่ถูกตัดออกว่าอย่างไร
+## How to Assess
+Give a backlog of 10 items mixing work for a major customer, technical debt reduction, and something the CEO asked for. Have them pick 3 for next quarter and explain what they would tell the owners of the items that were cut.
 
-ดูที่คำอธิบาย ไม่ใช่ที่ตัวเลือก — คนระดับ Expert จะพูดถึง opportunity cost และผลต่อเป้าหมายรวม ไม่ใช่แค่ "อันนี้ impact สูงกว่า"
+Judge the explanation, not the selection — an Expert talks about opportunity cost and the effect on overall goals, not just "this one has higher impact".
 
-## เส้นทางพัฒนา
-1. ทุกครั้งที่รับงานใหม่เข้า sprint ให้ระบุว่างานอะไรถูกเลื่อนออกไปแทน — ฝึกให้ opportunity cost เป็นสิ่งที่มองเห็น
-2. ฝึกเขียนคำปฏิเสธที่อ้างอิงเป้าหมายรวม ไม่ใช่อ้าง capacity
-3. ทบทวนย้อนหลังทุกไตรมาส: ถ้าย้อนเวลาได้จะเลือกต่างไหม เพราะอะไร
-4. ฝึกหยุดโครงการเล็กๆ ที่ไม่ไปไหนหนึ่งตัวต่อไตรมาส
+## Development Path
+1. Every time new work enters a sprint, name what got pushed out in its place — make opportunity cost visible
+2. Practise writing refusals grounded in overall goals rather than in capacity
+3. Look back each quarter: with hindsight, would you choose differently, and why?
+4. Practise killing one small project that is going nowhere every quarter
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** คำนวณคะแนนตามกรอบที่ให้, สรุปผลกระทบของแต่ละตัวเลือก, หาข้อมูลประกอบ
-- **Agent ทำแทนไม่ได้:** รับผิดชอบผลของการเลือก, อ่านการเมืองในองค์กร, ตัดสินใจภายใต้ความไม่แน่นอน
+## Relationship with Agents
+- **Agents can do:** Compute scores against a given framework, summarise the impact of each option, gather supporting data
+- **Agents cannot do:** Own the consequences of the choice, read organisational politics, decide under uncertainty
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ทุกอย่างเป็น P1
-- Sprint เต็มตลอดแต่ไม่มีอะไรเสร็จสมบูรณ์
-- ไม่มีใครจำได้ว่าปีที่แล้วตัดสินใจไม่ทำอะไรบ้าง
+## Signals the Team Lacks This Skill
+- Everything is P1
+- Sprints are always full but nothing is ever finished
+- Nobody remembers what the team decided *not* to do last year

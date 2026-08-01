@@ -12,7 +12,7 @@ related: []
 review_by:
 ---
 
-# ชื่อทักษะ
+# Skill Name
 
 > [Canonical Skill Library](../skills-library-README.md) ·
 > [Skill Directory](README.md) ·
@@ -20,23 +20,23 @@ review_by:
 > [Workflow Guide for All Roles](../system-development-flow-role-guide.md) ·
 > [System Development Flow Master](../system-development-flow-master.md)
 
-## นิยาม
-ทำอะไรได้ถึงเรียกว่ามีทักษะนี้ — เขียนเป็นความสามารถที่สังเกตได้ ไม่ใช่ความรู้ที่ท่องได้
+## Definition
+What someone must be able to do to be said to have this skill — write it as an observable capability, not as knowledge that can be recited.
 
-## ทำไมสำคัญตอนนี้
+## Why It Matters Now
 
-## ระดับ
+## Levels
 ### Foundation
 ### Proficient
 ### Expert
 
-## วิธีประเมิน
-แบบฝึกหัดหรือสถานการณ์จริงที่ใช้วัด ไม่ใช่คำถามปากเปล่า
+## How to Assess
+An exercise or a real situation used to measure it — not verbal questioning.
 
-## เส้นทางพัฒนา
+## Development Path
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:**
-- **Agent ทำแทนไม่ได้:**
+## Relationship with Agents
+- **Agents can do:**
+- **Agents cannot do:**
 
-## สัญญาณว่าทีมขาดทักษะนี้
+## Signals the Team Lacks This Skill

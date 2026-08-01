@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-OPS-002 — Incident Response](skill-ops-002-incident-response.md) · [SKILL-CODE-004 — Production Debugging](skill-code-004-production-debugging.md) · [SKILL-HUM-002 — Decision Documentation](skill-hum-002-decision-documentation.md)
 
-## นิยาม
-ความสามารถในการวิเคราะห์หลังเหตุการณ์เพื่อหาสาเหตุเชิงระบบ ไม่ใช่เชิงบุคคล และแปลงเป็นการเปลี่ยนแปลงที่ป้องกันการเกิดซ้ำได้จริง
+## Definition
+The ability to analyse an incident afterwards to find systemic rather than personal causes, and to turn that into changes that genuinely prevent recurrence.
 
-## ทำไมสำคัญตอนนี้
-เมื่อโค้ดถูกผลิตเร็วขึ้น รูปแบบความผิดพลาดจะซ้ำเร็วขึ้นตาม RCA ที่ดีจะเปลี่ยน bug หนึ่งตัวเป็น fitness function หรือ gate ที่กันทั้งประเภทได้ — ซึ่งเป็นวิธีเดียวที่คุณภาพจะตามทันปริมาณ
+## Why It Matters Now
+As code gets produced faster, failure patterns repeat faster too. Good RCA turns one bug into a fitness function or a gate that blocks the whole class of it — which is the only way quality keeps up with volume.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียน timeline ของเหตุการณ์ได้ครบ
-- ระบุสาเหตุโดยตรงได้
+- Can write a complete timeline of the incident
+- Can identify the immediate cause
 
 ### Proficient
-- ใช้เทคนิคอย่าง 5 Whys โดยไม่หยุดที่ "คนทำพลาด"
-- แยก contributing factor ออกจาก root cause
-- เสนอ action item ที่วัดผลได้และมีเจ้าของ
+- Uses techniques like 5 Whys without stopping at "someone made a mistake"
+- Distinguishes contributing factors from the root cause
+- Proposes action items that are measurable and have an owner
 
 ### Expert
-- วิเคราะห์เชิงระบบ: ทำไมกระบวนการถึงปล่อยให้เกิดสิ่งนี้ได้
-- เห็นรูปแบบข้าม incident หลายครั้งที่ดูไม่เกี่ยวกัน
-- แปลง finding เป็น gate อัตโนมัติแทนที่จะเป็นการเตือนให้ระวัง
+- Analyses systemically: why did the process allow this to happen?
+- Sees patterns across several incidents that look unrelated
+- Turns findings into automated gates rather than reminders to be careful
 
-## วิธีประเมิน
-ให้ postmortem ที่สรุปว่า "developer ลืมเพิ่ม index" แล้วถามว่าจะวิเคราะห์ต่ออย่างไร
-- ยอมรับคำตอบนั้น = Foundation
-- ถามว่าทำไมระบบถึงปล่อยให้ deploy ได้โดยไม่มีใครสังเกต = Proficient
-- เสนอ gate อัตโนมัติที่ตรวจ query plan ใน CI = Expert
+## How to Assess
+Give them a postmortem concluding "the developer forgot to add an index", then ask how they would take the analysis further.
+- Accepting that conclusion = Foundation
+- Asking why the system allowed it to be deployed unnoticed = Proficient
+- Proposing an automated gate that checks query plans in CI = Expert
 
-## เส้นทางพัฒนา
-1. เขียน postmortem ทุกครั้งแม้เหตุเล็ก แล้วบังคับตัวเองให้ถาม "ทำไม" ห้าชั้น
-2. ตรวจ action item จาก postmortem เก่า — กี่ % ที่ทำจริง และกี่ % ที่กลายเป็น automation
-3. หา pattern จาก incident 10 ครั้งล่าสุด
-4. ฝึกเขียน blameless postmortem — ภาษาที่ใช้กำหนดว่าคนจะพูดความจริงหรือไม่
+## Development Path
+1. Write a postmortem every time, even for small incidents, and force yourself through five levels of "why"
+2. Audit action items from old postmortems — what % were actually done, and what % became automation?
+3. Look for patterns across the last 10 incidents
+4. Practise writing blameless postmortems — the language used determines whether people tell the truth
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** รวบรวม timeline จาก log และ chat, หา correlation, ร่างเอกสาร, ค้น incident คล้ายกันในอดีต
-- **Agent ทำแทนไม่ได้:** วิเคราะห์สาเหตุเชิงองค์กร, ตัดสินว่า action item ไหนคุ้มที่จะทำ
+## Relationship with Agents
+- **Agents can do:** Assemble the timeline from logs and chat, find correlations, draft the document, search for similar past incidents
+- **Agents cannot do:** Analyse organisational causes, decide which action items are worth doing
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Postmortem จบที่ "จะระมัดระวังมากขึ้น"
-- Incident แบบเดิมเกิดซ้ำภายในหกเดือน
-- Action item ค้างไม่มีใครทำ
+## Signals the Team Lacks This Skill
+- Postmortems ending in "we will be more careful"
+- The same kind of incident recurring within six months
+- Action items left outstanding with nobody doing them

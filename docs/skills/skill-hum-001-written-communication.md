@@ -21,43 +21,43 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-HUM-002 — Decision Documentation](skill-hum-002-decision-documentation.md) · [SKILL-SPEC-001 — Spec Writing](skill-spec-001-spec-writing.md)
 
-## นิยาม
-ความสามารถในการเขียนให้คนที่ไม่ได้อยู่ในบทสนทนาเข้าใจได้โดยไม่ต้องถามกลับ — ในความยาวที่สั้นที่สุดที่ยังครบ
+## Definition
+The ability to write so that someone who was not part of the conversation understands without having to ask — in the shortest form that is still complete.
 
-## ทำไมสำคัญตอนนี้
-เมื่อกระบวนการทั้งหมดเป็น markdown และ async ความสามารถนี้กลายเป็นตัวกำหนดความเร็วของทั้งทีมโดยตรง และเมื่อ agent อ่านเอกสารของเราเป็นบริบท เอกสารที่เขียนคลุมเครือจะกลายเป็นโค้ดที่ผิดทันที — ทักษะที่เคยถูกมองว่าเป็น "soft skill" กลายเป็นข้อกำหนดทางเทคนิค
+## Why It Matters Now
+When the entire process is markdown and asynchronous, this ability directly sets the pace of the whole team. And when agents read our documents as context, an ambiguously written document becomes wrong code immediately — a skill once dismissed as "soft" is now a technical requirement.
 
-## ระดับ
+## Levels
 ### Foundation
-- เขียนอธิบายสิ่งที่ทำได้เข้าใจ
-- ใช้โครงสร้าง (หัวข้อ, bullet) ช่วยการอ่าน
+- Explains what was done in a way people understand
+- Uses structure (headings, bullets) to aid reading
 
 ### Proficient
-- เขียนโดยเริ่มจากข้อสรุป ไม่ใช่จากที่มา
-- ปรับความลึกตามผู้อ่าน (ผู้บริหาร vs วิศวกร)
-- เขียนสิ่งที่ซับซ้อนให้สั้นได้โดยไม่เสียความหมาย
+- Writes starting from the conclusion rather than from the background
+- Adjusts depth to the reader (executives vs engineers)
+- Writes complex things briefly without losing meaning
 
 ### Expert
-- เขียนเอกสารที่คนอ่านแล้วตัดสินใจได้ทันทีโดยไม่ต้องประชุม
-- คาดการณ์คำถามของผู้อ่านแล้วตอบไว้ล่วงหน้าในลำดับที่ถูกต้อง
-- เขียนได้ชัดในเรื่องที่ตัวเองยังไม่แน่ใจ โดยระบุความไม่แน่นอนอย่างตรงไปตรงมา
+- Writes documents that let readers decide immediately, without a meeting
+- Anticipates the reader's questions and answers them in advance, in the right order
+- Writes clearly about things they are unsure of, stating the uncertainty plainly
 
-## วิธีประเมิน
-ให้เขียน ADR หรือ status update แล้วส่งให้คนที่ไม่ได้อยู่ในเรื่องนั้นอ่าน
-- ถามกลับเกิน 2 คำถาม = ยังไม่ผ่าน Proficient
-- อ่านแล้วตัดสินใจต่อได้ทันที = Expert
+## How to Assess
+Have them write an ADR or status update, then give it to someone not involved in the topic.
+- More than 2 follow-up questions = not yet Proficient
+- The reader can act on it immediately = Expert
 
-## เส้นทางพัฒนา
-1. ฝึกเขียนย่อหน้าแรกเป็นข้อสรุปเสมอ (BLUF — bottom line up front)
-2. เขียนแล้วตัดออก 30% โดยไม่ให้เสียความหมาย ทำทุกเอกสารเป็นเวลาหนึ่งเดือน
-3. ขอ feedback ว่าคนอ่านต้องอ่านซ้ำตรงไหน — จุดนั้นคือจุดที่เขียนไม่ชัด
-4. อ่าน ADR และ RFC ที่เขียนดีในโปรเจกต์ open source
+## Development Path
+1. Practise making the first paragraph the conclusion, every time (BLUF — bottom line up front)
+2. Write, then cut 30% without losing meaning; do this for every document for a month
+3. Ask for feedback on where readers had to re-read — that is where the writing is unclear
+4. Read well-written ADRs and RFCs in open source projects
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ขัดเกลาภาษา, ปรับโครงสร้าง, ย่อความ, แปลภาษา, ชี้จุดที่คลุมเครือ
-- **Agent ทำแทนไม่ได้:** รู้ว่าผู้อ่านต้องการอะไรจริงๆ, ตัดสินว่าอะไรสำคัญพอที่จะเขียน — และข้อความที่ agent ขัดเกลาจนสวยเกินไปอาจกลบความไม่แน่นอนที่ควรถูกสื่อสาร
+## Relationship with Agents
+- **Agents can do:** Polish the language, restructure, condense, translate, flag ambiguity
+- **Agents cannot do:** Know what the reader actually needs, decide what is important enough to write — and text an agent has polished until it is too smooth can bury uncertainty that ought to be communicated
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ต้องประชุมเพื่ออธิบายสิ่งที่เขียนไปแล้ว
-- เอกสารยาวแต่ไม่มีใครอ่านจบ
-- คำถามเดิมถูกถามซ้ำหลายรอบ
+## Signals the Team Lacks This Skill
+- Meetings are needed to explain what has already been written
+- Documents are long but nobody finishes them
+- The same question gets asked over and over

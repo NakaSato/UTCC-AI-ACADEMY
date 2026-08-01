@@ -21,45 +21,45 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-OPS-003 — Root Cause Analysis](skill-ops-003-root-cause-analysis.md) · [SKILL-CODE-004 — Production Debugging](skill-code-004-production-debugging.md) · [SKILL-HUM-001 — Written Communication](skill-hum-001-written-communication.md)
 
-## นิยาม
-ความสามารถในการนำการแก้ปัญหาในสถานการณ์ที่ระบบกำลังเสียหาย ข้อมูลไม่ครบ มีหลายคนเกี่ยวข้อง และทุกนาทีมีต้นทุน
+## Definition
+The ability to lead the resolution of a problem while the system is actively failing, information is incomplete, several people are involved, and every minute has a cost.
 
-## ทำไมสำคัญตอนนี้
-Throughput ที่สูงขึ้นแปลว่าจำนวน incident มีแนวโน้มสูงขึ้นตาม และเมื่อทีมเข้าใจโค้ดที่ตัวเองดูแลน้อยลง ความสามารถในการรับมือเหตุจึงกลายเป็นตัวแยกทีมที่รอดออกจากทีมที่ล่ม
+## Why It Matters Now
+Higher throughput means the number of incidents tends to rise with it, and as teams understand the code they maintain less, the ability to handle an incident becomes what separates the teams that survive from the ones that go down.
 
-## ระดับ
+## Levels
 ### Foundation
-- ทำตาม runbook ได้
-- รู้ว่าต้อง escalate เมื่อไหร่และหาใคร
+- Can follow a runbook
+- Knows when to escalate and to whom
 
 ### Proficient
-- ทำหน้าที่ Incident Commander ได้ — แยกบทบาท สื่อสาร ตัดสินใจ
-- แยก "บรรเทาอาการ" ออกจาก "แก้สาเหตุ" และเลือกทำอย่างแรกก่อนเสมอ
-- สื่อสารกับผู้มีส่วนได้ส่วนเสียระหว่างเหตุอย่างสม่ำเสมอ
+- Can act as Incident Commander — assigning roles, communicating, deciding
+- Separates "mitigate the symptom" from "fix the cause", and always does the former first
+- Communicates with stakeholders at a steady cadence during the incident
 
 ### Expert
-- ตัดสินใจภายใต้ข้อมูลไม่ครบและความกดดันสูงได้อย่างมีสติ
-- รู้ว่าเมื่อไหร่ควรหยุดหาสาเหตุแล้ว rollback ทันที
-- จัดการทั้งด้านเทคนิคและด้านคนพร้อมกัน (คนที่ตื่นตระหนก คนที่โทษตัวเอง ผู้บริหารที่กดดัน)
+- Decides calmly under incomplete information and high pressure
+- Knows when to stop looking for the cause and roll back immediately
+- Manages the technical and the human side at once (people panicking, people blaming themselves, executives applying pressure)
 
-## วิธีประเมิน
-Game day: จงใจสร้างเหตุในระบบทดสอบ แล้วสังเกตว่าเขา
-1. ประกาศบทบาทตัวเองชัดเจนไหม
-2. บรรเทาก่อนหรือไล่หาสาเหตุก่อน
-3. สื่อสารสถานะทุกกี่นาที
-4. บันทึก timeline ระหว่างทางไหม
+## How to Assess
+Game day: deliberately cause an incident in a test system, then observe whether they:
+1. Announce their role clearly
+2. Mitigate first or chase the cause first
+3. Communicate status at what interval
+4. Record a timeline as they go
 
-## เส้นทางพัฒนา
-1. เข้าเวร on-call แบบมีพี่เลี้ยงก่อนรับผิดชอบเอง
-2. ทำ game day ไตรมาสละครั้ง
-3. อ่าน postmortem ของบริษัทอื่น สังเกตจุดตัดสินใจ
-4. ฝึกเขียน status update ที่ผู้บริหารอ่านเข้าใจภายใน 3 บรรทัด
+## Development Path
+1. Take on-call shifts with a mentor before owning them alone
+2. Run a game day once a quarter
+3. Read other companies' postmortems, noting the decision points
+4. Practise writing status updates an executive can understand in 3 lines
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ดึง log, สรุป timeline, เทียบ metric, อธิบายโค้ดที่ไม่คุ้น, ร่าง status update
-- **Agent ทำแทนไม่ได้:** ตัดสินใจ rollback, ประสานคน, รับผิดชอบผลลัพธ์ — และห้ามให้ agent ทำ action ที่กระทบ production อัตโนมัติระหว่างเหตุ
+## Relationship with Agents
+- **Agents can do:** Pull logs, summarise the timeline, compare metrics, explain unfamiliar code, draft status updates
+- **Agents cannot do:** Decide to roll back, coordinate people, own the outcome — and agents must never be allowed to take automatic production-affecting actions during an incident
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ไม่มีใครประกาศตัวเป็น IC ระหว่างเหตุ ทุกคนพิมพ์กันมั่ว
-- MTTR ยาวเพราะเสียเวลาหาสาเหตุก่อนบรรเทา
-- ไม่มี timeline ให้เขียน postmortem
+## Signals the Team Lacks This Skill
+- Nobody declares themselves IC during an incident; everyone types over each other
+- MTTR is long because time goes into finding the cause before mitigating
+- No timeline exists to write the postmortem from

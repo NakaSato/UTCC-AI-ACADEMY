@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-CODE-001 — Language Proficiency](skill-code-001-language-proficiency.md) · [SKILL-AI-003 — Review at Scale](skill-ai-003-review-at-scale.md) · [SKILL-TEST-001 — Test Design](skill-test-001-test-design.md)
 
-## นิยาม
-ความสามารถในการอ่านผลงานของ agent แล้วตัดสินได้ว่ามันทำในสิ่งที่ตั้งใจจริงหรือไม่ — โดยเฉพาะการจับ **โค้ดที่ดูถูกต้องแต่ไม่ตรงเจตนา**
+## Definition
+The ability to read an agent's output and judge whether it actually did what was intended — above all, catching **code that looks correct but does not match the intent**.
 
-## ทำไมสำคัญตอนนี้
-นี่คือทักษะที่สำคัญที่สุดในกลุ่ม AI-era และเป็นคอขวดใหม่ของทั้งระบบ ความเสี่ยงหลักไม่ใช่โค้ดที่พัง — โค้ดที่พังถูกจับโดย CI แต่เป็นโค้ดที่ **ผ่านทุก gate แล้วยังผิด** เพราะมันตอบโจทย์ที่ agent เข้าใจ ไม่ใช่โจทย์ที่เราตั้งใจ
+## Why It Matters Now
+This is the most important skill in the AI-era group and the new bottleneck for the whole system. The main risk is not broken code — broken code gets caught by CI. It is code that **passes every gate and is still wrong**, because it answers the problem the agent understood rather than the problem we meant.
 
-## ระดับ
+## Levels
 ### Foundation
-- อ่านโค้ดที่ agent เขียนเข้าใจ
-- ตรวจว่าผ่าน test และ lint หรือไม่
+- Reads and understands the code an agent wrote
+- Checks whether tests and lint pass
 
 ### Proficient
-- ตรวจเทียบกับ spec ทีละข้อ ไม่ใช่อ่านผ่านๆ
-- รู้จุดที่ agent มักพลาดซ้ำๆ: กรณีว่าง, error path, off-by-one ที่ขอบเขต, concurrency, การ catch exception กว้างเกินไป, การเพิ่ม dependency โดยไม่จำเป็น
-- ตรวจสิ่งที่ **ไม่ได้ทำ** ด้วย ไม่ใช่แค่สิ่งที่ทำ
+- Checks against the spec point by point instead of skimming
+- Knows where agents repeatedly slip: empty cases, error paths, off-by-one at boundaries, concurrency, overly broad exception catching, adding unnecessary dependencies
+- Also checks what was **not** done, not just what was
 
 ### Expert
-- จับ "โค้ดที่ถูกทางเทคนิคแต่ผิดทาง domain" ได้
-- ประเมินผลระยะยาวของ pattern ที่ถูกเพิ่มเข้ามา
-- รู้ว่าเมื่อไหร่ควรทิ้ง diff แล้วให้เริ่มใหม่ แทนที่จะไล่แก้
+- Catches "technically correct but wrong for the domain" code
+- Assesses the long-term consequences of any pattern that was introduced
+- Knows when to throw the diff away and start over instead of patching it
 
-## วิธีประเมิน
-ให้ diff จาก agent ที่มีปัญหาฝังไว้ 5 จุด โดย 2 จุดเป็นเรื่อง domain ไม่ใช่เรื่อง syntax และ test ผ่านหมด
-- เจอเฉพาะจุดที่เป็น technical = Proficient
-- เจอจุดที่เป็น domain ด้วย = Expert
-- บอกว่า "ดูดี" = ยังไม่ควรรีวิวงาน Tier C
+## How to Assess
+Provide an agent diff with 5 planted problems, 2 of which are domain issues rather than syntax, and where all tests pass.
+- Finds only the technical ones = Proficient
+- Finds the domain ones as well = Expert
+- Says "looks good" = not yet ready to review Tier C work
 
-## เส้นทางพัฒนา
-1. ให้ agent เขียนโค้ดที่คุณรู้คำตอบอยู่แล้ว แล้วหาจุดที่มันเบี่ยง ทำซ้ำจนเห็นรูปแบบ
-2. **เก็บ log ส่วนตัวว่า agent พลาดตรงไหนบ้าง** แล้วสร้าง checklist จากรูปแบบที่ซ้ำ
-3. ฝึกอ่าน diff โดยเทียบกับ spec ทีละบรรทัด ไม่ใช่อ่านโค้ดอย่างเดียว
-4. ยังต้องเขียนโค้ดเองบ้าง — ทักษะนี้สร้างจากประสบการณ์การเขียนผิดด้วยตัวเองเท่านั้น
+## Development Path
+1. Have an agent write code where you already know the answer, then find where it drifts. Repeat until the patterns become visible
+2. **Keep a personal log of where agents went wrong**, then build a checklist from the recurring patterns
+3. Practise reading a diff line by line against the spec, not just reading the code
+4. Keep writing some code yourself — this skill is built only from the experience of getting it wrong firsthand
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ไม่ได้ — agent ตรวจงาน agent คือระบบรับรองตัวเอง
-- **หมายเหตุ:** ใช้ agent ตัวที่สองช่วยชี้จุดน่าสงสัยได้ แต่การตัดสินต้องเป็นของมนุษย์
+## Relationship with Agents
+- **Agents can do:** No — an agent checking an agent's work is a self-certifying system
+- **Note:** a second agent can help flag suspicious spots, but the judgement must be human
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- Review depth (เวลารีวิว ÷ ขนาด diff) ลดลงเรื่อยๆ
-- Approve ภายในไม่กี่นาทีสำหรับ diff ขนาดใหญ่
-- Escaped defect เพิ่มขึ้นแม้ coverage สูง
+## Signals the Team Lacks This Skill
+- Review depth (review time ÷ diff size) steadily declining
+- Approvals within minutes on large diffs
+- Escaped defects rising despite high coverage

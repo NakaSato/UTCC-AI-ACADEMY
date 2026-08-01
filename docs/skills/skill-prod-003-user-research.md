@@ -21,44 +21,44 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-PROD-001 — Problem Framing](skill-prod-001-problem-framing.md)
 
-## นิยาม
-ความสามารถในการได้มาซึ่งข้อมูลจากผู้ใช้จริงโดยไม่ใส่คำตอบเข้าไปในคำถาม และแยกได้ว่าอะไรคือสิ่งที่ผู้ใช้ **ทำ** กับสิ่งที่ผู้ใช้ **บอกว่าทำ**
+## Definition
+The ability to obtain information from real users without planting the answer in the question, and to distinguish what users **do** from what users **say they do**.
 
-## ทำไมสำคัญตอนนี้
-คงเดิม — agent ช่วยประมวลผลข้อมูลได้มาก แต่การได้มาซึ่งข้อมูลที่ไม่ปนเปื้อนยังเป็นงานมนุษย์ทั้งหมด และเป็นวัตถุดิบตั้งต้นของทั้งสายโซ่
+## Why It Matters Now
+Unchanged — agents can process a great deal of data, but obtaining uncontaminated data is still entirely human work, and it is the raw material for the whole chain.
 
-## ระดับ
+## Levels
 ### Foundation
-- ทำ interview ตาม script ที่คนอื่นเตรียมได้
-- จดบันทึกโดยไม่ตีความไปพร้อมกัน
+- Can run an interview from a script someone else prepared
+- Takes notes without interpreting as they go
 
 ### Proficient
-- ตั้งคำถามปลายเปิดที่ไม่ชี้นำ
-- ถามถึงพฤติกรรมในอดีตแทนที่จะถามความตั้งใจในอนาคต
-- แยกข้อสังเกตออกจากข้อสรุปในบันทึก
+- Asks open-ended, non-leading questions
+- Asks about past behaviour instead of future intent
+- Separates observations from conclusions in their notes
 
 ### Expert
-- ออกแบบ research ที่ตอบคำถามที่ตัดสินใจได้จริง ไม่ใช่แค่ได้ข้อมูลเพิ่ม
-- รู้ว่าเมื่อไหร่ข้อมูลพอแล้ว (saturation)
-- จับได้ว่าตัวเองกำลังหาหลักฐานมายืนยันสิ่งที่เชื่ออยู่แล้ว
+- Designs research that answers questions you can actually decide on, rather than merely producing more data
+- Knows when there is enough data (saturation)
+- Catches themselves looking for evidence to confirm what they already believe
 
-## วิธีประเมิน
-ให้เขาเขียนคำถามสัมภาษณ์ 5 ข้อสำหรับฟีเจอร์ที่กำลังคิดจะทำ แล้วนับว่า:
-- มีกี่ข้อที่ชี้นำ ("คุณคิดว่าฟีเจอร์นี้จะช่วยไหม")
-- มีกี่ข้อที่ถามอนาคต ("คุณจะใช้ไหม") แทนที่จะถามอดีต ("ครั้งล่าสุดที่เจอปัญหานี้คือเมื่อไหร่ แล้วทำยังไง")
+## How to Assess
+Have them write 5 interview questions for a feature under consideration, then count:
+- how many are leading ("do you think this feature would help?")
+- how many ask about the future ("would you use it?") instead of the past ("when did you last hit this problem, and what did you do?")
 
-เกิน 2 ข้อชี้นำ = ยังไม่ถึง Proficient
+More than 2 leading questions = not yet Proficient.
 
-## เส้นทางพัฒนา
-1. อ่าน *The Mom Test* (Rob Fitzpatrick) — สั้นและเปลี่ยนวิธีถามได้ทันที
-2. อัดเสียง interview ของตัวเองแล้วฟังย้อน นับจำนวนครั้งที่พูดแทรกหรือชี้นำ
-3. ทำ 5 interview ติดกันโดยห้ามพูดถึงทางแก้ที่คิดไว้เลย
-4. เทียบสิ่งที่ผู้ใช้บอกกับ analytics จริง ดูว่าตรงกันแค่ไหน
+## Development Path
+1. Read *The Mom Test* (Rob Fitzpatrick) — short, and it changes how you ask immediately
+2. Record your own interviews and listen back, counting how often you interrupt or lead
+3. Run 5 interviews back to back without once mentioning the solution you have in mind
+4. Compare what users said against the actual analytics, and see how far they agree
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ถอดเทป, จัดกลุ่ม theme พร้อม quote อ้างอิง, สรุปความถี่ของ pain point
-- **Agent ทำแทนไม่ได้:** ทำ interview เอง, อ่านภาษากาย, ตัดสินว่าผู้ใช้พูดจริงหรือพูดให้เราพอใจ
+## Relationship with Agents
+- **Agents can do:** Transcribe, cluster themes with supporting quotes, summarise the frequency of pain points
+- **Agents cannot do:** Run the interview, read body language, judge whether a user is being honest or being polite
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ข้อสรุปจาก research ตรงกับสิ่งที่ทีมเชื่ออยู่แล้วทุกครั้ง
-- อ้าง "ผู้ใช้ต้องการ X" โดยไม่มีใครระบุได้ว่าผู้ใช้คนไหนพูดเมื่อไหร่
+## Signals the Team Lacks This Skill
+- Research conclusions match what the team already believed, every time
+- Claims that "users want X" with nobody able to say which user said it, or when

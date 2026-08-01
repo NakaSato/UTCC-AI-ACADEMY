@@ -21,46 +21,46 @@ review_by: 2027-01-31
 
 > Related skills: [SKILL-ARCH-002 — Boundary & Module Design](skill-arch-002-boundary-design.md) · [SKILL-HUM-002 — Decision Documentation](skill-hum-002-decision-documentation.md)
 
-## นิยาม
-ความสามารถในการเปรียบเทียบทางเลือกทางเทคนิคโดยระบุได้ว่า **แลกอะไรไปเพื่อได้อะไร** และตัดสินใจได้ทั้งที่ทุกทางเลือกมีข้อเสีย
+## Definition
+The ability to compare technical options by identifying **what is being given up to gain what**, and to decide even when every option has drawbacks.
 
-## ทำไมสำคัญตอนนี้
-Agent เสนอทางเลือกได้เก่งมาก และเสนอได้เยอะกว่าที่มนุษย์คิดออกเอง แต่มันไม่รู้บริบทของทีม ข้อจำกัดขององค์กร และสิ่งที่เราแบกไหว ทักษะนี้จึงเป็นคอขวดใหม่ที่แท้จริง
+## Why It Matters Now
+Agents are very good at proposing options, and propose more of them than a human would come up with alone. But they do not know the team's context, the organisation's constraints, or what we can realistically carry. That makes this the real new bottleneck.
 
-## ระดับ
+## Levels
 ### Foundation
-- เปรียบเทียบทางเลือกได้เมื่อมีตารางให้กรอก
-- ระบุข้อดีข้อเสียที่เห็นชัดได้
+- Can compare options when given a table to fill in
+- Can identify the obvious pros and cons
 
 ### Proficient
-- สร้างเกณฑ์เปรียบเทียบเองที่ตรงกับปัญหา ไม่ใช่เกณฑ์ทั่วไป
-- ระบุต้นทุนระยะยาว (operational cost, cognitive load) ไม่ใช่แค่ต้นทุนตอนสร้าง
-- แยกได้ว่าการตัดสินใจนี้กลับง่ายหรือกลับยาก
+- Creates comparison criteria that fit the problem rather than using generic ones
+- Identifies long-term costs (operational cost, cognitive load), not just the cost of building
+- Distinguishes decisions that are easy to reverse from those that are hard to reverse
 
 ### Expert
-- ประเมินได้ว่าทางเลือกไหนจะพังก่อนภายใต้เงื่อนไขอะไร
-- ตัดสินใจได้เร็วกับเรื่องที่กลับง่าย และช้าลงกับเรื่องที่กลับยาก
-- มองเห็นทางเลือกที่ไม่มีใครเสนอ รวมถึง "ไม่ทำอะไรเลย"
+- Can assess which option will break first and under what conditions
+- Decides quickly on easily reversible matters and slows down on hard-to-reverse ones
+- Sees options nobody proposed, including "do nothing at all"
 
-## วิธีประเมิน
-ให้โจทย์จริงที่ทีมเคยตัดสินใจไปแล้ว เช่น "จะใช้ message queue ตัวไหน" แล้วดูว่าเขา:
-1. ถามถึง throughput, ordering guarantee, ทีมมีประสบการณ์อะไร ก่อนเสนอชื่อ product
-2. พูดถึงต้นทุนการดูแลระยะยาว ไม่ใช่แค่ feature
-3. ระบุได้ว่าถ้าเลือกผิดแล้วเปลี่ยนยากแค่ไหน
+## How to Assess
+Give a real problem the team has already decided on — for example "which message queue should we use" — and watch whether they:
+1. Ask about throughput, ordering guarantees, and what the team has experience with, before naming a product
+2. Talk about long-term maintenance cost, not just features
+3. Can state how hard it would be to change course if the choice turns out wrong
 
-คนที่เริ่มด้วยชื่อ product ทันที = ยังไม่ถึง Proficient
+Anyone who opens with a product name = not yet Proficient.
 
-## เส้นทางพัฒนา
-1. เขียน ADR ย้อนหลังสำหรับการตัดสินใจที่ทำไปแล้ว 5 เรื่อง บังคับให้มี section Alternatives
-2. ฝึกถามคำถาม "แล้วเราแลกอะไรไป" กับทุกข้อเสนอในทีม
-3. ติดตามผลการตัดสินใจเก่า 6 เดือนย้อนหลัง — อันไหนที่คิดผิด และผิดเพราะประเมินอะไรพลาด
-4. ให้ agent เสนอทางเลือกแล้วฝึกหาข้อเสียที่มันไม่ได้พูดถึง
+## Development Path
+1. Write retrospective ADRs for 5 decisions already made, forcing an Alternatives section into each
+2. Practise asking "so what are we giving up?" of every proposal in the team
+3. Follow up on old decisions 6 months later — which ones were wrong, and what was misjudged
+4. Have an agent propose options, then practise finding the drawbacks it did not mention
 
-## ความสัมพันธ์กับ Agent
-- **Agent ทำแทนได้:** ค้นหาทางเลือกที่มีอยู่, สร้างตารางเปรียบเทียบเบื้องต้น, หา prior art ใน codebase
-- **Agent ทำแทนไม่ได้:** ชั่งน้ำหนักตามบริบทของทีม, รับผลของการเลือก, รู้ว่าองค์กรแบกอะไรไหว
+## Relationship with Agents
+- **Agents can do:** Find existing options, build a first-pass comparison table, find prior art in the codebase
+- **Agents cannot do:** Weigh things against team context, live with the consequences of the choice, know what the organisation can carry
 
-## สัญญาณว่าทีมขาดทักษะนี้
-- ADR มีแต่ Decision ไม่มี Alternatives
-- เลือกเทคโนโลยีตามที่กำลังเป็นกระแส
-- ทุกการตัดสินใจใช้เวลาเท่ากันหมด ไม่ว่าจะกลับง่ายหรือกลับยาก
+## Signals the Team Lacks This Skill
+- ADRs contain only a Decision and no Alternatives
+- Technology chosen by whatever is currently in fashion
+- Every decision takes the same amount of time, whether it is easy or hard to reverse
