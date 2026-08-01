@@ -757,6 +757,61 @@ th:
           console_idle: "  พร้อมรัน — กดปุ่ม “รันและตรวจ”"
           console_pass: "✓ ผ่านทั้ง 3 เกณฑ์ · +10 เพชร"
           console_fail: "✗ ยังไม่ผ่าน — ฝึกด้วย train และวัดคะแนนด้วย test ที่กันไว้"
+      topic_4_1:
+        theory:
+          eyebrow: "หัวข้อ 4-1 · 10 นาที"
+          heading: "LLM ทำงานอย่างไร"
+          p1: "Large language model แทนข้อความด้วย token และพยากรณ์ token ถัดไปที่น่าจะเป็นจากบริบทที่เห็น การทำซ้ำขั้นนี้สร้างลำดับข้อความที่อ่านเหมือนคำตอบ"
+          p2: "โมเดลไม่ได้ค้นหาความจริงโดยอัตโนมัติ ผลลัพธ์ขึ้นกับ prompt บริบท ข้อมูลที่เรียนรู้ และการตั้งค่า sampling ดังนั้นเรื่องสำคัญยังต้องตรวจสอบ"
+          sup_title: "Token และบริบท"
+          sup_desc: "Token คือชิ้นส่วนของข้อความ prompt และคำตอบที่สร้างจะใช้พื้นที่บริบทและงบ token ที่มีจำกัด"
+          sup_eg: "prompt tokens + new tokens ≤ context limit"
+          unsup_title: "การพยากรณ์ไม่ใช่การยืนยัน"
+          unsup_desc: "ข้อความที่ลื่นไหลอาจผิดหรือไม่มีแหล่งอ้างอิง ควรใส่บริบทที่เชื่อถือได้และตรวจข้อเท็จจริงที่สำคัญ"
+          unsup_eg: "prompt ชัดเจน → ข้อความที่น่าจะเป็น ไม่ใช่ความจริงที่รับรอง"
+          code_comment: "# วางแผนงบ token"
+          to_quiz: "ตรวจความเข้าใจ →"
+          open_link: "อ่านคำอธิบาย transformer →"
+          blocks:
+            - "การสร้างข้อความเกิดทีละขั้น: token ที่เลือกแล้วจะกลายเป็นส่วนหนึ่งของบริบทสำหรับการพยากรณ์ถัดไป"
+            - "token ทั้งหมด = prompt tokens + generated tokens"
+            - "total_tokens = prompt_tokens + max_new_tokens\nprint(total_tokens)"
+            - "อภิธานศัพท์ Google ML · language model"
+        quiz:
+          eyebrow: "แบบฝึกหัด · ระบุกลไก"
+          question: "autoregressive language model ทำอะไรซ้ำ ๆ ตอนสร้างข้อความ?"
+          options:
+            - "ค้นฐานข้อมูลเพื่อหาคำตอบเดียวที่รับรองแล้ว"
+            - "พยากรณ์ token ถัดไปจากบริบทปัจจุบัน"
+            - "รันสูตรสเปรดชีตทุกประโยค"
+            - "ให้คนติดป้ายกำกับ token ทุกตัว"
+          keys: [ "ก", "ข", "ค", "ง" ]
+          check: "ตรวจคำตอบ"
+          to_code: "ลองทำโจทย์ประยุกต์ →"
+          correct_title: "ถูกต้อง · +5 เพชร"
+          correct_body: "ถูกต้อง — การสร้างข้อความทำซ้ำการพยากรณ์ token ถัดไปจากบริบทที่มี"
+          wrong_title: "ลองอีกครั้ง · −1 หัวใจ"
+          wrong_body: "มองหากลไกที่เลือกข้อความต่อที่น่าจะเป็นทีละ token จากบริบทปัจจุบัน"
+        code:
+          eyebrow: "โจทย์ประยุกต์ · Python"
+          title: "คำนวณงบ token"
+          task: "เติมโค้ดให้งบ token รวม token ของ prompt และจำนวน token ใหม่สูงสุด"
+          criteria: "เกณฑ์ผ่าน"
+          run: "รันและตรวจ"
+          reset: "รีเซ็ต"
+          finish: "จบหัวข้อ →"
+          editor_label: "โค้ด Python สำหรับโจทย์นี้"
+          starter: |
+            total_tokens = ___ + ___
+            print(total_tokens)
+          checks:
+            - "กำหนดจำนวน token ทั้งหมด"
+            - "รวม prompt_tokens"
+            - "รวม max_new_tokens"
+          console_running: "  กำลังรัน…"
+          console_idle: "  พร้อมรัน — กดปุ่ม “รันและตรวจ”"
+          console_pass: "✓ ผ่านทั้ง 3 เกณฑ์ · +10 เพชร"
+          console_fail: "✗ ยังไม่ผ่าน — รวม prompt_tokens และ max_new_tokens"
     # แสดงเป็น toast ไม่ใช่ flash เพราะไม่มีการโหลดหน้าใหม่มารองรับ flash
     # และทั้งแบบฝึกหัดและโจทย์เขียนโค้ดล้มเหลวแบบเดียวกัน
     grading_unreachable: "ติดต่อเซิร์ฟเวอร์ไม่ได้ ระบบยังไม่ได้ตรวจคำตอบ กรุณาลองใหม่อีกครั้ง"

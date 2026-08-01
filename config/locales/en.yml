@@ -750,6 +750,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — fit on train data and score on held-out test data"
+      topic_4_1:
+        theory:
+          eyebrow: "Topic 4-1 · 10 min"
+          heading: "How LLMs work"
+          p1: "A large language model represents text as tokens and predicts a likely next token from the context it has seen. Repeating that step produces a sequence that reads like an answer."
+          p2: "The model does not look up truth automatically. Its output depends on the prompt, context window, training patterns, and sampling settings, so important claims still need checking."
+          sup_title: "Tokens and context"
+          sup_desc: "Tokens are pieces of text. The prompt and generated response consume a finite context and output budget."
+          sup_eg: "prompt tokens + new tokens ≤ context limit"
+          unsup_title: "Prediction is not verification"
+          unsup_desc: "A fluent continuation can be wrong or unsupported. Ground answers in trusted context and verify consequential facts."
+          unsup_eg: "clear prompt → likely text, not guaranteed truth"
+          code_comment: "# plan the token budget"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the transformer explainer →"
+          blocks:
+            - "Generation is sequential: each chosen token becomes part of the context for the next prediction."
+            - "total tokens = prompt tokens + generated tokens"
+            - "total_tokens = prompt_tokens + max_new_tokens\nprint(total_tokens)"
+            - "Google ML glossary · language model"
+        quiz:
+          eyebrow: "Exercise · identify the mechanism"
+          question: "What does an autoregressive language model do repeatedly when generating text?"
+          options:
+            - "Search a database for one guaranteed answer."
+            - "Predict the next token from the current context."
+            - "Run a spreadsheet formula for every sentence."
+            - "Ask a human to label each output token."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — generation repeats next-token prediction using the context so far."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the mechanism that selects one likely continuation at a time from the current context."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Calculate a token budget"
+          task: "Complete the code so the total token budget includes the prompt tokens and the maximum number of new tokens."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            total_tokens = ___ + ___
+            print(total_tokens)
+          checks:
+            - "Assign the total token count"
+            - "Include prompt_tokens"
+            - "Include max_new_tokens"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — add prompt_tokens and max_new_tokens"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
