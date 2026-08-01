@@ -21,6 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
+  REAL_TOPIC_KEY = "1-1"
 
   # How full the top progress bar is on each step.
   STEP_PERCENT = { theory: 12, exercise: 42, code: 74, summary: 100 }.freeze
@@ -85,12 +86,65 @@ module LessonContent
     { type: :link, extra: "https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html" }
   ].freeze
 
-  Block = Data.define(:type, :extra, :position) do
-    def value = I18n.t("lesson.theory.blocks")[position]
+  Block = Data.define(:type, :extra, :position, :definition) do
+    def value = definition.translate("theory.blocks")[position]
 
     # An image block only renders once its `extra` is a real URL, matching the
     # design — a caption with no source would otherwise draw an empty plate.
     def image? = type == :image && extra.to_s.match?(%r{\Ahttps?://\S+\z})
+  end
+
+  TopicDefinition = Data.define(:key) do
+    def real? = key.to_s == REAL_TOPIC_KEY
+
+    def step_for(param) = LessonContent.step_for(param)
+    def step_number(step) = LessonContent.step_number(step)
+    def percent_for(step) = LessonContent.percent_for(step)
+    def step_label(step) = LessonContent.step_label(step)
+    def rewards = LessonContent.rewards
+
+    def translate(path)
+      scoped = "lesson.topics.topic_1_1.#{path}"
+      I18n.exists?(scoped) ? I18n.t(scoped) : I18n.t("lesson.#{path}")
+    end
+
+    def blocks
+      BLOCKS.each_with_index.map do |attrs, position|
+        Block.new(type: attrs[:type], extra: attrs[:extra], position:, definition: self)
+      end
+    end
+
+    def options
+      return LessonContent.options unless real?
+
+      translate("quiz.options").each_with_index.map do |text, index|
+        { key: translate("quiz.keys")[index], text: }
+      end
+    end
+
+    def checks = real? ? translate("code.checks") : LessonContent.checks
+    def starter_code = real? ? translate("code.starter") : STARTER_CODE
+    def correct_option = real? ? 1 : CORRECT_OPTION
+    def solution = real? ? translate("code.solution") : "train_test_split(X, y, test_size=0.2, random_state=42)"
+
+    def grade_quiz(answer)
+      passed = answer.to_s == correct_option.to_s
+      { passed:, score: passed ? 100 : 0, gems: QUIZ_GEMS, correct_index: correct_option }
+    end
+
+    def grade_code(source)
+      return LessonContent.grade_code(source) unless real?
+
+      results = [
+        source.to_s.match?(/def\s+classify_risk/),
+        source.to_s.match?(/score\s*>=\s*0\.7/),
+        source.to_s.match?(/return\s+["']high["']/)
+      ]
+
+      { passed: results.all? && source.to_s.exclude?(BLANK),
+        score: (results.count(true) * 100.0 / results.size).round,
+        checks: results, gems: CODE_GEMS }
+    end
   end
 
   class << self
@@ -109,10 +163,10 @@ module LessonContent
     end
 
     def blocks
-      BLOCKS.each_with_index.map do |attrs, position|
-        Block.new(type: attrs[:type], extra: attrs[:extra], position:)
-      end
+      LessonContent.for(nil).blocks
     end
+
+    def for(topic_key) = TopicDefinition.new(key: topic_key.to_s)
 
     def options
       keys = I18n.t("lesson.quiz.keys")

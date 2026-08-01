@@ -6,14 +6,14 @@
      data-quiz-course-value="<%= @course.code %>"
      data-quiz-topic-value="<%= @topic_key %>">
   <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
-    <%= t("lesson.quiz.eyebrow") %>
+    <%= @lesson_content.translate("quiz.eyebrow") %>
   </div>
   <h1 class="mb-6.5 max-w-[60ch] text-22 leading-[1.35] font-bold tracking-[-0.02em] text-balance sm:text-27">
-    <%= t("lesson.quiz.question") %>
+    <%= @lesson_content.translate("quiz.question") %>
   </h1>
 
   <div class="mb-7 flex flex-col gap-2.75" role="radiogroup">
-    <% LessonContent.options.each_with_index do |option, index| %>
+    <% @lesson_content.options.each_with_index do |option, index| %>
       <button type="button" role="radio" aria-checked="false"
               data-quiz-target="option" data-action="quiz#pick" data-index="<%= index %>" data-state=""
               class="group flex items-center gap-3.5 rounded-[13px] border-[1.5px] border-hairline bg-surface
@@ -46,10 +46,10 @@
             data-quiz-target="check" data-action="quiz#check"
             class="rounded-field bg-brand px-7 py-3.25 text-15 font-semibold text-white transition-colors
                    hover:bg-brand-deep disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-muted-3">
-      <%= t("lesson.quiz.check") %>
+      <%= @lesson_content.translate("quiz.check") %>
     </button>
 
-    <%= link_to t("lesson.quiz.to_code"), lesson_step_path(:code),
+    <%= link_to @lesson_content.translate("quiz.to_code"), lesson_step_path(:code),
           data: { quiz_target: "next", panel: :code, action: "panels#select" },
           class: "hidden rounded-field border-[1.5px] border-brand px-6.5 py-2.75 text-15 font-semibold text-brand
                   transition-colors hover:bg-brand-tint" %>
@@ -58,9 +58,9 @@
   <%# The strings the controller writes into the feedback panel, plus the one it
       raises as a toast when the answer never reached the server. %>
   <template data-quiz-target="copy"
-            data-unreachable="<%= t("lesson.grading_unreachable") %>"
-            data-correct-title="<%= t("lesson.quiz.correct_title") %>"
-            data-correct-body="<%= t("lesson.quiz.correct_body") %>"
-            data-wrong-title="<%= t("lesson.quiz.wrong_title") %>"
-            data-wrong-body="<%= t("lesson.quiz.wrong_body") %>"></template>
+            data-unreachable="<%= @lesson_content.translate("grading_unreachable") %>"
+            data-correct-title="<%= @lesson_content.translate("quiz.correct_title") %>"
+            data-correct-body="<%= @lesson_content.translate("quiz.correct_body") %>"
+            data-wrong-title="<%= @lesson_content.translate("quiz.wrong_title") %>"
+            data-wrong-body="<%= @lesson_content.translate("quiz.wrong_body") %>"></template>
 </div>

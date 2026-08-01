@@ -12,6 +12,7 @@ class LessonsController < ApplicationController
 
   def show
     @step = LessonContent.step_for(params[:step])
+    @lesson_content = LessonContent.for(@topic_key)
   end
 
   # Where the exercise and the coding task send what the student did. The server
@@ -31,7 +32,7 @@ class LessonsController < ApplicationController
     return head :unprocessable_entity unless course && topic
     return head :forbidden unless Syllabus.unlocked?(topic.key, progress.keys_for(course.code))
 
-    verdict = grade(kind, params[:answer])
+    verdict = grade(kind, params[:answer], topic.key)
     Submission.record(user: Current.user, course:, topic:, kind:, answer: params[:answer], verdict:)
 
     # The progress screens count the rows when they next render; nothing here
@@ -55,8 +56,9 @@ class LessonsController < ApplicationController
   end
 
   private
-    def grade(kind, answer)
-      kind == "quiz" ? LessonContent.grade_quiz(answer) : LessonContent.grade_code(answer)
+    def grade(kind, answer, topic_key)
+      content = LessonContent.for(topic_key)
+      kind == "quiz" ? content.grade_quiz(answer) : content.grade_code(answer)
     end
 
     def set_course

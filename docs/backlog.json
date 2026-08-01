@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:52:19+07:00",
+  "updated_at": "2026-08-01T13:39:08+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -304,19 +304,23 @@
     {
       "id": "M2-001",
       "title": "Deliver the first real bilingual AI1101 topic (1-1)",
-      "status": "in_progress",
+      "status": "verification",
       "priority": 1,
       "owner": "Product Owner and Instructor",
       "milestone": "M2",
       "depends_on": [],
-      "blocker": null,
+      "blocker": {
+        "summary": "Implementation and automated verification pass; instructor and small student-group content review remain outstanding.",
+        "decision_owner": "Instructor",
+        "next_action": "Review the bilingual lesson, objectives, exercise, feedback, and applied task with an instructor and small student group; record findings before completion."
+      },
       "evidence": [
         {
           "label": "M2 first real topic specification",
           "url": "specs/spec-m2-first-real-topic.html"
         }
       ],
-      "updated_at": "2026-08-01T11:52:19+07:00"
+      "updated_at": "2026-08-01T13:39:08+07:00"
     }
   ],
   "recently_completed": [
@@ -1067,6 +1071,14 @@
       "from": "queued",
       "to": "in_progress",
       "summary": "Product Owner and instructor accepted SPEC-0001; M2-001 implementation is authorized to begin for topic 1-1.",
+      "evidence_url": "specs/spec-m2-first-real-topic.html"
+    },
+    {
+      "at": "2026-08-01T13:39:08+07:00",
+      "item_id": "M2-001",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented topic 1-1 bilingual content, topic-scoped quiz and coding grading, locale-aware lesson rendering, focused tests, browser system tests, documentation validation, and focused style checks; instructor and student content review remain required.",
       "evidence_url": "specs/spec-m2-first-real-topic.html"
     }
   ]

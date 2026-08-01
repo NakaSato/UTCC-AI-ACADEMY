@@ -30,11 +30,11 @@
           class: "flex-none text-13-5 whitespace-nowrap text-muted hover:text-ink" %>
     <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-hairline">
       <div class="h-full rounded-full bg-brand transition-[width] duration-300"
-           data-panels-target="progress" style="width: <%= LessonContent.percent_for(@step) %>%"></div>
+           data-panels-target="progress" style="width: <%= @lesson_content.percent_for(@step) %>%"></div>
     </div>
     <%# One label per step, swapped with the panels rather than rewritten. %>
     <% LessonContent::STEPS.each do |step| %>
-      <%= tag.span LessonContent.step_label(step),
+      <%= tag.span @lesson_content.step_label(step),
             hidden: step != @step,
             data: { panel: step, panels_target: "panel" },
             class: "flex-none text-13 font-medium whitespace-nowrap text-muted-2" %>
@@ -57,7 +57,7 @@
                 role: "tab", id: "lesson-tab-#{step}",
                 aria: { selected: step == @step, controls: "lesson-panel-#{step}" },
                 data: { panel: step, path: lesson_step_path(step), index:, state:,
-                        percent: LessonContent.percent_for(step),
+                        percent: @lesson_content.percent_for(step),
                         panels_target: "tab", action: "panels#select" },
                 class: "group flex items-center gap-2.75 rounded-[10px] px-2.75 py-2.5 text-14
                         data-[state=current]:bg-brand-tint data-[state=current]:font-semibold

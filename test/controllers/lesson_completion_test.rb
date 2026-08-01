@@ -4,9 +4,10 @@ require "test_helper"
 # did; the server decides. The cases that matter most are the ones that used to
 # be impossible to enforce — a claimed pass, and a pass at a locked topic.
 class LessonCompletionTest < ActionDispatch::IntegrationTest
-  RIGHT_ANSWER = LessonContent::CORRECT_OPTION
-  WRONG_ANSWER = LessonContent::CORRECT_OPTION + 1
-  GOOD_CODE = "train_test_split(X, y, test_size=0.2, random_state=42)".freeze
+  TOPIC_CONTENT = LessonContent.for("1-1")
+  RIGHT_ANSWER = TOPIC_CONTENT.correct_option
+  WRONG_ANSWER = TOPIC_CONTENT.correct_option + 1
+  GOOD_CODE = TOPIC_CONTENT.solution
 
   # A method, not a constant. The syllabus is a table now, and a constant in the
   # class body is evaluated when the file loads — before fixtures are inserted,
@@ -69,7 +70,7 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
   end
 
   test "a partly correct coding task is scored for what matched" do
-    submit(kind: "code", answer: "train_test_split(")
+    submit(kind: "code", answer: "def classify_risk(score):")
 
     assert_not_predicate Submission.sole, :passed?
     assert_equal 33, Submission.sole.score

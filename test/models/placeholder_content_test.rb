@@ -259,4 +259,18 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     assert_equal LessonContent::CHECKS.size, LessonContent.checks.size
     assert LessonContent.checks.all? { it.is_a?(String) && it.present? }
   end
+
+  test "the first real topic has its own bilingual content and grading" do
+    content = LessonContent.for("1-1")
+
+    assert_predicate content, :real?
+    assert_equal 4, content.options.size
+    assert_equal 3, content.checks.size
+    assert content.translate("theory.heading").present?
+    assert content.grade_quiz(content.correct_option)[:passed]
+    assert content.grade_code(content.solution)[:passed]
+
+    I18n.with_locale(:en) { assert_equal 4, content.translate("quiz.options").size }
+    I18n.with_locale(:th) { assert_equal 4, content.translate("quiz.options").size }
+  end
 end

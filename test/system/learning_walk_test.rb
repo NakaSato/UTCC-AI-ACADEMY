@@ -30,7 +30,7 @@ class LearningWalkTest < ApplicationSystemTestCase
     # Reload and answer right: the verdict comes back a pass, the next step
     # unlocks, and the completion exists.
     visit "/lesson?course=AI1101&topic=1-1&step=exercise"
-    find("[data-quiz-target=option][data-index='#{LessonContent::CORRECT_OPTION}']").click
+    find("[data-quiz-target=option][data-index='#{LessonContent.for("1-1").correct_option}']").click
     click_button I18n.t("lesson.quiz.check")
     assert_selector "[data-quiz-target=feedback][data-state=correct]"
     assert_selector "a[data-quiz-target=next]"

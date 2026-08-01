@@ -249,6 +249,65 @@ en:
           - "Data privacy"
 
   lesson:
+    topics:
+      topic_1_1:
+        theory:
+          eyebrow: "Topic 1-1 · 8 min"
+          heading: "What AI is, and actually does"
+          p1: "Artificial intelligence is a system that uses data and rules or learned models to produce an output such as a prediction, classification, recommendation, or generated response."
+          p2: "Ask what went in, what came out, and how you will check whether the result is useful and safe."
+          sup_title: "AI capability"
+          sup_desc: "A model learns a relationship from examples, then applies that pattern to new inputs."
+          sup_eg: "e.g. predict whether a payment needs review"
+          unsup_title: "Rule-based automation"
+          unsup_desc: "A fixed rule follows instructions written in advance; it does not learn a pattern from examples."
+          unsup_eg: "e.g. send a receipt when payment succeeds"
+          code_comment: "# input → model → output"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the AI glossary →"
+          blocks:
+            - "Start with the decision: what should a person do differently because of this output?"
+            - "input + model → output → evaluation"
+            - "prediction = model(customer_data)\nprint(prediction)"
+            - "Google ML glossary · artificial intelligence"
+        quiz:
+          eyebrow: "Exercise · identify the capability"
+          question: "Which example best describes an AI capability rather than a fixed rule?"
+          options:
+            - "Send a receipt whenever a payment succeeds"
+            - "Predict whether a new payment needs review from patterns in past examples"
+            - "Rename a file when it is uploaded"
+            - "Show a warning when a required field is empty"
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — the model uses examples to predict whether a new payment needs review."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the example that learns a pattern from past data instead of following one fixed instruction."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Turn a model score into a decision"
+          task: "Complete the function so a score of 0.7 or higher is classified as high risk and every lower score is classified as low risk."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            def classify_risk(score):
+                if score >= ___:
+                    return "___"
+                return "low"
+          solution: "def classify_risk(score):\n    if score >= 0.7:\n        return \"high\"\n    return \"low\""
+          checks:
+            - "Define classify_risk(score)"
+            - "Use the 0.7 decision threshold"
+            - "Return high for a high-risk score"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — replace ___ with 0.7 and high"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
