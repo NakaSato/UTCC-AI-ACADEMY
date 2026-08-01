@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:08:11+07:00",
+  "updated_at": "2026-08-01T11:11:33+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -72,7 +72,7 @@
     {
       "id": "DOCS-010",
       "title": "Cross-link every skill with every development-flow guide",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -84,7 +84,7 @@
           "url": "development-flow.html#phase-skill-routes"
         }
       ],
-      "updated_at": "2026-07-31T23:00:27+07:00"
+      "updated_at": "2026-08-01T11:11:33+07:00"
     },
     {
       "id": "DOCS-009",
@@ -955,6 +955,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the worked Milestone 1 development-flow example after reviewing its roadmap framing, lifecycle artifacts, role handoffs, skill routes, verification evidence, and outcome measures; DOCS-011 is complete.",
       "evidence_url": "examples/milestone-1-reliable-account-recovery.html"
+    },
+    {
+      "at": "2026-08-01T11:11:33+07:00",
+      "item_id": "DOCS-010",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the cross-linked lifecycle skill routes after reviewing the Plan, Design, Spec, Code, Test, Build, Release, Operate, and Measure phase mappings; DOCS-010 is complete.",
+      "evidence_url": "development-flow.html#phase-skill-routes"
     }
   ]
 }
