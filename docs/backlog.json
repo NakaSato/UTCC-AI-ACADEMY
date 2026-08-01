@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:25:51+07:00",
+  "updated_at": "2026-08-01T10:36:44+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -174,7 +174,7 @@
     {
       "id": "AGENT-002",
       "title": "Reduce AGENTS.md to the canonical master-flow reference",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -186,7 +186,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
         }
       ],
-      "updated_at": "2026-07-31T12:22:18+07:00"
+      "updated_at": "2026-08-01T10:36:44+07:00"
     },
     {
       "id": "AGENT-001",
@@ -931,6 +931,14 @@
       "to": "blocked",
       "summary": "Product Owner rejected ADR-0002 without selecting a production email provider or providing a replacement direction; MAIL-001 remains blocked and MAIL-002 is not authorized to start.",
       "evidence_url": "decisions/adr-0002-select-production-email-provider.html"
+    },
+    {
+      "at": "2026-08-01T10:36:44+07:00",
+      "item_id": "AGENT-002",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the Tier C diff after reviewing the minimal AGENTS.md reference to the canonical system development flow; AGENT-002 is complete.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
     }
   ]
 }
