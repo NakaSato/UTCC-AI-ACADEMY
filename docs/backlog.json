@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:13:29+07:00",
+  "updated_at": "2026-08-01T11:18:53+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -106,7 +106,7 @@
     {
       "id": "DOCS-008",
       "title": "Enforce one connected graph across all project Markdown documents",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -118,7 +118,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
         }
       ],
-      "updated_at": "2026-07-31T22:34:20+07:00"
+      "updated_at": "2026-08-01T11:18:53+07:00"
     },
     {
       "id": "DOCS-007",
@@ -971,6 +971,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the skill directory links to the project development flow, role guide, master flow, and canonical skill library; DOCS-009 is complete.",
       "evidence_url": "skills/README.html"
+    },
+    {
+      "at": "2026-08-01T11:18:53+07:00",
+      "item_id": "DOCS-008",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the connected Markdown graph enforcement after reviewing the validator's repository-wide link resolution and single-component result; DOCS-008 is complete.",
+      "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/validate-markdown-graph"
     }
   ]
 }
