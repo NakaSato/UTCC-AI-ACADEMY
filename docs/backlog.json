@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:23:55+07:00",
+  "updated_at": "2026-08-01T11:33:30+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -239,9 +239,9 @@
       "milestone": "M1",
       "depends_on": [],
       "blocker": {
-        "summary": "The Product Owner rejected ADR-0002; no production email provider or credentials are authorized.",
+        "summary": "ADR-0004 proposes deferring production email; no production email provider or credentials are authorized until the Product Owner accepts a replacement direction.",
         "decision_owner": "Product Owner",
-        "next_action": "The Product Owner must provide a new direction before production email work can resume."
+        "next_action": "The Product Owner must review and accept ADR-0004 or provide a different production-email direction."
       },
       "evidence": [
         {
@@ -251,6 +251,10 @@
         {
           "label": "Provider decision options",
           "url": "decisions/adr-0002-select-production-email-provider.html"
+        },
+        {
+          "label": "Proposed deferral decision",
+          "url": "decisions/adr-0004-defer-production-email.html"
         }
       ],
       "updated_at": "2026-08-01T02:25:51+07:00"
@@ -995,6 +999,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the external feature proposal template after reviewing requester intake, privacy and confidentiality safeguards, untrusted external content handling, internal triage, ownership, prioritization, and acceptance criteria; DOCS-006 is complete.",
       "evidence_url": "templates/external-feature-proposal.html"
+    },
+    {
+      "at": "2026-08-01T11:33:30+07:00",
+      "item_id": "MAIL-001",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "Drafted ADR-0004 to defer production email while preserving local Mailpit; MAIL-001 remains blocked pending Product Owner acceptance or a replacement direction.",
+      "evidence_url": "decisions/adr-0004-defer-production-email.html"
     }
   ]
 }
