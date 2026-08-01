@@ -418,6 +418,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use notna() and mean()"
+      topic_2_1:
+        theory:
+          eyebrow: "Topic 2-1 · 10 min"
+          heading: "How models learn"
+          p1: "A model learns by adjusting internal parameters so its predictions make less error on training examples. The learning algorithm repeats prediction, measurement, and update many times."
+          p2: "Training changes parameters; inference keeps those learned parameters fixed and uses them to predict an output for a new input."
+          sup_title: "Training loop"
+          sup_desc: "Make a prediction, measure its loss, compute an update direction, and adjust the parameters."
+          sup_eg: "prediction → loss → gradient → update"
+          unsup_title: "Inference"
+          unsup_desc: "After training, the model applies its learned parameters to new data without learning from that request."
+          unsup_eg: "new input → fixed model → prediction"
+          code_comment: "# one parameter update"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the ML glossary →"
+          blocks:
+            - "Learning is an optimization process: each useful update should reduce the chosen loss over time."
+            - "w_{new} = w_{old} - learning\_rate × gradient"
+            - "weight = weight - learning_rate * gradient\nprint(weight)"
+            - "Google ML glossary · training"
+        quiz:
+          eyebrow: "Exercise · identify the learning signal"
+          question: "During training, what quantity tells the optimizer how wrong the model's predictions are?"
+          options:
+            - "The file name"
+            - "The loss"
+            - "The screen size"
+            - "The deployment region"
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — the loss measures prediction error and gives the optimizer a target to reduce."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the quantity computed from predictions and expected results that training tries to minimize."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Apply one learning update"
+          task: "Complete the parameter update so the gradient, scaled by the learning rate, is subtracted from the current weight."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            weight = weight ___ learning_rate * ___
+            print(weight)
+          checks:
+            - "Assign the updated weight"
+            - "Subtract the scaled update"
+            - "Multiply the learning rate by the gradient"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — subtract learning_rate * gradient"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."
