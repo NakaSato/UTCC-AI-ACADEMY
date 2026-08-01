@@ -805,6 +805,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — add prompt_tokens and max_new_tokens"
+      topic_4_2:
+        theory:
+          eyebrow: "Topic 4-2 · 10 min"
+          heading: "Writing prompts that work"
+          p1: "A dependable prompt gives the model a task, the relevant context, and a clear output format. Examples and constraints can reduce ambiguity when the work is important."
+          p2: "Prompt quality is a hypothesis to test, not a magic phrase. Try representative inputs, inspect failures, and keep the prompt versioned when it becomes part of a workflow."
+          sup_title: "Task and context"
+          sup_desc: "Say what the model should do and provide the facts or source text it may use. Do not assume hidden context."
+          sup_eg: "Task: summarize · Context: feedback text"
+          unsup_title: "Format and constraints"
+          unsup_desc: "Specify the shape, length, audience, and boundaries of the response so a useful result is easier to check."
+          unsup_eg: "Output format: three bullet points"
+          code_comment: "# make the request testable"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the prompt design guide →"
+          blocks:
+            - "A prompt should make the desired decision or artifact observable: define what success looks like before tuning wording."
+            - "task + context + output format + constraints"
+            - "Task: summarize the customer feedback.\nContext: use only the provided feedback.\nOutput format: three bullet points."
+            - "OpenAI guide · prompt engineering"
+        quiz:
+          eyebrow: "Exercise · make a prompt testable"
+          question: "Which prompt structure gives a model the clearest starting point for a bounded task?"
+          options:
+            - "State the task, provide relevant context, and specify the output format."
+            - "Say only: ‘Do something useful.’"
+            - "Hide the source text and rely on the model to guess it."
+            - "Change the request randomly after every response."
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — task, context, and output format make the request concrete and testable."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Look for the structure that reduces ambiguity and tells the model what evidence and shape to use."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Write a structured prompt"
+          task: "Complete the prompt so it states a task, supplies context, and requires an explicit output format."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            prompt = "Task: ___\nContext: ___\nOutput format: ___"
+            print(prompt)
+          checks:
+            - "State a task"
+            - "Provide relevant context"
+            - "Specify an output format"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — include task, context, and output format"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3 2-4 3-1 3-2 4-1].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3 2-4 3-1 3-2 4-1 4-2].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -147,6 +147,15 @@ module LessonContent
         /max_new_tokens/
       ],
       solution: "total_tokens = prompt_tokens + max_new_tokens\nprint(total_tokens)"
+    },
+    "4-2" => {
+      correct_option: 0,
+      checks: [
+        /Task:\s*\S/,
+        /Context:\s*\S/,
+        /Output\s+format:\s*\S/
+      ],
+      solution: "prompt = \"Task: summarize the customer feedback.\\nContext: use only the provided feedback.\\nOutput format: three bullet points.\"\nprint(prompt)"
     }
   }.freeze
 
