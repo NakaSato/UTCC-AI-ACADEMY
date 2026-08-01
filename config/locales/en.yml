@@ -528,6 +528,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use np.abs() and mean()"
+      topic_2_3:
+        theory:
+          eyebrow: "Topic 2-3 · 10 min"
+          heading: "Supervised vs. Unsupervised Learning"
+          p1: "Supervised learning uses examples with known labels to learn a mapping from inputs to outputs. Unsupervised learning receives no target labels and looks for structure in the inputs."
+          p2: "Choose the learning setup from the data and the decision: if a trusted answer exists, learn to predict it; if not, describe or group what is present without inventing labels."
+          sup_title: "Supervised learning"
+          sup_desc: "The training rows include a target such as a price, class, or risk label. The model learns to predict that target for new rows."
+          sup_eg: "e.g. classify an approved loan"
+          unsup_title: "Unsupervised learning"
+          unsup_desc: "The rows have no target label. The model can discover clusters or reduce dimensions, but a person must interpret what the structure means."
+          unsup_eg: "e.g. segment customers"
+          code_comment: "# discover three customer groups"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the scikit-learn clustering docs →"
+          blocks:
+            - "No algorithm can create a trustworthy target label from nothing: unsupervised structure still needs human interpretation."
+            - "labels = model.fit_predict(X)"
+            - "model = KMeans(n_clusters=3, random_state=42)\nlabels = model.fit_predict(X)"
+            - "scikit-learn docs · KMeans"
+        quiz:
+          eyebrow: "Exercise · choose the learning setup"
+          question: "A shop has customer behaviour data but no predefined groups and wants to discover segments. Which setup fits?"
+          options:
+            - "Supervised classification"
+            - "Unsupervised clustering"
+            - "Supervised regression"
+            - "A fixed business rule"
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — without target labels, clustering can discover groups for a person to interpret."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "Ask whether the training data already contains a trusted target label. Here it does not."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Configure a clustering model"
+          task: "Complete the code so KMeans discovers three reproducible customer groups and returns their labels."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            model = KMeans(___ = ___, random_state=___)
+            labels = model.fit_predict(X)
+          checks:
+            - "Create a KMeans model"
+            - "Set n_clusters to 3"
+            - "Set random_state to 42"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use n_clusters=3 and random_state=42"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

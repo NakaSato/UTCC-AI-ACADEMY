@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3 2-1 2-2 2-3].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -102,6 +102,15 @@ module LessonContent
         /\.mean\s*\(\s*\)/
       ],
       solution: "mae = np.abs(y_true - y_pred).mean()\nprint(mae)"
+    },
+    "2-3" => {
+      correct_option: 1,
+      checks: [
+        /KMeans\s*\(/,
+        /n_clusters\s*=\s*3/,
+        /random_state\s*=\s*42/
+      ],
+      solution: "model = KMeans(n_clusters=3, random_state=42)\nlabels = model.fit_predict(X)"
     }
   }.freeze
 
