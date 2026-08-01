@@ -2,13 +2,13 @@
 id: ADR-0002
 type: adr
 title: Select the production transactional-email provider
-status: rejected
+status: superseded
 owners: ["@product-owner"]
 created: 2026-07-31
 updated: 2026-08-01
 review_by: 2026-08-07
 supersedes: []
-superseded_by: []
+superseded_by: [ADR-0004]
 depends_on: []
 implemented_by: []
 touches:

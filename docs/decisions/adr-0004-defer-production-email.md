@@ -2,7 +2,7 @@
 id: ADR-0004
 type: adr
 title: Defer production email delivery
-status: proposed
+status: accepted
 owners: ["@product-owner"]
 created: 2026-08-01
 updated: 2026-08-01
@@ -27,8 +27,8 @@ agent_writable: false
 > [Local Mailpit Decision](adr-0003-use-mailpit-for-local-email-capture.md) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Proposed for Product Owner review. This draft does not
-> authorize production deployment, credentials, or a provider.
+> **Decision state:** Accepted by the Product Owner on 2026-08-01. This decision
+> does not authorize production deployment, credentials, or a provider.
 
 ## Context
 
@@ -52,12 +52,13 @@ replacement provider decision with named owners. During the deferral:
 2. Keep ADR-0003 as the accepted development-only Mailpit decision.
 3. Do not add production SMTP settings, provider credentials, DNS changes, or
    provider integrations.
-4. Keep `MAIL-001` blocked with this ADR as the next decision-review artifact.
-5. Keep `MAIL-002` and `MAIL-003` queued and blocked by `MAIL-001`.
+4. Resolve `MAIL-001` as the completed deferral decision with this ADR as its
+   evidence.
+5. Keep `MAIL-002` and `MAIL-003` blocked because no provider implementation is
+   authorized.
 
-If accepted, this ADR supersedes ADR-0002 as the current production-email
-direction. A later provider selection may supersede this deferral through a new
-accepted ADR.
+This ADR supersedes ADR-0002 as the current production-email direction. A later
+provider selection may supersede this deferral through a new accepted ADR.
 
 ## Alternatives
 
@@ -84,24 +85,21 @@ unresolved dependency without silently removing the capability.
   selected and configured.
 - No production credential or third-party email data is introduced while the
   decision is unresolved.
-- The Product Owner must review this ADR before the repository can treat
-  `MAIL-001` as superseded.
+- `MAIL-001` is resolved as a completed deferral decision; production email
+  remains unavailable.
 
 ## Fitness Functions
 
 - `bin/docs` validates this ADR's frontmatter, references, and required
   headings.
-- `MAIL-001` remains blocked until a human accepts this ADR or supplies a
-  replacement production-provider decision.
-- `MAIL-002` and `MAIL-003` do not move to implementation while `MAIL-001` is
-  unresolved.
+- `MAIL-001` records this accepted ADR as its decision evidence.
+- `MAIL-002` and `MAIL-003` remain blocked while no provider decision exists.
 - `ADR-0003` continues to verify local Mailpit behavior without changing
   production configuration.
 
 ## Acceptance criteria
 
-- [ ] Product Owner accepts or rejects this ADR.
-- [ ] If accepted, ADR-0002 is marked `superseded` with
-      `superseded_by: [ADR-0004]`.
-- [ ] `MAIL-001` records ADR-0004 as its current decision evidence.
-- [ ] `MAIL-002` and `MAIL-003` remain blocked until a provider decision exists.
+- [x] Product Owner accepts this ADR on 2026-08-01.
+- [x] ADR-0002 is marked `superseded` with `superseded_by: [ADR-0004]`.
+- [x] `MAIL-001` records ADR-0004 as its current decision evidence.
+- [x] `MAIL-002` and `MAIL-003` remain blocked until a provider decision exists.

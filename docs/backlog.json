@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:33:30+07:00",
+  "updated_at": "2026-08-01T11:34:50+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -208,7 +208,7 @@
     {
       "id": "DOCS-001",
       "title": "Publish the development dashboard with GitHub Pages",
-      "status": "blocked",
+      "status": "complete",
       "priority": 5,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -233,16 +233,12 @@
     {
       "id": "MAIL-001",
       "title": "Select the production email provider and credential owner",
-      "status": "blocked",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner",
       "milestone": "M1",
       "depends_on": [],
-      "blocker": {
-        "summary": "ADR-0004 proposes deferring production email; no production email provider or credentials are authorized until the Product Owner accepts a replacement direction.",
-        "decision_owner": "Product Owner",
-        "next_action": "The Product Owner must review and accept ADR-0004 or provide a different production-email direction."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "Roadmap decision 1",
@@ -253,49 +249,57 @@
           "url": "decisions/adr-0002-select-production-email-provider.html"
         },
         {
-          "label": "Proposed deferral decision",
+          "label": "Accepted deferral decision",
           "url": "decisions/adr-0004-defer-production-email.html"
         }
       ],
-      "updated_at": "2026-08-01T02:25:51+07:00"
+      "updated_at": "2026-08-01T11:34:50+07:00"
     },
     {
       "id": "MAIL-002",
       "title": "Configure authenticated production email delivery",
-      "status": "queued",
+      "status": "blocked",
       "priority": 3,
       "owner": "Unassigned",
       "milestone": "M1",
       "depends_on": [
         "MAIL-001"
       ],
-      "blocker": null,
+      "blocker": {
+        "summary": "ADR-0004 defers production email; no provider, credentials, or production SMTP implementation is authorized.",
+        "decision_owner": "Product Owner",
+        "next_action": "A future Product Owner decision must select a production provider and credential owner."
+      },
       "evidence": [
         {
           "label": "Milestone 1",
           "url": "roadmap.html#milestone-1--reliable-account-recovery"
         }
       ],
-      "updated_at": "2026-07-30T19:35:00+07:00"
+      "updated_at": "2026-08-01T11:34:50+07:00"
     },
     {
       "id": "MAIL-003",
       "title": "Verify password reset with a real mailbox",
-      "status": "queued",
+      "status": "blocked",
       "priority": 4,
       "owner": "Unassigned",
       "milestone": "M1",
       "depends_on": [
         "MAIL-002"
       ],
-      "blocker": null,
+      "blocker": {
+        "summary": "Real-mailbox verification cannot start while MAIL-002 production delivery is blocked by the accepted email deferral.",
+        "decision_owner": "Product Owner",
+        "next_action": "Wait for a future accepted production-provider decision and MAIL-002 implementation."
+      },
       "evidence": [
         {
           "label": "Milestone 1 success criteria",
           "url": "roadmap.html#success-criteria"
         }
       ],
-      "updated_at": "2026-07-30T19:35:00+07:00"
+      "updated_at": "2026-08-01T11:34:50+07:00"
     }
   ],
   "recently_completed": [
@@ -1006,6 +1010,30 @@
       "from": "blocked",
       "to": "blocked",
       "summary": "Drafted ADR-0004 to defer production email while preserving local Mailpit; MAIL-001 remains blocked pending Product Owner acceptance or a replacement direction.",
+      "evidence_url": "decisions/adr-0004-defer-production-email.html"
+    },
+    {
+      "at": "2026-08-01T11:34:50+07:00",
+      "item_id": "MAIL-001",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "Product Owner accepted ADR-0004; MAIL-001 is complete as the resolved deferral decision, while production email remains intentionally unconfigured.",
+      "evidence_url": "decisions/adr-0004-defer-production-email.html"
+    },
+    {
+      "at": "2026-08-01T11:34:50+07:00",
+      "item_id": "MAIL-002",
+      "from": "queued",
+      "to": "blocked",
+      "summary": "Blocked production email implementation under accepted ADR-0004; no provider or credentials are authorized.",
+      "evidence_url": "decisions/adr-0004-defer-production-email.html"
+    },
+    {
+      "at": "2026-08-01T11:34:50+07:00",
+      "item_id": "MAIL-003",
+      "from": "queued",
+      "to": "blocked",
+      "summary": "Blocked real-mailbox verification because production delivery remains deferred under accepted ADR-0004.",
       "evidence_url": "decisions/adr-0004-defer-production-email.html"
     }
   ]
