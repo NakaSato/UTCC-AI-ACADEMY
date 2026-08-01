@@ -363,6 +363,61 @@ en:
           console_idle: "  ready — press “Run & check”"
           console_pass: "✓ all 3 criteria passed · +10 gems"
           console_fail: "✗ not passing yet — use float and dtypes"
+      topic_1_3:
+        theory:
+          eyebrow: "Topic 1-3 · 8 min"
+          heading: "Measuring data quality"
+          p1: "Data quality is not one vague feeling. Check dimensions such as completeness, accuracy, consistency, and timeliness against the decision the data will support."
+          p2: "A simple metric makes a quality discussion testable: measure the share of required values that are present, then investigate what the missing records have in common."
+          sup_title: "Completeness and accuracy"
+          sup_desc: "Completeness asks whether required values are present. Accuracy asks whether those values match reality or a trusted source."
+          sup_eg: "e.g. 98% of required emails are present"
+          unsup_title: "Consistency and timeliness"
+          unsup_desc: "Consistency keeps formats and meanings aligned across sources. Timeliness checks whether the data is fresh enough for the decision."
+          unsup_eg: "e.g. timestamps use one timezone"
+          code_comment: "# share of email values that are present"
+          to_quiz: "Check your understanding →"
+          open_link: "Read the pandas docs →"
+          blocks:
+            - "Choose the quality dimension from the decision: a stale value can be worse than a missing one."
+            - "completeness = present_required_values / required_values"
+            - "completeness = df[\"email\"].notna().mean()\nprint(completeness)"
+            - "pandas docs · missing data"
+        quiz:
+          eyebrow: "Exercise · choose the metric"
+          question: "A data team wants to know what share of customer records contain an email address. Which quality dimension are they measuring?"
+          options:
+            - "Completeness"
+            - "Accuracy"
+            - "Timeliness"
+            - "Consistency"
+          keys: [ "A", "B", "C", "D" ]
+          check: "Check answer"
+          to_code: "Try the applied task →"
+          correct_title: "Correct · +5 gems"
+          correct_body: "Correct — the share of required values that are present is a completeness measure."
+          wrong_title: "Try again · −1 heart"
+          wrong_body: "The question asks whether the required value exists, not whether it is correct, fresh, or consistently formatted."
+        code:
+          eyebrow: "Applied task · Python"
+          title: "Calculate completeness"
+          task: "Complete the code so completeness is the share of non-missing email values and print the result."
+          criteria: "Passing criteria"
+          run: "Run & check"
+          reset: "Reset"
+          finish: "Finish topic →"
+          editor_label: "Python code for this task"
+          starter: |
+            completeness = df["email"].___().___()
+            print(completeness)
+          checks:
+            - "Select the email column"
+            - "Check which email values are present"
+            - "Calculate the share with mean"
+          console_running: "  running…"
+          console_idle: "  ready — press “Run & check”"
+          console_pass: "✓ all 3 criteria passed · +10 gems"
+          console_fail: "✗ not passing yet — use notna() and mean()"
     # Raised as a toast rather than a flash: there is no page load to carry a
     # flash, and the exercise and the coding task both fail this way.
     grading_unreachable: "Could not reach the server, so nothing was graded — please try again."

@@ -21,7 +21,7 @@ module LessonContent
   # Without a course the lesson is about the one every student starts on; without
   # a topic it is about the next one they have not finished.
   DEFAULT_COURSE = "AI1101"
-  REAL_TOPIC_KEYS = %w[1-1 1-2].freeze
+  REAL_TOPIC_KEYS = %w[1-1 1-2 1-3].freeze
   REAL_TOPIC_KEY = REAL_TOPIC_KEYS.first
 
   # How full the top progress bar is on each step.
@@ -75,6 +75,15 @@ module LessonContent
         /df\.dtypes/
       ],
       solution: "df[\"age\"] = df[\"age\"].astype(\"float\")\nprint(df.dtypes)"
+    },
+    "1-3" => {
+      correct_option: 0,
+      checks: [
+        /df\s*\[\s*[\"']email[\"']\s*\]/,
+        /\.notna\s*\(\s*\)/,
+        /\.mean\s*\(\s*\)/
+      ],
+      solution: "completeness = df[\"email\"].notna().mean()\nprint(completeness)"
     }
   }.freeze
 
