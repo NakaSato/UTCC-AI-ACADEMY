@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T10:36:44+07:00",
+  "updated_at": "2026-08-01T10:44:36+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -157,7 +157,7 @@
     {
       "id": "DOCS-005",
       "title": "Create an all-roles guide for the system development workflow",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -169,7 +169,7 @@
           "url": "system-development-flow-role-guide.html"
         }
       ],
-      "updated_at": "2026-07-31T12:31:42+07:00"
+      "updated_at": "2026-08-01T10:44:36+07:00"
     },
     {
       "id": "AGENT-002",
@@ -939,6 +939,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the Tier C diff after reviewing the minimal AGENTS.md reference to the canonical system development flow; AGENT-002 is complete.",
       "evidence_url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/AGENTS.md"
+    },
+    {
+      "at": "2026-08-01T10:44:36+07:00",
+      "item_id": "DOCS-005",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the all-roles workflow guide after reviewing its role playbooks, lifecycle handoffs, skill packs, delegation rules, Slack handoff rules, and repository handoff template; DOCS-005 is complete.",
+      "evidence_url": "system-development-flow-role-guide.html"
     }
   ]
 }
