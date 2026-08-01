@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:52:01+07:00",
+  "updated_at": "2026-08-01T14:00:21+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -337,9 +337,9 @@
         "M2-001"
       ],
       "blocker": {
-        "summary": "SPEC-0002 is proposed; content owners, objectives, and review cadence require Product Owner and instructor approval.",
+        "summary": "Implementation may proceed under accepted SPEC-0002; topic owners and learner-review evidence remain required for completion.",
         "decision_owner": "Product Owner and Instructor",
-        "next_action": "Review and accept SPEC-0002 before the remaining AI1101 topics are implemented."
+        "next_action": "Assign topic content owners and begin the first vertical topic slice."
       },
       "evidence": [
         {
@@ -347,7 +347,7 @@
           "url": "specs/spec-m3-foundation-course.html"
         }
       ],
-      "updated_at": "2026-08-01T13:52:01+07:00"
+      "updated_at": "2026-08-01T14:00:21+07:00"
     }
   ],
   "recently_completed": [
@@ -1122,6 +1122,14 @@
       "from": "new",
       "to": "queued",
       "summary": "Drafted SPEC-0002 and queued the AI1101 foundation-course content increment for Product Owner and instructor review.",
+      "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-01T14:00:21+07:00",
+      "item_id": "M3-001",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Product Owner and instructor approved SPEC-0002; M3 implementation is authorized to begin with topic-owner assignment and the first vertical slice.",
       "evidence_url": "specs/spec-m3-foundation-course.html"
     }
   ]

@@ -2,7 +2,7 @@
 id: SPEC-0002
 type: spec
 title: Complete the AI1101 foundation course content
-status: proposed
+status: accepted
 owners: ["@product-owner", "@instructor"]
 created: 2026-08-01
 updated: 2026-08-01
@@ -36,9 +36,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-TEST-001]
 > [M2 first-topic specification](spec-m2-first-real-topic.md) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Proposed. The Product Owner and instructor must assign
-> content owners, approve objectives, and confirm the review cadence before
-> implementation begins.
+> **Review state:** Accepted by the Product Owner and instructor on 2026-08-01.
+> M3 implementation is authorized; each topic still requires its assigned
+> content-owner and learner-review evidence before completion.
 
 ## Problem
 
@@ -121,4 +121,3 @@ bin/rails test:system test/system/learning_walk_test.rb
 bin/docs
 bin/verify
 ```
-
