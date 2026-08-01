@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:34:50+07:00",
+  "updated_at": "2026-08-01T11:47:06+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -300,6 +300,27 @@
         }
       ],
       "updated_at": "2026-08-01T11:34:50+07:00"
+    },
+    {
+      "id": "M2-001",
+      "title": "Deliver the first real bilingual AI1101 topic (1-1)",
+      "status": "queued",
+      "priority": 1,
+      "owner": "Product Owner and Instructor",
+      "milestone": "M2",
+      "depends_on": [],
+      "blocker": {
+        "summary": "SPEC-0001 is proposed; learning objectives, answer key, grading criteria, and acceptance intent require Product Owner and instructor review.",
+        "decision_owner": "Product Owner and Instructor",
+        "next_action": "Review and accept SPEC-0001 before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M2 first real topic specification",
+          "url": "specs/spec-m2-first-real-topic.html"
+        }
+      ],
+      "updated_at": "2026-08-01T11:47:06+07:00"
     }
   ],
   "recently_completed": [
@@ -1035,6 +1056,14 @@
       "to": "blocked",
       "summary": "Blocked real-mailbox verification because production delivery remains deferred under accepted ADR-0004.",
       "evidence_url": "decisions/adr-0004-defer-production-email.html"
+    },
+    {
+      "at": "2026-08-01T11:47:06+07:00",
+      "item_id": "M2-001",
+      "from": "new",
+      "to": "queued",
+      "summary": "Drafted SPEC-0001 for topic 1-1, What AI is, and actually does; implementation is awaiting Product Owner and instructor review of objectives, invariants, and acceptance criteria.",
+      "evidence_url": "specs/spec-m2-first-real-topic.html"
     }
   ]
 }
