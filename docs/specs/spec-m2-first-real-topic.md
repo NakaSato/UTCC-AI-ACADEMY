@@ -2,7 +2,7 @@
 id: SPEC-0001
 type: spec
 title: Deliver the first real bilingual AI1101 topic
-status: proposed
+status: accepted
 owners: ["@product-owner", "@instructor"]
 created: 2026-08-01
 updated: 2026-08-01
@@ -36,9 +36,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-TEST-001]
 > [Project Development Flow](../development-flow.md) ·
 > [System Development Flow Master](../system-development-flow-master.md)
 
-> **Review state:** Proposed. The Product Owner and instructor must approve the
-> learning objectives, answer key, grading criteria, and acceptance intent
-> before this specification becomes accepted implementation authority.
+> **Review state:** Accepted by the Product Owner and instructor on 2026-08-01.
+> The approved objectives, invariants, grading criteria, and acceptance intent
+> are implementation authority for M2-001.
 
 ## Problem
 

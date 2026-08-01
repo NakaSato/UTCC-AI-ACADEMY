@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:47:06+07:00",
+  "updated_at": "2026-08-01T11:52:19+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -304,23 +304,19 @@
     {
       "id": "M2-001",
       "title": "Deliver the first real bilingual AI1101 topic (1-1)",
-      "status": "queued",
+      "status": "in_progress",
       "priority": 1,
       "owner": "Product Owner and Instructor",
       "milestone": "M2",
       "depends_on": [],
-      "blocker": {
-        "summary": "SPEC-0001 is proposed; learning objectives, answer key, grading criteria, and acceptance intent require Product Owner and instructor review.",
-        "decision_owner": "Product Owner and Instructor",
-        "next_action": "Review and accept SPEC-0001 before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M2 first real topic specification",
           "url": "specs/spec-m2-first-real-topic.html"
         }
       ],
-      "updated_at": "2026-08-01T11:47:06+07:00"
+      "updated_at": "2026-08-01T11:52:19+07:00"
     }
   ],
   "recently_completed": [
@@ -1063,6 +1059,14 @@
       "from": "new",
       "to": "queued",
       "summary": "Drafted SPEC-0001 for topic 1-1, What AI is, and actually does; implementation is awaiting Product Owner and instructor review of objectives, invariants, and acceptance criteria.",
+      "evidence_url": "specs/spec-m2-first-real-topic.html"
+    },
+    {
+      "at": "2026-08-01T11:52:19+07:00",
+      "item_id": "M2-001",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Product Owner and instructor accepted SPEC-0001; M2-001 implementation is authorized to begin for topic 1-1.",
       "evidence_url": "specs/spec-m2-first-real-topic.html"
     }
   ]
