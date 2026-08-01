@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:11:33+07:00",
+  "updated_at": "2026-08-01T11:13:29+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -89,7 +89,7 @@
     {
       "id": "DOCS-009",
       "title": "Link every documented skill to the project development flow",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Repository owner",
       "milestone": "M1",
@@ -101,7 +101,7 @@
           "url": "skills/README.html"
         }
       ],
-      "updated_at": "2026-07-31T22:55:39+07:00"
+      "updated_at": "2026-08-01T11:13:29+07:00"
     },
     {
       "id": "DOCS-008",
@@ -963,6 +963,14 @@
       "to": "complete",
       "summary": "Repository Owner approved the cross-linked lifecycle skill routes after reviewing the Plan, Design, Spec, Code, Test, Build, Release, Operate, and Measure phase mappings; DOCS-010 is complete.",
       "evidence_url": "development-flow.html#phase-skill-routes"
+    },
+    {
+      "at": "2026-08-01T11:13:29+07:00",
+      "item_id": "DOCS-009",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Repository Owner approved the skill directory links to the project development flow, role guide, master flow, and canonical skill library; DOCS-009 is complete.",
+      "evidence_url": "skills/README.html"
     }
   ]
 }
