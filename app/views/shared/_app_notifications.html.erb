@@ -50,6 +50,10 @@
               class="mt-1.5 size-[7px] flex-none rounded-full <%= notification.unread? ? "bg-brand" : "bg-transparent" %>"></span>
         <div>
           <div class="text-13-5 leading-[1.45] text-ink"><%= notification.text %></div>
+          <% if notification.action_path %>
+            <%= link_to notification.action_label, notification.action_path,
+                  class: "mt-1 inline-block text-12-5 font-semibold text-brand hover:text-brand-deep" %>
+          <% end %>
           <div class="mt-0.5 font-mono text-11 text-muted-2">
             <%= notification.created_at.in_time_zone.strftime("%d/%m %H:%M") %>
           </div>

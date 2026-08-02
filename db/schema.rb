@@ -10,9 +10,89 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_160002) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "academic_post_invitations", force: :cascade do |t|
+    t.bigint "academic_post_id", null: false
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "invitee_id", null: false
+    t.bigint "inviter_id", null: false
+    t.string "permission", default: "viewer", null: false
+    t.datetime "revoked_at"
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "updated_at", null: false
+    t.index ["academic_post_id", "invitee_id"], name: "academic_post_invitations_one_pending", unique: true, where: "((accepted_at IS NULL) AND (revoked_at IS NULL))"
+    t.index ["academic_post_id"], name: "index_academic_post_invitations_on_academic_post_id"
+    t.index ["invitee_id", "accepted_at", "revoked_at"], name: "idx_on_invitee_id_accepted_at_revoked_at_5cc0987b0f"
+    t.index ["invitee_id"], name: "index_academic_post_invitations_on_invitee_id"
+    t.index ["inviter_id"], name: "index_academic_post_invitations_on_inviter_id"
+    t.index ["token_digest"], name: "index_academic_post_invitations_on_token_digest", unique: true
+    t.check_constraint "inviter_id <> invitee_id", name: "academic_post_invitations_not_self"
+    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying, 'editor'::character varying]::text[])", name: "academic_post_invitations_permission"
+  end
+
+  create_table "academic_post_memberships", force: :cascade do |t|
+    t.bigint "academic_post_id", null: false
+    t.datetime "created_at", null: false
+    t.string "permission", default: "viewer", null: false
+    t.datetime "revoked_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["academic_post_id", "user_id"], name: "idx_on_academic_post_id_user_id_a58ffa8cad", unique: true
+    t.index ["academic_post_id"], name: "index_academic_post_memberships_on_academic_post_id"
+    t.index ["user_id"], name: "index_academic_post_memberships_on_user_id"
+    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying, 'editor'::character varying]::text[])", name: "academic_post_memberships_permission"
+  end
+
+  create_table "academic_post_revisions", force: :cascade do |t|
+    t.bigint "academic_post_id", null: false
+    t.bigint "author_id", null: false
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.string "title", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.integer "version", null: false
+    t.index ["academic_post_id", "version"], name: "index_academic_post_revisions_on_academic_post_id_and_version", unique: true
+    t.index ["academic_post_id"], name: "index_academic_post_revisions_on_academic_post_id"
+    t.index ["author_id"], name: "index_academic_post_revisions_on_author_id"
+  end
+
+  create_table "academic_posts", force: :cascade do |t|
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "owner_id", null: false
+    t.string "status", default: "draft", null: false
+    t.string "title", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id", "status"], name: "index_academic_posts_on_owner_id_and_status"
+    t.index ["owner_id"], name: "index_academic_posts_on_owner_id"
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
 
   create_table "audit_events", force: :cascade do |t|
     t.string "action", null: false
@@ -334,6 +414,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_160002) do
     t.index ["student_id"], name: "index_users_on_student_id", unique: true
   end
 
+  add_foreign_key "academic_post_invitations", "academic_posts"
+  add_foreign_key "academic_post_invitations", "users", column: "invitee_id"
+  add_foreign_key "academic_post_invitations", "users", column: "inviter_id"
+  add_foreign_key "academic_post_memberships", "academic_posts"
+  add_foreign_key "academic_post_memberships", "users"
+  add_foreign_key "academic_post_revisions", "academic_posts"
+  add_foreign_key "academic_post_revisions", "users", column: "author_id"
+  add_foreign_key "academic_posts", "users", column: "owner_id"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "audit_events", "users"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"

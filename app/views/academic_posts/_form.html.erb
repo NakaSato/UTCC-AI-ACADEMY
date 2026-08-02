@@ -1,0 +1,68 @@
+<section class="rounded-panel border border-hairline bg-surface px-6 py-7 sm:px-8.5"
+         data-controller="tiptap"
+         data-tiptap-picture-url-value="<%= post.persisted? ? pictures_academic_post_path(post) : "" %>">
+  <%= form_with model: post, data: { action: "submit->tiptap#sync" } do |form| %>
+    <%= render "shared/form_errors", record: post %>
+    <%= form.hidden_field :lock_version %>
+
+    <div class="mb-6 flex flex-col gap-4">
+      <label class="flex flex-col gap-1.75">
+        <span class="text-13-5 font-medium text-ink-4"><%= t("academic.fields.title") %></span>
+        <%= form.text_field :title, required: false, maxlength: 200,
+              placeholder: t("academic.fields.title_placeholder"),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none focus:border-brand" %>
+      </label>
+
+      <div class="flex flex-col gap-1.75">
+        <span class="text-13-5 font-medium text-ink-4"><%= t("academic.fields.body") %></span>
+        <%= form.hidden_field :body, value: ::AcademicPostContentSanitizer.sanitize(post.body),
+              data: { tiptap_target: "input" }, maxlength: 100_000 %>
+
+        <div class="relative">
+            <div class="mb-2 flex flex-wrap items-center gap-1.5 rounded-field border border-hairline-2 bg-surface-2 p-1.5"
+               aria-label="<%= t("academic.editor.toolbar") %>">
+            <button type="button" data-action="tiptap#toggleHeading" class="rounded px-2 py-1 text-13 font-semibold hover:bg-surface" aria-label="<%= t("academic.editor.heading") %>">H2</button>
+            <button type="button" data-action="tiptap#insertCitation" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.citation") %>">[C]</button>
+            <button type="button" data-action="tiptap#insertReference" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.reference") %>">[R]</button>
+            <button type="button" data-action="tiptap#toggleBold" class="rounded px-2 py-1 text-13 font-semibold hover:bg-surface" aria-label="<%= t("academic.editor.bold") %>">B</button>
+            <button type="button" data-action="tiptap#toggleItalic" class="rounded px-2 py-1 text-13 italic hover:bg-surface" aria-label="<%= t("academic.editor.italic") %>">I</button>
+            <button type="button" data-action="tiptap#toggleBulletList" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.bulleted_list") %>">• <%= t("academic.editor.list") %></button>
+            <button type="button" data-action="tiptap#toggleOrderedList" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.numbered_list") %>">1. <%= t("academic.editor.list") %></button>
+            <button type="button" data-action="tiptap#toggleBlockquote" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.blockquote") %>">❝</button>
+            <button type="button" data-action="tiptap#insertMath" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.math") %>">∑</button>
+            <% if post.persisted? %>
+              <label class="ml-auto cursor-pointer rounded px-2 py-1 text-13 font-medium text-brand-deep hover:bg-brand-tint">
+                <span><%= t("academic.editor.picture") %></span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"
+                       data-tiptap-target="pictureInput" data-action="change->tiptap#importPicture">
+              </label>
+              <input type="text" maxlength="160" placeholder="<%= t("academic.editor.picture_alt") %>"
+                     class="w-40 rounded border border-hairline-2 bg-surface px-2 py-1 text-12.5 text-ink outline-none focus:border-brand"
+                     data-tiptap-target="pictureAlt" aria-label="<%= t("academic.editor.picture_alt") %>">
+            <% end %>
+          </div>
+
+          <div data-tiptap-target="editor" class="min-h-[260px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-4 py-3 text-15 leading-[1.65] text-ink outline-none focus-within:border-brand"
+               data-placeholder="<%= t("academic.fields.body_placeholder") %>"></div>
+
+          <div data-tiptap-target="bubbleMenu" class="tiptap-menu rounded-field border border-hairline bg-surface px-2 py-1 shadow-menu" aria-label="<%= t("academic.editor.selection_menu") %>">
+            <button type="button" data-action="tiptap#toggleBold" class="px-2 py-1 text-13 font-semibold">B</button>
+            <button type="button" data-action="tiptap#toggleItalic" class="px-2 py-1 text-13 italic">I</button>
+          </div>
+          <div data-tiptap-target="floatingMenu" class="tiptap-menu rounded-field border border-hairline bg-surface px-2 py-1 shadow-menu" aria-label="<%= t("academic.editor.block_menu") %>">
+            <button type="button" data-action="tiptap#insertMath" class="px-2 py-1 text-13">∑</button>
+            <button type="button" data-action="tiptap#toggleBulletList" class="px-2 py-1 text-13">•</button>
+          </div>
+        </div>
+        <p data-tiptap-target="status" class="min-h-5 text-12.5 text-muted" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <%= form.submit t("academic.save"),
+            class: "cursor-pointer rounded-[12px] bg-brand px-6 py-3.25 text-15-5 font-semibold text-white hover:bg-brand-deep" %>
+      <%= link_to t("academic.cancel"), post.persisted? ? post : academic_posts_path,
+            class: "px-2 text-14-5 font-medium text-muted hover:text-ink" %>
+    </div>
+  <% end %>
+</section>

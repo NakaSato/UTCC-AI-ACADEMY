@@ -38,7 +38,8 @@ module ApplicationHelper
       [ t("chrome.nav.lesson"),      lesson_path ],
       [ t("chrome.nav.map"),         knowledge_map_path ],
       [ t("chrome.nav.progress"),    progress_path ],
-      [ t("chrome.nav.ranking"),     leaderboard_path ]
+      [ t("chrome.nav.ranking"),     leaderboard_path ],
+      [ t("chrome.nav.writing"),     academic_posts_path ]
     ]
 
     items << [ t("chrome.nav.instructor"), instructor_path ] if Current.user&.staff?

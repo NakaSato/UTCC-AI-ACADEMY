@@ -81,6 +81,17 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_select "header", text: /#{Regexp.escape(I18n.t("chrome.notif_empty"))}/
   end
 
+  test "an academic-post invitation notification exposes only its acceptance link" do
+    sign_in_as users(:two)
+    token = "a" * 64
+    Notification.notify(users(:two), "academic_post_invitation", token:, title: "Shared draft")
+
+    get root_url
+
+    assert_select "a[href=?]", academic_post_invitation_path(token),
+                  text: I18n.t("notifications.academic_post_invitation_action")
+  end
+
   private
     def make_event(user)
       ProctorEvent.create!(user:, course: Course.find_by!(code: "AI1101"),

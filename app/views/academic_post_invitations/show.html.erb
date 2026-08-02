@@ -1,0 +1,12 @@
+<% content_for :title, t("academic.collaboration.invitation_title") %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <section class="mx-auto max-w-[620px] rounded-panel border border-hairline bg-surface px-6 py-8 sm:px-10">
+    <h1 class="text-28 font-bold tracking-[-0.03em] text-ink"><%= t("academic.collaboration.invitation_title") %></h1>
+    <p class="mt-3 text-15 leading-[1.7] text-ink-3">
+      <%= t("academic.collaboration.invitation_help", title: @invitation.academic_post.title.presence || t("academic.untitled"), permission: t("academic.collaboration.#{@invitation.permission}")) %>
+    </p>
+    <%= button_to t("academic.collaboration.accept"), accept_academic_post_invitation_path(@invitation.token), method: :post,
+          class: "mt-6 rounded-[12px] bg-brand px-5 py-3 text-14-5 font-semibold text-white hover:bg-brand-deep" %>
+  </section>
+</main>

@@ -302,3 +302,30 @@
   list-style: none;
   &::-webkit-details-marker { display: none; }
 }
+
+/* Academic-post Tiptap surface. The editor is headless; these rules keep the
+ * authoring and read-only surfaces aligned with the application tokens. */
+.tiptap:focus { outline: none; }
+.tiptap > * + * { margin-top: 0.75rem; }
+.tiptap-menu { position: absolute; z-index: 40; visibility: hidden; opacity: 0; }
+.tiptap img { max-width: 100%; height: auto; border-radius: 0.75rem; }
+.tiptap .tiptap-mathematics-render { border-radius: 0.25rem; }
+.tiptap .tiptap-mathematics-render--editable { cursor: pointer; }
+.tiptap .block-math-inner,
+.tiptap .inline-math { background: var(--color-surface-2); border-radius: 0.25rem; padding: 0.125rem 0.375rem; }
+.tiptap:empty::before {
+  color: var(--color-muted-2);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Reader preferences are local-only presentation state. They never change the
+ * saved academic-post document or its authorization boundary. */
+.academic-reader[data-reader-width="narrow"] .academic-reader-column { max-width: 48rem; }
+.academic-reader[data-reader-width="wide"] .academic-reader-column { max-width: 64rem; }
+.academic-reader[data-reader-font-size="small"] .academic-reader-content { font-size: 0.9375rem; }
+.academic-reader[data-reader-font-size="large"] .academic-reader-content { font-size: 1.125rem; }
+.academic-reader[data-reader-theme="dark"] .academic-reader-surface { background: var(--color-chrome); color: var(--color-on-chrome-bright); border-color: var(--color-chrome-line); }
+.academic-reader[data-reader-theme="dark"] .academic-reader-content { color: var(--color-on-chrome); }

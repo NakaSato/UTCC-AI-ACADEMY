@@ -76,6 +76,20 @@ Rails.application.routes.draw do
   # like every other, and the same staff gate as the screen.
   get "instructor/grades", to: "instructor#grades", as: :instructor_grades
 
+  # Public surface is /academic. Keep the internal resource name and helpers
+  # stable so AcademicPost records, associations, and existing callers do not
+  # require a database migration.
+  resources :academic_posts, path: "academic", only: %i[index new create show edit update] do
+    post :submit, on: :member
+    post :publish, on: :member
+    post :pictures, on: :member
+    get :export, on: :member
+    post :invitations, on: :member, to: "academic_post_invitations#create"
+    delete "memberships/:user_id", to: "academic_post_invitations#revoke", as: :membership
+  end
+  get "academic-post-invitations/:token", to: "academic_post_invitations#show", as: :academic_post_invitation
+  post "academic-post-invitations/:token/accept", to: "academic_post_invitations#accept", as: :accept_academic_post_invitation
+
   # /instructor needs the instructor or admin role, /admin the admin role — see
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin

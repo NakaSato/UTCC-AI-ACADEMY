@@ -4,6 +4,20 @@ class User < ApplicationRecord
   has_many :topic_completions, dependent: :destroy
   has_many :submissions, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  has_many :academic_posts, foreign_key: :owner_id, dependent: :destroy,
+                            inverse_of: :owner
+  has_many :academic_post_memberships, dependent: :destroy,
+                                       inverse_of: :user
+  has_many :collaborating_academic_posts, through: :academic_post_memberships,
+                                          source: :academic_post
+  has_many :sent_academic_post_invitations, class_name: "AcademicPostInvitation",
+                                            foreign_key: :inviter_id, dependent: :restrict_with_exception,
+                                            inverse_of: :inviter
+  has_many :received_academic_post_invitations, class_name: "AcademicPostInvitation",
+                                                foreign_key: :invitee_id, dependent: :restrict_with_exception,
+                                                inverse_of: :invitee
+  has_many :academic_post_revisions, foreign_key: :author_id, dependent: :restrict_with_exception,
+                                     inverse_of: :author
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

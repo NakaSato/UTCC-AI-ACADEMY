@@ -1,0 +1,35 @@
+<% content_for :title, "#{t("academic.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="mb-2 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("academic.title") %></h1>
+      <p class="max-w-[620px] text-16 leading-[1.6] text-muted"><%= t("academic.subtitle") %></p>
+    </div>
+    <%= link_to t("academic.new"), new_academic_post_path,
+          class: "rounded-[12px] bg-brand px-5 py-3 text-14-5 font-semibold text-white hover:bg-brand-deep" %>
+  </div>
+
+  <% if @posts.empty? %>
+    <section class="rounded-panel border border-dashed border-hairline-2 bg-surface px-6 py-12 text-center">
+      <h2 class="mb-2 text-20 font-bold"><%= t("academic.empty_title") %></h2>
+      <p class="text-14-5 text-muted"><%= t("academic.empty_body") %></p>
+    </section>
+  <% else %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <% @posts.each do |post| %>
+        <article class="rounded-panel border border-hairline bg-surface p-5 shadow-card">
+          <div class="mb-3 flex items-start justify-between gap-3">
+            <h2 class="text-19 font-bold"><%= link_to post.title.presence || t("academic.untitled"), post, class: "hover:text-brand" %></h2>
+            <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted-2"><%= t("academic.status.#{post.status}") %></span>
+          </div>
+          <p class="line-clamp-3 whitespace-pre-line text-14 leading-[1.6] text-muted"><%= post.body.presence || t("academic.no_body") %></p>
+          <div class="mt-5 flex items-center justify-between gap-3 text-12-5 text-muted-2">
+            <span><%= l(post.updated_at, format: :short) %></span>
+            <%= link_to t("academic.open"), post, class: "font-semibold text-brand hover:text-brand-deep" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</main>

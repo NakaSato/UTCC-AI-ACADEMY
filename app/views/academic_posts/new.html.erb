@@ -1,0 +1,10 @@
+<% content_for :title, "#{t("academic.new")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <div class="mx-auto max-w-[760px]">
+    <%= link_to t("academic.back"), academic_posts_path, class: "mb-5.5 inline-block text-13-5 text-muted hover:text-ink" %>
+    <h1 class="mb-2 text-30 font-bold tracking-[-0.03em] sm:text-38"><%= t("academic.new") %></h1>
+    <p class="mb-7 text-16 leading-[1.6] text-muted"><%= t("academic.draft_help") %></p>
+    <%= render "form", post: @post %>
+  </div>
+</main>

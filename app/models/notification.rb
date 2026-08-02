@@ -6,9 +6,11 @@
 # one reader and English to another, and rewording a notification is a locale
 # edit that retroactively rewords the history.
 class Notification < ApplicationRecord
+  after_create_commit :broadcast_refresh
+
   belongs_to :user
 
-  KINDS = %w[ enrolled role_changed integrity_notice integrity_escalated ].freeze
+  KINDS = %w[ enrolled role_changed integrity_notice integrity_escalated academic_post_invitation ].freeze
 
   validates :kind, inclusion: { in: KINDS }
 
@@ -22,15 +24,27 @@ class Notification < ApplicationRecord
   # bell has to be told. Every caller is in AdminController acting *on* somebody
   # else, so the recipient is by definition looking at a different page than the
   # one that caused this — see NotificationBell.
-  def self.notify(user, kind, **params)
-    create!(user:, kind:, params:).tap { NotificationBell.new(user).broadcast_refresh! }
-  end
+  def self.notify(user, kind, **params) = create!(user:, kind:, params:)
 
   def unread? = read_at.nil?
 
   def text = I18n.t("notifications.#{kind}", **interpolations)
 
+  def action_path
+    return unless kind == "academic_post_invitation"
+
+    Rails.application.routes.url_helpers.academic_post_invitation_path(params.fetch("token"))
+  end
+
+  def action_label
+    return unless kind == "academic_post_invitation"
+
+    I18n.t("notifications.academic_post_invitation_action")
+  end
+
   private
+    def broadcast_refresh = NotificationBell.new(user).broadcast_refresh!
+
     # Stored values are keys where a key exists — a role is stored as "admin"
     # so the sentence can name it in the reader's language, not the granter's.
     def interpolations

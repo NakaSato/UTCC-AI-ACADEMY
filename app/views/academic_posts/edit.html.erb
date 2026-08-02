@@ -1,0 +1,30 @@
+<% content_for :title, "#{t("academic.edit")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <div class="mx-auto max-w-[820px]">
+    <%= link_to t("academic.back"), @post, class: "mb-5.5 inline-block text-13-5 text-muted hover:text-ink" %>
+
+    <article class="rounded-panel border border-hairline bg-surface px-6 py-8 sm:px-10">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted-2"><%= t("academic.status.#{@post.status}") %></span>
+        <span class="text-12-5 text-muted-2"><%= t("academic.revision", version: @post.lock_version) %></span>
+      </div>
+      <h1 class="mb-5 text-32 font-bold tracking-[-0.03em] sm:text-44"><%= @post.title.presence || t("academic.untitled") %></h1>
+      <div data-controller="tiptap" data-tiptap-readonly-value="true">
+        <div data-tiptap-target="editor" class="tiptap text-16 leading-[1.8] text-ink-3">
+          <%= sanitize(
+                ::AcademicPostContentSanitizer.sanitize(@post.body.presence || "<p>#{t("academic.no_body")}</p>"),
+                tags: ::AcademicPostContentSanitizer::ALLOWED_TAGS,
+                attributes: ::AcademicPostContentSanitizer::ALLOWED_ATTRIBUTES
+              ) %>
+        </div>
+      </div>
+
+      <section class="mt-8 border-t border-hairline pt-6" aria-labelledby="academic-post-edit-title">
+        <h2 id="academic-post-edit-title" class="mb-2 text-22 font-bold tracking-[-0.02em]"><%= t("academic.edit") %></h2>
+        <p class="mb-6 text-15 leading-[1.7] text-muted"><%= @conflict ? t("academic.conflict") : t("academic.draft_help") %></p>
+        <%= render "form", post: @post %>
+      </section>
+    </article>
+  </div>
+</main>

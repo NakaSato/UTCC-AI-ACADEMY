@@ -1,0 +1,100 @@
+<% content_for :title, "#{@post.title.presence || t("academic.untitled")} — UTCC AI Academy" %>
+
+<main id="main" class="academic-reader mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8"
+      data-controller="reader" data-reader-storage-key-value="academic-post-<%= @post.id %>">
+  <div class="academic-reader-column mx-auto max-w-[820px]">
+    <%= link_to t("academic.back"), academic_posts_path, class: "mb-5.5 inline-block text-13-5 text-muted hover:text-ink" %>
+
+    <article data-reader-target="surface" class="academic-reader-surface rounded-panel border border-hairline bg-surface px-6 py-8 sm:px-10">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted-2"><%= t("academic.status.#{@post.status}") %></span>
+        <span class="text-12-5 text-muted-2"><%= t("academic.revision", version: @post.lock_version) %></span>
+      </div>
+      <h1 class="mb-5 text-32 font-bold tracking-[-0.03em] sm:text-44"><%= @post.title.presence || t("academic.untitled") %></h1>
+      <section class="mb-6 flex flex-wrap items-center gap-2 rounded-field border border-hairline-2 bg-surface-2 p-2" aria-label="<%= t("academic.reader.controls") %>">
+        <label class="flex items-center gap-2 text-12.5 text-muted">
+          <span><%= t("academic.reader.width") %></span>
+          <select data-action="change->reader#setWidth" class="rounded border border-hairline-2 bg-surface px-2 py-1 text-12.5 text-ink" aria-label="<%= t("academic.reader.width") %>">
+            <option value="narrow"><%= t("academic.reader.narrow") %></option>
+            <option value="comfortable" selected><%= t("academic.reader.comfortable") %></option>
+            <option value="wide"><%= t("academic.reader.wide") %></option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-12.5 text-muted">
+          <span><%= t("academic.reader.font_size") %></span>
+          <select data-reader-target="fontSize" data-action="change->reader#setFontSize" class="rounded border border-hairline-2 bg-surface px-2 py-1 text-12.5 text-ink" aria-label="<%= t("academic.reader.font_size") %>">
+            <option value="small"><%= t("academic.reader.small") %></option>
+            <option value="medium" selected><%= t("academic.reader.medium") %></option>
+            <option value="large"><%= t("academic.reader.large") %></option>
+          </select>
+        </label>
+        <%= button_to t("academic.reader.export"), export_academic_post_path(@post), method: :get,
+              class: "rounded px-3 py-1 text-12.5 font-semibold text-brand hover:bg-brand-tint" %>
+        <button type="button" data-action="reader#toggleTheme" class="rounded px-3 py-1 text-12.5 font-semibold text-brand hover:bg-brand-tint"><%= t("academic.reader.theme") %></button>
+      </section>
+
+      <nav class="mb-6 rounded-field border border-hairline-2 bg-surface-2 p-3 text-13" aria-label="<%= t("academic.reader.contents") %>">
+        <h2 class="mb-2 text-13 font-semibold text-ink"><%= t("academic.reader.contents") %></h2>
+        <ol data-reader-target="toc" class="space-y-1 text-muted"></ol>
+      </nav>
+
+      <div data-controller="tiptap" data-tiptap-readonly-value="true">
+        <div data-reader-target="content" data-tiptap-target="editor" class="academic-reader-content tiptap text-16 leading-[1.8] text-ink-3">
+          <%= sanitize(
+                ::AcademicPostContentSanitizer.sanitize(@post.body.presence || "<p>#{t("academic.no_body")}</p>"),
+                tags: ::AcademicPostContentSanitizer::ALLOWED_TAGS,
+                attributes: ::AcademicPostContentSanitizer::ALLOWED_ATTRIBUTES
+              ) %>
+        </div>
+      </div>
+
+      <% if @post.owned_by?(Current.user) && @post.draft? %>
+        <section class="mt-8 rounded-field border border-hairline-2 bg-surface-2 p-4" aria-labelledby="collaboration-title">
+          <h2 id="collaboration-title" class="text-15 font-semibold text-ink"><%= t("academic.collaboration.title") %></h2>
+          <p class="mt-1 text-13 text-muted"><%= t("academic.collaboration.help") %></p>
+          <%= form_with scope: :invitation, url: invitations_academic_post_path(@post), class: "mt-3 flex flex-wrap items-end gap-2" do |form| %>
+            <label class="flex flex-col gap-1">
+              <span class="text-12.5 text-muted"><%= t("academic.collaboration.student_id") %></span>
+              <%= form.text_field :student_id, required: true, maxlength: 13, class: "rounded border border-hairline-2 bg-surface px-2.5 py-2 text-13 text-ink" %>
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="text-12.5 text-muted"><%= t("academic.collaboration.permission") %></span>
+              <%= form.select :permission, [[t("academic.collaboration.viewer"), "viewer"], [t("academic.collaboration.editor"), "editor"]], {}, class: "rounded border border-hairline-2 bg-surface px-2.5 py-2 text-13 text-ink" %>
+            </label>
+            <%= form.submit t("academic.collaboration.invite"), class: "cursor-pointer rounded px-3 py-2 text-13 font-semibold text-brand hover:bg-brand-tint" %>
+          <% end %>
+
+          <% if @post.memberships.active.any? || @post.invitations.pending.any? %>
+            <div class="mt-4 space-y-2 border-t border-hairline pt-3">
+              <% @post.memberships.active.includes(:user).each do |membership| %>
+                <div class="flex flex-wrap items-center justify-between gap-2 text-13 text-ink-3">
+                  <span><%= membership.user.name %> · <%= t("academic.collaboration.#{membership.permission}") %></span>
+                  <%= button_to t("academic.collaboration.revoke"), membership_academic_post_path(@post, membership.user), method: :delete, class: "text-12.5 text-muted hover:text-ink" %>
+                </div>
+              <% end %>
+              <% @post.invitations.pending.includes(:invitee).each do |invitation| %>
+                <div class="text-13 text-muted">
+                  <%= t("academic.collaboration.pending", name: invitation.invitee.name) %> ·
+                  <%= link_to t("academic.collaboration.acceptance_link"), academic_post_invitation_path(invitation.token), class: "text-brand hover:text-brand-deep" %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3 border-t border-hairline pt-5">
+        <% if @post.draft? && @post.editable_by?(Current.user) %>
+          <%= link_to t("academic.edit"), edit_academic_post_path(@post), class: "rounded-[12px] bg-brand px-5 py-3 text-14-5 font-semibold text-white hover:bg-brand-deep" %>
+        <% end %>
+        <% if @post.draft? && @post.owned_by?(Current.user) %>
+          <%= button_to t("academic.submit"), submit_academic_post_path(@post), method: :post,
+                class: "rounded-[12px] border border-hairline-2 px-5 py-3 text-14-5 font-semibold text-ink-3 hover:bg-canvas" %>
+        <% elsif @post.review? && Current.user.instructor? %>
+          <%= button_to t("academic.publish"), publish_academic_post_path(@post), method: :post,
+                class: "rounded-[12px] bg-brand px-5 py-3 text-14-5 font-semibold text-white hover:bg-brand-deep" %>
+        <% end %>
+      </div>
+    </article>
+  </div>
+</main>
