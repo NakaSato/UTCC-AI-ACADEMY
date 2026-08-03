@@ -5,7 +5,7 @@ title: Persisted admin approval queue and decisions
 status: draft
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-04
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -27,9 +27,11 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Persisted admin approval queue and decisions
 
-> **Review state:** Draft and blocked on request-kind, authority, and
-> downstream-effect policy. Until this specification is approved, the queue
-> must not present fabricated requests or decision controls.
+> **Review state:** The first request kind is approved as a course lifecycle
+> transition targeting one persisted `Course`, with admin/academic approval and
+> append-only decision history. This specification remains draft while exact
+> role mapping, allowed transitions, downstream effects, privacy, and SLA rules
+> are defined.
 
 > [Executable Specifications](README.md) ·
 > [M7 approval queue decision](../decisions/adr-0014-approval-queue-records.md) ·
@@ -45,6 +47,7 @@ authority, outcome, or downstream change.
 
 ### Included after policy approval
 
+- Create course lifecycle transition requests targeting one persisted `Course`.
 - Persist approved request kinds, targets, requesters, status, and timestamps.
 - Persist append-only decisions with actor, outcome, timestamp, and approved
   note fields.

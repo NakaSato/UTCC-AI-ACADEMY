@@ -2467,6 +2467,14 @@
       "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
+      "at": "2026-08-04T02:35:00+07:00",
+      "item_id": "M7-003",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user approved the first request kind: a course lifecycle transition targeting one persisted Course, with admin/academic approval and append-only decision history. Exact role mapping, transitions, downstream effects, privacy, and SLA rules remain open.",
+      "evidence_url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",

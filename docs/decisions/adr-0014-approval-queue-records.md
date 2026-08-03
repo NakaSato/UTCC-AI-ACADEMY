@@ -5,7 +5,7 @@ title: Define approval queue records and decision history
 status: draft
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-04
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -27,9 +27,11 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Define approval queue records and decision history
 
-> **Decision state:** Agent-prepared draft. The Product Owner, Tech Lead, and
-> Academic Owner must define what may enter the queue, who may decide it, and
-> what an approval changes before the fabricated queue can be replaced.
+> **Decision state:** The user approved on 2026-08-04 that the first real
+> request kind is a course lifecycle transition targeting one persisted
+> `Course`, with admin/academic approval and append-only decision history.
+> Exact role mapping, transition states, downstream effects, privacy, and SLA
+> rules remain implementation prerequisites.
 
 > [Decision Records](README.md) ·
 > [M7 approval queue specification](../specs/spec-m7-approval-queue.md) ·
@@ -77,6 +79,13 @@ request producer exists.
    shows approved aggregate or identifying fields only.
 7. A request producer is responsible for creating a request only after its own
    validation succeeds; the queue does not infer requests from arbitrary rows.
+
+### Approved first request kind
+
+The first producer is a course lifecycle transition request. Its target is one
+persisted `Course` record. The decision uses append-only history and requires an
+authorized administrative or academic approver; exact role mapping and allowed
+transitions remain to be defined in the executable specification.
 
 ## Alternatives
 
