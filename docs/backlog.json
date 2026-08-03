@@ -2527,6 +2527,14 @@
       "evidence_url": "decisions/adr-0015-feature-flag-boundary.html#approved-first-flag"
     },
     {
+      "at": "2026-08-04T04:15:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user deferred the hearts flag because its zero-heart behavior, attempt cost, refill/recovery, academic effect, and learner support remain governed by the blocked M8 policy.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
