@@ -2543,6 +2543,14 @@
       "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
+      "at": "2026-08-04T04:35:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user approved deferring the learning_map flag because no explicit runtime consumer is defined; it must not become a persisted setting until a real consumer and owner are approved.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
