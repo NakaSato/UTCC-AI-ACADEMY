@@ -131,6 +131,7 @@ authorization to persist the remaining display-only controls.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `notifications` | boolean | global | on | Notification creation and delivery | admin | immediate | fail safe on; restore previous value or default |
 | `search` | boolean | global | on | Learner/admin search UI and query behavior | admin | immediate | fail safe on; restore previous value or default |
+| `leaderboard` | boolean | global | off | Learner leaderboard visibility | admin/Academic Owner | immediate | fail safe off; restore previous value or default |
 
 Notification content remains kind-based and localized at read time. The setting
 must not expose learner-level data beyond the existing notification and audit

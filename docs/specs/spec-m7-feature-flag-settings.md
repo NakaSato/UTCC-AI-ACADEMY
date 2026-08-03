@@ -131,6 +131,9 @@ The approved rows are:
 - `search`: boolean, global scope, default on, consumed by the learner/admin
   search UI and query behavior, editable by an administrator, effective
   immediately, fail-safe on, and rollback-supported.
+- `leaderboard`: boolean, global scope, default off, consumed by learner
+  leaderboard visibility, editable by an administrator or Academic Owner,
+  effective immediately, fail-safe off for privacy, and rollback-supported.
 
 | Review point | Decision required |
 | --- | --- |
