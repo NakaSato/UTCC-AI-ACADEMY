@@ -10,7 +10,20 @@ review_by: 2026-08-10
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0014, SPEC-0014]
-implemented_by: []
+implemented_by:
+  - app/models/feature_setting.rb
+  - app/models/admin_console.rb
+  - app/controllers/admin_controller.rb
+  - app/models/notification.rb
+  - app/controllers/leaderboards_controller.rb
+  - app/helpers/application_helper.rb
+  - app/views/admin/_features.html.erb
+  - config/routes.rb
+  - db/migrate/20260804040000_create_feature_settings.rb
+enforced_by:
+  - test/models/feature_setting_test.rb
+  - test/controllers/admin_features_test.rb
+  - test/system/admin_features_walk_test.rb
 touches:
   - app/models/admin_console.rb
   - app/views/admin/_features.html.erb
@@ -19,7 +32,6 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
@@ -31,8 +43,8 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 > 2026-08-04: use a typed allow-list of explicitly supported flags, with one
 > runtime consumer and safe defaults per flag. The concrete flag table,
 > consumers, scopes, defaults, actors, and academic/privacy review remain
-> implementation prerequisites except for the approved `notifications` row
-> below.
+> implementation prerequisites except for the approved `notifications`,
+> `search`, and `leaderboard` rows below.
 
 > [Decision Records](README.md) ·
 > [M7 feature-flag specification](../specs/spec-m7-feature-flag-settings.md) ·

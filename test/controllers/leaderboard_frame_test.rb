@@ -8,7 +8,10 @@ require "test_helper"
 class LeaderboardFrameTest < ActionDispatch::IntegrationTest
   FRAME = "leaderboard-board"
 
-  setup { sign_in_as users(:one) }
+  setup do
+    sign_in_as users(:one)
+    FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true)
+  end
 
   test "the shell ships a lazy frame pointed at this tab and defers the rows" do
     learn(users(:student), 3)

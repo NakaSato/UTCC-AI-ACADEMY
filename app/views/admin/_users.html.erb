@@ -13,13 +13,15 @@
           ) %>
   <% end %>
 
-  <%= form_with url: admin_path, method: :get, class: "ml-auto flex min-w-[240px] flex-1 sm:flex-none" do %>
-    <%= hidden_field_tag :tab, :users %>
-    <%= hidden_field_tag :role, @role unless @role == :all %>
-    <%= search_field_tag :q, @query, placeholder: t("admin.users_search_ph"),
-          "aria-label": t("admin.users_search_ph"),
-          class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25 text-14
-                  text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+  <% if FeatureSetting.enabled?(:search) %>
+    <%= form_with url: admin_path, method: :get, class: "ml-auto flex min-w-[240px] flex-1 sm:flex-none" do %>
+      <%= hidden_field_tag :tab, :users %>
+      <%= hidden_field_tag :role, @role unless @role == :all %>
+      <%= search_field_tag :q, @query, placeholder: t("admin.users_search_ph"),
+            "aria-label": t("admin.users_search_ph"),
+            class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25 text-14
+                    text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+    <% end %>
   <% end %>
 </div>
 

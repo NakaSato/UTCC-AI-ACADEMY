@@ -24,7 +24,11 @@ class Notification < ApplicationRecord
   # bell has to be told. Every caller is in AdminController acting *on* somebody
   # else, so the recipient is by definition looking at a different page than the
   # one that caused this — see NotificationBell.
-  def self.notify(user, kind, **params) = create!(user:, kind:, params:)
+  def self.notify(user, kind, **params)
+    return unless FeatureSetting.enabled?(:notifications)
+
+    create!(user:, kind:, params:)
+  end
 
   def unread? = read_at.nil?
 

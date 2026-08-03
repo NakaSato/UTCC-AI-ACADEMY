@@ -10,7 +10,16 @@ review_by: 2026-08-10
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0015, ADR-0014, SPEC-0014]
-implemented_by: []
+implemented_by:
+  - app/models/feature_setting.rb
+  - app/models/admin_console.rb
+  - app/controllers/admin_controller.rb
+  - app/models/notification.rb
+  - app/controllers/leaderboards_controller.rb
+  - app/helpers/application_helper.rb
+  - app/views/admin/_features.html.erb
+  - config/routes.rb
+  - db/migrate/20260804040000_create_feature_settings.rb
 touches:
   - app/models/admin_console.rb
   - app/views/admin/_features.html.erb
@@ -19,7 +28,10 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/feature_setting_test.rb
+  - test/controllers/admin_features_test.rb
+  - test/system/admin_features_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-002, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
@@ -28,11 +40,10 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 # Persisted admin feature-flag settings
 
 > **Review state:** The high-level typed allow-list boundary is approved, but
-> this specification remains draft and blocked on the supported-flag list,
-> scopes, runtime consumers, and academic/privacy policy. The current disabled
-> controls must not become persisted settings by default. The `notifications`
-> row is approved as the first bounded policy entry; remaining rows require
-> separate review.
+> this specification remains draft and blocked on the unreviewed supported-flag
+> rows, scopes, runtime consumers, and academic/privacy policy. The approved
+> `notifications`, `search`, and `leaderboard` rows are implemented and covered;
+> remaining rows require separate review.
 
 > [Executable Specifications](README.md) ·
 > [M7 feature-flag decision](../decisions/adr-0015-feature-flag-boundary.md) ·
@@ -128,9 +139,9 @@ The approved rows are:
   creation and delivery, editable by an administrator, effective immediately,
   fail-safe on, and rollback-supported. Its content and audit behavior remain
   localized and within existing privacy boundaries.
-- `search`: boolean, global scope, default on, consumed by the learner/admin
-  search UI and query behavior, editable by an administrator, effective
-  immediately, fail-safe on, and rollback-supported.
+- `search`: boolean, global scope, default on, consumed by the existing admin
+  roster and course search controls and query behavior, editable by an
+  administrator, effective immediately, fail-safe on, and rollback-supported.
 - `leaderboard`: boolean, global scope, default off, consumed by learner
   leaderboard visibility, editable by an administrator or Academic Owner,
   effective immediately, fail-safe off for privacy, and rollback-supported.

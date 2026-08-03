@@ -38,10 +38,10 @@ module ApplicationHelper
       [ t("chrome.nav.lesson"),      lesson_path ],
       [ t("chrome.nav.map"),         knowledge_map_path ],
       [ t("chrome.nav.progress"),    progress_path ],
-      [ t("chrome.nav.ranking"),     leaderboard_path ],
       [ t("chrome.nav.writing"),     academic_posts_path ]
     ]
 
+    items.insert(-2, [ t("chrome.nav.ranking"), leaderboard_path ]) if FeatureSetting.enabled?(:leaderboard)
     items << [ t("chrome.nav.instructor"), instructor_path ] if Current.user&.staff?
     items
   end
@@ -121,7 +121,7 @@ module ApplicationHelper
   end
 
   def app_footer_columns
-    {
+    columns = {
       learn: {
         catalog: root_path,
         course: course_path("AI1101"),
@@ -129,10 +129,11 @@ module ApplicationHelper
       },
       track: {
         my_learning: my_learning_path,
-        progress: progress_path,
-        ranking: leaderboard_path
+        progress: progress_path
       }
     }
+    columns[:track][:ranking] = leaderboard_path if FeatureSetting.enabled?(:leaderboard)
+    columns
   end
 
   def university_footer_column

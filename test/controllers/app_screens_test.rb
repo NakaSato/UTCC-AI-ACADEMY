@@ -5,7 +5,10 @@ require "test_helper"
 # test/models, so this file only asserts that each screen renders the thing its
 # route promises.
 class AppScreensTest < ActionDispatch::IntegrationTest
-  setup { sign_in_as users(:one) }
+  setup do
+    sign_in_as users(:one)
+    FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true)
+  end
 
   def complete_topics(user, code, keys)
     keys.each { TopicCompletion.record(user:, course_code: code, topic_key: it, kind: :learned) }

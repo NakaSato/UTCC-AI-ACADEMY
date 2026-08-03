@@ -20,6 +20,7 @@ class AuditEvent < ApplicationRecord
     role_changed
     course_state_changed
     approval_decided
+    feature_setting_changed
     section_created section_updated enrolled unenrolled
     integrity_closed integrity_notified integrity_escalated
     landing_saved card_added card_removed
@@ -27,7 +28,7 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ role_changed course_state_changed approval_decided unenrolled integrity_escalated card_removed ].freeze
+  WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed unenrolled integrity_escalated card_removed ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50
@@ -72,6 +73,10 @@ class AuditEvent < ApplicationRecord
       values[:from] = I18n.t("admin.courses.state.#{values[:from]}") if values.key?(:from)
       values[:to] = I18n.t("admin.courses.state.#{values[:to]}") if values.key?(:to)
       values[:outcome] = I18n.t("admin.queue.status.#{values[:outcome]}") if values.key?(:outcome)
+      values[:key] = I18n.t("admin.features.keys.#{values[:key]}") if values.key?(:key)
+      %i[from_state to_state].each do |state|
+        values[state] = I18n.t("admin.features.state.#{values[state]}") if values.key?(state)
+      end
       values[:group] = I18n.t("admin.landing.sections.#{values[:group]}") if values.key?(:group)
       values
     end

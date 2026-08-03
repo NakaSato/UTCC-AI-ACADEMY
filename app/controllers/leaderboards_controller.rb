@@ -7,6 +7,8 @@
 # figure on the screen nobody is reading in the first 200ms.
 class LeaderboardsController < ApplicationController
   def show
+    return redirect_to root_path, alert: t("flash.feature_unavailable") unless FeatureSetting.enabled?(:leaderboard)
+
     @tab = Leaderboard.tab_for(params[:tab])
     @course = Course.find_by(code: params[:course].presence || Syllabus::DEFAULT_COURSE) ||
               Course.find_by!(code: Syllabus::DEFAULT_COURSE)

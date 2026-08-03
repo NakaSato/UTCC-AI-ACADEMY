@@ -1,9 +1,11 @@
-<%= form_with url: admin_path, method: :get, class: "mb-4 flex" do %>
-  <%= hidden_field_tag :tab, :courses %>
-  <%= search_field_tag :q, @query, placeholder: t("admin.courses_search_ph"),
-        "aria-label": t("admin.courses_search_ph"),
-        class: "w-full max-w-[340px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25
-                text-14 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+<% if FeatureSetting.enabled?(:search) %>
+  <%= form_with url: admin_path, method: :get, class: "mb-4 flex" do %>
+    <%= hidden_field_tag :tab, :courses %>
+    <%= search_field_tag :q, @query, placeholder: t("admin.courses_search_ph"),
+          "aria-label": t("admin.courses_search_ph"),
+          class: "w-full max-w-[340px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25
+                  text-14 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+  <% end %>
 <% end %>
 
 <div class="overflow-x-auto rounded-card border border-hairline bg-surface">

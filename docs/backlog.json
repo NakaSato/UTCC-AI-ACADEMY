@@ -765,7 +765,7 @@
     {
       "id": "M7-004",
       "title": "Persist approved admin feature flags with explicit runtime consumers",
-      "status": "in_progress",
+      "status": "verification",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
@@ -797,9 +797,21 @@
         {
           "label": "Feature policy handoff",
           "url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+        },
+        {
+          "label": "Approved feature settings implementation",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/feature_setting.rb"
+        },
+        {
+          "label": "Feature settings focused coverage",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/admin_features_test.rb"
+        },
+        {
+          "label": "Full verification gate",
+          "url": "specs/spec-m7-feature-flag-settings.html#verification"
         }
       ],
-    "updated_at": "2026-08-04T02:25:00+07:00"
+      "updated_at": "2026-08-04T05:35:00+07:00"
     },
     {
       "id": "M8-001",
@@ -2501,6 +2513,22 @@
       "to": "complete",
       "summary": "The user accepted M7-003 after implementation, focused coverage, and the full verification gate passed; SPEC-0014 is accepted and M7-003 is complete.",
       "evidence_url": "specs/spec-m7-approval-queue.html"
+    },
+    {
+      "at": "2026-08-04T05:25:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Implemented the approved notifications, search, and leaderboard subset with typed global persistence, safe defaults, admin optimistic locking, audit events, runtime consumers, approved-only controls, focused model/controller coverage, and a Thai browser walkthrough; proctoring and deferred flags remain outside scope.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html"
+    },
+    {
+      "at": "2026-08-04T05:35:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "The approved feature-setting subset passes the full verification gate: 588 Rails tests, 11 system tests, documentation validation, style, dependency/importmap audits, Brakeman, and seed verification. Human review remains required; proctoring and deferred flags are not implemented.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#verification"
     },
     {
       "at": "2026-08-04T03:45:00+07:00",

@@ -1,0 +1,17 @@
+notifications:
+  key: notifications
+  scope: global
+  enabled: true
+  lock_version: 0
+
+search:
+  key: search
+  scope: global
+  enabled: true
+  lock_version: 0
+
+leaderboard:
+  key: leaderboard
+  scope: global
+  enabled: false
+  lock_version: 0

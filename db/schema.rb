@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_04_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -174,6 +174,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_030000) do
     t.index ["section_id"], name: "index_enrollments_on_section_id"
     t.index ["user_id", "section_id"], name: "index_enrollments_on_user_id_and_section_id"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
+  create_table "feature_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "enabled", null: false
+    t.string "key", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "scope", default: "global", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key", "scope"], name: "index_feature_settings_on_key_and_scope", unique: true
   end
 
   create_table "landing_cards", force: :cascade do |t|

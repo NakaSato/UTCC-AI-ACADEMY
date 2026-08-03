@@ -6,6 +6,8 @@ require "test_helper"
 # These tests guard that branch and the locale wiring behind it, in both
 # locales, since a `#learn` anchor on /progress would scroll nowhere.
 class FooterTest < ActionDispatch::IntegrationTest
+  setup { FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true) }
+
   # Signed in as an admin below, since /instructor and /admin are role-gated and
   # admin is the one role that can open every screen. `/` is missing on purpose:
   # it redirects an admin to /admin, so the catalog is checked as a student.

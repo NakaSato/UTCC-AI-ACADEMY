@@ -1,12 +1,11 @@
-# The admin console's placeholder tabs and its small live Overview boundary.
+# The admin console's backed tabs and its small live Overview boundary.
 #
 # Four tabs are NOT here, because they are backed by records rather than by this
 # file: Users is the real roster (the `role` column and `AdminController#update`),
 # Sections is real cohorts, Integrity reads `proctor_events` through `Proctoring`,
 # and Landing is the marketing page's copy (`LandingText`, over `Landing`).
-# The remaining placeholder tabs keep their numbers and taxonomy in Ruby, every
-# readable word in `admin.*` in the locale files, joined BY INDEX. Overview
-# cards are the exception: they query authoritative records below.
+# Feature settings are the approved typed allow-list in `FeatureSetting`; every
+# readable word in `admin.*` in the locale files is still joined BY INDEX.
 #
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
@@ -28,16 +27,14 @@ module AdminConsole
 
   # ---- Feature control ------------------------------------------------------
 
-  # A toggle is on/off; a select carries its option keys. `on:` is the shipped
-  # default — nothing here is persisted, so it is also the only state there is.
-  Flag = Data.define(:key, :group, :position, :kind, :on, :options) do
+  # Every rendered row comes from the approved FeatureSetting allow-list. The
+  # record may be absent after a replant, so the model supplies its safe default.
+  Flag = Data.define(:key, :group, :position, :enabled, :lock_version) do
     def name = copy[:name]
     def scope = copy[:scope]
     def desc = copy[:desc]
-    def toggle? = kind == :toggle
-    def state_note = I18n.t("admin.features.state.#{on ? :on : :off}")
-
-    def option_labels = options.map { |o| [ o, I18n.t("admin.features.options.#{o}") ] }
+    def toggle? = true
+    def state_note = I18n.t("admin.features.state.#{enabled ? :on : :off}")
 
     private
 
@@ -45,16 +42,8 @@ module AdminConsole
   end
 
   FLAG_GROUPS = [
-    [ [ :learning_map, :toggle, true,  nil ],
-      [ :search,       :toggle, true,  nil ],
-      [ :notifications, :toggle, true, nil ],
-      [ :catalog_cols, :select, nil,   %w[ two three ] ] ],
-    [ [ :gamify,      :toggle, true,  nil ],
-      [ :hearts,      :toggle, true,  nil ],
-      [ :lives_cap,   :select, nil,   %w[ three five ] ],
-      [ :leaderboard, :toggle, true,  nil ] ],
-    [ [ :proctoring,  :toggle, true,  nil ],
-      [ :language,    :select, nil,   %w[ th en ] ] ]
+    [ :search, :notifications ],
+    [ :leaderboard ]
   ].freeze
 
   # ---- Courses --------------------------------------------------------------
@@ -105,17 +94,19 @@ module AdminConsole
 
     def flags
       FLAG_GROUPS.flat_map.with_index do |items, group|
-        items.each_with_index.map do |(key, kind, on, options), position|
-          Flag.new(key:, group:, position:, kind:, on:, options:)
+        items.each_with_index.map do |key, position|
+          setting = FeatureSetting.admin_rows.find { it.key == key.to_s }
+          Flag.new(key:, group:, position:, enabled: setting.enabled,
+                   lock_version: setting.lock_version)
         end
       end
     end
 
     def flag_groups = flags.group_by(&:group).values
 
-    # The Feature-control tab badge counts what an admin has switched OFF,
+    # The Feature-control tab badge counts approved settings switched off,
     # because that is the number worth noticing.
-    def flags_off = flags.count { it.toggle? && !it.on }
+    def flags_off = flags.count { !it.enabled }
 
     def stats
       values = [

@@ -9,7 +9,7 @@ class AdminController < ApplicationController
       # Both filters are whitelist-or-default; the search is a plain substring
       # over the two columns the roster shows.
       @role = AdminConsole.role_filter(params[:role])
-      @query = params[:q].to_s.strip
+      @query = FeatureSetting.enabled?(:search) ? params[:q].to_s.strip : ""
 
       @users = User.order(:role, :name)
       @users = @users.where(role: @role) unless @role == :all
@@ -27,7 +27,7 @@ class AdminController < ApplicationController
       # Filtered in SQL, so the cap is what survives the filter rather than what
       # went into it.
       @events = AuditEvent.at_level(@level).newest_first.includes(:user).limit(AuditEvent::RECENT)
-    in :courses then @query = params[:q].to_s.strip
+    in :courses then @query = FeatureSetting.enabled?(:search) ? params[:q].to_s.strip : ""
     in :queue then nil
     else nil
     end
@@ -50,6 +50,31 @@ class AdminController < ApplicationController
     redirect_to admin_path(tab: :queue), notice: t("flash.approval_decided")
   rescue ActiveRecord::RecordInvalid
     redirect_to admin_path(tab: :queue), alert: t("flash.approval_invalid")
+  end
+
+  def update_feature_setting
+    key = params[:key].to_s
+    enabled = FeatureSetting.parse_boolean(params[:enabled])
+
+    unless FeatureSetting.definition(key) && !enabled.nil?
+      redirect_to admin_path(tab: :features), alert: t("flash.feature_setting_invalid")
+      return
+    end
+
+    previous = FeatureSetting.enabled?(key)
+    FeatureSetting.transaction do
+      FeatureSetting.update!(key:, enabled:, expected_lock_version: params[:lock_version])
+      AuditEvent.record("feature_setting_changed", key:, from_state: previous ? "on" : "off",
+                        to_state: enabled ? "on" : "off")
+    end
+
+    redirect_to admin_path(tab: :features), notice: t("flash.feature_setting_changed",
+                                                         name: t("admin.features.keys.#{key}"),
+                                                         state: t("admin.features.state.#{enabled ? :on : :off}"))
+  rescue ActiveRecord::StaleObjectError
+    redirect_to admin_path(tab: :features), alert: t("flash.feature_setting_stale")
+  rescue ActiveRecord::RecordInvalid
+    redirect_to admin_path(tab: :features), alert: t("flash.feature_setting_invalid")
   end
 
   # The three section writes. Each answers with a redirect back to the tab and

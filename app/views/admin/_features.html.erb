@@ -1,6 +1,5 @@
-<%# Feature control. The switches show the shipped defaults and do not persist —
-    there is nowhere to write them yet, so they render as disabled rather than
-    as controls that quietly forget. %>
+<%# Feature control. Every row is a typed, persisted setting with an explicit
+    runtime consumer; unsupported sample controls are intentionally absent. %>
 <div class="grid grid-cols-1 items-start gap-5 nav:grid-cols-[minmax(0,1fr)_330px]">
   <div class="flex flex-col gap-5">
     <% AdminConsole.flag_groups.each_with_index do |flags, index| %>
@@ -22,29 +21,18 @@
               </div>
               <div class="mt-1 text-13 text-balance text-muted"><%= flag.desc %></div>
               <% if flag.toggle? %>
-                <div class="mt-1.5 text-12 <%= flag.on ? "text-success-deep" : "text-muted-2" %>">
+                <div class="mt-1.5 text-12 <%= flag.enabled ? "text-success-deep" : "text-muted-2" %>">
                   <%= flag.state_note %>
                 </div>
               <% end %>
             </div>
 
-            <% if flag.toggle? %>
-              <button type="button" role="switch" disabled
-                      aria-checked="<%= flag.on %>" aria-label="<%= flag.name %>"
-                      class="relative h-6 w-10.5 flex-none rounded-full disabled:cursor-not-allowed
-                             <%= flag.on ? "bg-brand" : "bg-hairline-3" %>">
-                <span class="absolute top-0.75 size-4.5 rounded-full bg-white shadow-sm
-                             <%= flag.on ? "left-[21px]" : "left-0.75" %>"></span>
-              </button>
-            <% else %>
-              <div class="flex flex-none rounded-[10px] bg-surface-2 p-0.75">
-                <% flag.option_labels.each_with_index do |(key, label), position| %>
-                  <span class="rounded-[7px] px-3.5 py-2 text-13
-                               <%= position.zero? ? "bg-surface font-semibold text-ink shadow-sm" : "text-muted" %>">
-                    <%= label %>
-                  </span>
-                <% end %>
-              </div>
+            <%= button_to admin_feature_setting_path(flag.key), method: :patch,
+                  params: { enabled: !flag.enabled, lock_version: flag.lock_version },
+                  role: "switch", aria: { checked: flag.enabled, label: flag.name },
+                  class: "relative h-6 w-10.5 flex-none rounded-full #{flag.enabled ? "bg-brand" : "bg-hairline-3"}" do %>
+              <span class="absolute top-0.75 size-4.5 rounded-full bg-white shadow-sm
+                           <%= flag.enabled ? "left-[21px]" : "left-0.75" %>"></span>
             <% end %>
           </div>
         <% end %>
@@ -65,7 +53,7 @@
 
     <div class="mb-3 text-12-5 text-on-chrome-muted"><%= t("admin.features.off_title") %></div>
     <div class="flex flex-col gap-2.5">
-      <% off = AdminConsole.flags.select { it.toggle? && !it.on } %>
+      <% off = AdminConsole.flags.select { !it.enabled } %>
       <% if off.any? %>
         <% off.each do |flag| %>
           <div class="flex items-baseline gap-2.5">

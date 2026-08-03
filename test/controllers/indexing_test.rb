@@ -18,6 +18,7 @@ class IndexingTest < ActionDispatch::IntegrationTest
   # URL as far as an index is concerned, and saying otherwise splits it.
   test "the canonical drops every param but the language" do
     sign_in_as users(:one)
+    FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true)
     get leaderboard_path(tab: "semester")
 
     assert_select "link[rel=canonical][href=?]", leaderboard_url

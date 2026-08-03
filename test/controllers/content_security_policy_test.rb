@@ -100,6 +100,7 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
 
   test "signed-in screens carry the policy too, not just the public one" do
     sign_in_as users(:student)
+    FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true)
 
     [ my_learning_path, progress_path, lesson_path, leaderboard_path ].each do |path|
       get path
