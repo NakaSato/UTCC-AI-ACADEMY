@@ -30,7 +30,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 > **Review state:** The high-level typed allow-list boundary is approved, but
 > this specification remains draft and blocked on the supported-flag list,
 > scopes, runtime consumers, and academic/privacy policy. The current disabled
-> controls must not become persisted settings by default.
+> controls must not become persisted settings by default. The `notifications`
+> row is approved as the first bounded policy entry; remaining rows require
+> separate review.
 
 > [Executable Specifications](README.md) ·
 > [M7 feature-flag decision](../decisions/adr-0015-feature-flag-boundary.md) ·
@@ -119,6 +121,11 @@ consumer or scope.
 Implementation is held until the accountable owners complete this table. The
 agent can implement an approved typed setting, but cannot decide whether an
 institution-wide learner behavior should exist.
+
+The first approved row is `notifications`: boolean, global scope, default on,
+consumed by notification creation and delivery, editable by an administrator,
+effective immediately, fail-safe on, and rollback-supported. Its content and
+audit behavior remain localized and within existing privacy boundaries.
 
 | Review point | Decision required |
 | --- | --- |

@@ -31,7 +31,8 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 > 2026-08-04: use a typed allow-list of explicitly supported flags, with one
 > runtime consumer and safe defaults per flag. The concrete flag table,
 > consumers, scopes, defaults, actors, and academic/privacy review remain
-> implementation prerequisites.
+> implementation prerequisites except for the approved `notifications` row
+> below.
 
 > [Decision Records](README.md) ·
 > [M7 feature-flag specification](../specs/spec-m7-feature-flag-settings.md) ·
@@ -120,6 +121,19 @@ for academic product settings.
   academic or privacy review requirements.
 - Audit fields, settings retention, correction, and display of current values.
 - How a missing or corrupted setting behaves in each consumer.
+
+## Approved first flag
+
+The user approved the following bounded policy row on 2026-08-04. It is not an
+authorization to persist the remaining display-only controls.
+
+| Key | Type | Scope | Default | Consumer | Actor | Effective time | Failure/rollback |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `notifications` | boolean | global | on | Notification creation and delivery | admin | immediate | fail safe on; restore previous value or default |
+
+Notification content remains kind-based and localized at read time. The setting
+must not expose learner-level data beyond the existing notification and audit
+boundaries.
 
 ## Consequences
 
