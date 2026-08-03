@@ -2535,6 +2535,14 @@
       "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
+      "at": "2026-08-04T04:25:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user deferred the language flag because language is a per-session preference rather than a global admin runtime setting; it must not be persisted as an institution-wide feature flag without a new policy.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
