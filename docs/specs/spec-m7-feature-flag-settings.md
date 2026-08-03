@@ -122,10 +122,15 @@ Implementation is held until the accountable owners complete this table. The
 agent can implement an approved typed setting, but cannot decide whether an
 institution-wide learner behavior should exist.
 
-The first approved row is `notifications`: boolean, global scope, default on,
-consumed by notification creation and delivery, editable by an administrator,
-effective immediately, fail-safe on, and rollback-supported. Its content and
-audit behavior remain localized and within existing privacy boundaries.
+The approved rows are:
+
+- `notifications`: boolean, global scope, default on, consumed by notification
+  creation and delivery, editable by an administrator, effective immediately,
+  fail-safe on, and rollback-supported. Its content and audit behavior remain
+  localized and within existing privacy boundaries.
+- `search`: boolean, global scope, default on, consumed by the learner/admin
+  search UI and query behavior, editable by an administrator, effective
+  immediately, fail-safe on, and rollback-supported.
 
 | Review point | Decision required |
 | --- | --- |
