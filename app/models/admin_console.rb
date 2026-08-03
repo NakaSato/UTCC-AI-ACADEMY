@@ -70,23 +70,6 @@ module AdminConsole
     def available_transitions = record.available_transitions
   end
 
-  # ---- Approval queue -------------------------------------------------------
-
-  # Which tone the kind pill takes. All four ship pending; deciding one would
-  # need somewhere to write the decision.
-  QUEUE_KINDS = %i[ access course content data ].freeze
-
-  QueueItem = Data.define(:kind, :position) do
-    def title = copy[:title]
-    def label = copy[:label]
-    def meta = copy[:meta]
-    def when_text = copy[:when]
-
-    private
-
-    def copy = I18n.t("admin.queue.rows")[position]
-  end
-
   # ---- Permissions matrix ---------------------------------------------------
 
   # One row per capability, one flag per role in User::ROLES order. Every row is
@@ -159,10 +142,22 @@ module AdminConsole
     end
 
     def queue
-      QUEUE_KINDS.each_with_index.map { |kind, position| QueueItem.new(kind:, position:) }
+      ApprovalRequest.includes(:course, :requester, :decisions).newest_first.to_a
     end
 
-    def pending_count = queue.size
+    def pending_count = ApprovalRequest.pending.count
+
+    def queue_sla
+      pending = ApprovalRequest.pending
+      oldest = pending.minimum(:created_at)
+      approved_this_month = ApprovalDecision.approved.where(created_at: Time.current.beginning_of_month..).count
+
+      [
+        { label: I18n.t("admin.queue.sla.oldest"), value: oldest ? I18n.l(oldest, format: :short) : I18n.t("admin.queue.sla.none") },
+        { label: I18n.t("admin.queue.sla.pending"), value: pending.count.to_s },
+        { label: I18n.t("admin.queue.sla.approved"), value: approved_this_month.to_s }
+      ]
+    end
 
     def perm_rows
       I18n.t("admin.perms.rows").zip(PERMS).map { |label, flags| { label:, flags: } }

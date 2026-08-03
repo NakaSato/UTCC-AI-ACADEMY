@@ -28,22 +28,28 @@ class AdminController < ApplicationController
       # went into it.
       @events = AuditEvent.at_level(@level).newest_first.includes(:user).limit(AuditEvent::RECENT)
     in :courses then @query = params[:q].to_s.strip
+    in :queue then nil
     else nil
     end
   end
 
   def update_course_state
     course = Course.find(params[:id])
-    from = course.lifecycle_state
+    ApprovalRequest.create_course_lifecycle!(course:, requester: Current.user,
+                                             from_state: params[:from], to_state: params[:state], note: params[:note])
 
-    Course.transaction do
-      course.transition_to!(params[:state], expected_from: params[:from])
-      AuditEvent.record("course_state_changed", course: course.code, from:, to: course.lifecycle_state)
-    end
+    redirect_to admin_path(tab: :queue), notice: t("flash.approval_requested", course: course.code)
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to admin_path(tab: :courses), alert: invalid.record.errors.full_messages.to_sentence
+  end
 
-    redirect_to admin_path(tab: :courses), notice: t("flash.course_state_changed", course: course.code)
+  def decide_approval
+    request = ApprovalRequest.find(params[:id])
+    request.decide!(actor: Current.user, outcome: params[:outcome], note: params[:note])
+
+    redirect_to admin_path(tab: :queue), notice: t("flash.approval_decided")
   rescue ActiveRecord::RecordInvalid
-    redirect_to admin_path(tab: :courses), alert: t("flash.course_state_invalid")
+    redirect_to admin_path(tab: :queue), alert: t("flash.approval_invalid")
   end
 
   # The three section writes. Each answers with a redirect back to the tab and

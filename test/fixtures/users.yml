@@ -34,3 +34,9 @@ admin:
   student_id: "2011071730992"
   password_digest: <%= password_digest %>
   role: admin
+
+admin_two:
+  name: ผู้ดูแล สอง
+  student_id: "2011071730998"
+  password_digest: <%= password_digest %>
+  role: admin

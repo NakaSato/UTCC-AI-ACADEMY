@@ -718,7 +718,7 @@
     {
       "id": "M7-003",
       "title": "Replace fabricated admin approval queue with persisted requests and decisions",
-      "status": "in_progress",
+      "status": "verification",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
@@ -728,11 +728,11 @@
       "blocker": null,
       "evidence": [
         {
-          "label": "M7 approval queue architecture draft",
+          "label": "M7 approval queue architecture decision",
           "url": "decisions/adr-0014-approval-queue-records.html"
         },
         {
-          "label": "M7 approval queue specification draft",
+          "label": "M7 approval queue specification and test traceability",
           "url": "specs/spec-m7-approval-queue.html"
         },
         {
@@ -740,23 +740,27 @@
           "url": "roadmap.html#milestone-7--operational-admin-controls"
         },
         {
-          "label": "Current fabricated queue view",
-          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/admin/_queue.html.erb"
+          "label": "Persisted approval workflow",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/approval_request.rb"
         },
         {
-          "label": "Current fabricated queue source",
-          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/admin_console.rb"
+          "label": "Approval decision history",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/approval_decision.rb"
         },
         {
-          "label": "Existing audit boundary",
-          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/audit_event.rb"
+          "label": "Approval queue browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/admin_queue_walk_test.rb"
+        },
+        {
+          "label": "Full verification gate",
+          "url": "specs/spec-m7-approval-queue.html#verification"
         },
         {
           "label": "M7 approval workflow handoff",
           "url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
         }
       ],
-      "updated_at": "2026-08-04T02:25:00+07:00"
+      "updated_at": "2026-08-04T03:25:00+07:00"
     },
     {
       "id": "M7-004",
@@ -2481,6 +2485,14 @@
       "to": "in_progress",
       "summary": "The user approved the complete M7-003 baseline: Academic Owner transition approvals, requester separation, atomic course-state effects, append-only audit history, minimized queue data, localized notes, Asia/Bangkok informational SLA age, and audit retention. Implementation and verification remain.",
       "evidence_url": "decisions/adr-0014-approval-queue-records.html"
+    },
+    {
+      "at": "2026-08-04T03:25:00+07:00",
+      "item_id": "M7-003",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Persisted course approval requests, append-only decisions, atomic lifecycle effects, truthful queue/SLA data, localized audit outcomes, focused coverage, and the full verification gate are complete; human review remains before final acceptance.",
+      "evidence_url": "specs/spec-m7-approval-queue.html#verification"
     },
     {
       "at": "2026-08-03T19:05:00+07:00",

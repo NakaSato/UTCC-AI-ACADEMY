@@ -10,8 +10,15 @@ review_by: 2026-08-10
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0013, SPEC-0013]
-implemented_by: []
+implemented_by:
+  - app/models/approval_request.rb
+  - app/models/approval_decision.rb
+  - app/controllers/admin_controller.rb
+  - app/views/admin/_queue.html.erb
+  - db/migrate/20260804030000_create_approval_workflow_records.rb
 touches:
+  - app/models/approval_request.rb
+  - app/models/approval_decision.rb
   - app/models/audit_event.rb
   - app/controllers/admin_controller.rb
   - app/views/admin/_queue.html.erb
@@ -19,7 +26,10 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/approval_request_test.rb
+  - test/models/approval_decision_test.rb
+  - test/controllers/admin_queue_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]

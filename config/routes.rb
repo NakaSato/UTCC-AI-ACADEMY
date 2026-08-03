@@ -96,6 +96,7 @@ Rails.application.routes.draw do
   get "admin", to: "admin#show", as: :admin
   patch "admin/users/:id", to: "admin#update", as: :admin_user
   patch "admin/courses/:id/state", to: "admin#update_course_state", as: :admin_course_state
+  post "admin/approvals/:id/decision", to: "admin#decide_approval", as: :admin_approval_decision
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
   # The other two case actions write a notification — to the student, and to

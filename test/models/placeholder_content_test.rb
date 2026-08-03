@@ -44,7 +44,6 @@ class PlaceholderContentTest < ActiveSupport::TestCase
           "course.modules" => Syllabus.entries,
           "lesson.theory.blocks" => LessonContent::BLOCKS,
           "admin.features.groups" => AdminConsole::FLAG_GROUPS,
-          "admin.queue.rows" => AdminConsole::QUEUE_KINDS,
           "admin.perms.rows" => AdminConsole::PERMS
         }.each do |key, rows|
           assert_equal rows.size, I18n.t(key).size, "#{key} in #{locale}"

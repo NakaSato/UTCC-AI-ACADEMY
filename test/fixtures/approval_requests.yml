@@ -1,0 +1,2 @@
+# Deliberately empty — approval requests are created by the workflow tests so
+# every test starts with a truthful empty queue.
