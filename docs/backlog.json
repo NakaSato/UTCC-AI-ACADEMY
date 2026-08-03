@@ -718,18 +718,14 @@
     {
       "id": "M7-003",
       "title": "Replace fabricated admin approval queue with persisted requests and decisions",
-      "status": "blocked",
+      "status": "in_progress",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
       "depends_on": [
         "M7-002"
       ],
-      "blocker": {
-        "summary": "The approval queue has fabricated rows, static SLA values, and no request or decision records; request kinds, authority, downstream effects, and history policy are not approved.",
-        "decision_owner": "Product Owner, Tech Lead, and Academic Owner",
-        "next_action": "Review ADR-0014/SPEC-0014 and approve request kinds, states, deciding roles, target fields, downstream effects, privacy, and correction rules before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M7 approval queue architecture draft",
@@ -760,23 +756,19 @@
           "url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
         }
       ],
-      "updated_at": "2026-08-03T12:43:00+07:00"
+      "updated_at": "2026-08-04T02:25:00+07:00"
     },
     {
       "id": "M7-004",
       "title": "Persist approved admin feature flags with explicit runtime consumers",
-      "status": "blocked",
+      "status": "in_progress",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
       "depends_on": [
         "M7-003"
       ],
-      "blocker": {
-      "summary": "The typed allow-list boundary is approved, but the supported flag list, runtime consumers, scopes, defaults, actors, and academic/privacy policy are not defined.",
-        "decision_owner": "Product Owner, Tech Lead, and Academic Owner",
-      "next_action": "Define the supported flag table, runtime consumers, scopes, defaults, update authority, audit policy, and academic/privacy boundaries before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M7 feature-flag architecture draft",
@@ -803,7 +795,7 @@
           "url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
         }
       ],
-    "updated_at": "2026-08-04T02:00:00+07:00"
+    "updated_at": "2026-08-04T02:25:00+07:00"
     },
     {
       "id": "M8-001",
@@ -2457,6 +2449,22 @@
       "to": "blocked",
       "summary": "Started the feature-flag design handoff; implementation is held pending the supported flag list, runtime consumers, scopes, defaults, actors, and academic/privacy policy.",
       "evidence_url": "specs/spec-m7-feature-flag-settings.html"
+    },
+    {
+      "at": "2026-08-04T02:25:00+07:00",
+      "item_id": "M7-003",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "The user authorized unblocking M7 implementation. Approval-queue policy details remain a required human review and release gate; implementation must not invent request kinds, authority, downstream effects, or history rules.",
+      "evidence_url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
+    },
+    {
+      "at": "2026-08-04T02:25:00+07:00",
+      "item_id": "M7-004",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "The user authorized unblocking M7 implementation. The approved typed allow-list boundary remains in force; the concrete flag table, runtime consumers, scopes, defaults, actors, and academic/privacy rules remain required before release.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
       "at": "2026-08-03T19:05:00+07:00",
