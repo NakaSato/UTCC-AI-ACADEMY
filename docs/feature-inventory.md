@@ -119,6 +119,7 @@ This inventory reflects the routes, controllers, models, views, and documented b
 - Per-event integrity-score deductions
 - Lesson guard after serious events
 - Persisted proctor events
+- Teacher-controlled per-course/lesson visibility for the student integrity log
 - Risk/review/clean case scoring
 
 ## Personal learning

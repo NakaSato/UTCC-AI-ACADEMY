@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_04_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -206,6 +206,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_040000) do
     t.datetime "updated_at", null: false
     t.text "value", null: false
     t.index ["key", "locale"], name: "index_landing_texts_on_key_and_locale", unique: true
+  end
+
+  create_table "lesson_integrity_settings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "topic_key", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "topic_key"], name: "index_lesson_integrity_settings_on_course_id_and_topic_key", unique: true
+    t.index ["course_id"], name: "index_lesson_integrity_settings_on_course_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -475,6 +486,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_040000) do
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "lesson_integrity_settings", "courses"
   add_foreign_key "notifications", "users"
   add_foreign_key "proctor_events", "courses"
   add_foreign_key "proctor_events", "topics"

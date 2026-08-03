@@ -76,6 +76,8 @@ Rails.application.routes.draw do
   # The Teaching console's one download: the roster as CSV. A plain-word URL
   # like every other, and the same staff gate as the screen.
   get "instructor/grades", to: "instructor#grades", as: :instructor_grades
+  patch "instructor/integrity/:topic_key", to: "instructor#update_integrity_setting",
+        as: :instructor_integrity_setting
 
   # Public surface is /academic. Keep the internal resource name and helpers
   # stable so AcademicPost records, associations, and existing callers do not

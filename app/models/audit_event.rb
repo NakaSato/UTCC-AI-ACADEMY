@@ -21,6 +21,7 @@ class AuditEvent < ApplicationRecord
     course_state_changed
     approval_decided
     feature_setting_changed
+    lesson_integrity_setting_changed
     section_created section_updated enrolled unenrolled
     integrity_closed integrity_notified integrity_escalated
     landing_saved card_added card_removed
@@ -28,7 +29,8 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed unenrolled integrity_escalated card_removed ].freeze
+  WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
+              unenrolled integrity_escalated card_removed ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50

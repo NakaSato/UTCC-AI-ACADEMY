@@ -14,6 +14,10 @@ th:
     section_updated: "บันทึกผู้สอนของหมู่ %{label} แล้ว"
     enrolled: "เพิ่ม %{name} เข้าหมู่ %{label} แล้ว"
     unenrolled: "นำ %{name} ออกจากหมู่ %{label} แล้ว"
+    lesson_integrity_setting_changed: "บันทึกการตั้งค่าบันทึกความซื่อสัตย์ของ %{course} · บทเรียน %{lesson} แล้ว"
+    integrity_setting_invalid: "การตั้งค่าบันทึกความซื่อสัตย์ไม่ถูกต้อง"
+    integrity_setting_stale: "การตั้งค่าบทเรียนนี้ถูกเปลี่ยนแล้ว — โหลดหน้าใหม่แล้วลองอีกครั้ง"
+    integrity_setting_forbidden: "คุณเปลี่ยนได้เฉพาะการตั้งค่าของวิชาที่ได้รับมอบหมาย"
     student_missing: "ไม่พบรหัสนักศึกษานี้"
     course_missing: "ไม่พบรายวิชาที่ต้องการ"
     topic_missing: "ไม่มีหัวข้อนี้ในโครงสร้างเนื้อหา"
@@ -1205,6 +1209,14 @@ th:
     th_progress: "ความก้าวหน้า"
     th_projects: "โปรเจกต์"
     th_seen: "เข้าใช้ล่าสุด"
+    integrity_settings_title: "การแสดงบันทึกความซื่อสัตย์ของนักศึกษา"
+    integrity_settings_sub: "ซ่อนบันทึกด้านข้างของบทเรียนได้เมื่อเหมาะสม แต่เหตุการณ์คุมสอบยังถูกบันทึกเพื่อการตรวจสอบทางวิชาการ"
+    integrity_state:
+      enabled: "นักศึกษาเห็นบันทึก"
+      disabled: "ซ่อนจากนักศึกษา"
+    integrity_actions:
+      disable: "ซ่อนบันทึก"
+      enable: "แสดงบันทึก"
     stats:
       - label: "ความก้าวหน้าเฉลี่ย"
         note: "เป้าสัปดาห์ที่ 6 คือ 35%"
@@ -1240,6 +1252,7 @@ th:
     section_updated: "เปลี่ยนอาจารย์ผู้สอนของ %{label}"
     enrolled: "เพิ่ม %{name} เข้าหมู่ %{label}"
     unenrolled: "นำ %{name} ออกจากหมู่ %{label}"
+    lesson_integrity_setting_changed: "เปลี่ยนบันทึกความซื่อสัตย์ของบทเรียน %{topic} ใน %{course} จาก%{from_state}เป็น%{to_state}"
     integrity_closed: "ปิดเคสความซื่อสัตย์ของ %{name}"
     integrity_notified: "แจ้ง %{name} เรื่อง %{course}"
     integrity_escalated: "ส่งต่อเคสของ %{name} (%{course}) ถึง %{to}"

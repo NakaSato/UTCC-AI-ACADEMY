@@ -13,6 +13,10 @@ en:
     section_updated: "Saved the instructor for %{label}"
     enrolled: "Enrolled %{name} in %{label}"
     unenrolled: "Removed %{name} from %{label}"
+    lesson_integrity_setting_changed: "Saved the integrity log setting for %{course} · lesson %{lesson}"
+    integrity_setting_invalid: "That integrity-log setting is invalid"
+    integrity_setting_stale: "That lesson setting changed already — reload and try again"
+    integrity_setting_forbidden: "You can only change integrity settings for your assigned course"
     student_missing: "No account with that student ID"
     course_missing: "That course could not be found"
     topic_missing: "That topic is not in the syllabus"
@@ -1198,6 +1202,14 @@ en:
     th_progress: "Progress"
     th_projects: "Projects"
     th_seen: "Last seen"
+    integrity_settings_title: "Student integrity-log visibility"
+    integrity_settings_sub: "Hide the sidebar log for a lesson when appropriate. Proctor events continue recording for academic review."
+    integrity_state:
+      enabled: "visible to students"
+      disabled: "hidden from students"
+    integrity_actions:
+      disable: "Hide log"
+      enable: "Show log"
     stats:
       - label: "Average progress"
         note: "week 6 target is 35%"
@@ -1236,6 +1248,7 @@ en:
     section_updated: "Changed the instructor for %{label}"
     enrolled: "Enrolled %{name} in %{label}"
     unenrolled: "Removed %{name} from %{label}"
+    lesson_integrity_setting_changed: "Changed the integrity log for %{course} lesson %{topic} from %{from_state} to %{to_state}"
     integrity_closed: "Closed the integrity case for %{name}"
     integrity_notified: "Notified %{name} about %{course}"
     integrity_escalated: "Escalated %{name} (%{course}) to %{to}"

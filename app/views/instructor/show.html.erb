@@ -34,6 +34,34 @@
       <% end %>
     </div>
 
+    <section class="mb-5 rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+      <div class="mb-5">
+        <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.integrity_settings_title") %></h2>
+        <p class="text-13 text-balance text-muted-2"><%= t("instructor.integrity_settings_sub") %></p>
+      </div>
+
+      <div class="flex flex-col divide-y divide-surface-3">
+        <% @integrity_settings.each do |setting| %>
+          <div class="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
+            <div class="min-w-0 flex-1">
+              <div class="text-14-5 font-semibold"><%= Syllabus.topic_name(setting.topic_key, @section.course.code) %></div>
+              <div class="mt-0.5 font-mono text-12 text-muted-2"><%= setting.topic_key %> ·
+                <%= t("instructor.integrity_state.#{setting.enabled ? :enabled : :disabled}") %>
+              </div>
+            </div>
+            <%= form_with url: instructor_integrity_setting_path(setting.topic_key), method: :patch,
+                  class: "flex-none" do %>
+              <%= hidden_field_tag :enabled, (!setting.enabled).to_s %>
+              <%= hidden_field_tag :lock_version, setting.lock_version %>
+              <%= submit_tag t("instructor.integrity_actions.#{setting.enabled ? :disable : :enable}"),
+                    class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
+                            text-13-5 text-ink-4 transition-colors hover:border-brand hover:text-brand" %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
     <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[400px_minmax(0,1fr)]">
       <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
         <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("instructor.hardest_title") %></h2>

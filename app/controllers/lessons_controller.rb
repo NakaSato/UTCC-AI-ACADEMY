@@ -13,6 +13,9 @@ class LessonsController < ApplicationController
   def show
     @step = LessonContent.step_for(params[:step])
     @lesson_content = LessonContent.for(@topic_key)
+    @course_record = Course.find_by!(code: @course.code)
+    @show_integrity_log = Current.user.student? && LessonIntegritySetting.enabled?(course: @course_record,
+                                                                                     topic_key: @topic_key)
   end
 
   # Where the exercise and the coding task send what the student did. The server
