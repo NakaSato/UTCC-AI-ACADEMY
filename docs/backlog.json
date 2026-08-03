@@ -2567,6 +2567,14 @@
       "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
+      "at": "2026-08-04T05:05:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user approved deferring the lives_cap flag with hearts because its meaning and safe limits depend on the blocked M8 academic policy.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
