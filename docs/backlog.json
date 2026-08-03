@@ -718,7 +718,7 @@
     {
       "id": "M7-003",
       "title": "Replace fabricated admin approval queue with persisted requests and decisions",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
@@ -760,7 +760,7 @@
           "url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
         }
       ],
-      "updated_at": "2026-08-04T03:25:00+07:00"
+      "updated_at": "2026-08-04T03:35:00+07:00"
     },
     {
       "id": "M7-004",
@@ -2493,6 +2493,14 @@
       "to": "verification",
       "summary": "Persisted course approval requests, append-only decisions, atomic lifecycle effects, truthful queue/SLA data, localized audit outcomes, focused coverage, and the full verification gate are complete; human review remains before final acceptance.",
       "evidence_url": "specs/spec-m7-approval-queue.html#verification"
+    },
+    {
+      "at": "2026-08-04T03:35:00+07:00",
+      "item_id": "M7-003",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user accepted M7-003 after implementation, focused coverage, and the full verification gate passed; SPEC-0014 is accepted and M7-003 is complete.",
+      "evidence_url": "specs/spec-m7-approval-queue.html"
     },
     {
       "at": "2026-08-03T19:05:00+07:00",

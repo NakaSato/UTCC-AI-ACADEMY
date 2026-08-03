@@ -2,7 +2,7 @@
 id: SPEC-0014
 type: spec
 title: Persisted admin approval queue and decisions
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
 updated: 2026-08-04
@@ -44,8 +44,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 > **Review state:** The first request kind, role mapping, allowed transitions,
 > downstream effects, audit history, privacy boundary, and Asia/Bangkok
-> informational SLA baseline are approved. The specification remains draft
-> until implementation adds and verifies its enforced test paths.
+> informational SLA baseline were approved. Implementation and enforced test
+> paths passed the full repository gate, and the specification was accepted on
+> 2026-08-04.
 
 > [Executable Specifications](README.md) ·
 > [M7 approval queue decision](../decisions/adr-0014-approval-queue-records.md) ·
@@ -109,26 +110,26 @@ authority, outcome, or downstream change.
 
 ## Acceptance Criteria
 
-- [ ] The Product Owner, Tech Lead, and Academic Owner approve request kinds,
+- [x] The Product Owner, Tech Lead, and Academic Owner approve request kinds,
       states, authority, target fields, downstream effects, and correction rules
       (`docs/decisions/adr-0014-approval-queue-records.md`).
-- [ ] The queue renders persisted pending requests and a truthful empty state
+- [x] The queue renders persisted pending requests and a truthful empty state
       when none exist (`test/controllers/admin_queue_test.rb`).
-- [ ] Request and decision models enforce approved kinds, state transitions,
+- [x] Request and decision models enforce approved kinds, state transitions,
       target presence, actor rules, and immutable decision history
       (`test/models/approval_request_test.rb`, `test/models/approval_decision_test.rb`).
-- [ ] An approved decision changes its downstream target and writes exactly one
+- [x] An approved decision changes its downstream target and writes exactly one
       audit event in the same transaction
       (`test/controllers/admin_queue_test.rb`).
-- [ ] Repeated, stale, invalid, unauthorized, and failed decisions leave
+- [x] Repeated, stale, invalid, unauthorized, and failed decisions leave
       request, target, decision history, and audit log unchanged
       (`test/controllers/admin_queue_test.rb`).
-- [ ] Pending badges and SLA values derive from timestamps or are not rendered
+- [x] Pending badges and SLA values derive from timestamps or are not rendered
       (`test/models/approval_request_test.rb`).
-- [ ] Thai and English browser walkthroughs cover pending, decided, and empty
+- [x] Thai and English browser walkthroughs cover pending, decided, and empty
       states without exposing unapproved personal data
       (`test/system/admin_queue_walk_test.rb`).
-- [ ] Full repository verification passes (`bin/verify`).
+- [x] Full repository verification passes (`bin/verify`).
 
 ## Error and boundary cases
 
