@@ -86,9 +86,7 @@
       </div>
 
       <% if monitored %>
-        <%# Hidden with the switch rather than removed, so turning proctoring
-            back on does not have to rebuild the panel. %>
-        <div class="mt-5 border-t border-surface-3 pt-4.5 group-data-[proctor=off]:hidden">
+        <div class="mt-5 border-t border-surface-3 pt-4.5">
           <div class="mb-3 text-12 font-semibold tracking-[0.06em] text-muted-2 uppercase">
             <%= t("lesson.proctor.events_title") %>
           </div>

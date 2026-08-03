@@ -1,34 +1,14 @@
 <%#
   The proctoring bar, and the guard that covers the lesson when the learner
-  leaves the window. Staff are never monitored, so they get the same bar with
-  the controls inert — see Proctoring for what this does and does not do.
+  leaves the window. Student proctoring is always on and has no lesson-page
+  toggle. Staff are never monitored — see Proctoring for what this does and
+  does not do.
 
-  The controller lives on <main>, so the band and on/off state set there drive
-  the colours here through group-data variants.
+  The controller lives on <main>, so the integrity band set there drives the
+  colours here through group-data variants.
 %>
 <div class="mb-5 flex flex-wrap items-center gap-4 rounded-[16px] border border-hairline bg-surface px-5 py-3.5">
-  <% if monitored %>
-    <button type="button" role="switch" aria-checked="true"
-            data-proctor-target="switch" data-action="proctor#toggle"
-            class="flex flex-none items-center gap-2.75">
-      <span aria-hidden="true"
-            class="relative h-5 w-8.5 rounded-full transition-colors
-                   group-data-[proctor=on]:bg-brand group-data-[proctor=off]:bg-hairline-3">
-        <span class="absolute top-0.5 size-4 rounded-full bg-white transition-[left]
-                     group-data-[proctor=on]:left-[17px] group-data-[proctor=off]:left-0.5"></span>
-      </span>
-      <span data-proctor-target="label"
-            class="rounded-full border px-3 py-1.25 text-13-5 font-semibold whitespace-nowrap
-                   group-data-[proctor=on]:border-brand-soft group-data-[proctor=on]:bg-brand-tint
-                   group-data-[proctor=on]:text-brand-deep group-data-[proctor=off]:border-hairline-2
-                   group-data-[proctor=off]:bg-surface-2 group-data-[proctor=off]:text-muted">
-        <%= t("lesson.proctor.label_on") %>
-      </span>
-    </button>
-    <span data-proctor-target="note" class="flex-1 text-13-5 text-balance text-muted">
-      <%= t("lesson.proctor.note_on") %>
-    </span>
-  <% else %>
+  <% unless monitored %>
     <span class="flex-none rounded-full border border-hairline-2 bg-surface-2 px-3 py-1.25
                  text-13-5 font-semibold whitespace-nowrap text-muted">
       <%= t("lesson.proctor.label_exempt") %>

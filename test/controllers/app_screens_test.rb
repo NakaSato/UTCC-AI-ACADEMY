@@ -122,12 +122,13 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", content.blocks.find { it.type == :link }.extra
   end
 
-  test "a student gets the proctor controller and staff get the exempt notice" do
+  test "student proctoring is on without a lesson-page switch and staff are exempt" do
     get lesson_url
 
     assert_response :success
     assert_select "main[data-controller*=proctor]", 1
-    assert_select "main", text: /#{I18n.t("lesson.proctor.label_on")}/
+    assert_select "main[data-proctor=on]", 1
+    assert_select "button[data-proctor-target=switch]", count: 0
 
     sign_in_as users(:instructor)
     get lesson_url

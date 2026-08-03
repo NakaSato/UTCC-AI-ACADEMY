@@ -13,7 +13,7 @@ import { Controller } from "@hotwired/stimulus"
 // Visual state travels on data attributes read by Tailwind variants, so this
 // controller only ever sets an attribute; it never juggles class lists.
 export default class extends Controller {
-  static targets = ["switch", "label", "note", "score", "verdict", "meter", "log", "empty", "row"]
+  static targets = ["score", "verdict", "meter", "log", "empty", "row"]
   static values = {
     url: String,
     course: String,
@@ -24,7 +24,7 @@ export default class extends Controller {
     maxEvents: { type: Number, default: 6 },
     bands: Object,   // { clean: 85, review: 60, risk: 0 }
     events: Object,  // kind -> { weight, text }
-    copy: Object     // the label/note/guard sentences, both switch positions
+    copy: Object     // the verdict and guard sentences
   }
 
   connect() {
@@ -74,12 +74,6 @@ export default class extends Controller {
 
   get active() {
     return this.onValue
-  }
-
-  toggle() {
-    this.onValue = !this.onValue
-    if (!this.onValue) this.element.dataset.proctorHidden = "false"
-    this.render()
   }
 
   // The guard only lifts on the learner's own say-so, so a tab-switch costs
@@ -135,12 +129,7 @@ export default class extends Controller {
 
   render() {
     const copy = this.copyValue
-    const state = this.onValue ? "on" : "off"
-
-    this.element.dataset.proctor = state
-    this.switchTarget.setAttribute("aria-checked", String(this.onValue))
-    this.labelTarget.textContent = copy[`label_${state}`]
-    this.noteTarget.textContent = copy[`note_${state}`]
+    this.element.dataset.proctor = this.onValue ? "on" : "off"
 
     this.scoreTarget.textContent = this.scoreValue
     this.meterTarget.style.width = `${this.scoreValue}%`

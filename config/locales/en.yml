@@ -971,11 +971,7 @@ en:
       code: "Coding task"
       summary: "Summary"
     proctor:
-      label_on: "Proctored mode on"
-      label_off: "Proctored mode off"
       label_exempt: "Exempt · staff account"
-      note_on: "Tab switching, copy, paste and screen capture are monitored during the exercise."
-      note_off: "Integrity checks disabled — practice mode only."
       note_exempt: "Staff accounts are never monitored — proctoring applies to student accounts only."
       verdict_clean: "Clean"
       verdict_review: "Review needed"
