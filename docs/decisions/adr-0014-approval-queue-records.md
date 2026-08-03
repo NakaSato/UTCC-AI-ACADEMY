@@ -2,7 +2,7 @@
 id: ADR-0014
 type: adr
 title: Define approval queue records and decision history
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
 updated: 2026-08-04
@@ -27,11 +27,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Define approval queue records and decision history
 
-> **Decision state:** The user approved on 2026-08-04 that the first real
-> request kind is a course lifecycle transition targeting one persisted
-> `Course`, with admin/academic approval and append-only decision history.
-> Exact role mapping, transition states, downstream effects, privacy, and SLA
-> rules remain implementation prerequisites.
+> **Decision state:** The user approved on 2026-08-04 the first course
+> lifecycle-transition request kind, its approver roles and transitions,
+> atomic downstream effects, append-only audit history, privacy boundary, and
+> Asia/Bangkok informational SLA baseline.
 
 > [Decision Records](README.md) ·
 > [M7 approval queue specification](../specs/spec-m7-approval-queue.md) ·
@@ -85,7 +84,28 @@ request producer exists.
 The first producer is a course lifecycle transition request. Its target is one
 persisted `Course` record. The decision uses append-only history and requires an
 authorized administrative or academic approver; exact role mapping and allowed
-transitions remain to be defined in the executable specification.
+transitions are defined below.
+
+### Approved M7-003 policy baseline
+
+- The Academic Owner approves `draft → published`.
+- `published → archived` requires Academic Owner approval.
+- `archived → published` requires explicit Academic Owner re-approval.
+- An administrator may execute only an approved transition; the requester
+  cannot approve their own request.
+- Approval atomically updates `Course.lifecycle_state`; rejection leaves the
+  course unchanged.
+- Audit history records the request, actor, target course, old state, new
+  state, reason, and timestamp. Corrections append a new record.
+- Repeated or stale decisions make no change. Failed transactions create no
+  successful decision or audit event.
+- The queue shows requester role, course code/title, request state, timestamps,
+  and decision notes. It excludes student IDs, email addresses, raw payloads,
+  and unnecessary learner data.
+- Notes are localized plain text and length-limited. SLA age uses persisted
+  request timestamps in Asia/Bangkok time and is informational only; there is
+  no automatic escalation.
+- Request and decision history is retained for audit.
 
 ## Alternatives
 
@@ -114,20 +134,13 @@ This avoids a premature workflow policy but leaves administrators looking at
 fictional requests. It is acceptable only as a temporary state while the queue
 is changed to a truthful empty state and the records remain deferred.
 
-## Human decisions required
+## Implementation constraints
 
-- Which request kinds are real in M7 and what target record each kind names.
-- Required request fields, requester roles, target visibility, and retention.
-- Request states and allowed transitions, including withdrawal, expiry,
-  rejection, re-submission, and re-review.
-- Decision authority by kind, separation-of-duties rules, and whether the
-  requester may decide their own request.
-- Exact downstream effect of approval/rejection for access, courses, content,
-  and data; an audit row alone is not an effect.
-- Whether decisions may be corrected, reversed, or superseded and how that is
-  shown to the requester.
-- Note content, privacy, localization, notification, SLA, and timezone rules.
-- Which existing workflows will create the first real requests.
+The approved baseline must be encoded without broadening the workflow. The
+implementation must preserve the approved first request kind, role boundary,
+course-state effects, append-only history, minimized display, localized notes,
+Asia/Bangkok informational SLA age, and audit retention. Any new request kind,
+authority, downstream effect, or privacy exposure requires a new decision.
 
 ## Consequences
 

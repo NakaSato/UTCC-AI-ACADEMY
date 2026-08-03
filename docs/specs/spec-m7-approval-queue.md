@@ -27,11 +27,10 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Persisted admin approval queue and decisions
 
-> **Review state:** The first request kind is approved as a course lifecycle
-> transition targeting one persisted `Course`, with admin/academic approval and
-> append-only decision history. This specification remains draft while exact
-> role mapping, allowed transitions, downstream effects, privacy, and SLA rules
-> are defined.
+> **Review state:** The first request kind, role mapping, allowed transitions,
+> downstream effects, audit history, privacy boundary, and Asia/Bangkok
+> informational SLA baseline are approved. The specification remains draft
+> until implementation adds and verifies its enforced test paths.
 
 > [Executable Specifications](README.md) ·
 > [M7 approval queue decision](../decisions/adr-0014-approval-queue-records.md) ·
@@ -129,21 +128,20 @@ authority, outcome, or downstream change.
 - A non-admin requests the queue or posts a guessed request/decision ID.
 - Thai and English readers see the same state and timestamp semantics.
 
-## Human Approval Workflow Handoff
+## Approved Policy Handoff
 
-Implementation is held until the accountable owners complete this table. The
-agent can model and test a recorded workflow, but cannot decide what an
-institutional approval means or which actor may grant it.
+The accountable owners approved the first request kind and its bounded policy.
+Implementation must preserve these decisions and must not add request kinds,
+authority, downstream effects, or privacy exposure without a new review.
 
-| Review point | Decision required |
+| Review point | Approved baseline |
 | --- | --- |
-| Request kinds and producers | Name the first real workflows and their target records. |
-| States and re-review | Define pending, approved, rejected, withdrawn, expired, and correction behavior. |
-| Authority | Name deciding roles, separation-of-duties, and self-approval rules. |
-| Downstream effects | State exactly what each decision changes and what remains pending. |
-| History and rollback | Choose immutable decision history, correction, reversal, and retention behavior. |
-| Privacy and display | Approve requester/target fields, note limits, localization, and access scope. |
-| Time/SLA | Define timezone, business hours, stale threshold, and empty/SLA behavior. |
+| Request kind and target | Course lifecycle transition targeting one persisted `Course`. |
+| Authority | Academic Owner approval; administrators execute only approved transitions; no self-approval. |
+| Downstream effects | Approval atomically changes lifecycle state; rejection leaves the course unchanged. |
+| History and rollback | Append-only decision history; repeated/stale decisions are no-ops; failed transactions create no success event. |
+| Privacy and display | Requester role, course code/title, state, timestamps, and notes only; no student IDs, email, or raw payloads. |
+| Time/SLA | Asia/Bangkok persisted timestamps; informational pending age; no automatic escalation. |
 
 ## Rollback and observability
 

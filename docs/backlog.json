@@ -2475,6 +2475,14 @@
       "evidence_url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
     },
     {
+      "at": "2026-08-04T02:45:00+07:00",
+      "item_id": "M7-003",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user approved the complete M7-003 baseline: Academic Owner transition approvals, requester separation, atomic course-state effects, append-only audit history, minimized queue data, localized notes, Asia/Bangkok informational SLA age, and audit retention. Implementation and verification remain.",
+      "evidence_url": "decisions/adr-0014-approval-queue-records.html"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
