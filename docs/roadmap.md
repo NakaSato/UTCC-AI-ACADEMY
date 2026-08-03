@@ -9,6 +9,8 @@ This roadmap starts from the current successful implementation and orders the re
 
 It is a product-level plan, not a fixed delivery contract. Sprint scope may change as the team learns, but each sprint must still produce a working increment. See [process.md](process.md) for the team's two-week sprint process and [feature-inventory.md](feature-inventory.md) for the full feature inventory.
 
+For the separate AI-first recruitment initiative, see the draft [AI Recruitment Platform Roadmap](roadmap-ai-recruitment-platform.md). It has its own product scope, outcome measures, dependencies, and human approval gate.
+
 ## Status
 
 - **Complete** — implemented, tested, and available in the current application
@@ -30,6 +32,7 @@ It is a product-level plan, not a fixed delivery contract. Sprint scope may chan
 | 7 | Operational admin controls | Placeholder admin screens become real management tools | Later |
 | 8 | Community and pedagogy decisions | Social awards and heart behavior have real rules | Later |
 | 9 | Production hardening | Session control, delivery monitoring, and deployment are strengthened | Continuous |
+| 10 | Academic writing | Students and teachers can create, review, and collaboratively publish academic posts | Next |
 
 ## Milestone 0 — Successful platform baseline
 
@@ -290,6 +293,79 @@ Resolve features whose implementation depends on teaching policy rather than eng
 - Restore procedures are tested, not only documented
 - Production deployment configuration names real infrastructure
 - Performance remains within the repository's query budgets
+
+## Milestone 10 — Academic writing
+
+**Status: Next**
+
+### Goal
+
+Give normal users (students) and teachers a focused academic-writing workspace
+where they can create a draft, invite co-authors, edit together, and preview a
+well-structured academic post before publication.
+
+The visual and interaction direction should use the supplied Academic Reader
+prototype as reference: `Academic Reader.dc.html`, `katex-el.js`, and
+`support.js` from the Academic content reader updates folder. The prototype is
+design evidence, not an implementation or persistence contract.
+
+### Scope
+
+- Allow normal users/students and teachers to create and edit their own
+  academic posts.
+- Support draft, review, and published states with ownership and permission
+  rules.
+- Allow a draft owner to invite multiple users to collaborate, with explicit
+  roles and revocation of access.
+- Provide an editor in the post preview page so authors can move from reading
+  preview to editing without losing context.
+- Support academic-post structure: title, authors, affiliations, abstract,
+  sections, subsections, references, citations, figures, captions, tables,
+  code blocks, links, lists, quotations, notes, and mathematical equations.
+- Provide reader and authoring tools inspired by the prototype: table of
+  contents, citation popovers, KaTeX rendering, themes, dark mode, font and
+  reading-width controls, search/library views, highlighting, comments,
+  translation, and copy/export actions where permissions allow.
+- Preserve Thai and English content alignment and existing role-based access
+  controls.
+
+### Success criteria
+
+- A student and a teacher can each create, save, reopen, and edit an academic
+  post draft.
+- A draft owner can invite at least two other users; invited users can join,
+  edit only within their granted permission, and be removed by the owner.
+- Concurrent edits do not silently overwrite another user's saved work; the
+  conflict or merge behavior is visible and tested.
+- The preview page renders the same saved content as the editor, including
+  citations, references, figures, tables, and KaTeX equations.
+- A post can be moved through the defined lifecycle only by authorized users,
+  and published content is protected from unauthorized edits.
+- The academic-post tools have focused tests, accessibility coverage, and
+  Thai/English locale coverage.
+- The complete author-to-preview-to-publish path can be demonstrated in a
+  browser walkthrough.
+
+### Product decisions required before implementation
+
+1. Whether “normal user” means the existing `student` role and whether
+   teachers map to the existing `instructor` role.
+2. Whether collaborators may edit simultaneously in real time or whether
+   saved draft revisions are sufficient for the first increment.
+3. How invitations are delivered and accepted while production email remains
+   deferred.
+4. Which users may publish, and whether teacher approval is required.
+5. Which export formats are required first: HTML, PDF, Markdown, or another
+   academic format.
+
+### Reference prototype capabilities
+
+The supplied reader prototype demonstrates the desired presentation language
+and interaction vocabulary: academic typography, multiple themes, dark mode,
+font-size and reading-width controls, section navigation, citation details,
+KaTeX equations, code and table presentation, text highlighting, comments,
+translation, copy-source, and library filtering. These should be validated
+against the authoring workflow before becoming implementation requirements.
 
 ## Product decisions required before scheduling
 

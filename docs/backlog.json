@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T15:30:26+07:00",
+  "updated_at": "2026-08-02T01:09:55+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -329,7 +329,7 @@
     {
       "id": "M3-001",
       "title": "Complete the AI1101 foundation course content",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner and Instructor",
       "milestone": "M3",
@@ -364,6 +364,956 @@
         }
       ],
       "updated_at": "2026-08-01T16:53:15+07:00"
+    },
+    {
+      "id": "M4-001",
+      "title": "Enable course-specific curricula",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M4",
+      "depends_on": [
+        "M3-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Accepted M4 course-specific curricula specification",
+          "url": "specs/spec-m4-course-specific-curricula.html"
+        },
+        {
+          "label": "M4 curriculum data-model ADR",
+          "url": "decisions/adr-0005-course-specific-curricula.html"
+        },
+        {
+          "label": "Accepted M4 data-model decisions",
+          "url": "decisions/adr-0005-course-specific-curricula.html"
+        },
+        {
+          "label": "Roadmap Milestone 4",
+          "url": "roadmap.html#milestone-4--course-specific-curricula"
+        },
+        {
+          "label": "Course scoping migration",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/db/migrate/20260802100000_add_course_to_course_modules.rb"
+        },
+        {
+          "label": "M4 model and controller tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/course_curriculum_test.rb"
+        },
+        {
+          "label": "M4 browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/course_curriculum_walk_test.rb"
+        },
+        {
+          "label": "Course-scoped leaderboard evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/leaderboard_test.rb"
+        },
+        {
+          "label": "Course-scoped instructor report evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/instructor_report_test.rb"
+        },
+        {
+          "label": "Completion migration-preservation evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/topic_completion_test.rb"
+        },
+        {
+          "label": "Course-owned activity boundary evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/course_curriculum_test.rb"
+        },
+        {
+          "label": "Course-specific project and certificate evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/course_curriculum_test.rb"
+        },
+        {
+          "label": "AI1102 end-to-end grading evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/course_curriculum_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-02T20:15:00+07:00"
+    },
+    {
+      "id": "M5-001",
+      "title": "Make the knowledge map course-scoped and derived from curriculum",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M5",
+      "depends_on": [
+        "M4-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "M5 knowledge-map architecture decision",
+          "url": "decisions/adr-0008-real-knowledge-map.html"
+        },
+        {
+          "label": "M5 real knowledge-map specification",
+          "url": "specs/spec-m5-real-knowledge-map.html"
+        },
+        {
+          "label": "Accepted M5 baseline decisions",
+          "url": "decisions/adr-0008-real-knowledge-map.html"
+        },
+        {
+          "label": "Roadmap Milestone 5",
+          "url": "roadmap.html#milestone-5--real-knowledge-map"
+        },
+        {
+          "label": "M5 dynamic map model evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/knowledge_map_test.rb"
+        },
+        {
+          "label": "M5 map controller evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/knowledge_maps_controller_test.rb"
+        },
+        {
+          "label": "M5 map browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/knowledge_map_walk_test.rb"
+        },
+        {
+          "label": "M5 unmodeled-course isolation evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/knowledge_map_test.rb"
+        },
+        {
+          "label": "M5 project-prerequisite visibility evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/knowledge_maps_controller_test.rb"
+        },
+        {
+          "label": "M5 invalid-parameter fallback evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/knowledge_maps_controller_test.rb"
+        },
+        {
+          "label": "M5 static-map removal evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/knowledge_map.rb"
+        },
+        {
+          "label": "M5 human acceptance handoff",
+          "url": "specs/spec-m5-real-knowledge-map.html#human-acceptance-handoff"
+        }
+      ],
+      "updated_at": "2026-08-02T21:26:27+07:00"
+    },
+    {
+      "id": "M6-001",
+      "title": "Define the downloadable localized course syllabus PDF slice",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M6",
+      "depends_on": [
+        "M5-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "M6 syllabus PDF architecture draft",
+          "url": "decisions/adr-0009-course-syllabus-pdf.html"
+        },
+        {
+          "label": "M6 syllabus PDF specification draft",
+          "url": "specs/spec-m6-course-syllabus-pdf.html"
+        },
+        {
+          "label": "M6 roadmap context",
+          "url": "roadmap.html#milestone-6--institutional-access-and-documents"
+        },
+        {
+          "label": "Existing course-page document placeholder",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/courses/show.html.erb"
+        },
+        {
+          "label": "Existing course-owned curriculum boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/syllabus.rb"
+        },
+        {
+          "label": "M6 human design review handoff",
+          "url": "specs/spec-m6-course-syllabus-pdf.html#human-design-review-record"
+        },
+        {
+          "label": "M6 PDF controller evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/course_syllabus_documents_test.rb"
+        },
+        {
+          "label": "M6 PDF browser evidence",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/course_syllabus_document_walk_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-02T22:05:00+07:00"
+    },
+    {
+      "id": "M6-002",
+      "title": "Define UTCC SSO and safe account linking",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, and Security Owner",
+      "milestone": "M6",
+      "depends_on": [
+        "M6-001"
+      ],
+      "blocker": {
+        "summary": "The SSO/account-linking boundary is drafted, but UTCC provider metadata, protocol, identity claims, linking policy, and emergency-access ownership are not approved.",
+        "decision_owner": "Product Owner, Tech Lead, Security Owner, and UTCC identity owner",
+        "next_action": "Provide the institutional provider contract and approve ADR-0010/SPEC-0010 before any callback or credential flow is implemented."
+      },
+      "evidence": [
+        {
+          "label": "M6 SSO architecture draft",
+          "url": "decisions/adr-0010-utcc-sso-account-linking.html"
+        },
+        {
+          "label": "M6 SSO specification draft",
+          "url": "specs/spec-m6-utcc-sso-account-linking.html"
+        },
+        {
+          "label": "Disabled SSO control boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/shared/_auth_sso.html.erb"
+        },
+        {
+          "label": "Current local session authentication",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/controllers/concerns/authentication.rb"
+        },
+        {
+          "label": "M6 SSO human identity review handoff",
+          "url": "specs/spec-m6-utcc-sso-account-linking.html#human-identity-review-handoff"
+        }
+      ],
+      "updated_at": "2026-08-02T22:15:00+07:00"
+    },
+    {
+      "id": "M6-003",
+      "title": "Define course-completion certificate policy and artifact",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, and Academic Owner",
+      "milestone": "M6",
+      "depends_on": [
+        "M6-001"
+      ],
+      "blocker": {
+        "summary": "Certificate counts exist, but no academic issuer, completion evidence rule, identity disclosure, verification, or revocation policy is approved.",
+        "decision_owner": "Product Owner and Academic Owner",
+        "next_action": "Review ADR-0011/SPEC-0011 and decide whether the certificate flag represents an official credential, a completion record, or deferred catalog metadata."
+      },
+      "evidence": [
+        {
+          "label": "M6 certificate policy architecture draft",
+          "url": "decisions/adr-0011-course-completion-certificates.html"
+        },
+        {
+          "label": "M6 certificate specification draft",
+          "url": "specs/spec-m6-course-completion-certificates.html"
+        },
+        {
+          "label": "Existing completion and certificate counters",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/learner_progress.rb"
+        },
+        {
+          "label": "Existing certificate catalog flag",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/course.rb"
+        },
+        {
+          "label": "M6 academic certificate review handoff",
+          "url": "specs/spec-m6-course-completion-certificates.html#human-academic-review-handoff"
+        }
+      ],
+      "updated_at": "2026-08-02T22:25:00+07:00"
+    },
+    {
+      "id": "M7-001",
+      "title": "Replace fabricated admin Overview metrics with defined live metrics",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Privacy Owner",
+      "milestone": "M7",
+      "depends_on": [
+        "M6-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "M7 Overview architecture draft",
+          "url": "decisions/adr-0012-live-admin-overview-metrics.html"
+        },
+        {
+          "label": "M7 Overview specification draft",
+          "url": "specs/spec-m7-live-admin-overview-metrics.html"
+        },
+        {
+          "label": "M7 roadmap context",
+          "url": "roadmap.html#milestone-7--operational-admin-controls"
+        },
+        {
+          "label": "Current fabricated Overview source",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/admin_console.rb"
+        },
+        {
+          "label": "Current fabricated Overview view",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/admin/_overview.html.erb"
+        },
+        {
+          "label": "M7 metric and privacy review handoff",
+          "url": "specs/spec-m7-live-admin-overview-metrics.html#human-metric-and-privacy-review-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T07:10:00+07:00"
+    },
+    {
+      "id": "M7-002",
+      "title": "Replace fabricated admin Courses rows with real catalog and lifecycle controls",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Academic Owner",
+      "milestone": "M7",
+      "depends_on": [
+        "M7-001",
+        "M5-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "M7 course lifecycle architecture draft",
+          "url": "decisions/adr-0013-admin-course-lifecycle.html"
+        },
+        {
+          "label": "M7 course lifecycle specification draft",
+          "url": "specs/spec-m7-admin-course-lifecycle.html"
+        },
+        {
+          "label": "M7 roadmap context",
+          "url": "roadmap.html#milestone-7--operational-admin-controls"
+        },
+        {
+          "label": "Current fabricated Courses source",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/admin_console.rb"
+        },
+        {
+          "label": "Current fabricated Courses view",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/admin/_courses.html.erb"
+        },
+        {
+          "label": "Existing persisted course catalog",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/course.rb"
+        },
+        {
+          "label": "M7 academic lifecycle review handoff",
+          "url": "specs/spec-m7-admin-course-lifecycle.html#human-academic-review-handoff"
+        },
+        {
+          "label": "M7 course lifecycle focused tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/admin_courses_test.rb"
+        },
+        {
+          "label": "M7 course lifecycle browser walkthrough",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/admin_courses_walk_test.rb"
+        },
+        {
+          "label": "M7-002 full verification",
+          "url": "specs/spec-m7-admin-course-lifecycle.html#verification"
+        }
+      ],
+      "updated_at": "2026-08-03T12:32:00+07:00"
+    },
+    {
+      "id": "M7-003",
+      "title": "Replace fabricated admin approval queue with persisted requests and decisions",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Academic Owner",
+      "milestone": "M7",
+      "depends_on": [
+        "M7-002"
+      ],
+      "blocker": {
+        "summary": "The approval queue has fabricated rows, static SLA values, and no request or decision records; request kinds, authority, downstream effects, and history policy are not approved.",
+        "decision_owner": "Product Owner, Tech Lead, and Academic Owner",
+        "next_action": "Review ADR-0014/SPEC-0014 and approve request kinds, states, deciding roles, target fields, downstream effects, privacy, and correction rules before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M7 approval queue architecture draft",
+          "url": "decisions/adr-0014-approval-queue-records.html"
+        },
+        {
+          "label": "M7 approval queue specification draft",
+          "url": "specs/spec-m7-approval-queue.html"
+        },
+        {
+          "label": "M7 roadmap context",
+          "url": "roadmap.html#milestone-7--operational-admin-controls"
+        },
+        {
+          "label": "Current fabricated queue view",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/admin/_queue.html.erb"
+        },
+        {
+          "label": "Current fabricated queue source",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/admin_console.rb"
+        },
+        {
+          "label": "Existing audit boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/audit_event.rb"
+        },
+        {
+          "label": "M7 approval workflow handoff",
+          "url": "specs/spec-m7-approval-queue.html#human-approval-workflow-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T12:43:00+07:00"
+    },
+    {
+      "id": "M7-004",
+      "title": "Persist approved admin feature flags with explicit runtime consumers",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Academic Owner",
+      "milestone": "M7",
+      "depends_on": [
+        "M7-003"
+      ],
+      "blocker": {
+      "summary": "The typed allow-list boundary is approved, but the supported flag list, runtime consumers, scopes, defaults, actors, and academic/privacy policy are not defined.",
+        "decision_owner": "Product Owner, Tech Lead, and Academic Owner",
+      "next_action": "Define the supported flag table, runtime consumers, scopes, defaults, update authority, audit policy, and academic/privacy boundaries before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M7 feature-flag architecture draft",
+          "url": "decisions/adr-0015-feature-flag-boundary.html"
+        },
+        {
+          "label": "M7 feature-setting specification draft",
+          "url": "specs/spec-m7-feature-flag-settings.html"
+        },
+        {
+          "label": "M7 roadmap context",
+          "url": "roadmap.html#milestone-7--operational-admin-controls"
+        },
+        {
+          "label": "Current feature-flag source",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/admin_console.rb"
+        },
+        {
+          "label": "Current feature controls",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/views/admin/_features.html.erb"
+        },
+        {
+          "label": "Feature policy handoff",
+          "url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+        }
+      ],
+    "updated_at": "2026-08-04T02:00:00+07:00"
+    },
+    {
+      "id": "M8-001",
+      "title": "Define whether zero hearts blocks learner attempts and how recovery works",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Academic Owner, and Tech Lead",
+      "milestone": "M8",
+      "depends_on": [],
+      "blocker": {
+        "summary": "The application displays a derived five-heart counter and passively refills it after four hours, but zero hearts does not currently block attempts and no academic policy defines blocking, refill, exceptions, or support.",
+        "decision_owner": "Product Owner and Academic Owner",
+        "next_action": "Review ADR-0016/SPEC-0016 and approve zero-heart meaning, heart cost, refill, affected attempt kinds, learner support, academic effects, and safety boundaries before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M8 hearts policy architecture draft",
+          "url": "decisions/adr-0016-hearts-attempt-policy.html"
+        },
+        {
+          "label": "M8 hearts policy specification draft",
+          "url": "specs/spec-m8-hearts-attempt-policy.html"
+        },
+        {
+          "label": "M8 roadmap context",
+          "url": "roadmap.html#milestone-8--community-and-pedagogy-decisions"
+        },
+        {
+          "label": "Current hearts derivation",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/learner_progress.rb"
+        },
+        {
+          "label": "Current lesson submission boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/controllers/lessons_controller.rb"
+        },
+        {
+          "label": "Hearts policy handoff",
+          "url": "specs/spec-m8-hearts-attempt-policy.html#human-hearts-policy-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T19:05:00+07:00"
+    },
+    {
+      "id": "M8-002",
+      "title": "Define the Helping Hand award and learner community boundary",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Academic Owner, Tech Lead, and Privacy Owner",
+      "milestone": "M8",
+      "depends_on": [],
+      "blocker": {
+        "summary": "The Helping Hand badge promises ten forum answers, but no forum or peer-review records exist; the educational outcome, contribution evidence, moderation, privacy, and community ownership are not approved.",
+        "decision_owner": "Product Owner, Academic Owner, and Privacy Owner",
+        "next_action": "Review ADR-0017/SPEC-0017 and choose no feature, course Q&A, structured peer review, or another bounded model, then approve eligibility, quality, safety, moderation, and award-retraction rules before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M8 Helping Hand architecture draft",
+          "url": "decisions/adr-0017-helping-hand-community-boundary.html"
+        },
+        {
+          "label": "M8 community specification draft",
+          "url": "specs/spec-m8-helping-hand-community.html"
+        },
+        {
+          "label": "M8 roadmap context",
+          "url": "roadmap.html#milestone-8--community-and-pedagogy-decisions"
+        },
+        {
+          "label": "Current unearnable award rule",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/learner_progress.rb"
+        },
+        {
+          "label": "Current award copy",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/locales/en.yml"
+        },
+        {
+          "label": "Community policy handoff",
+          "url": "specs/spec-m8-helping-hand-community.html#human-community-policy-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T19:12:00+07:00"
+    },
+    {
+      "id": "M8-003",
+      "title": "Define the meaning and downstream effects of marking prior knowledge",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Academic Owner, and Tech Lead",
+      "milestone": "M8",
+      "depends_on": [],
+      "blocker": {
+      "summary": "The user approved that Mark as known contributes to academic progress and course completion; authority, evidence, provenance, reversibility, and remaining downstream effects are not defined.",
+        "decision_owner": "Product Owner and Academic Owner",
+      "next_action": "Define who may mark or verify prior knowledge, its provenance and reversal rules, and whether it affects XP, gems, streaks, leaderboards, reports, applied work, or certificates."
+      },
+      "evidence": [
+        {
+          "label": "M8 prior-knowledge architecture draft",
+          "url": "decisions/adr-0018-prior-knowledge-boundary.html"
+        },
+        {
+          "label": "M8 prior-knowledge specification draft",
+          "url": "specs/spec-m8-prior-knowledge.html"
+        },
+        {
+          "label": "M8 roadmap context",
+          "url": "roadmap.html#milestone-8--community-and-pedagogy-decisions"
+        },
+        {
+          "label": "Current knowledge-map read model",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/knowledge_map.rb"
+        },
+        {
+          "label": "Current completion evidence boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/topic_completion.rb"
+        },
+        {
+          "label": "Prior-knowledge policy handoff",
+          "url": "specs/spec-m8-prior-knowledge.html#human-prior-knowledge-policy-handoff"
+        }
+      ],
+    "updated_at": "2026-08-04T02:10:00+07:00"
+    },
+    {
+      "id": "M9-001",
+      "title": "Define active-session visibility and revocation",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security Owner, and Privacy Owner",
+      "milestone": "M9",
+      "depends_on": [],
+      "blocker": {
+        "summary": "Sessions have a 30-day absolute expiry, current logout, and password-change revocation, but users cannot inspect or individually revoke sessions and no approved metadata, authority, WebSocket, retention, or support policy exists.",
+        "decision_owner": "Tech Lead, Security Owner, and Privacy Owner",
+        "next_action": "Review ADR-0019/SPEC-0019 and approve visible metadata, user/admin target scope, revocation semantics, HTTP/WebSocket enforcement, retention, cleanup, and compromise support before implementation."
+      },
+      "evidence": [
+        {
+          "label": "M9 session architecture draft",
+          "url": "decisions/adr-0019-session-visibility-and-revocation.html"
+        },
+        {
+          "label": "M9 session specification draft",
+          "url": "specs/spec-m9-session-visibility-and-revocation.html"
+        },
+        {
+          "label": "M9 roadmap context",
+          "url": "roadmap.html#milestone-9--production-hardening"
+        },
+        {
+          "label": "Current session model",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/models/session.rb"
+        },
+        {
+          "label": "Current HTTP authentication boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/controllers/concerns/authentication.rb"
+        },
+        {
+          "label": "Session-security policy handoff",
+          "url": "specs/spec-m9-session-visibility-and-revocation.html#human-session-security-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T19:30:00+07:00"
+    },
+    {
+      "id": "M9-002",
+      "title": "Define critical-failure observability and alert ownership",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Tech Lead, Platform Owner, Security Owner, and Privacy Owner",
+      "milestone": "M9",
+      "depends_on": [],
+      "blocker": {
+        "summary": "The app has a boot-only /up check, logs, Solid Queue, mail, WebSockets, and durable security records, but no approved critical symptom matrix, SLOs, telemetry contract, alert owners, runbooks, redaction, retention, or provider boundary.",
+        "decision_owner": "Tech Lead, Platform Owner, Security Owner, and Privacy Owner",
+        "next_action": "Review ADR-0020/SPEC-0020 and approve critical symptoms, thresholds, owners, runbooks, correlation fields, redaction, retention, destinations, and controlled-failure verification before instrumentation."
+      },
+      "evidence": [
+        {
+          "label": "M9 observability architecture draft",
+          "url": "decisions/adr-0020-critical-failure-observability.html"
+        },
+        {
+          "label": "M9 observability specification draft",
+          "url": "specs/spec-m9-critical-failure-observability.html"
+        },
+        {
+          "label": "M9 roadmap context",
+          "url": "roadmap.html#milestone-9--production-hardening"
+        },
+        {
+          "label": "Current boot health check",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/routes.rb"
+        },
+        {
+          "label": "Current background-job boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/jobs/application_job.rb"
+        },
+        {
+          "label": "Observability policy handoff",
+          "url": "specs/spec-m9-critical-failure-observability.html#human-observability-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T19:40:00+07:00"
+    },
+    {
+      "id": "M9-003",
+      "title": "Define backup, restore, and recovery verification",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Platform Owner, Tech Lead, Security Owner, and Privacy Owner",
+      "milestone": "M9",
+      "depends_on": [
+        "M9-002"
+      ],
+      "blocker": {
+        "summary": "Production uses an external managed PostgreSQL database and a separate local Active Storage volume, but no approved data inventory, RPO/RTO, backup provider contract, restore isolation, recovery runbook, or exercised drill exists.",
+        "decision_owner": "Platform Owner, Tech Lead, Security Owner, and Privacy Owner",
+        "next_action": "Review ADR-0021/SPEC-0021 and approve data classes, RPO/RTO, schedule, retention, encryption, restore target, credential boundary, runbook, and drill evidence before recovery is treated as operational."
+      },
+      "evidence": [
+        {
+          "label": "M9 recovery architecture draft",
+          "url": "decisions/adr-0021-backup-restore-verification.html"
+        },
+        {
+          "label": "M9 recovery specification draft",
+          "url": "specs/spec-m9-backup-restore-verification.html"
+        },
+        {
+          "label": "M9 roadmap context",
+          "url": "roadmap.html#milestone-9--production-hardening"
+        },
+        {
+          "label": "Current external database deployment boundary",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/deploy.yml"
+        },
+        {
+          "label": "Current database configuration",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/database.yml"
+        },
+        {
+          "label": "Current Active Storage configuration",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/storage.yml"
+        },
+        {
+          "label": "Recovery policy handoff",
+          "url": "specs/spec-m9-backup-restore-verification.html#human-recovery-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T19:50:00+07:00"
+    },
+    {
+      "id": "M9-004",
+      "title": "Define the production deployment, artifact, and rollback boundary",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "Platform Owner, Tech Lead, Security Owner, and Release Owner",
+      "milestone": "M9",
+      "depends_on": [
+        "M9-002",
+        "M9-003"
+      ],
+      "blocker": {
+        "summary": "The repository has a Dockerfile and placeholder Kamal configuration, but no real deployment target, registry, domain/TLS, secret boundary, immutable artifact provenance, migration rollout, rollback authority, or post-deploy evidence.",
+        "decision_owner": "Platform Owner, Tech Lead, Security Owner, and Release Owner",
+        "next_action": "Review ADR-0022/SPEC-0022 and approve the real target, artifact/provenance controls, secrets, process topology, migration compatibility, release owners, rollback action, and numeric post-deploy checks before replacing placeholders."
+      },
+      "evidence": [
+        {
+          "label": "M9 deployment architecture draft",
+          "url": "decisions/adr-0022-production-deployment-boundary.html"
+        },
+        {
+          "label": "M9 deployment specification draft",
+          "url": "specs/spec-m9-production-deployment.html"
+        },
+        {
+          "label": "M9 roadmap context",
+          "url": "roadmap.html#milestone-9--production-hardening"
+        },
+        {
+          "label": "Current placeholder deployment configuration",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/config/deploy.yml"
+        },
+        {
+          "label": "Current release policy and deployment gaps",
+          "url": "build-release.html#current-gaps"
+        },
+        {
+          "label": "Deployment policy handoff",
+          "url": "specs/spec-m9-production-deployment.html#human-release-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T20:00:00+07:00"
+    },
+    {
+      "id": "M9-005",
+      "title": "Define curriculum-scale accessibility and performance quality budgets",
+      "status": "blocked",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, QA Owner, and Accessibility Owner",
+      "milestone": "M9",
+      "depends_on": [
+        "M9-002"
+      ],
+      "blocker": {
+        "summary": "The repository has selected query-budget tests and browser walkthroughs, but no approved accessibility target, supported device/assistive-technology matrix, user-facing performance budgets, route coverage, waiver authority, or trend owner exists.",
+        "decision_owner": "Product Owner, Tech Lead, QA Owner, and Accessibility Owner",
+        "next_action": "Review ADR-0023/SPEC-0023 and approve supported audiences, critical journeys, accessibility target, latency/payload/query budgets, measurement environment, release response, waivers, and remediation ownership before adding gates."
+      },
+      "evidence": [
+        {
+          "label": "M9 curriculum-quality architecture draft",
+          "url": "decisions/adr-0023-curriculum-quality-budgets.html"
+        },
+        {
+          "label": "M9 curriculum-quality specification draft",
+          "url": "specs/spec-m9-curriculum-quality-budgets.html"
+        },
+        {
+          "label": "M9 roadmap context",
+          "url": "roadmap.html#milestone-9--production-hardening"
+        },
+        {
+          "label": "Current performance evidence",
+          "url": "performance.html#the-per-screen-query-budget"
+        },
+        {
+          "label": "Current query-budget tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/query_budget_test.rb"
+        },
+        {
+          "label": "Quality policy handoff",
+          "url": "specs/spec-m9-curriculum-quality-budgets.html#human-quality-handoff"
+        }
+      ],
+      "updated_at": "2026-08-03T20:10:00+07:00"
+    },
+    {
+      "id": "AW-001",
+      "title": "Define academic-writing permissions and draft lifecycle",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic writing roadmap",
+          "url": "roadmap.html#milestone-10--academic-writing"
+        },
+        {
+          "label": "Draft permission and lifecycle ADR",
+          "url": "decisions/adr-0006-academic-post-permissions-and-lifecycle.html"
+        },
+        {
+          "label": "Draft permission and lifecycle specification",
+          "url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+        }
+      ],
+      "updated_at": "2026-08-02T00:51:04+07:00"
+    },
+    {
+      "id": "AW-002",
+      "title": "Enable student and teacher academic-post drafting",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [
+        "AW-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic writing role and draft scope",
+          "url": "roadmap.html#milestone-10--academic-writing"
+        },
+        {
+          "label": "Academic-post lifecycle specification",
+          "url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+        },
+        {
+          "label": "Academic-post lifecycle tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/academic_post_lifecycle_test.rb"
+        },
+        {
+          "label": "Academic-post controller tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/academic_posts_controller_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-02T00:51:04+07:00"
+    },
+    {
+      "id": "AW-003",
+      "title": "Support invitation-based multi-user draft collaboration",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [
+        "AW-001",
+        "AW-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic writing collaboration scope",
+          "url": "roadmap.html#milestone-10--academic-writing"
+        },
+        {
+          "label": "Academic-post permissions and invitation specification",
+          "url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+        },
+        {
+          "label": "AW-003 focused verification: 24 tests, 149 assertions",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/academic_post_invitations_controller_test.rb"
+        },
+        {
+          "label": "AW-003 permission and revocation tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/academic_post_permission_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-02T14:41:03+07:00"
+    },
+    {
+      "id": "AW-004",
+      "title": "Create the academic-post editor inside the preview page",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [
+        "AW-001",
+        "AW-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic Reader prototype reference",
+          "url": "roadmap.html#reference-prototype-capabilities"
+        },
+        {
+          "label": "Draft preview-page editing specification",
+          "url": "specs/spec-academic-post-preview-editing.html"
+        }
+      ],
+      "updated_at": "2026-08-02T14:49:33+07:00"
+    },
+    {
+      "id": "AW-005",
+      "title": "Add academic-post authoring and reader tools",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [
+        "AW-004"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic writing tools scope",
+          "url": "roadmap.html#milestone-10--academic-writing"
+        },
+        {
+          "label": "Draft authoring and reader tools specification",
+          "url": "specs/spec-academic-post-authoring-reader-tools.html"
+        }
+      ],
+      "updated_at": "2026-08-02T15:14:27+07:00"
+    },
+    {
+      "id": "AW-006",
+      "title": "Evaluate and integrate Tiptap for the academic-post editor",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M10",
+      "depends_on": [
+        "AW-001",
+        "AW-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Academic writing editor roadmap",
+          "url": "roadmap.html#milestone-10--academic-writing"
+        },
+        {
+          "label": "Tiptap upstream project",
+          "url": "https://github.com/ueberdosis/tiptap"
+        },
+        {
+          "label": "Academic-post lifecycle specification",
+          "url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+        },
+        {
+          "label": "Tiptap editor specification",
+          "url": "specs/spec-academic-post-tiptap-editor.html"
+        },
+        {
+          "label": "Tiptap implementation and focused verification",
+          "url": "specs/spec-academic-post-tiptap-editor.html"
+        }
+      ],
+      "updated_at": "2026-08-02T14:43:20+07:00"
     }
   ],
   "recently_completed": [
@@ -1155,6 +2105,422 @@
       "to": "verification",
       "summary": "Implemented the first M3 vertical slice for topic 1-2 with unique Thai/English content, topic-specific quiz and coding grading, focused tests, full Rails tests, and browser walkthrough; human content review remains required.",
       "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-01T18:31:55+07:00",
+      "item_id": "M4-001",
+      "from": "new",
+      "to": "queued",
+      "summary": "Drafted SPEC-0003 for course-specific curricula; M4 implementation remains gated on M3 learner evidence and Product Owner/Tech Lead decisions.",
+      "evidence_url": "specs/spec-m4-course-specific-curricula.html"
+    },
+    {
+      "at": "2026-08-02T14:49:33+07:00",
+      "item_id": "AW-004",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Approved by the user after focused tests, RuboCop, bin/docs, and formatting verification passed; browser walkthrough remains an environment limitation.",
+      "evidence_url": "specs/spec-academic-post-preview-editing.html"
+    },
+    {
+      "at": "2026-08-02T14:46:25+07:00",
+      "item_id": "AW-004",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented preview-shell editing with return-to-preview saves; 13 focused tests and 95 assertions pass, RuboCop and bin/docs pass, while browser verification remains environment-blocked by Linux EdgeDriver.",
+      "evidence_url": "specs/spec-academic-post-preview-editing.html"
+    },
+    {
+      "at": "2026-08-02T14:45:51+07:00",
+      "item_id": "AW-004",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "SPEC-0006 accepted with the existing edit route rendered in the preview shell, return-to-preview saves, existing conflict behavior, and keyboard/focus baseline; implementing the preview-context editor.",
+      "evidence_url": "specs/spec-academic-post-preview-editing.html"
+    },
+    {
+      "at": "2026-08-02T15:14:27+07:00",
+      "item_id": "AW-005",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Approved by the user after the bounded authoring and reader increment passed 19 focused tests with 153 assertions, RuboCop, JavaScript syntax, importmap audit, bin/docs, and formatting checks; browser walkthrough remains an environment limitation because the verification container lacks Linux EdgeDriver.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-02T15:05:12+07:00",
+      "item_id": "AW-005",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented the bounded authoring and reader increment with H2 sections, safe citation and reference nodes, section navigation, reading width, font size, theme controls, and HTML export; 19 focused tests and 153 assertions pass, RuboCop, bin/docs, importmap audit, and JavaScript syntax checks pass, while browser verification remains environment-blocked by Linux EdgeDriver.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-02T14:59:42+07:00",
+      "item_id": "AW-005",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "SPEC-0007 accepted with one sanitized Tiptap document, section navigation, reading width, font size, theme controls, structured author-entered references and citations, HTML-only export, and WCAG 2.2 AA baseline; deferred features remain out of scope.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-01T20:31:26+07:00",
+      "item_id": "AW-001",
+      "from": "new",
+      "to": "queued",
+      "summary": "Created the Academic Writing roadmap milestone and queued the permission and draft-lifecycle definition for Product Owner and Tech Lead review.",
+      "evidence_url": "roadmap.html#milestone-10--academic-writing"
+    },
+    {
+      "at": "2026-08-01T20:31:26+07:00",
+      "item_id": "AW-002",
+      "from": "new",
+      "to": "queued",
+      "summary": "Queued student and teacher academic-post drafting under the Academic Writing milestone.",
+      "evidence_url": "roadmap.html#milestone-10--academic-writing"
+    },
+    {
+      "at": "2026-08-01T20:31:26+07:00",
+      "item_id": "AW-003",
+      "from": "new",
+      "to": "queued",
+      "summary": "Queued invitation-based multi-user draft collaboration; invitation delivery and concurrent-edit behavior remain product decisions.",
+      "evidence_url": "roadmap.html#milestone-10--academic-writing"
+    },
+    {
+      "at": "2026-08-02T14:00:00+07:00",
+      "item_id": "AW-003",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Implemented expiring hashed invitations, in-app acceptance notifications, viewer/editor memberships, owner revocation, and membership-aware post authorization with focused adversarial tests.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-02T14:30:00+07:00",
+      "item_id": "AW-003",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Approved by the user after focused invitation tests passed; full CI remains environment-blocked by missing git and Linux EdgeDriver in the verification container.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-01T20:31:26+07:00",
+      "item_id": "AW-004",
+      "from": "new",
+      "to": "queued",
+      "summary": "Queued the editor-in-preview experience using the supplied Academic Reader prototype as design reference.",
+      "evidence_url": "roadmap.html#reference-prototype-capabilities"
+    },
+    {
+      "at": "2026-08-01T20:31:26+07:00",
+      "item_id": "AW-005",
+      "from": "new",
+      "to": "queued",
+      "summary": "Queued academic-post authoring and reader tools, including structured academic content, citations, equations, comments, translation, and export decisions.",
+      "evidence_url": "roadmap.html#milestone-10--academic-writing"
+    },
+    {
+      "at": "2026-08-01T23:14:05+07:00",
+      "item_id": "AW-001",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Drafted ADR-0006 and SPEC-0004 for academic-post permissions, lifecycle states, server-side authorization, invitation boundaries, and stale-write handling; Product Owner and Tech Lead review remains required.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-02T00:41:05+07:00",
+      "item_id": "AW-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Recorded the requested author roles, saved-revision conflict policy, in-app invitations, owner submission with instructor publication approval, and HTML-first export in ADR-0006 and SPEC-0004; repository acceptance remains required.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-02T00:51:04+07:00",
+      "item_id": "AW-001",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "Product Owner/Tech Lead acceptance is recorded for ADR-0006 and SPEC-0004; bin/docs passes with the resolved Academic Writing policy baseline.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-02T00:51:04+07:00",
+      "item_id": "AW-002",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Implemented student/instructor-owned drafts, saved revision snapshots, optimistic stale-write conflicts, review submission, instructor publication, bilingual UI, focused tests, and route authorization.",
+      "evidence_url": "specs/spec-academic-post-permissions-and-lifecycle.html"
+    },
+    {
+      "at": "2026-08-02T00:56:57+07:00",
+      "item_id": "AW-006",
+      "from": "new",
+      "to": "queued",
+      "summary": "Queued Tiptap editor evaluation and integration for the Academic Writing milestone, including the Stimulus bridge, HTML form synchronization, headless menus, Tailwind styling, and an ADR gate for dependency and product-scope decisions.",
+      "evidence_url": "roadmap.html#milestone-10--academic-writing"
+    },
+    {
+      "at": "2026-08-02T00:58:44+07:00",
+      "item_id": "AW-006",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Drafted ADR-0007 for the native Stimulus and Importmap integration, HTML synchronization, server-side sanitization, Tailwind styling, and deferred uploads or real-time collaboration; human acceptance remains required.",
+      "evidence_url": "decisions/adr-0007-integrate-tiptap-with-stimulus-importmap.html"
+    },
+    {
+      "at": "2026-08-02T01:02:45+07:00",
+      "item_id": "AW-006",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Drafted SPEC-0005 with editor, HTML-synchronization, sanitization, accessibility, conflict, and package-audit acceptance criteria; human invariant and scope review remains required.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T01:05:12+07:00",
+      "item_id": "AW-006",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Expanded SPEC-0005 with official Tiptap mathematics and KaTeX requirements, safe stylesheet delivery, math-node sanitization, invalid-expression handling, and open macro or delimiter decisions.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T01:05:12+07:00",
+      "item_id": "AW-006",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Added gated picture import requirements to SPEC-0005, including server-owned attachment authorization, byte-level validation, safe formats, alt text, orphan cleanup, and unsafe URL prevention.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T01:09:55+07:00",
+      "item_id": "AW-006",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Synchronized ADR-0007 and SPEC-0005 references with their accepted repository statuses; AW-006 is unblocked for Tiptap implementation while production release remains gated.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T13:15:00+07:00",
+      "item_id": "AW-006",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Implemented the accepted Tiptap editor, KaTeX mathematics, sanitized HTML reader path, validated Active Storage picture import, and focused system/model/controller coverage; human review remains required before release.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T13:30:00+07:00",
+      "item_id": "AW-006",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Approved by the user after Rails restart and browser-backed editor verification passed.",
+      "evidence_url": "specs/spec-academic-post-tiptap-editor.html"
+    },
+    {
+      "at": "2026-08-02T20:15:00+07:00",
+      "item_id": "M4-001",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "M3 learner validation and Product Owner/Tech Lead approval were confirmed by the user after the full M4 verification gate passed.",
+      "evidence_url": "specs/spec-m4-course-specific-curricula.html"
+    },
+    {
+      "at": "2026-08-02T20:24:47+07:00",
+      "item_id": "M5-001",
+      "from": "new",
+      "to": "in_progress",
+      "summary": "Drafted ADR-0008 and SPEC-0008 for a course-scoped knowledge map; prerequisite policy, project mode, and learner-action behavior remain human decisions before implementation.",
+      "evidence_url": "specs/spec-m5-real-knowledge-map.html"
+    },
+    {
+      "at": "2026-08-02T20:35:00+07:00",
+      "item_id": "M5-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Product Owner and Tech Lead approved the M5 baseline; the dynamic course-scoped map and automated enforcement are implemented and verified, while SPEC-0008 still needs formal acceptance-test ownership and intent review.",
+      "evidence_url": "decisions/adr-0008-real-knowledge-map.html"
+    },
+    {
+      "at": "2026-08-02T21:26:27+07:00",
+      "item_id": "M5-001",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "The user approved SPEC-0008 after the M5 implementation, acceptance-test evidence, and full verification gate were reviewed.",
+      "evidence_url": "specs/spec-m5-real-knowledge-map.html"
+    },
+    {
+      "at": "2026-08-02T21:35:00+07:00",
+      "item_id": "M6-001",
+      "from": "new",
+      "to": "in_progress",
+      "summary": "Started M6 with a bounded course-syllabus PDF planning slice; renderer, visibility, locale, empty-course, and accessibility policies remain human decisions before implementation.",
+      "evidence_url": "specs/spec-m6-course-syllabus-pdf.html"
+    },
+    {
+      "at": "2026-08-02T21:43:41+07:00",
+      "item_id": "M6-001",
+      "from": "in_progress",
+      "to": "blocked",
+      "summary": "M6 implementation is held at its human design gate; ADR-0009 and SPEC-0009 record the renderer, visibility, locale, empty-course, and accessibility choices awaiting approval.",
+      "evidence_url": "specs/spec-m6-course-syllabus-pdf.html#human-design-review-handoff"
+    },
+    {
+      "at": "2026-08-02T21:59:00+07:00",
+      "item_id": "M6-001",
+      "from": "blocked",
+      "to": "verification",
+      "summary": "The user approved the M6 baseline; Prawn PDF generation, bundled Thai font output, course-scoped 404 isolation, focused controller coverage, and browser links are implemented and ready for the full gate.",
+      "evidence_url": "specs/spec-m6-course-syllabus-pdf.html"
+    },
+    {
+      "at": "2026-08-02T22:05:00+07:00",
+      "item_id": "M6-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The full M6 verification gate passed with the accepted syllabus-PDF implementation, dependency audit, 553 Rails tests, and 7 system tests.",
+      "evidence_url": "specs/spec-m6-course-syllabus-pdf.html"
+    },
+    {
+      "at": "2026-08-02T22:15:00+07:00",
+      "item_id": "M6-002",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the SSO/account-linking design handoff; implementation is held pending UTCC provider metadata, identity claims, linking policy, emergency-access ownership, and security review.",
+      "evidence_url": "specs/spec-m6-utcc-sso-account-linking.html"
+    },
+    {
+      "at": "2026-08-02T22:25:00+07:00",
+      "item_id": "M6-003",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the certificate-policy design handoff; certificate issuance is held pending academic authority, eligibility evidence, identity disclosure, verification, and revocation decisions.",
+      "evidence_url": "specs/spec-m6-course-completion-certificates.html"
+    },
+    {
+      "at": "2026-08-03T06:47:00+07:00",
+      "item_id": "M7-001",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the M7 Overview slice; implementation is held pending approved metric definitions, authoritative sources, time windows, telemetry semantics, and privacy limits.",
+      "evidence_url": "specs/spec-m7-live-admin-overview-metrics.html"
+    },
+    {
+      "at": "2026-08-03T07:02:00+07:00",
+      "item_id": "M7-001",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "The user approved the baseline four-count Overview slice; live cards are implemented and adoption, activity, and health panels are deferred pending separate source and privacy decisions.",
+      "evidence_url": "specs/spec-m7-live-admin-overview-metrics.html"
+    },
+    {
+      "at": "2026-08-03T07:10:00+07:00",
+      "item_id": "M7-001",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "The approved live Overview cards, truthful panel removal, bilingual copy, focused tests, browser walkthrough, and full verification gate are complete.",
+      "evidence_url": "specs/spec-m7-live-admin-overview-metrics.html"
+    },
+    {
+      "at": "2026-08-03T07:19:00+07:00",
+      "item_id": "M7-002",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the real Courses and lifecycle design handoff; implementation is held pending academic state meanings, transition authority, learner-facing archive behavior, metadata sources, and audit policy.",
+      "evidence_url": "specs/spec-m7-admin-course-lifecycle.html"
+    },
+    {
+      "at": "2026-08-03T07:29:00+07:00",
+      "item_id": "M7-002",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "The user approved the baseline course lifecycle policy; persisted states, real course counts, admin transitions, stale-form protection, learner archive preservation, and audit events are implemented and ready for the full gate.",
+      "evidence_url": "specs/spec-m7-admin-course-lifecycle.html"
+    },
+    {
+      "at": "2026-08-03T12:32:00+07:00",
+      "item_id": "M7-002",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "The real Courses table, persisted lifecycle state, safe transitions, audit events, learner archive preservation, focused tests, browser walkthrough, and full verification gate are complete.",
+      "evidence_url": "specs/spec-m7-admin-course-lifecycle.html"
+    },
+    {
+      "at": "2026-08-03T12:43:00+07:00",
+      "item_id": "M7-003",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the approval queue design handoff; implementation is held pending request kinds, authority, downstream effects, immutable history, privacy, and SLA policy.",
+      "evidence_url": "specs/spec-m7-approval-queue.html"
+    },
+    {
+      "at": "2026-08-03T12:50:00+07:00",
+      "item_id": "M7-004",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the feature-flag design handoff; implementation is held pending the supported flag list, runtime consumers, scopes, defaults, actors, and academic/privacy policy.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html"
+    },
+    {
+      "at": "2026-08-03T19:05:00+07:00",
+      "item_id": "M8-001",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the hearts-policy design handoff; implementation is held pending zero-heart meaning, cost, refill, affected attempts, support, academic effects, and safety policy.",
+      "evidence_url": "specs/spec-m8-hearts-attempt-policy.html"
+    },
+    {
+      "at": "2026-08-03T19:12:00+07:00",
+      "item_id": "M8-002",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the Helping Hand and community design handoff; implementation is held pending the educational outcome, interaction model, quality evidence, moderation, privacy, and award policy.",
+      "evidence_url": "specs/spec-m8-helping-hand-community.html"
+    },
+    {
+      "at": "2026-08-03T19:20:00+07:00",
+      "item_id": "M8-003",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the prior-knowledge design handoff; implementation is held pending the meaning, authority, provenance, reversibility, and downstream academic effects of a learner-marked topic.",
+      "evidence_url": "specs/spec-m8-prior-knowledge.html"
+    },
+    {
+      "at": "2026-08-03T19:30:00+07:00",
+      "item_id": "M9-001",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the session-security design handoff; implementation is held pending visible metadata, revocation authority, HTTP/WebSocket enforcement, retention, cleanup, and compromise-support policy.",
+      "evidence_url": "specs/spec-m9-session-visibility-and-revocation.html"
+    },
+    {
+      "at": "2026-08-03T19:40:00+07:00",
+      "item_id": "M9-002",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the critical-failure observability handoff; implementation is held pending symptom definitions, thresholds, owners, runbooks, telemetry privacy, retention, destinations, and controlled-failure verification.",
+      "evidence_url": "specs/spec-m9-critical-failure-observability.html"
+    },
+    {
+      "at": "2026-08-03T19:50:00+07:00",
+      "item_id": "M9-003",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the recovery design handoff; implementation is held pending the data inventory, RPO/RTO, backup provider, retention, storage consistency, restore isolation, runbook, and drill policy.",
+      "evidence_url": "specs/spec-m9-backup-restore-verification.html"
+    },
+    {
+      "at": "2026-08-03T20:00:00+07:00",
+      "item_id": "M9-004",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the production-deployment design handoff; implementation is held pending the real target, artifact/provenance controls, secrets, process topology, migration compatibility, release ownership, rollback, and post-deploy policy.",
+      "evidence_url": "specs/spec-m9-production-deployment.html"
+    },
+    {
+      "at": "2026-08-03T20:10:00+07:00",
+      "item_id": "M9-005",
+      "from": "new",
+      "to": "blocked",
+      "summary": "Started the curriculum-quality design handoff; implementation is held pending accessibility targets, supported audiences, critical journeys, performance budgets, measurement, release response, waivers, and remediation ownership.",
+      "evidence_url": "specs/spec-m9-curriculum-quality-budgets.html"
     }
   ]
 }

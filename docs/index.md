@@ -6,7 +6,7 @@ title: Current Development Update
 
 **Tags:** [#development](tags.md#development) [#backlog](tags.md#backlog) [#status](tags.md#status) [#monitoring](tags.md#monitoring) [#planning](tags.md#planning)
 
-This is the current project status page. It is generated from the machine-readable [JSON backlog](backlog.json), which remains the single source of truth for development execution. The [product roadmap](roadmap.md) controls priority, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
+This is the current project status page. It is generated from the machine-readable [JSON backlog](backlog.json), which remains the single source of truth for development execution. The [UTCC Academy product roadmap](roadmap.md) controls current priority, the [AI Recruitment Platform roadmap](roadmap-ai-recruitment-platform.md) is a separate draft initiative, the [feature inventory](feature-inventory.md) records implemented behavior, and the [team process](process.md) defines when work is done.
 
 {% assign current_items = site.data.backlog.items | sort: "priority" %}
 {% assign blocked_items = current_items | where: "status", "blocked" %}
