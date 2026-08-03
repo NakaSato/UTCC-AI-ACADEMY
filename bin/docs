@@ -88,7 +88,7 @@ TYPE_CONFIG.each do |type, config|
     next if path.basename.to_s.casecmp("README.md").zero?
 
     relative_path = path.relative_path_from(ROOT).to_s
-    body = path.read
+    body = File.read(path, encoding: Encoding::UTF_8)
     frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
 
     unless frontmatter_match

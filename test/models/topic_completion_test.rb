@@ -31,6 +31,18 @@ class TopicCompletionTest < ActiveSupport::TestCase
     assert_equal @key, completion.topic_key
   end
 
+  test "course scoping does not rewrite an existing completion identity" do
+    learned_at = 4.days.ago.change(usec: 0)
+    completion = TopicCompletion.record(user: @user, course_code: "AI1101", topic_key: @key,
+                                        kind: :learned, at: learned_at)
+    identity = [ completion.id, completion.course_id, completion.topic_id, completion.learned_at ]
+
+    Syllabus.reload!
+
+    reloaded = completion.reload
+    assert_equal identity, [ reloaded.id, reloaded.course_id, reloaded.topic_id, reloaded.learned_at ]
+  end
+
   test "recording the same topic twice keeps one row and the first timestamp" do
     first = TopicCompletion.record(user: @user, course_code: "AI1101", topic_key: @key,
                                    kind: :learned, at: 2.days.ago)

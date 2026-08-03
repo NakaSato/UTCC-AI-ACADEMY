@@ -30,6 +30,7 @@ class Submission < ApplicationRecord
   # A quiz answer can be "0", so presence would reject a legitimate one; the
   # column is NOT NULL and an empty coding task is a fail, not a bad request.
   validates :answer, exclusion: { in: [ nil ] }
+  validate :topic_belongs_to_course
 
   scope :passed, -> { where(passed: true) }
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
@@ -43,14 +44,23 @@ class Submission < ApplicationRecord
   # writes NULL, which is the honest record of an attempt nothing scored, and is
   # what the pre-column rows already say.
   def self.record(user:, course:, topic:, kind:, answer:, verdict:)
-    submission = create!(user:, course:, topic:, kind:, answer: answer.to_s,
-                         passed: verdict.fetch(:passed), score: verdict[:score])
+    transaction do
+      submission = create!(user:, course:, topic:, kind:, answer: answer.to_s,
+                           passed: verdict.fetch(:passed), score: verdict[:score])
 
-    if submission.passed?
-      TopicCompletion.record(user:, course_code: course.code, topic_key: topic.key,
-                             kind: submission.completion_kind)
+      if submission.passed?
+        TopicCompletion.record(user:, course_code: course.code, topic_key: topic.key,
+                               kind: submission.completion_kind)
+      end
+
+      submission
     end
-
-    submission
   end
+
+  private
+    def topic_belongs_to_course
+      return if course.blank? || topic.blank? || topic.course_module.course_id == course.id
+
+      errors.add(:topic, "must belong to the selected course")
+    end
 end

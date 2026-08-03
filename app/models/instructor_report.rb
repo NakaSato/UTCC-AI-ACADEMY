@@ -158,20 +158,22 @@ class InstructorReport
       done = done_keys.fetch(user.id, Set.new)
 
       Student.new(user:,
-                  percent: percent(done.size, Syllabus.topic_count),
+                  percent: percent(done.size, Syllabus.topic_count(section.course.code)),
                   projects: (done & project_keys).size,
                   projects_total: project_keys.size,
                   seen: days_since_last_seen(user))
     end
 
-    def project_keys = @project_keys ||= Syllabus.topics.select { it.kind == "project" }.map(&:key).to_set
+    def project_keys = @project_keys ||= Syllabus.topics(section.course.code).select { it.kind == "project" }.map(&:key).to_set
 
     # The most recent thing this learner did — a topic finished or an answer
     # sent. Nil for someone who has done neither.
     def last_seen_at
       @last_seen_at ||= begin
-        learned = TopicCompletion.where(user: students).group(:user_id).maximum(:learned_at)
-        sent = Submission.where(user: students).group(:user_id).maximum(:created_at)
+        learned = TopicCompletion.where(user: students, course: section.course)
+                                  .group(:user_id).maximum(:learned_at)
+        sent = Submission.where(user: students, course: section.course)
+                         .group(:user_id).maximum(:created_at)
 
         learned.merge(sent) { |_id, a, b| [ a, b ].max }
       end
@@ -191,14 +193,14 @@ class InstructorReport
     # and `first_attempts`, and for the same reason: a per-student query would
     # make this screen's cost grow with the size of a section.
     def scored_attempts
-      @scored_attempts ||= Submission.where(user: students).where.not(score: nil)
+      @scored_attempts ||= Submission.where(user: students, course: section.course).where.not(score: nil)
                                      .group_by { [ it.user_id, it.topic_id, it.kind ] }
                                      .transform_values { |attempts| attempts.map(&:score) }
     end
 
     # topic => the first submission each learner made against it.
     def first_attempts
-      Submission.where(user: students, kind: "quiz")
+      Submission.where(user: students, course: section.course, kind: "quiz")
                 .includes(:topic)
                 .order(:created_at, :id)
                 .group_by(&:topic)
@@ -208,7 +210,7 @@ class InstructorReport
     def hard_topic_row(topic, attempts)
       failed = attempts.count { !it.passed? }
 
-      { name: Syllabus.topic_name(topic.key), key: topic.key,
+      { name: Syllabus.topic_name(topic.key, section.course.code), key: topic.key,
         percent: percent(failed, attempts.size), severity: severity_for(percent(failed, attempts.size)) }
     end
 

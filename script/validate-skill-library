@@ -106,7 +106,7 @@ end
 
 SKILLS_DIRECTORY.glob("skill-*.md").sort.each do |path|
   relative_path = path.relative_path_from(ROOT).to_s
-  body = path.read
+  body = File.read(path, encoding: Encoding::UTF_8)
   frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
 
   unless frontmatter_match
@@ -190,12 +190,12 @@ skills.each_value do |skill|
 end
 
 if TEMPLATE_PATH.file?
-  validate_skill_navigation.call(TEMPLATE_PATH.relative_path_from(ROOT), TEMPLATE_PATH.read)
+  validate_skill_navigation.call(TEMPLATE_PATH.relative_path_from(ROOT), File.read(TEMPLATE_PATH, encoding: Encoding::UTF_8))
 end
 
 index_rows = {}
 if LIBRARY_PATH.file?
-  LIBRARY_PATH.each_line do |line|
+  File.foreach(LIBRARY_PATH, encoding: Encoding::UTF_8) do |line|
     next unless line.start_with?("| SKILL-")
 
     cells = line.split("|").map(&:strip)
@@ -236,17 +236,17 @@ skills.each do |id, skill|
   errors << "skill index: #{id} has the wrong delegation" unless row[:delegation] == metadata["agent_delegable"]
 
   directory_target = skill[:path].relative_path_from(DIRECTORY_PATH.dirname).to_s
-  errors << "docs/skills/README.md: missing #{id}" unless DIRECTORY_PATH.read.include?("](#{directory_target})")
+  errors << "docs/skills/README.md: missing #{id}" unless File.read(DIRECTORY_PATH, encoding: Encoding::UTF_8).include?("](#{directory_target})")
   [ MASTER_PATH, PROJECT_FLOW_PATH, ROLE_GUIDE_PATH ].each do |flow_path|
     target = skill[:path].relative_path_from(flow_path.dirname).to_s
-    unless flow_path.read.include?("](#{target})")
+    unless File.read(flow_path, encoding: Encoding::UTF_8).include?("](#{target})")
       errors << "#{flow_path.relative_path_from(ROOT)}: missing #{id}"
     end
   end
 end
 
 ROOT_GUIDE_PATHS.each do |path|
-  body = path.read
+  body = File.read(path, encoding: Encoding::UTF_8)
   errors << "#{path.basename}: missing master flow link" unless body.include?("](docs/system-development-flow-master.md)")
   errors << "#{path.basename}: missing all-roles workflow guide link" unless body.include?("](docs/system-development-flow-role-guide.md)")
   errors << "#{path.basename}: missing documentation templates link" unless body.include?("](docs/templates/README.md)")
@@ -256,34 +256,34 @@ ROOT_GUIDE_PATHS.each do |path|
   end
 end
 
-unless MASTER_PATH.read.include?("](system-development-flow-role-guide.md)")
+unless File.read(MASTER_PATH, encoding: Encoding::UTF_8).include?("](system-development-flow-role-guide.md)")
   errors << "docs/system-development-flow-master.md: missing all-roles workflow guide link"
 end
 
 LIFECYCLE_DIRECTORY_PATHS.each do |directory, path|
   master_target = path.relative_path_from(MASTER_PATH.dirname).to_s
-  unless MASTER_PATH.read.include?("](#{master_target})")
+  unless File.read(MASTER_PATH, encoding: Encoding::UTF_8).include?("](#{master_target})")
     errors << "docs/system-development-flow-master.md: missing #{directory} directory link"
   end
 
-  unless path.read.include?("](../system-development-flow-master.md)")
+  unless File.read(path, encoding: Encoding::UTF_8).include?("](../system-development-flow-master.md)")
     errors << "#{path.relative_path_from(ROOT)}: missing master flow link"
   end
 end
 
-unless LIBRARY_PATH.read.include?("](system-development-flow-role-guide.md)")
+unless File.read(LIBRARY_PATH, encoding: Encoding::UTF_8).include?("](system-development-flow-role-guide.md)")
   errors << "docs/skills-library-README.md: missing all-roles workflow guide link"
 end
 
-unless LIBRARY_PATH.read.include?(LIBRARY_NAVIGATION)
+unless File.read(LIBRARY_PATH, encoding: Encoding::UTF_8).include?(LIBRARY_NAVIGATION)
   errors << "docs/skills-library-README.md: skill-first development-flow navigation is missing or out of order"
 end
 
-unless DIRECTORY_PATH.read.include?(DIRECTORY_NAVIGATION)
+unless File.read(DIRECTORY_PATH, encoding: Encoding::UTF_8).include?(DIRECTORY_NAVIGATION)
   errors << "docs/skills/README.md: skill-first development-flow navigation is missing or out of order"
 end
 
-unless ROOT.join("docs/development-flow.md").read.include?("](system-development-flow-role-guide.md)")
+unless File.read(ROOT.join("docs/development-flow.md"), encoding: Encoding::UTF_8).include?("](system-development-flow-role-guide.md)")
   errors << "docs/development-flow.md: missing all-roles workflow guide link"
 end
 
@@ -294,7 +294,7 @@ end
   ROOT.join("docs/mdlc.md") => "](templates/README.md)",
   DOCUMENT_TEMPLATE_INDEX_PATH => "](external-feature-proposal.md)"
 }.each do |path, expected_link|
-  errors << "#{path.relative_path_from(ROOT)}: missing external proposal workflow link" unless path.read.include?(expected_link)
+    errors << "#{path.relative_path_from(ROOT)}: missing external proposal workflow link" unless File.read(path, encoding: Encoding::UTF_8).include?(expected_link)
 end
 
 if EXTERNAL_PROPOSAL_PATH.file?
@@ -306,18 +306,18 @@ if EXTERNAL_PROPOSAL_PATH.file?
     "## 12. Product Decision",
     "## 14. Ready-for-Backlog Gate"
   ].each do |heading|
-    errors << "#{EXTERNAL_PROPOSAL_PATH.relative_path_from(ROOT)}: missing heading #{heading.inspect}" unless EXTERNAL_PROPOSAL_PATH.read.include?(heading)
+    errors << "#{EXTERNAL_PROPOSAL_PATH.relative_path_from(ROOT)}: missing heading #{heading.inspect}" unless File.read(EXTERNAL_PROPOSAL_PATH, encoding: Encoding::UTF_8).include?(heading)
   end
 else
   errors << "missing #{EXTERNAL_PROPOSAL_PATH.relative_path_from(ROOT)}"
 end
 
-unless AGENTS_PATH.read == EXPECTED_AGENTS_BODY
+unless File.read(AGENTS_PATH, encoding: Encoding::UTF_8) == EXPECTED_AGENTS_BODY
   errors << "AGENTS.md: must contain only the system development flow master reference"
 end
 
 if PROJECT_SKILL_PATH.file?
-  body = PROJECT_SKILL_PATH.read
+  body = File.read(PROJECT_SKILL_PATH, encoding: Encoding::UTF_8)
   frontmatter_match = body.match(/\A---\s*\n(.*?)\n---\s*\n/m)
 
   if frontmatter_match
@@ -360,7 +360,7 @@ end
 
 if PROJECT_SKILL_METADATA_PATH.file?
   begin
-    metadata = YAML.safe_load(PROJECT_SKILL_METADATA_PATH.read, aliases: false)
+    metadata = YAML.safe_load(File.read(PROJECT_SKILL_METADATA_PATH, encoding: Encoding::UTF_8), aliases: false)
     prompt = metadata.dig("interface", "default_prompt") if metadata.is_a?(Hash)
     implicit = metadata.dig("policy", "allow_implicit_invocation") if metadata.is_a?(Hash)
 
@@ -391,7 +391,7 @@ graph_paths = ROOT_GUIDE_PATHS +
     next
   end
 
-  path.read.scan(/\[[^\]]+\]\(([^)]+\.md(?:#[^)]+)?)\)/).flatten.each do |target|
+  File.read(path, encoding: Encoding::UTF_8).scan(/\[[^\]]+\]\(([^)]+\.md(?:#[^)]+)?)\)/).flatten.each do |target|
     next if target.match?(/\A[a-z][a-z0-9+.-]*:/i)
 
     target_path = target.split("#", 2).first

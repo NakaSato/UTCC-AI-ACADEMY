@@ -203,10 +203,10 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     in_progress = "[data-panel=progress] summary"
     completed = "[data-panel=done] summary"
 
-    # One topic of AI1101 finished, every topic of AI2402 — one course in each
+    # One topic of AI1101 finished, every topic of AI1102 — one course in each
     # list.
     complete_topics(users(:one), "AI1101", Syllabus.topic_keys.first(1))
-    complete_topics(users(:one), "AI2402", Syllabus.topic_keys)
+    complete_topics(users(:one), "AI1102", Syllabus.topic_keys("AI1102"))
 
     get my_learning_url
 
@@ -214,7 +214,7 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "#{in_progress}", text: /#{Regexp.escape(I18n.t("catalog.courses.AI1101.title"))}/
     assert_select "[role=tabpanel][data-panel=progress]:not([hidden])", 1
     # The completed list is in the page too, just hidden until the tab is used.
-    assert_select "#{completed}", text: /#{Regexp.escape(I18n.t("catalog.courses.AI2402.title"))}/
+    assert_select "#{completed}", text: /#{Regexp.escape(I18n.t("catalog.courses.AI1102.title"))}/
     assert_select "[role=tabpanel][data-panel=done][hidden]", 1
 
     get my_learning_url(tab: "done")
@@ -225,21 +225,22 @@ class AppScreensTest < ActionDispatch::IntegrationTest
   end
 
   test "the map expands the ancestors of the selected topic" do
-    get knowledge_map_url(topic: "ml-split")
+    topic = Syllabus.topics("AI1101").first
+    get knowledge_map_url(course: "AI1101", topic: topic.key)
 
     assert_response :success
     # The breadcrumb is the path from the root to the selection.
-    assert_select "nav a", text: I18n.t("map.nodes.cs")
-    assert_select "nav a", text: I18n.t("map.nodes.ml-prep")
+    assert_select "nav a", text: I18n.t("catalog.courses.AI1101.title")
+    assert_select "nav a", text: Syllabus.modules(Set.new, "AI1101").first.title
     # A leaf shows its own detail card rather than child cards.
-    assert_select "h2", text: I18n.t("map.nodes.ml-split")
+    assert_select "h2", text: Syllabus.modules(Set.new, "AI1101").first.topics.first.name
   end
 
   test "the map falls back to the default selection for an unknown topic" do
-    get knowledge_map_url(topic: "does-not-exist")
+    get knowledge_map_url(course: "AI1101", topic: "does-not-exist")
 
     assert_response :success
-    assert_select "nav a", text: I18n.t("map.nodes.#{KnowledgeMap::DEFAULT_SELECTED}")
+    assert_select "h2", text: Syllabus.modules(Set.new, "AI1101").first.topics.first.name
   end
 
   test "progress and leaderboard screens render" do

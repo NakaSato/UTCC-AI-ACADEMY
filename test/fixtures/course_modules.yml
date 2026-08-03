@@ -2,25 +2,41 @@
 # migration; see courses.yml for why fixtures exist for reference data at all.
 
 module_1:
+  course: ai1101
   number: 1
   units: 12
 
 module_2:
+  course: ai1101
   number: 2
   units: 18
 
 module_3:
+  course: ai1101
   number: 3
   units: 22
 
 module_4:
+  course: ai1101
   number: 4
   units: 15
 
 module_5:
+  course: ai1101
   number: 5
   units: 14
 
 module_6:
+  course: ai1101
   number: 6
   units: 10
+
+python_module_1:
+  course: ai1102
+  number: 1
+  units: 8
+
+python_module_2:
+  course: ai1102
+  number: 2
+  units: 12

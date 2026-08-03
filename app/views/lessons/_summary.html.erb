@@ -18,7 +18,7 @@
     <%# The next topic in the syllabus, or back to the course once there is
         none. Reaching it needs this one recorded, which the reward post has
         already done by the time the button is on screen. %>
-    <% next_key = Syllabus.topic_after(@topic_key) %>
+    <% next_key = Syllabus.topic_after(@topic_key, @course.code) %>
     <%= link_to t(next_key ? "lesson.done.next_topic" : "lesson.done.back_course"),
           next_key ? lesson_path(course: @course.code, topic: next_key) : course_path(@course.code),
           class: "rounded-field bg-brand px-6.5 py-3.25 text-15 font-semibold text-white transition-colors

@@ -32,6 +32,20 @@ class AdminController < ApplicationController
     end
   end
 
+  def update_course_state
+    course = Course.find(params[:id])
+    from = course.lifecycle_state
+
+    Course.transaction do
+      course.transition_to!(params[:state], expected_from: params[:from])
+      AuditEvent.record("course_state_changed", course: course.code, from:, to: course.lifecycle_state)
+    end
+
+    redirect_to admin_path(tab: :courses), notice: t("flash.course_state_changed", course: course.code)
+  rescue ActiveRecord::RecordInvalid
+    redirect_to admin_path(tab: :courses), alert: t("flash.course_state_invalid")
+  end
+
   # The three section writes. Each answers with a redirect back to the tab and
   # a flash, like #update below — no JSON, no partial responses. Validation
   # failures surface as the model's own messages, so the invariants (staff-only
@@ -41,28 +55,32 @@ class AdminController < ApplicationController
                           code: params[:code].to_s.strip, term: params[:term].to_s.strip,
                           instructor: find_staff(params[:instructor_id]))
 
-    if section.save
+    Section.transaction do
+      section.save!
       AuditEvent.record("section_created", label: section.label)
-      redirect_to admin_path(tab: :sections, section: section.id),
-                  notice: t("flash.section_created", label: section.label)
-    else
-      redirect_to admin_path(tab: :sections), alert: section.errors.full_messages.to_sentence
     end
+
+    redirect_to admin_path(tab: :sections, section: section.id),
+                notice: t("flash.section_created", label: section.label)
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to admin_path(tab: :sections), alert: invalid.record.errors.full_messages.to_sentence
   end
 
   def update_section
     section = Section.find(params[:id])
 
-    if section.update(instructor: find_staff(params[:instructor_id]))
+    Section.transaction do
+      section.update!(instructor: find_staff(params[:instructor_id]))
       # The label and no more: "unassigned" would have to be stored as a
       # translated phrase, and who teaches a section is on the Sections tab.
       AuditEvent.record("section_updated", label: section.label)
-      redirect_to admin_path(tab: :sections, section: section.id),
-                  notice: t("flash.section_updated", label: section.label)
-    else
-      redirect_to admin_path(tab: :sections, section: section.id),
-                  alert: section.errors.full_messages.to_sentence
     end
+
+    redirect_to admin_path(tab: :sections, section: section.id),
+                notice: t("flash.section_updated", label: section.label)
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to admin_path(tab: :sections, section: section.id),
+                alert: invalid.record.errors.full_messages.to_sentence
   end
 
   def enrol
@@ -77,27 +95,32 @@ class AdminController < ApplicationController
     enrollment = Enrollment.find_or_initialize_by(section:, user: student)
     fresh = enrollment.new_record?
 
-    if enrollment.persisted? || enrollment.save
-      # Only a new enrolment is news — re-submitting the form must not ping, and
-      # must not log a second time either.
-      if fresh
-        Notification.notify(student, "enrolled", label: section.label)
-        AuditEvent.record("enrolled", name: student.name, label: section.label)
+    unless enrollment.persisted?
+      Section.transaction do
+        enrollment.save!
+        # Only a new enrolment is news — re-submitting the form must not ping, and
+        # must not log a second time either.
+        if fresh
+          Notification.notify(student, "enrolled", label: section.label)
+          AuditEvent.record("enrolled", name: student.name, label: section.label)
+        end
       end
-
-      redirect_to admin_path(tab: :sections, section: section.id),
-                  notice: t("flash.enrolled", name: student.name, label: section.label)
-    else
-      redirect_to admin_path(tab: :sections, section: section.id),
-                  alert: enrollment.errors.full_messages.to_sentence
     end
+
+    redirect_to admin_path(tab: :sections, section: section.id),
+                notice: t("flash.enrolled", name: student.name, label: section.label)
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to admin_path(tab: :sections, section: section.id),
+                alert: invalid.record.errors.full_messages.to_sentence
   end
 
   def unenrol
     section = Section.find(params[:id])
     enrollment = section.enrollments.find_by!(user_id: params[:user_id])
-    enrollment.destroy
-    AuditEvent.record("unenrolled", name: enrollment.user.name, label: section.label)
+    Section.transaction do
+      enrollment.destroy!
+      AuditEvent.record("unenrolled", name: enrollment.user.name, label: section.label)
+    end
 
     redirect_to admin_path(tab: :sections, section: section.id),
                 notice: t("flash.unenrolled", name: enrollment.user.name, label: section.label)
@@ -129,11 +152,11 @@ class AdminController < ApplicationController
       end
 
       group&.cards&.each { save_attributes(it.record) }
+      # One entry per save, naming the group — not one per field, which would be
+      # a hundred lines for a page nobody rewrote a hundred strings of.
+      AuditEvent.record("landing_saved", group: group&.key.to_s)
     end
 
-    # One entry per save, naming the group — not one per field, which would be
-    # a hundred lines for a page nobody rewrote a hundred strings of.
-    AuditEvent.record("landing_saved", group: group&.key.to_s)
     redirect_to landing_tab(group), notice: t("flash.landing_saved")
   rescue ActiveRecord::RecordInvalid => invalid
     redirect_to landing_tab(group), alert: invalid.record.errors.full_messages.to_sentence
@@ -153,16 +176,19 @@ class AdminController < ApplicationController
     return redirect_to landing_tab(group_of(collection)), alert: t("flash.card_untitled") if
       titles.values.all?(&:blank?)
 
+    copy_field = collection == "faqs" ? "q" : "title"
     card = LandingCard.new(collection:, key: LandingCard.key_for(collection, titles[:en], titles[:th]))
 
-    if card.save
-      Landing.forget_cards
-      titles.each { |locale, title| LandingText.write("#{card.prefix}.title", locale, title) }
+    LandingCard.transaction do
+      card.save!
+      titles.each { |locale, title| LandingText.write("#{card.prefix}.#{copy_field}", locale, title) }
       AuditEvent.record("card_added", group: group_of(collection)&.key, name: card.label)
-      redirect_to landing_tab(group_of(collection)), notice: t("flash.card_added")
-    else
-      redirect_to landing_tab(group_of(collection)), alert: card.errors.full_messages.to_sentence
     end
+
+    Landing.forget_cards
+    redirect_to landing_tab(group_of(collection)), notice: t("flash.card_added")
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to landing_tab(group_of(collection)), alert: invalid.record.errors.full_messages.to_sentence
   end
 
   # A no-op at either end: the button is not rendered there, and a request that
@@ -180,10 +206,14 @@ class AdminController < ApplicationController
     card = LandingCard.find(params[:id])
     # Read before the destroy: afterwards the copy that named it is gone too.
     name = card.label
-    card.destroy
+    LandingCard.transaction do
+      card.destroy!
+      LandingText.forget
+      AuditEvent.record("card_removed", group: group_of(card.collection)&.key, name:)
+    end
+
     Landing.forget_cards
     LandingText.forget
-    AuditEvent.record("card_removed", group: group_of(card.collection)&.key, name:)
 
     redirect_to landing_tab(group_of(card.collection)), notice: t("flash.card_removed")
   end

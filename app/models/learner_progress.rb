@@ -61,9 +61,9 @@ class LearnerProgress
   # The catalog with this learner's counts filled in. One pass over the rows
   # feeds every card, so the catalog is still a single query.
   def courses
-    @courses ||= CourseCatalog.all.map do |course|
+    @courses ||= CourseCatalog.all(user:).map do |course|
       learned, applied = course_counts.fetch(course.code, [ 0, 0 ])
-      course.with(learned:, applied:, next_key: Syllabus.next_topic_key(keys_for(course.code)))
+      course.with(learned:, applied:, next_key: Syllabus.next_topic_key(keys_for(course.code), course.code))
     end
   end
 
@@ -88,7 +88,7 @@ class LearnerProgress
 
   # Wall-clock time is not recorded; the minutes budgeted for each finished topic
   # in the syllabus are the closest honest estimate.
-  def minutes_studied = completions.sum { Syllabus.topic_minutes(it.topic_key) }
+  def minutes_studied = completions.sum { Syllabus.topic_minutes(it.topic_key, it.course_code) }
   def hours_studied = (minutes_studied / 60.0).round(1)
 
   # ---- XP, level and gems -------------------------------------------------
@@ -126,7 +126,7 @@ class LearnerProgress
 
   def hours_this_week
     minutes = completions.sum do
-      it.learned_at.in_time_zone >= Date.current.beginning_of_week ? Syllabus.topic_minutes(it.topic_key) : 0
+      it.learned_at.in_time_zone >= Date.current.beginning_of_week ? Syllabus.topic_minutes(it.topic_key, it.course_code) : 0
     end
     (minutes / 60.0).round(1)
   end
@@ -145,8 +145,8 @@ class LearnerProgress
   # A project is a syllabus topic of kind "project", and submitting one is
   # applying it. Certificates follow the courses that carry the flag.
 
-  def projects_done = completions.count { it.applied? && project_keys.include?(it.topic_key) }
-  def projects_total = started_courses.sum { project_keys.size }
+  def projects_done = completions.count { it.applied? && project_keys(it.course_code).include?(it.topic_key) }
+  def projects_total = started_courses.sum { project_keys(it.code).size }
 
   def certificates_earned = courses.count { it.certificate && it.completed? }
   def certificates_total = courses.count(&:certificate)
@@ -264,8 +264,15 @@ class LearnerProgress
 
     # ---- The award rules --------------------------------------------------
 
-    def project_keys = @project_keys ||= Syllabus.topics.select { it.kind == "project" }.map(&:key).to_set
-    def exercise_keys = @exercise_keys ||= Syllabus.topics.select { it.kind == "exercise" }.map(&:key)
+    def project_keys(course_code)
+      @project_keys ||= {}
+      @project_keys[course_code] ||= Syllabus.topics(course_code).select { it.kind == "project" }.map(&:key).to_set
+    end
+
+    def exercise_keys(course_code)
+      @exercise_keys ||= {}
+      @exercise_keys[course_code] ||= Syllabus.topics(course_code).select { it.kind == "exercise" }.map(&:key)
+    end
 
     def ten_topics? = learned >= 10
 
@@ -286,7 +293,7 @@ class LearnerProgress
     end
 
     def every_exercise?
-      started_courses.any? { |course| exercise_keys.all? { keys_for(course.code).include?(it) } }
+      started_courses.any? { |course| exercise_keys(course.code).all? { keys_for(course.code).include?(it) } }
     end
 
     # Every topic of one module learned on the same day, in any course.
@@ -294,8 +301,8 @@ class LearnerProgress
       started_courses.any? do |course|
         by_key = completions.select { it.course_code == course.code }.index_by(&:topic_key)
 
-        Syllabus.entries.map(&:number).any? do |number|
-          keys = Syllabus.keys_in(number)
+        Syllabus.entries(course.code).map(&:number).any? do |number|
+          keys = Syllabus.keys_in(number, course.code)
           keys.all? { by_key[it] } &&
             keys.map { by_key[it].learned_at.in_time_zone.to_date }.uniq.one?
         end
@@ -316,8 +323,10 @@ class LearnerProgress
     end
 
     def final_module?
-      last = Syllabus.entries.map(&:number).max
-      started_courses.any? { |course| Syllabus.keys_in(last).all? { keys_for(course.code).include?(it) } }
+      started_courses.any? do |course|
+        last = Syllabus.entries(course.code).map(&:number).max
+        Syllabus.keys_in(last, course.code).all? { keys_for(course.code).include?(it) }
+      end
     end
 
     def recent_failures

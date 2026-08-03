@@ -16,9 +16,19 @@
     <%= @section ? t("leaderboard.subtitle", section: @section.code) : t("leaderboard.subtitle_none") %>
   </p>
 
+  <nav class="mb-4 flex flex-wrap gap-2" aria-label="<%= @course_card.title %>">
+    <% @courses.each do |course| %>
+      <%= link_to course.title, leaderboard_path(course: course.code, tab: @tab),
+            aria: { current: @course.code == course.code ? "page" : nil },
+            class: "rounded-full border-[1.5px] border-hairline bg-surface px-4.5 py-2.25 text-14 font-medium
+                    text-ink-2 transition-colors hover:border-muted-3 aria-[current=page]:border-brand
+                    aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand-deep" %>
+    <% end %>
+  </nav>
+
   <nav role="tablist" class="mb-6 flex flex-wrap gap-2" aria-label="<%= t("leaderboard.title") %>">
     <% Leaderboard.tab_labels.each do |tab, label| %>
-      <%= link_to label, leaderboard_path(tab: tab),
+      <%= link_to label, leaderboard_path(course: @course.code, tab: tab),
             role: "tab", aria: { selected: @tab == tab, controls: "leaderboard-board" },
             class: "rounded-full border-[1.5px] border-hairline bg-surface px-4.5 py-2.25 text-14 font-medium
                     text-ink-2 transition-colors hover:border-muted-3 aria-selected:border-brand
@@ -38,7 +48,7 @@
 
     <%# `class: "block"` because a custom element is inline until something says
         otherwise, and nothing in Turbo ships a stylesheet that does. %>
-    <%= turbo_frame_tag "leaderboard-board", src: leaderboard_path(tab: @tab), loading: :lazy,
+    <%= turbo_frame_tag "leaderboard-board", src: leaderboard_path(course: @course.code, tab: @tab), loading: :lazy,
           role: "tabpanel", class: "block" do %>
       <%= render "skeleton" %>
     <% end %>

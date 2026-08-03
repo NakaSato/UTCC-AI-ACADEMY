@@ -13,6 +13,7 @@ class ProctorEvent < ApplicationRecord
 
   validates :kind, inclusion: { in: KINDS }
   validates :occurred_at, presence: true
+  validate :topic_belongs_to_course
 
   scope :unreviewed, -> { where(reviewed_at: nil) }
   scope :newest_first, -> { order(occurred_at: :desc, id: :desc) }
@@ -21,4 +22,11 @@ class ProctorEvent < ApplicationRecord
 
   # The same sentence the lesson sidebar shows for this kind of incident.
   def text = I18n.t("lesson.proctor.events.#{kind}")
+
+  private
+    def topic_belongs_to_course
+      return if course.blank? || topic.blank? || topic.course_module.course_id == course.id
+
+      errors.add(:topic, "must belong to the selected course")
+    end
 end

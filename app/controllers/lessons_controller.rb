@@ -28,9 +28,9 @@ class LessonsController < ApplicationController
     return head :unprocessable_entity unless Submission::KINDS.include?(kind)
 
     course = Course.find_by(code: params[:course].to_s)
-    topic = Topic.find_by(key: params[:topic].to_s)
+    topic = course&.topics&.find_by(key: params[:topic].to_s)
     return head :unprocessable_entity unless course && topic
-    return head :forbidden unless Syllabus.unlocked?(topic.key, progress.keys_for(course.code))
+    return head :forbidden unless Syllabus.unlocked?(topic.key, progress.keys_for(course.code), course.code)
 
     verdict = grade(kind, params[:answer], topic.key)
     Submission.record(user: Current.user, course:, topic:, kind:, answer: params[:answer], verdict:)
@@ -48,7 +48,7 @@ class LessonsController < ApplicationController
     return head :unprocessable_entity unless ProctorEvent::KINDS.include?(kind)
 
     course = Course.find_by(code: params[:course].to_s)
-    topic = Topic.find_by(key: params[:topic].to_s)
+    topic = course&.topics&.find_by(key: params[:topic].to_s)
     return head :unprocessable_entity unless course && topic
 
     ProctorEvent.create!(user: Current.user, course:, topic:, kind:, occurred_at: Time.current)
@@ -70,11 +70,11 @@ class LessonsController < ApplicationController
     # No `?topic=` means "carry on": the first topic of this course not yet
     # finished, or the last one once they all are.
     def set_topic
-      @topic_key = params[:topic].presence || @course.next_key || Syllabus.topic_keys.last
+      @topic_key = params[:topic].presence || @course.next_key || Syllabus.topic_keys(@course.code).last
 
-      return if Syllabus.unlocked?(@topic_key, progress.keys_for(@course.code))
+      return if Syllabus.unlocked?(@topic_key, progress.keys_for(@course.code), @course.code)
 
       redirect_to course_path(@course.code),
-                  alert: t(Syllabus.topic_keys.include?(@topic_key) ? "flash.topic_locked" : "flash.topic_missing")
+                  alert: t(Syllabus.topic_keys(@course.code).include?(@topic_key) ? "flash.topic_locked" : "flash.topic_missing")
     end
 end

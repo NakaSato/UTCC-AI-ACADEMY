@@ -3,7 +3,7 @@
 require "json"
 
 path = ARGV.fetch(0, "docs/backlog.json")
-backlog = JSON.parse(File.read(path))
+backlog = JSON.parse(File.read(path, encoding: Encoding::UTF_8))
 errors = []
 
 errors << "schema_version must equal 1" unless backlog["schema_version"] == 1

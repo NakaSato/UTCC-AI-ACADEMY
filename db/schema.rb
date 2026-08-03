@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_070000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,7 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
     t.index ["inviter_id"], name: "index_academic_post_invitations_on_inviter_id"
     t.index ["token_digest"], name: "index_academic_post_invitations_on_token_digest", unique: true
     t.check_constraint "inviter_id <> invitee_id", name: "academic_post_invitations_not_self"
-    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying, 'editor'::character varying]::text[])", name: "academic_post_invitations_permission"
+    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying::text, 'editor'::character varying::text])", name: "academic_post_invitations_permission"
   end
 
   create_table "academic_post_memberships", force: :cascade do |t|
@@ -45,7 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
     t.index ["academic_post_id", "user_id"], name: "idx_on_academic_post_id_user_id_a58ffa8cad", unique: true
     t.index ["academic_post_id"], name: "index_academic_post_memberships_on_academic_post_id"
     t.index ["user_id"], name: "index_academic_post_memberships_on_user_id"
-    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying, 'editor'::character varying]::text[])", name: "academic_post_memberships_permission"
+    t.check_constraint "permission::text = ANY (ARRAY['viewer'::character varying::text, 'editor'::character varying::text])", name: "academic_post_memberships_permission"
   end
 
   create_table "academic_post_revisions", force: :cascade do |t|
@@ -106,11 +106,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
   end
 
   create_table "course_modules", force: :cascade do |t|
+    t.bigint "course_id", null: false
     t.datetime "created_at", null: false
     t.integer "number", null: false
     t.integer "units", null: false
     t.datetime "updated_at", null: false
-    t.index ["number"], name: "index_course_modules_on_number", unique: true
+    t.index ["course_id", "number"], name: "index_course_modules_on_course_id_and_number", unique: true
+    t.index ["course_id"], name: "index_course_modules_on_course_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -122,13 +124,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
     t.integer "hours", null: false
     t.string "learners", null: false
     t.string "level", null: false
+    t.string "lifecycle_state", default: "draft", null: false
     t.integer "position", null: false
     t.integer "projects", null: false
     t.string "rating", null: false
     t.json "tags", default: [], null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_courses_on_code", unique: true
+    t.index ["lifecycle_state"], name: "index_courses_on_lifecycle_state"
     t.index ["position"], name: "index_courses_on_position", unique: true
+    t.check_constraint "lifecycle_state::text = ANY (ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "courses_lifecycle_state"
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -424,6 +429,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_020000) do
   add_foreign_key "academic_posts", "users", column: "owner_id"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "audit_events", "users"
+  add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
   add_foreign_key "notifications", "users"

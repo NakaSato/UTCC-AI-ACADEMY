@@ -1,12 +1,12 @@
-# The admin console's placeholder tabs.
+# The admin console's placeholder tabs and its small live Overview boundary.
 #
 # Four tabs are NOT here, because they are backed by records rather than by this
 # file: Users is the real roster (the `role` column and `AdminController#update`),
 # Sections is real cohorts, Integrity reads `proctor_events` through `Proctoring`,
 # and Landing is the marketing page's copy (`LandingText`, over `Landing`).
-# Everything in this file is fabricated the way the rest of app/models is:
-# numbers and taxonomy in Ruby, every readable word in `admin.*` in the locale
-# files, joined BY INDEX.
+# The remaining placeholder tabs keep their numbers and taxonomy in Ruby, every
+# readable word in `admin.*` in the locale files, joined BY INDEX. Overview
+# cards are the exception: they query authoritative records below.
 #
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
@@ -15,9 +15,8 @@ module AdminConsole
 
   # ---- The dark header ------------------------------------------------------
 
-  # The one placeholder module allowed to count real rows: /admin is the screen
-  # backed by records, so its head stats are counts, not copy. Labels are
-  # `admin.head.stats`, positional as ever.
+  # The admin screen is backed by records, so its head stats are counts, not
+  # copy. Labels are `admin.head.stats`, positional as ever.
   def self.head_stats
     values = [
       User.count, User.student.count, User.instructor.count + User.admin.count,
@@ -58,44 +57,17 @@ module AdminConsole
       [ :language,    :select, nil,   %w[ th en ] ] ]
   ].freeze
 
-  # ---- Overview -------------------------------------------------------------
-
-  # value, and whether the note reads as good / neutral / warning.
-  STATS = [
-    [ "2,184", :good ], [ "12", :neutral ], [ "38", :warn ], [ "71%", :good ]
-  ].freeze
-
-  # percent adopted — the bar colour follows the number, not a stored choice.
-  ADOPTION = [ 78, 71, 54, 39 ].freeze
-
-  # The activity feed flags one row as an integrity alert; that row gets the
-  # crimson avatar plate rather than the neutral one.
-  ACTIVITY_ALERT_INDEX = 2
-  ACTIVITY_COUNT = 5
-
-  # ok | warn, one per service row.
-  HEALTH = %i[ ok warn ok ok warn ].freeze
-
   # ---- Courses --------------------------------------------------------------
 
-  # code, sections, students. A course with no students is a draft; the rest
-  # are live until an admin hides them.
-  COURSES = [
-    [ "AI1101", 6, 284 ], [ "AI1150", 3, 128 ], [ "AI2101", 2, 74 ],
-    [ "AI2180", 2, 61 ], [ "AI2204", 2, 0 ]
-  ].freeze
-
-  CourseRow = Data.define(:code, :sections, :students, :position) do
-    def name = copy[:name]
-    def faculty = copy[:faculty]
-    def owner = copy[:owner]
-    def draft? = students.zero?
-    def state = draft? ? :draft : :live
+  # The Courses tab is a read model over the persisted catalog and cohort
+  # records. It deliberately exposes no owner/faculty field until those have a
+  # source of truth rather than deriving them from locale copy.
+  CourseRow = Data.define(:record, :sections, :students) do
+    def code = record.code
+    def name = I18n.t("catalog.courses.#{code}.title")
+    def state = record.lifecycle_state.to_sym
     def state_name = I18n.t("admin.courses.state.#{state}")
-
-    private
-
-    def copy = I18n.t("admin.courses.rows")[position]
+    def available_transitions = record.available_transitions
   end
 
   # ---- Approval queue -------------------------------------------------------
@@ -163,39 +135,22 @@ module AdminConsole
     def flags_off = flags.count { it.toggle? && !it.on }
 
     def stats
+      values = [
+        User.count, User.student.count, User.instructor.count + User.admin.count,
+        TopicCompletion.count
+      ]
       copy = I18n.t("admin.overview.stats")
-      STATS.each_with_index.map do |(value, tone), index|
-        { value:, tone:, label: copy[index][:label], note: copy[index][:note] }
-      end
-    end
-
-    def adoption
-      copy = I18n.t("admin.overview.adoption")
-      ADOPTION.each_with_index.map do |percent, index|
-        { percent:, name: copy[index][:name], meta: copy[index][:meta] }
-      end
-    end
-
-    def activity
-      copy = I18n.t("admin.overview.activity")
-      ACTIVITY_COUNT.times.map do |index|
-        { alert: index == ACTIVITY_ALERT_INDEX, text: copy[index][:text],
-          who: copy[index][:who], when_text: copy[index][:when] }
-      end
-    end
-
-    def health
-      copy = I18n.t("admin.overview.health")
-      HEALTH.each_with_index.map do |state, index|
-        { state:, label: copy[index][:label], note: copy[index][:note] }
+      values.each_with_index.map do |value, index|
+        { value: value.to_fs(:delimited), tone: %i[ good neutral neutral good ][index],
+          label: copy[index][:label], note: copy[index][:note] }
       end
     end
 
     # `matching` filters by code or localized name, so the search box works in
     # whichever language the console is being read in.
     def courses(matching: nil)
-      rows = COURSES.each_with_index.map do |(code, sections, students), position|
-        CourseRow.new(code:, sections:, students:, position:)
+      rows = Course.in_catalog_order.includes(:sections, :enrollments).map do |record|
+        CourseRow.new(record:, sections: record.sections.size, students: record.enrollments.size)
       end
       return rows if matching.blank?
 

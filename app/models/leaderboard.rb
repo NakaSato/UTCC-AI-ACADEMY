@@ -26,15 +26,16 @@ class Leaderboard
     def streak_text = I18n.t("units.days", count: streak)
   end
 
-  attr_reader :viewer, :tab
+  attr_reader :viewer, :tab, :course
 
-  def initialize(viewer, tab)
+  def initialize(viewer, tab, course_code: Syllabus::DEFAULT_COURSE)
     @viewer = viewer
     @tab = tab
+    @course = Course.find_by(code: course_code) || Course.find_by!(code: Syllabus::DEFAULT_COURSE)
   end
 
   # The viewer's home section — what the subtitle names, whatever the tab.
-  def section = @section ||= viewer&.sections&.first
+  def section = @section ||= viewer&.sections&.find_by(course:)
 
   # Ranked best-first, ties broken by id so equal scores keep a stable order.
   # Only learners with XP inside the window appear: an all-zero row is not a
@@ -77,7 +78,7 @@ class Leaderboard
     # LearnerProgress takes for one learner, and the reason Entry rows cost no
     # queries of their own.
     def completions
-      @completions ||= TopicCompletion.where(user: contenders).to_a.group_by(&:user_id)
+      @completions ||= TopicCompletion.where(user: contenders, course:).to_a.group_by(&:user_id)
     end
 
     def scores
@@ -99,7 +100,7 @@ class Leaderboard
     # second line. One query; a learner in several sections shows the first.
     def section_codes
       @section_codes ||= Enrollment.joins(:section)
-                                   .where(user_id: users_by_id.keys)
+                                   .where(user_id: users_by_id.keys, sections: { course_id: course.id })
                                    .order(:id)
                                    .pluck(:user_id, "sections.code")
                                    .reverse.to_h

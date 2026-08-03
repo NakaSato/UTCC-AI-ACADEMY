@@ -12,7 +12,7 @@ links_checked = 0
 html_paths.each do |page_path|
   page_directory = page_path.dirname.relative_path_from(site_path)
 
-  page_path.read.scan(/(?:href|src)=["']([^"']+)["']/).flatten.each do |target|
+  File.read(page_path, encoding: Encoding::UTF_8).scan(/(?:href|src)=["']([^"']+)["']/).flatten.each do |target|
     next if target.empty? || target.start_with?("#", "//")
     next if target.match?(/\A[a-z][a-z0-9+.-]*:/i)
 

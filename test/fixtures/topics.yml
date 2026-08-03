@@ -109,3 +109,38 @@ topic_6_2:
   key: "6-2"
   kind: theory
   minutes: 12
+
+topic_ai1102_1_1:
+  course_module: python_module_1
+  position: 1
+  key: "AI1102-1-1"
+  kind: theory
+  minutes: 12
+
+topic_ai1102_1_2:
+  course_module: python_module_1
+  position: 2
+  key: "AI1102-1-2"
+  kind: exercise
+  minutes: 18
+
+topic_ai1102_2_1:
+  course_module: python_module_2
+  position: 1
+  key: "AI1102-2-1"
+  kind: code
+  minutes: 20
+
+topic_ai1102_2_2:
+  course_module: python_module_2
+  position: 2
+  key: "AI1102-2-2"
+  kind: theory
+  minutes: 15
+
+topic_ai1102_2_3:
+  course_module: python_module_2
+  position: 3
+  key: "AI1102-2-3"
+  kind: project
+  minutes: 35

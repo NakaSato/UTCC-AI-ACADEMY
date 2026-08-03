@@ -8,15 +8,13 @@ module CourseCatalog
 
   # `learned` and `applied` are the signed-in learner's own counts, filled in by
   # `for` from topic_completions and left at zero by `all`, which knows nothing
-  # about a user. How much there is to do comes from Syllabus — every course
-  # reuses the one placeholder syllabus, so the denominators are the same
-  # everywhere until real modules land.
+  # about a user. How much there is to do comes from that course's Syllabus.
   Course = Data.define(
     :code, :credits, :rating, :projects, :hours, :level, :core, :certificate,
     :tags, :learners, :learned, :applied, :next_key
   ) do
-    def topics = Syllabus.topic_count
-    def applied_topics = Syllabus.applied_topic_count
+    def topics = Syllabus.topic_count(code)
+    def applied_topics = Syllabus.applied_topic_count(code)
 
     def title = I18n.t("catalog.courses.#{code}.title")
     def description = I18n.t("catalog.courses.#{code}.desc")
@@ -62,22 +60,29 @@ module CourseCatalog
     def next_up
       return I18n.t("progress.next_up_done") if next_key.nil?
 
-      I18n.t("progress.next_up", topic: Syllabus.topic_name(next_key))
+      I18n.t("progress.next_up", topic: Syllabus.topic_name(next_key, code))
     end
   end
 
   class << self
     # The catalog with nobody signed in: taxonomy only, every progress bar at
     # zero. `for` is the one that knows about a learner.
-    def all
-      first_key = Syllabus.topic_keys.first
-
-      records.map { Course.new(**attributes_for(it), learned: 0, applied: 0, next_key: first_key) }
+    def all(user: nil)
+      records(user:).map do |record|
+        Course.new(**attributes_for(record), learned: 0, applied: 0,
+                   next_key: Syllabus.topic_keys(record.code).first)
+      end
     end
 
     # The rows behind the catalog, in catalog order. One query; `all` and `for`
     # both fold off it rather than asking per course.
-    def records = ::Course.in_catalog_order.to_a
+    def records(user: nil)
+      scope = ::Course.in_catalog_order
+      return scope.published_for_catalog.to_a unless user
+
+      archived_ids = user.topic_completions.where(course: ::Course.archived).select(:course_id)
+      scope.where(lifecycle_state: :published).or(scope.where(id: archived_ids)).to_a
+    end
 
     def codes = records.map(&:code)
 

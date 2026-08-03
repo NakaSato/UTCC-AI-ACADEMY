@@ -16,7 +16,7 @@ class LeaderboardFrameTest < ActionDispatch::IntegrationTest
     get leaderboard_url(tab: :semester)
 
     assert_response :success
-    assert_select "turbo-frame##{FRAME}[loading=lazy][src=?]", leaderboard_path(tab: :semester)
+    assert_select "turbo-frame##{FRAME}[loading=lazy][src=?]", leaderboard_path(course: "AI1101", tab: :semester)
     assert_select "turbo-frame##{FRAME} [data-in=true]", count: 0
     assert_select "turbo-frame##{FRAME} .sr-only", text: I18n.t("chrome.loading")
     # The one thing the deferral is for: another learner's row is a fold of that
@@ -96,6 +96,21 @@ class LeaderboardFrameTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "header", count: 0
     assert_select "footer", count: 0
+  end
+
+  test "the selected course is preserved by the shell and frame" do
+    TopicCompletion.record(user: users(:two), course_code: "AI1102",
+                           topic_key: Syllabus.topic_keys("AI1102").first, kind: :learned)
+
+    get leaderboard_url(course: "AI1102", tab: :university)
+
+    assert_response :success
+    assert_select "a[href=?]", leaderboard_path(course: "AI1102", tab: :university)
+    assert_select "turbo-frame##{FRAME}[src=?]", leaderboard_path(course: "AI1102", tab: :university)
+
+    get leaderboard_url(course: "AI1102", tab: :university), headers: frame_headers
+
+    assert_includes response.body, users(:two).name
   end
 
   private

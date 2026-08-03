@@ -41,6 +41,7 @@ Rails.application.routes.draw do
   # The app proper. Everything here requires a session — see the Authentication
   # concern, which adds `before_action :require_authentication` globally.
   resources :courses, only: :show, param: :code
+  get "courses/:code/syllabus.pdf", to: "course_documents#syllabus", as: :course_syllabus
   get "lesson", to: "lessons#show", as: :lesson
   # Where the browser sends an exercise answer or a coding task to be graded —
   # see LessonsController#submit. It replaced lesson/complete, which took the
@@ -94,6 +95,7 @@ Rails.application.routes.draw do
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin
   patch "admin/users/:id", to: "admin#update", as: :admin_user
+  patch "admin/courses/:id/state", to: "admin#update_course_state", as: :admin_course_state
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
   # The other two case actions write a notification — to the student, and to

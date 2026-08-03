@@ -35,7 +35,8 @@ class PlaceholderContentTest < ActiveSupport::TestCase
 
   # Every one of these joins a Ruby array to a locale array BY INDEX. A row
   # added on one side and not the other shifts every label after it, silently,
-  # in one locale only — which is exactly what these lengths catch.
+  # in one locale only — which is exactly what these lengths catch. Overview
+  # cards are live database metrics and are tested with the admin screen.
   test "index-joined placeholder rows line up with their copy in both locales" do
     I18n.available_locales.each do |locale|
       I18n.with_locale(locale) do
@@ -43,19 +44,11 @@ class PlaceholderContentTest < ActiveSupport::TestCase
           "course.modules" => Syllabus.entries,
           "lesson.theory.blocks" => LessonContent::BLOCKS,
           "admin.features.groups" => AdminConsole::FLAG_GROUPS,
-          "admin.overview.stats" => AdminConsole::STATS,
-          "admin.overview.adoption" => AdminConsole::ADOPTION,
-          "admin.overview.health" => AdminConsole::HEALTH,
-          "admin.courses.rows" => AdminConsole::COURSES,
           "admin.queue.rows" => AdminConsole::QUEUE_KINDS,
           "admin.perms.rows" => AdminConsole::PERMS
         }.each do |key, rows|
           assert_equal rows.size, I18n.t(key).size, "#{key} in #{locale}"
         end
-
-        assert_equal(
-          AdminConsole::ACTIVITY_COUNT, I18n.t("admin.overview.activity").size, "activity in #{locale}"
-        )
 
         # The groups nest, so their item counts have to agree row by row too.
         AdminConsole::FLAG_GROUPS.each_with_index do |items, index|
@@ -74,22 +67,11 @@ class PlaceholderContentTest < ActiveSupport::TestCase
           assert flag.desc.present?, "#{flag.key} has no #{locale} description"
         end
 
-        AdminConsole.courses.each do |course|
-          assert course.name.present?, "#{course.code} has no #{locale} name"
-        end
-
         LessonContent.blocks.each do |block|
           assert block.value.present?, "block #{block.position} has no #{locale} copy"
         end
       end
     end
-  end
-
-  test "a draft course is the one with no students" do
-    drafts = AdminConsole.courses.select(&:draft?)
-
-    assert_equal [ "AI2204" ], drafts.map(&:code)
-    assert(AdminConsole.courses.reject(&:draft?).all? { it.students.positive? })
   end
 
   test "the integrity band follows the score" do
@@ -140,40 +122,6 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     Syllabus.topic_keys.each do |key|
       assert_operator Syllabus.topic_minutes(key), :>, 0, "#{key} has no duration"
       assert_predicate Syllabus.topic_name(key), :present?, "#{key} has no name"
-    end
-  end
-
-  test "map rows only descend into open groups" do
-    roots_only = KnowledgeMap.rows(open: [])
-    assert_equal 1, roots_only.size
-    assert_equal 0, roots_only.first.depth
-
-    default = KnowledgeMap.rows
-    assert_operator default.size, :>, roots_only.size
-    assert default.all? { KnowledgeMap::DEFAULT_OPEN.include?(it.node.id) || it.depth.positive? }
-  end
-
-  test "path_to returns the full ancestry and nil for a stranger" do
-    assert_equal %w[ cs ml ml-prep ml-split ], KnowledgeMap.path_to("ml-split").map(&:id)
-    assert_nil KnowledgeMap.path_to("not-a-topic")
-    assert_nil KnowledgeMap.find("not-a-topic")
-  end
-
-  test "map nodes classify their own completion" do
-    assert_predicate KnowledgeMap.find("py-var"), :fully_learned?
-    assert_predicate KnowledgeMap.find("ml-prep"), :partly_learned?
-    assert_not_predicate KnowledgeMap.find("gen"), :partly_learned?
-    assert_equal 11, KnowledgeMap.find("ml-prep").remaining
-  end
-
-  test "every map node resolves a name in both locales" do
-    I18n.available_locales.each do |locale|
-      I18n.with_locale(locale) do
-        KnowledgeMap.each_node.each do |node, _trail|
-          assert node.name.present?, "#{node.id} has no #{locale} name"
-          assert_no_match(/translation missing/, node.name)
-        end
-      end
     end
   end
 

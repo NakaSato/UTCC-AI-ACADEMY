@@ -18,6 +18,7 @@ class AuditEvent < ApplicationRecord
   # role grants.
   ACTIONS = %w[
     role_changed
+    course_state_changed
     section_created section_updated enrolled unenrolled
     integrity_closed integrity_notified integrity_escalated
     landing_saved card_added card_removed
@@ -25,7 +26,7 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ role_changed unenrolled integrity_escalated card_removed ].freeze
+  WARN = %w[ role_changed course_state_changed unenrolled integrity_escalated card_removed ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50
@@ -67,6 +68,8 @@ class AuditEvent < ApplicationRecord
     def interpolations
       values = params.symbolize_keys
       values[:role] = I18n.t("admin.roles.#{values[:role]}") if values.key?(:role)
+      values[:from] = I18n.t("admin.courses.state.#{values[:from]}") if values.key?(:from)
+      values[:to] = I18n.t("admin.courses.state.#{values[:to]}") if values.key?(:to)
       values[:group] = I18n.t("admin.landing.sections.#{values[:group]}") if values.key?(:group)
       values
     end

@@ -85,6 +85,18 @@ class LeaderboardTest < ActiveSupport::TestCase
     assert_predicate entries.find { it.name == users(:two).name }, :you?
   end
 
+  test "selected course limits completions and section membership" do
+    TopicCompletion.record(user: users(:one), course_code: "AI1101",
+                           topic_key: Syllabus.topic_keys.first, kind: :learned)
+    TopicCompletion.record(user: users(:two), course_code: "AI1102",
+                           topic_key: Syllabus.topic_keys("AI1102").first, kind: :learned)
+
+    entries = Leaderboard.new(@viewer, :university, course_code: "AI1102").entries
+
+    assert_equal [ users(:two).name ], entries.map(&:name)
+    assert_equal LearnerProgress::XP_PER_LEARNED.to_s, entries.first.xp
+  end
+
   test "the streak survives the week cut" do
     # Ten consecutive days ending today: only part is inside this week, but a
     # run of days is a fact about the learner, not about the range.

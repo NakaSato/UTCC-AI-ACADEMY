@@ -43,11 +43,14 @@ class TaxonomyTest < ActiveSupport::TestCase
 
   # The counts under a progress bar and on a stat tile are the same number by
   # construction. This is invariant 7 in CLAUDE.md.
-  test "every course reports the syllabus as its denominator" do
+  test "each course reports its own syllabus as its denominator" do
     CourseCatalog.all.each do |course|
-      assert_equal Syllabus.topic_count, course.topics, course.code
-      assert_equal Syllabus.applied_topic_count, course.applied_topics, course.code
+      assert_equal Syllabus.topic_count(course.code), course.topics, course.code
+      assert_equal Syllabus.applied_topic_count(course.code), course.applied_topics, course.code
     end
+
+    assert_equal 15, CourseCatalog.find("AI1101").topics
+    assert_equal 5, CourseCatalog.find("AI1102").topics
   end
 
   test "tags come back as symbols, so the catalog filters match" do

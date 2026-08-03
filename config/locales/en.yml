@@ -26,6 +26,8 @@ en:
     signup_throttled: "Please try again later"
     forbidden: "That screen is for teaching staff only"
     role_changed: "%{name} is now %{role}"
+    course_state_changed: "%{course} is now using the updated lifecycle state"
+    course_state_invalid: "That course state change is not allowed"
     role_self: "You cannot change your own role"
     role_invalid: "That role does not exist"
     landing_saved: "The landing page has been updated"
@@ -228,6 +230,7 @@ en:
       code: "Coding task"
       mix: "Theory + code"
       project: "Project"
+
     modules:
       - title: "Data and AI thinking"
         desc: "Where the data in an AI system comes from, what makes it usable, and the questions to ask before any model is trained."
@@ -262,6 +265,25 @@ en:
         topics:
           - "Bias in data"
           - "Data privacy"
+
+    curricula:
+      AI1102:
+        modules:
+          - title: "Python foundations"
+            desc: "Build the Python habits needed to inspect data and make small, reliable transformations."
+            topics:
+              - "Python data structures"
+              - "Working with tabular data"
+          - title: "Prepare a dataset"
+            desc: "Turn a raw dataset into a clear, testable input for an AI workflow."
+            topics:
+              - "Clean and transform data"
+              - "Check a prepared dataset"
+              - "Python data preparation project"
+
+  documents:
+    syllabus:
+      title: "%{course} syllabus"
 
   lesson:
     topics:
@@ -1072,6 +1094,7 @@ en:
     learned_label: "Learned"
     in_project: "In project"
     in_project_note: "— covered by the final project"
+    prerequisites: "Prerequisites for this project"
     symbols: "Map symbols"
     single_topic: "Single topic"
     leaf_desc: "Read the short theory, then clear the exercise and coding task to close this topic on the map."
@@ -1203,6 +1226,7 @@ en:
   # language it is being read in.
   audit:
     role_changed: "Set %{name} to %{role}"
+    course_state_changed: "Changed %{course} from %{from} to %{to}"
     section_created: "Created section %{label}"
     section_updated: "Changed the instructor for %{label}"
     enrolled: "Enrolled %{name} in %{label}"
@@ -1387,85 +1411,29 @@ en:
               scope: "All screens"
               desc: "Students can still switch it from the top bar"
     overview:
-      adopt_title: "Adoption by faculty"
-      adopt_sub: "share of accounts active in the last seven days"
-      activity_title: "Recent activity"
-      health_title: "Service health"
-      health_sub: "everything the console depends on"
-      state:
-        ok: "OK"
-        warn: "Watch"
+      live_note: "These figures are counted from current database records. Other operational views will appear when their data sources are defined."
       stats:
         - label: "Total accounts"
-          note: "+64 this week"
-        - label: "Active courses"
-          note: "4 faculties · 15 sections"
-        - label: "Instructors & TAs"
-          note: "3 access requests open"
-        - label: "Weekly active"
-          note: "up 4 pts week over week"
-      adoption:
-        - name: "Business"
-          meta: "412 accounts · 78% active"
-        - name: "Engineering"
-          meta: "268 accounts · 71% active"
-        - name: "Communication Arts"
-          meta: "186 accounts · 54% active"
-        - name: "Science & Technology"
-          meta: "141 accounts · 39% active"
-      activity:
-        - text: "Approved TA access for AI2101"
-          who: "Academic Services"
-          when: "11:02"
-        - text: "Imported 182 records from registrar"
-          who: "Automated job"
-          when: "10:40"
-        - text: "Published Prompt engineering v2"
-          who: "Asst. Prof. Warinthorn P."
-          when: "09:31"
-        - text: "Archived AI1180 for AY2025"
-          who: "Academic Services"
-          when: "yest."
-        - text: "Updated proctoring thresholds"
-          who: "System admin"
-          when: "2d"
-      health:
-        - label: "Registrar sync"
-          note: "last run 10:40 · 182 records"
-        - label: "Autograder queue"
-          note: "12 jobs queued · ~4 min lag"
-        - label: "UTCC SSO"
-          note: "healthy · 99.8% success"
-        - label: "Proctoring service"
-          note: "healthy · enabled on 9 courses"
-        - label: "Project storage"
-          note: "78% of 2 TB used"
+          note: "current database records"
+        - label: "Student accounts"
+          note: "current database records"
+        - label: "Staff accounts"
+          note: "current database records"
+        - label: "Topic completions"
+          note: "current database records"
     courses:
       th_code: "Code"
       th_course: "Course"
-      th_owner: "Owner"
       th_sections: "Sections"
       th_students: "Students"
       th_state: "State"
       state:
-        live: "Live"
+        published: "Published"
         draft: "Draft"
-      rows:
-        - name: "AI Academy"
-          faculty: "All faculties · core"
-          owner: "Asst. Prof. Warinthorn"
-        - name: "Data Thinking for Business"
-          faculty: "Business"
-          owner: "Chanakan P."
-        - name: "Applied Machine Learning"
-          faculty: "Engineering"
-          owner: "Asst. Prof. Warinthorn"
-        - name: "Generative AI for Media"
-          faculty: "Comm. Arts"
-          owner: "Pawarisa T."
-        - name: "Applied NLP"
-          faculty: "Engineering"
-          owner: "Asst. Prof. Warinthorn"
+        archived: "Archived"
+      transition:
+        published: "Publish"
+        archived: "Archive"
     queue:
       pending: "Awaiting review"
       sla_title: "Open requests"
@@ -1975,6 +1943,8 @@ en:
       blank: "can't be blank"
       taken: "has already been taken"
       invalid: "is invalid"
+      invalid_transition: "is not an allowed transition"
+      stale_transition: "has changed since this page was loaded"
       confirmation: "doesn't match %{attribute}"
       too_short: "is too short (minimum is %{count} characters)"
       too_long: "is too long (maximum is %{count} characters)"

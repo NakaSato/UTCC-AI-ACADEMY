@@ -5,7 +5,7 @@ require "set"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
 EXCLUDED_DIRECTORIES = Set.new(%w[
-  .git _site node_modules tmp vendor
+  .git _site graphify-out node_modules tmp vendor
 ]).freeze
 
 markdown_paths = ROOT.glob("**/*.md", File::FNM_DOTMATCH).select do |path|
@@ -19,7 +19,7 @@ errors = []
 links_checked = 0
 
 markdown_paths.each do |path|
-  body = path.read
+  body = File.read(path, encoding: Encoding::UTF_8)
   targets = body.scan(/\[[^\]]*\]\(([^)]+)\)/).flatten
   targets.concat(body.scan(/href=["']([^"']+)["']/).flatten)
 

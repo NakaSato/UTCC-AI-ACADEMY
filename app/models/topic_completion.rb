@@ -22,6 +22,7 @@ class TopicCompletion < ApplicationRecord
 
   validates :learned_at, presence: true
   validates :topic_id, uniqueness: { scope: %i[ user_id course_id ] }
+  validate :topic_belongs_to_course
 
   scope :applied, -> { where.not(applied_at: nil) }
 
@@ -34,11 +35,26 @@ class TopicCompletion < ApplicationRecord
   # `belongs_to` and comes back unpersisted — the same answer the inclusion
   # validations used to give, and what LessonsController checks for.
   def self.record(user:, course_code:, topic_key:, kind:, at: Time.current)
-    completion = find_or_initialize_by(user:, course: Course.find_by(code: course_code),
-                                       topic: Topic.find_by(key: topic_key))
-    completion.learned_at ||= at
-    completion.applied_at ||= at if kind.to_sym == :applied
-    LearnerProgress.forget_standings if completion.save
+    course = Course.find_by(code: course_code)
+    return new(user:, course:, learned_at: at) unless course
+
+    topic = Syllabus.topic(topic_key, course_code)
+    return new(user:, course:, topic:, learned_at: at) unless topic&.course_module&.course_id == course.id
+
+    applied = kind.to_sym == :applied
+    now = Time.current
+    insert_all(
+      [ {
+        user_id: user.id, course_id: course.id, topic_id: topic.id,
+        learned_at: at, applied_at: (at if applied), created_at: now, updated_at: now
+      } ],
+      unique_by: :index_topic_completions_on_user_id_and_course_id_and_topic_id
+    )
+
+    completion = find_by!(user:, course:, topic:)
+
+    completion.update_columns(applied_at: at, updated_at: now) if applied && completion.applied_at.nil?
+    LearnerProgress.forget_standings
     completion
   end
 
@@ -50,4 +66,11 @@ class TopicCompletion < ApplicationRecord
   # The day this counted towards a streak. Applying a topic later than learning
   # it keeps both days lit, so the grid reflects the work, not the topic.
   def active_days = [ learned_at, applied_at ].compact.map { it.in_time_zone.to_date }.uniq
+
+  private
+    def topic_belongs_to_course
+      return if course.blank? || topic.blank? || topic.course_module.course_id == course.id
+
+      errors.add(:topic, "must belong to the selected course")
+    end
 end

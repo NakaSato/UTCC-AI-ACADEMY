@@ -14,6 +14,18 @@ class AdminTest < ActionDispatch::IntegrationTest
     assert_select "main form[action=?]", admin_user_path(users(:student))
   end
 
+  test "the Overview cards count live records and omit fabricated panels" do
+    get admin_url(tab: :overview)
+
+    assert_response :success
+    assert_includes response.body, ">#{User.count.to_fs(:delimited)}<"
+    assert_includes response.body, ">#{TopicCompletion.count.to_fs(:delimited)}<"
+    assert_not_includes response.body, "Adoption by faculty"
+    assert_not_includes response.body, "Recent activity"
+    assert_not_includes response.body, "Service health"
+    assert_not_includes response.body, "412 accounts"
+  end
+
   # The roster is one tab of six; the other five are placeholder content, so the
   # only thing worth asserting about them is that each renders and that the tab
   # param cannot be used to reach a partial that does not exist.

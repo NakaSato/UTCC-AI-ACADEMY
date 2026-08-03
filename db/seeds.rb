@@ -29,13 +29,13 @@ courses = [
 courses.each_with_index do |(code, credits, rating, projects, hours, level, core, certificate, tags, learners), index|
   Course.find_or_initialize_by(code:).update!(
     position: index + 1, credits:, rating:, projects:, hours:, level:,
-    core:, certificate:, tags:, learners:
+    core:, certificate:, tags:, learners:, lifecycle_state: "published"
   )
 end
 
-# knowledge units, then one [kind, minutes] pair per topic — in the order the
-# topic names appear under `course.modules` in the locale files, since a topic's
-# position is half of its key.
+# Each course owns its module rows. Topic keys remain globally unique: AI1101
+# keeps the historic `1-1` shape, while the second curriculum uses keys such as
+# `AI1102-1-1` so old URLs and completion records remain stable.
 modules = [
   [ 12, [ [ "theory", 8 ],  [ "theory", 10 ], [ "exercise", 15 ] ] ],
   [ 18, [ [ "theory", 9 ],  [ "theory", 12 ], [ "mix", 14 ], [ "code", 20 ] ] ],
@@ -45,18 +45,33 @@ modules = [
   [ 10, [ [ "theory", 10 ], [ "theory", 12 ] ] ]
 ]
 
-modules.each_with_index do |(units, topics), index|
-  number = index + 1
-  course_module = CourseModule.find_or_initialize_by(number:)
-  course_module.update!(units:)
+curricula = {
+  "AI1101" => modules,
+  # Deliberately smaller and shaped around Python/data preparation rather than
+  # the six-module AI fundamentals syllabus.
+  "AI1102" => [
+    [ 8,  [ [ "theory", 12 ], [ "exercise", 18 ] ] ],
+    [ 12, [ [ "code", 20 ], [ "theory", 15 ], [ "project", 35 ] ] ]
+  ]
+}
 
-  topics.each_with_index do |(kind, minutes), position|
-    Topic.find_or_initialize_by(key: Topic.key_for(number, position + 1))
-         .update!(course_module:, position: position + 1, kind:, minutes:)
+curricula.each do |course_code, course_modules|
+  course = Course.find_by!(code: course_code)
+
+  course_modules.each_with_index do |(units, topics), index|
+    number = index + 1
+    course_module = CourseModule.find_or_initialize_by(course:, number:)
+    course_module.update!(units:)
+
+    topics.each_with_index do |(kind, minutes), position|
+      key = Topic.key_for(number, position + 1, course_code:)
+      Topic.find_or_initialize_by(key:)
+           .update!(course_module:, position: position + 1, kind:, minutes:)
+    end
   end
 end
 
-# The syllabus is memoised, and this process may have read it before the rows
+# The syllabi are memoised, and this process may have read them before the rows
 # above existed.
 Syllabus.reload!
 
@@ -142,7 +157,7 @@ if Rails.env.local?
   # A second student, further along, so the leaderboard has someone to rank
   # against and /admin has more than one row worth looking at.
   rival = User.find_by(student_id: "2011071730002")
-  keys.first(7).each_with_index do |key, index|
+  Syllabus.topic_keys("AI1102").each_with_index do |key, index|
     TopicCompletion.record(user: rival, course_code: "AI1102", topic_key: key,
                            kind: :learned, at: index.days.ago)
   end

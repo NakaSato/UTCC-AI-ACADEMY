@@ -27,7 +27,7 @@
       </p>
 
       <div class="mb-8.5 grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-        <% Syllabus.stats.each do |stat| %>
+        <% Syllabus.stats(@course.code).each do |stat| %>
           <div class="rounded-[14px] border border-hairline bg-surface px-4.5 py-4">
             <div class="mb-0.5 text-22 font-bold tracking-[-0.02em]"><%= stat[:value] %></div>
             <div class="text-12-5 text-muted-2"><%= stat[:label] %></div>
@@ -112,11 +112,12 @@
         <%= link_to t("course.continue"), lesson_path(course: @course.code),
               class: "mb-2.5 block rounded-field bg-brand py-3.25 text-center text-15 font-semibold text-white
                       transition-colors hover:bg-brand-deep" %>
-        <button type="button"
-                class="w-full rounded-field border-[1.5px] border-hairline-2 py-2.75 text-14 font-medium text-ink-4
-                       transition-colors hover:border-muted-3">
+        <%= link_to course_syllabus_path(@course.code),
+              class: "block w-full rounded-field border-[1.5px] border-hairline-2 py-2.75 text-center text-14 font-medium text-ink-4
+                      transition-colors hover:border-muted-3",
+              data: { turbo: false } do %>
           <%= t("course.download_syllabus") %>
-        </button>
+        <% end %>
       </div>
 
       <div class="rounded-card border border-hairline bg-surface p-6">
@@ -134,7 +135,7 @@
         </div>
 
         <dl class="flex flex-col gap-2.5 border-t border-surface-3 pt-4">
-          <% Syllabus.meta.each do |key, value| %>
+          <% Syllabus.meta(@course.code).each do |key, value| %>
             <div class="flex justify-between gap-3 text-13-5">
               <dt class="text-muted-2"><%= key %></dt>
               <dd class="text-right font-medium"><%= value %></dd>

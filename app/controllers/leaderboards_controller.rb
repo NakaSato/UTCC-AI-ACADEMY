@@ -8,7 +8,11 @@
 class LeaderboardsController < ApplicationController
   def show
     @tab = Leaderboard.tab_for(params[:tab])
-    board = Leaderboard.new(Current.user, @tab)
+    @course = Course.find_by(code: params[:course].presence || Syllabus::DEFAULT_COURSE) ||
+              Course.find_by!(code: Syllabus::DEFAULT_COURSE)
+    @courses = CourseCatalog.all
+    @course_card = @courses.find { it.code == @course.code }
+    board = Leaderboard.new(Current.user, @tab, course_code: @course.code)
 
     if turbo_frame_request?
       @entries = board.entries

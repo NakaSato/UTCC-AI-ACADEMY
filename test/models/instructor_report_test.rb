@@ -55,6 +55,19 @@ class InstructorReportTest < ActiveSupport::TestCase
     assert_equal I18n.t("instructor.seen.today"), row_for(users(:one)).seen_text
   end
 
+  test "activity and submission metrics ignore another course" do
+    other_course = Course.find_by!(code: "AI1102")
+    other_topic = Syllabus.topic("AI1102-1-1", other_course.code)
+    TopicCompletion.record(user: users(:one), course_code: other_course.code,
+                           topic_key: other_topic.key, kind: :learned)
+    Submission.create!(user: users(:one), course: other_course, topic: other_topic,
+                       kind: "quiz", answer: "1", passed: true, score: 100)
+
+    assert_nil row_for(users(:one)).seen
+    assert_equal 0, @report.average_score
+    assert_empty @report.hard_topics
+  end
+
   test "standing follows the thresholds" do
     learn(users(:one), Syllabus.topic_keys.first((Syllabus.topic_count * 0.6).ceil))
 
