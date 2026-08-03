@@ -2551,6 +2551,14 @@
       "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
     },
     {
+      "at": "2026-08-04T04:45:00+07:00",
+      "item_id": "M7-004",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The user approved deferring the catalog_cols flag because no runtime consumer currently uses its two/three-column value; it must not become a persisted setting without an approved consumer.",
+      "evidence_url": "specs/spec-m7-feature-flag-settings.html#human-feature-policy-handoff"
+    },
+    {
       "at": "2026-08-03T19:05:00+07:00",
       "item_id": "M8-001",
       "from": "new",
