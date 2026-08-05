@@ -2,10 +2,10 @@
 id: ADR-0019
 type: adr
 title: Define active-session visibility and revocation
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-05
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -23,7 +23,13 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/session_test.rb
+  - test/controllers/session_management_test.rb
+  - test/controllers/sessions_controller_test.rb
+  - test/controllers/profiles_controller_test.rb
+  - test/channels/application_cable/connection_test.rb
+  - test/system/session_management_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
@@ -31,9 +37,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
 
 # Define active-session visibility and revocation
 
-> **Decision state:** Agent-prepared draft. The Product Owner, Tech Lead,
-> Security Owner, and Privacy Owner must decide what session information may be
-> shown and who may revoke which sessions before implementation.
+> **Decision state:** Accepted by the user on 2026-08-05. An authenticated user
+> may review their own live sessions using minimized metadata and revoke one
+> other session or all other sessions. Current-session protection, HTTP and new
+> WebSocket enforcement, and the existing 30-day expiry remain in force.
 
 > [Decision Records](README.md) ·
 > [M9 session specification](../specs/spec-m9-session-visibility-and-revocation.md) ·
@@ -73,26 +80,32 @@ visibility into a new privacy or account-enumeration problem.
 
 ## Decision boundary
 
-The accountable owners must decide:
+The accepted policy is:
 
-1. Whether users see all active sessions, only non-current sessions, or a
-   summary; and whether IP address, user agent, creation time, last activity,
-   approximate location, or other metadata is displayed.
-2. Whether users may revoke one session, all other sessions, or the current
-   session; and what confirmation and recovery language applies.
-3. Whether administrators may view or revoke another user's sessions, which
-   roles may do so, what reason is required, and what audit data is retained.
-4. Whether revocation destroys the row, records a revocation state, or uses a
-   separate security-event record; and how expired-row cleanup works.
-5. What revocation means for in-flight HTTP requests, WebSockets, notifications,
-   remembered cookies, and concurrent requests.
-6. Whether the 30-day absolute limit remains appropriate, and whether idle or
-   step-up authentication is needed for sensitive actions.
-7. What a user sees when the current session is revoked elsewhere and how a
-   suspected compromise is escalated without exposing account existence.
-
-Until those decisions are accepted, the current 30-day lookup boundary and
-current logout/password-change behavior remain unchanged.
+1. An authenticated user sees only their own live sessions, ordered newest
+   first. The profile shows only a broad device family and sign-in time; it does
+   not show IP addresses, full user-agent strings, approximate location, raw
+   cookies, or database identifiers.
+2. The current session is labeled and cannot be revoked by the individual or
+   “other sessions” actions. The user may revoke one other session or all other
+   sessions. The UI uses truthful Thai and English success and stale-session
+   messages.
+3. There is no administrator or support cross-account session-management path
+   in this increment. A client-supplied identifier cannot widen account scope.
+4. Revocation destroys the targeted session row. Opaque signed IDs with a
+   dedicated purpose are used in mutation links; raw row IDs are not exposed.
+   Repeated or stale revocation requests are safe and do not report success.
+5. HTTP authentication and new WebSocket authentication continue to use the
+   same `Session.live` lookup, so a destroyed session's signed cookie fails at
+   both boundaries. Already-open WebSockets and in-flight requests are not
+   promised synchronous termination by this slice.
+6. The 30-day absolute session lifetime, logout behavior, password-change
+   revocation, and existing expired-row cleanup remain unchanged. No idle
+   timeout, step-up authentication, persisted revocation history, or new admin
+   audit record is introduced.
+7. The profile exposes no historical session list after rows are destroyed and
+   retains only the existing server-side session metadata under the current
+   application retention behavior.
 
 ## Alternatives
 
@@ -119,18 +132,23 @@ Support staff can end sessions without exposing metadata to learners. This can
 help incident response, but is slower for a user with a lost device and creates
 an authority and insider-risk boundary.
 
-No option is selected by this draft.
+### Approved policy direction
+
+User-managed sessions with row destruction is selected for this increment, with
+own-account scope, broad device/time metadata, current-session protection, and
+no administrator cross-account controls. Persisted revocation history and
+support workflows remain future policy work.
 
 ## Consequences
 
 - Session management is a security control, not only a profile-page feature;
   every authentication consumer must use the same live/revoked boundary.
-- Displaying IP addresses and user agents requires data minimization, locale,
-  timezone, retention, and access decisions.
-- Revocation must be idempotent and safe when the browser retries or two support
-  actors act at once.
-- If historical revocation events are required, they must not store cookies,
-  raw session identifiers, passwords, or unnecessary request data.
+- The profile intentionally trades exact device recognition for reduced
+  exposure by showing only a broad device family and sign-in time.
+- Revocation is idempotent and safe when the browser retries or two tabs act at
+  once; row destruction keeps the existing authentication boundary simple.
+- Historical revocation events, admin support controls, and immediate closure
+  of already-open channels remain outside this increment.
 - A shorter lifetime, idle timeout, or step-up challenge changes the user
   experience and needs a separate measurable security decision if not covered
   by the accepted policy.
@@ -143,8 +161,9 @@ No option is selected by this draft.
   represents; the UI must confirm the target without claiming exact location.
 - An administrator is a privileged actor; cross-account session operations need
   explicit authorization, reason, audit, and privacy limits.
-- A live WebSocket may outlast the page that opened it; revocation must define
-  whether the connection is closed immediately or denied on its next action.
+- A live WebSocket may outlast the page that opened it; this increment denies
+  the revoked cookie on a new connection and does not claim immediate closure
+  of an already-open connection.
 
 ## Fitness Functions
 
@@ -152,7 +171,7 @@ No option is selected by this draft.
   WebSocket connection, even when its signed cookie is replayed.
 - A user cannot list, revoke, or infer another user's sessions through IDs,
   parameters, response differences, or stale URLs.
-- A successful revocation creates exactly the approved security/audit evidence;
-  failed, unauthorized, or stale actions create no misleading success event.
+- A successful revocation destroys exactly the approved session row; failed,
+  unauthorized, or stale actions create no misleading success event.
 - Session pages reveal only approved metadata and never raw cookies, passwords,
   full request headers, or unnecessary personal data.

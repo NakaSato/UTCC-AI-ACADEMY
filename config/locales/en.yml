@@ -38,6 +38,9 @@ en:
     feature_setting_invalid: "That feature setting is not available"
     feature_setting_stale: "That feature setting changed elsewhere — reload before saving"
     feature_unavailable: "That feature is currently unavailable"
+    session_revoked: "That device has been signed out"
+    other_sessions_revoked: "Other devices have been signed out"
+    session_revoke_invalid: "That session is no longer available"
     prior_knowledge_marked: "This topic now counts as known for course progress"
     prior_knowledge_unmarked: "This topic no longer counts as prior knowledge"
     prior_knowledge_invalid: "That topic could not be marked as prior knowledge"
@@ -1502,6 +1505,21 @@ en:
       current: "Current password"
       submit: "Change password"
       note: "Changing it signs you out everywhere else. This device stays signed in."
+    sessions:
+      title: "Active sessions"
+      subtitle: "Review the devices signed in to this account. Only broad device information and sign-in time are shown."
+      current: "This device"
+      started: "Signed in %{time}"
+      revoke: "Sign out"
+      revoke_other: "Sign out other devices"
+      devices:
+        ios: "iPhone or iPad"
+        android: "Android device"
+        windows: "Windows device"
+        mac: "Mac device"
+        linux: "Linux device"
+        other: "Other device"
+
 
   auth:
     hero_title: "Start your AI journey at UTCC"

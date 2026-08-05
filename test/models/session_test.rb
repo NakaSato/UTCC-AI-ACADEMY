@@ -35,4 +35,18 @@ class SessionTest < ActiveSupport::TestCase
 
     assert_equal Session.count, Session.live.count + Session.expired.count
   end
+
+  test "revocation tokens are signed and resolve without exposing the row ID" do
+    session = @user.sessions.create!
+
+    assert_not_equal session.id.to_s, session.revoke_token
+    assert_equal session, Session.find_signed(session.revoke_token, purpose: Session::REVOCATION_PURPOSE)
+    assert_nil Session.find_signed(session.revoke_token, purpose: "wrong-purpose")
+  end
+
+  test "device family reduces stored user-agent data to a broad label" do
+    assert_equal :android, @user.sessions.create!(user_agent: "Mozilla/5.0 (Linux; Android 14)").device_family
+    assert_equal :ios, @user.sessions.create!(user_agent: "Mozilla/5.0 (iPhone)").device_family
+    assert_equal :other, @user.sessions.create!(user_agent: nil).device_family
+  end
 end

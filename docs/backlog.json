@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-05T23:44:18+07:00",
+  "updated_at": "2026-08-05T23:59:24+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -943,16 +943,12 @@
     {
       "id": "M9-001",
       "title": "Define active-session visibility and revocation",
-      "status": "blocked",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security Owner, and Privacy Owner",
       "milestone": "M9",
       "depends_on": [],
-      "blocker": {
-        "summary": "Sessions have a 30-day absolute expiry, current logout, and password-change revocation, but users cannot inspect or individually revoke sessions and no approved metadata, authority, WebSocket, retention, or support policy exists.",
-        "decision_owner": "Tech Lead, Security Owner, and Privacy Owner",
-        "next_action": "Review ADR-0019/SPEC-0019 and approve visible metadata, user/admin target scope, revocation semantics, HTTP/WebSocket enforcement, retention, cleanup, and compromise support before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M9 session architecture draft",
@@ -977,9 +973,21 @@
         {
           "label": "Session-security policy handoff",
           "url": "specs/spec-m9-session-visibility-and-revocation.html#human-session-security-handoff"
+        },
+        {
+          "label": "Session management model and controller tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/session_management_test.rb"
+        },
+        {
+          "label": "WebSocket revocation boundary test",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/channels/application_cable/connection_test.rb"
+        },
+        {
+          "label": "Thai profile session-management system walk",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/system/session_management_walk_test.rb"
         }
       ],
-      "updated_at": "2026-08-03T19:30:00+07:00"
+      "updated_at": "2026-08-05T23:59:24+07:00"
     },
     {
       "id": "M9-002",
@@ -2644,6 +2652,14 @@
       "from": "new",
       "to": "blocked",
       "summary": "Started the session-security design handoff; implementation is held pending visible metadata, revocation authority, HTTP/WebSocket enforcement, retention, cleanup, and compromise-support policy.",
+      "evidence_url": "specs/spec-m9-session-visibility-and-revocation.html"
+    },
+    {
+      "at": "2026-08-05T23:59:24+07:00",
+      "item_id": "M9-001",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved own-account minimized session visibility, individual/all-other row-destruction revocation, current-session protection, no cross-account controls, unchanged 30-day expiry, and HTTP/new-WebSocket enforcement; implementation and verification completed.",
       "evidence_url": "specs/spec-m9-session-visibility-and-revocation.html"
     },
     {

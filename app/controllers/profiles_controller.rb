@@ -22,6 +22,7 @@ class ProfilesController < ApplicationController
 
   def edit
     @user = Current.user
+    load_sessions
   end
 
   def update
@@ -31,6 +32,7 @@ class ProfilesController < ApplicationController
       redirect_to profile_path, notice: t("flash.profile_saved")
     else
       @errors_on = :profile
+      load_sessions
       render :edit, status: :unprocessable_entity
     end
   end
@@ -45,6 +47,7 @@ class ProfilesController < ApplicationController
     unless @user.authenticate(params[:current_password].to_s)
       @user.errors.add(:current_password, :invalid)
       @errors_on = :password
+      load_sessions
       return render :edit, status: :unprocessable_entity
     end
 
@@ -56,11 +59,16 @@ class ProfilesController < ApplicationController
       redirect_to profile_path, notice: t("flash.password_changed")
     else
       @errors_on = :password
+      load_sessions
       render :edit, status: :unprocessable_entity
     end
   end
 
   private
+    def load_sessions
+      @sessions = @user.sessions.live.order(created_at: :desc, id: :desc)
+    end
+
     # What a student may change about themselves, spelled out rather than
     # inferred from the form. Two absences are deliberate and must stay:
     #

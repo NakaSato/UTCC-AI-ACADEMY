@@ -38,4 +38,21 @@ class SessionsController < ApplicationController
     terminate_session
     redirect_to login_path, status: :see_other
   end
+
+  def destroy_other_sessions
+    Current.user.sessions.live.where.not(id: Current.session.id).destroy_all
+    redirect_to profile_path, notice: t("flash.other_sessions_revoked")
+  end
+
+  def destroy_session
+    target = Session.find_signed(params[:token], purpose: Session::REVOCATION_PURPOSE)
+    session = Current.user.sessions.live.find_by(id: target&.id)
+
+    if session && session.id != Current.session.id
+      session.destroy!
+      redirect_to profile_path, notice: t("flash.session_revoked")
+    else
+      redirect_to profile_path, alert: t("flash.session_revoke_invalid")
+    end
+  end
 end

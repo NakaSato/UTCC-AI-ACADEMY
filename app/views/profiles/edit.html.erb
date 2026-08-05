@@ -81,6 +81,48 @@
       <% end %>
     </section>
 
+    <section class="mt-6 rounded-panel border border-hairline bg-surface px-6 py-7 sm:px-8.5">
+      <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("profile.sessions.title") %></h2>
+          <p class="text-14 leading-[1.6] text-balance text-muted"><%= t("profile.sessions.subtitle") %></p>
+        </div>
+        <% if @sessions.size > 1 %>
+          <%= button_to t("profile.sessions.revoke_other"), revoke_other_sessions_path, method: :delete,
+                class: "rounded-field border-[1.5px] border-hairline-2 px-4 py-2.75 text-13-5 font-semibold text-ink-4
+                        transition-colors hover:border-muted-3" %>
+        <% end %>
+      </div>
+
+      <div class="flex flex-col divide-y divide-surface-3">
+        <% @sessions.each do |session| %>
+          <% current = session.id == Current.session.id %>
+          <div class="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2 text-14-5 font-semibold text-ink">
+                <span><%= t("profile.sessions.devices.#{session.device_family}") %></span>
+                <% if current %>
+                  <span class="rounded-full bg-brand-tint px-2.25 py-0.75 text-11-5 font-semibold text-brand-deep">
+                    <%= t("profile.sessions.current") %>
+                  </span>
+                <% end %>
+              </div>
+              <div class="mt-1 text-12-5 text-muted-2">
+                <%= t("profile.sessions.started", time: l(session.created_at, format: :short)) %>
+              </div>
+            </div>
+
+            <% unless current %>
+              <%= button_to t("profile.sessions.revoke"), revoke_profile_session_path(session.revoke_token),
+                    method: :delete,
+                    class: "session-revoke rounded-field border-[1.5px] border-hairline-2 px-4 py-2.5 text-13-5 font-semibold text-ink-4
+                            transition-colors hover:border-muted-3" %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
     <%# The password is its own form and its own action — see ProfilesController.
         It sits below rather than beside: it is the thing a student came here to
         do second, and mixing it into the fields above would make one Save button

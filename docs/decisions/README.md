@@ -26,7 +26,7 @@ deprecate it.
 - [ADR-0016 — Define the learner hearts attempt and refill policy](adr-0016-hearts-attempt-policy.md) — draft; academic and product policy pending
 - [ADR-0017 — Define the Helping Hand award and community interaction boundary](adr-0017-helping-hand-community-boundary.md) — accepted; Helping Hand deferred until a moderated community feature is approved
 - [ADR-0018 — Define the meaning and effects of learner-marked prior knowledge](adr-0018-prior-knowledge-boundary.md) — accepted; learner marks affect map progress and course completion only
-- [ADR-0019 — Define active-session visibility and revocation](adr-0019-session-visibility-and-revocation.md) — draft; security, privacy, authority, and retention policy pending
+- [ADR-0019 — Define active-session visibility and revocation](adr-0019-session-visibility-and-revocation.md) — accepted; own-account minimized session list and row-destruction revocation implemented
 - [ADR-0020 — Define critical-failure observability and alert ownership](adr-0020-critical-failure-observability.md) — draft; SLO, ownership, privacy, retention, and provider policy pending
 - [ADR-0021 — Define backup, restore, and recovery verification](adr-0021-backup-restore-verification.md) — draft; recovery target, provider, retention, storage, and drill policy pending
 - [ADR-0022 — Define the production deployment, artifact, and rollback boundary](adr-0022-production-deployment-boundary.md) — draft; target, artifact, migration, rollback, and release policy pending

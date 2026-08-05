@@ -69,6 +69,8 @@ Rails.application.routes.draw do
   # the reset flow under /reset-password is the signed-*out* way in and answers a
   # different question.
   patch "profile/password", to: "profiles#update_password", as: :profile_password
+  delete "profile/sessions", to: "sessions#destroy_other_sessions", as: :revoke_other_sessions
+  delete "profile/sessions/:token", to: "sessions#destroy_session", as: :revoke_profile_session
   get "map", to: "knowledge_maps#show", as: :knowledge_map
   post "map/known", to: "prior_knowledges#create", as: :mark_topic_known
   delete "map/known", to: "prior_knowledges#destroy", as: :unmark_topic_known
