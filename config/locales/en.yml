@@ -1087,7 +1087,7 @@ en:
       - name: "Deep Diver"
         hint: "Finish a module in one day"
       - name: "Helping Hand"
-        hint: "Answer 10 forum questions"
+        hint: "Unavailable until a moderated community feature exists"
       - name: "Persistent"
         hint: "Pass a task after 3 failed tries"
       - name: "Ethics Aware"

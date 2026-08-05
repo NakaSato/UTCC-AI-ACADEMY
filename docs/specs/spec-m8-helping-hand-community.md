@@ -2,10 +2,10 @@
 id: SPEC-0017
 type: spec
 title: Helping Hand award and learner community boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@academic-owner", "@tech-lead", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-05
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -19,7 +19,8 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/awards_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-002, SKILL-ARCH-004, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-004, SKILL-TEST-001]
@@ -27,9 +28,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-004, SKILL-TEST-001]
 
 # Helping Hand award and learner community boundary
 
-> **Review state:** Draft and blocked on product, academic, privacy, and
-> moderation policy. The current badge remains unearnable until an approved
-> evidence source and community boundary exist.
+> **Review state:** Accepted by the user on 2026-08-05 as a deferral. The badge
+> remains visible but unavailable and unearnable until a moderated community
+> feature has a separate approved policy and implementation.
 
 > [Executable Specifications](README.md) ·
 > [M8 community decision](../decisions/adr-0017-helping-hand-community-boundary.md) ·
@@ -44,20 +45,20 @@ useful, safe contribution the badge should recognize.
 
 ## Scope
 
-### Included after policy approval
+### Included in the deferral
 
-- Define the selected community interaction or explicitly remove/defer it.
-- Define the contribution record, course/section scope, lifecycle, and quality
-  state needed for the approved behavior.
-- Define server-side identity, visibility, authorization, moderation, reporting,
-  retention, and takedown boundaries.
-- Define the Helping Hand threshold, anti-gaming rule, and retraction behavior.
-- Provide truthful Thai/English copy for available, unavailable, pending,
-  rejected, and earned states.
+- Preserve the existing server-side unearnable rule.
+- Add truthful Thai/English copy that labels the badge unavailable.
+- Keep the badge independent from progress, grades, completion, certificates,
+  reports, access, notifications, and other academic state.
+- Record the boundary that no community records, endpoints, moderation workflow,
+  staff override, or award-credit path is introduced.
 
 ### Excluded
 
 - Enabling open learner messaging without moderation and ownership.
+- Adding forum, Q&A, peer-review, contribution, moderation, or reporting records
+  before a separate community policy is approved.
 - Treating marketing landing-page community cards as learner contributions.
 - Awarding activity from browser counters, client-supplied approval, or raw view
   counts.
@@ -87,24 +88,16 @@ useful, safe contribution the badge should recognize.
 
 ## Acceptance Criteria
 
-- [ ] The Product Owner, Academic Owner, Tech Lead, and Privacy Owner approve
-      the community model or approve removal/deferment of the award
-      (`docs/decisions/adr-0017-helping-hand-community-boundary.md`).
-- [ ] Before approval, no forum or peer-review records are created and the
-      current unearnable behavior remains unchanged (`test/models/awards_test.rb`).
-- [ ] After approval, only an authorized contribution in the accepted lifecycle
-      and quality state can count toward Helping Hand
-      (`test/models/community_contribution_test.rb`).
-- [ ] Scope, visibility, identity, moderation, reporting, and takedown rules are
-      enforced for direct requests and stale URLs
-      (`test/controllers/community_contributions_test.rb`).
-- [ ] Retries, duplicate answers, self-answers, rejected/deleted content, and
-      concurrent moderation cannot create excess award credit
-      (`test/models/community_award_test.rb`).
-- [ ] Thai and English browser walkthroughs show the approved contribution and
-      award states without promising an unavailable feature
-      (`test/system/community_award_walk_test.rb`).
-- [ ] Full repository verification passes (`bin/verify`).
+- [x] The user approves deferring the community feature and keeping the badge
+      unavailable (`docs/decisions/adr-0017-helping-hand-community-boundary.md`).
+- [x] No forum, peer-review, or contribution records or endpoints are added;
+      the current unearnable behavior remains unchanged
+      (`test/models/awards_test.rb`).
+- [x] The badge has truthful, structurally aligned Thai and English unavailable
+      copy (`test/models/awards_test.rb`).
+- [x] Progress, grades, completion, certificates, reports, access, and other
+      academic state remain unaffected by the deferred badge.
+- [x] Full repository verification passes (`bin/verify`).
 
 ## Error and boundary cases
 
@@ -123,7 +116,9 @@ useful, safe contribution the badge should recognize.
 
 ## Human Community Policy Handoff
 
-Implementation is held until the accountable owners complete this table.
+The deferral closes the current implementation question. Any future community
+feature must reopen this handoff and complete the following table before code is
+authorized.
 
 | Review point | Decision required |
 | --- | --- |
@@ -140,18 +135,15 @@ Implementation is held until the accountable owners complete this table.
 
 - Keep the badge unearnable or remove it as the rollback target until approved
   contribution records and moderation ownership are operational.
-- Disabling the feature must not delete learner content, moderation history, or
-  award evidence; it should stop new interactions and follow the approved
-  visibility/retraction rule.
-- Monitor aggregate contribution, report, moderation, rejection, and award rates
-  without logging learner answers or unnecessary identity data.
+- The current rollback target is the existing unearnable badge with unavailable
+  copy; there is no community data or moderation history to disable or delete.
+- A future implementation must define visibility/retraction behavior and
+  aggregate monitoring before it is enabled.
 
 ## Verification
 
 ```bash
 bin/docs
-bin/rails test test/models/awards_test.rb test/models/community_contribution_test.rb test/models/community_award_test.rb
-bin/rails test test/controllers/community_contributions_test.rb
-bin/rails test:system test/system/community_award_walk_test.rb
+bin/rails test test/models/awards_test.rb
 bin/verify
 ```

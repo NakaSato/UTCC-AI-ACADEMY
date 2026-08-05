@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-04T06:00:00+07:00",
+  "updated_at": "2026-08-05T12:43:33+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -861,23 +861,19 @@
     {
       "id": "M8-002",
       "title": "Define the Helping Hand award and learner community boundary",
-      "status": "blocked",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Academic Owner, Tech Lead, and Privacy Owner",
       "milestone": "M8",
       "depends_on": [],
-      "blocker": {
-        "summary": "The Helping Hand badge promises ten forum answers, but no forum or peer-review records exist; the educational outcome, contribution evidence, moderation, privacy, and community ownership are not approved.",
-        "decision_owner": "Product Owner, Academic Owner, and Privacy Owner",
-        "next_action": "Review ADR-0017/SPEC-0017 and choose no feature, course Q&A, structured peer review, or another bounded model, then approve eligibility, quality, safety, moderation, and award-retraction rules before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
-          "label": "M8 Helping Hand architecture draft",
+          "label": "Accepted M8 Helping Hand deferral architecture",
           "url": "decisions/adr-0017-helping-hand-community-boundary.html"
         },
         {
-          "label": "M8 community specification draft",
+          "label": "Accepted M8 Helping Hand deferral specification",
           "url": "specs/spec-m8-helping-hand-community.html"
         },
         {
@@ -895,9 +891,13 @@
         {
           "label": "Community policy handoff",
           "url": "specs/spec-m8-helping-hand-community.html#human-community-policy-handoff"
+        },
+        {
+          "label": "Deferred award behavior",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/models/awards_test.rb"
         }
       ],
-      "updated_at": "2026-08-03T19:12:00+07:00"
+      "updated_at": "2026-08-05T12:43:33+07:00"
     },
     {
       "id": "M8-003",
@@ -2677,6 +2677,14 @@
       "to": "blocked",
       "summary": "Started the curriculum-quality design handoff; implementation is held pending accessibility targets, supported audiences, critical journeys, performance budgets, measurement, release response, waivers, and remediation ownership.",
       "evidence_url": "specs/spec-m9-curriculum-quality-budgets.html"
+    },
+    {
+      "at": "2026-08-05T12:43:33+07:00",
+      "item_id": "M8-002",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved deferring Helping Hand until a moderated community feature exists; the badge remains visible but unavailable and unearnable, with no community records, moderation workflow, staff override, or academic effect introduced.",
+      "evidence_url": "specs/spec-m8-helping-hand-community.html"
     }
   ]
 }
