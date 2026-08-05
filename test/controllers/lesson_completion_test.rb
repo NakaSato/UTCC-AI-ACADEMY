@@ -58,6 +58,24 @@ class LessonCompletionTest < ActionDispatch::IntegrationTest
     assert_not_predicate Submission.sole, :passed?
   end
 
+  test "a learner can still submit when the display reaches zero hearts" do
+    student = users(:one)
+    course = Course.find_by!(code: topic_params[:course])
+    topic = Topic.find_by!(key: topic_params[:topic])
+    5.times do
+      Submission.create!(user: student, course:, topic:, kind: "quiz", answer: WRONG_ANSWER,
+                         passed: false, score: 0)
+    end
+
+    assert_equal 0, LearnerProgress.new(student.reload).hearts
+    assert_difference -> { Submission.count }, 1 do
+      submit(kind: "quiz", answer: RIGHT_ANSWER)
+    end
+
+    assert_response :success
+    assert response.parsed_body["passed"]
+  end
+
   # The grader scores the attempt and the controller has to carry that to the
   # row — a score that stops being passed through would leave the Teaching
   # console averaging nothing, with no other screen to notice.

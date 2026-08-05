@@ -2,10 +2,10 @@
 id: ADR-0016
 type: adr
 title: Define the learner hearts attempt and refill policy
-status: draft
+status: accepted
 owners: ["@product-owner", "@academic-owner", "@tech-lead"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-04
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -20,7 +20,10 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/learner_progress_test.rb
+  - test/controllers/lesson_completion_test.rb
+  - test/controllers/app_header_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
@@ -28,10 +31,11 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Define the learner hearts attempt and refill policy
 
-> **Decision state:** Agent-prepared draft. The Product Owner and Academic
-> Owner must decide whether hearts are display-only or an attempt gate, and
-> what learner support and override rules apply before the current behavior is
-> changed.
+> **Decision state:** Accepted by the user on 2026-08-04. Hearts remain a
+> display-only learner signal: five hearts maximum, one heart per failed
+> submission, and passive refill as each failure leaves the four-hour window.
+> Zero hearts never blocks an attempt. No instructor or administrator grants,
+> overrides, or persisted heart balance are introduced.
 
 > [Decision Records](README.md) ·
 > [M8 hearts specification](../specs/spec-m8-hearts-attempt-policy.md) ·
@@ -64,25 +68,22 @@ course progress, support workload, and the meaning of completion evidence.
 
 ## Decision boundary
 
-The accountable owners must decide:
+The accepted policy is:
 
-1. Whether zero hearts blocks any new graded attempt, only selected attempt
-   kinds, or no attempt at all.
-2. Whether a failure costs a heart on every attempt, only once per topic/round,
-   or according to another approved rule.
-3. Whether refill remains passive time-based recovery, becomes a scheduled
-   grant, or has another duration and maximum.
-4. Whether a learner may continue an in-flight attempt after reaching zero, and
-   how duplicate or concurrent submissions are handled.
-5. Whether an instructor or administrator can grant an exception, who may do so,
-   for how long, with what audit event, and without exposing unnecessary data.
-6. Whether course, section, role, accessibility, or assessment context changes
-   the rule.
-7. How the rule affects topic unlocking, completion, certificates, reports,
-   notifications, and learner-facing Thai/English explanations.
-
-Until those decisions are accepted, the safe engineering baseline is to retain
-the current display-only behavior and not persist or enforce a new gate.
+1. Zero hearts never blocks a graded attempt; the server continues accepting
+   attempts at zero.
+2. Each failed submission contributes one recent failure to the display. A
+   duplicate or concurrent failed submission follows the same existing
+   submission semantics; no separate heart transaction is introduced.
+3. The display has a maximum of five hearts. Each failure leaves the display
+   after four hours, passively restoring one heart; no scheduled grant exists.
+4. The rule is global and display-only. It does not vary by course, section,
+   role, accessibility context, or assessment kind.
+5. Instructors and administrators cannot grant, override, or edit hearts.
+6. Hearts do not affect unlocking, completion, certificates, reports,
+   notifications, or academic evidence.
+7. Existing Thai and English heart copy remains aligned with the display-only
+   behavior; no blocking or support workflow is exposed.
 
 ## Alternatives
 
@@ -109,8 +110,9 @@ server must classify every attempt consistently.
 This supports explicit grants, overrides, and audit history, but introduces new
 state, reconciliation, migration, privacy, and operational responsibilities.
 
-No option is selected by this draft. The display-only baseline remains the
-fallback until the human policy is accepted.
+The display-only option is selected. The other options remain documented as
+rejected because they would introduce an academic gate, recovery workflow, and
+persisted state that the owners did not approve.
 
 ## Consequences
 

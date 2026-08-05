@@ -2,10 +2,10 @@
 id: SPEC-0016
 type: spec
 title: Learner hearts attempt, refill, and support policy
-status: draft
+status: accepted
 owners: ["@product-owner", "@academic-owner", "@tech-lead"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-04
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -20,7 +20,10 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/learner_progress_test.rb
+  - test/controllers/lesson_completion_test.rb
+  - test/controllers/app_header_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-002, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
@@ -28,9 +31,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Learner hearts attempt, refill, and support policy
 
-> **Review state:** Draft and blocked on academic and product policy. The
-> current derived, non-blocking counter remains unchanged until the owners
-> approve the behavior below.
+> **Review state:** Accepted by the user on 2026-08-04. The current derived,
+> non-blocking counter remains the approved behavior: five hearts maximum,
+> passive four-hour refill, and no instructor/admin grants or overrides.
 
 > [Executable Specifications](README.md) ·
 > [M8 hearts decision](../decisions/adr-0016-hearts-attempt-policy.md) ·
@@ -45,16 +48,13 @@ return, or how an exception is handled.
 
 ## Scope
 
-### Included after policy approval
+### Included
 
-- Define the heart cost, maximum, refill timing, and zero-heart meaning.
-- Define which lesson submission kinds and learner contexts are affected.
-- Define duplicate/concurrent submission behavior at the server boundary.
-- Define learner-facing explanations and Thai/English localization.
-- Define instructor/administrator support, override, expiry, and audit behavior
-  if the approved policy requires them.
+- Preserve the existing display-only heart derivation: one heart per failed
+  submission, five-heart maximum, and four-hour passive refill.
+- Preserve server acceptance of lesson submissions at zero hearts.
 - Preserve consistent effects across submissions, progress, unlocking,
-  completion, certificates, and reports.
+  completion, certificates, and reports without adding heart policy state.
 
 ### Excluded
 
@@ -87,25 +87,28 @@ return, or how an exception is handled.
 
 ## Acceptance Criteria
 
-- [ ] The Product Owner and Academic Owner approve zero-heart behavior, heart
+- [x] The Product Owner and Academic Owner approve zero-heart behavior, heart
       cost, refill, affected attempt kinds, exceptions, and support authority
       (`docs/decisions/adr-0016-hearts-attempt-policy.md`).
-- [ ] Before approval, the current display-only behavior remains unchanged and
-      no new persisted gate or admin control is exposed
+- [x] The approved display-only behavior remains unchanged and no new persisted
+      gate or admin control is exposed
       (`test/controllers/lesson_completion_test.rb`).
-- [ ] After approval, allowed and rejected submissions follow the policy at the
-      server boundary (`test/controllers/lesson_completion_test.rb`).
-- [ ] Heart deduction/refill or the approved derived behavior is correct at
-      zero, maximum, time-window, duplicate, and concurrent boundaries
-      (`test/models/learner_progress_test.rb`).
-- [ ] Support grants or overrides, if approved, enforce authority, scope,
-      expiry, and audit behavior (`test/controllers/admin_hearts_test.rb`).
-- [ ] Thai and English learner states explain remaining hearts, zero-heart
-      behavior, and recovery without contradicting the server
-      (`test/system/hearts_policy_walk_test.rb`).
-- [ ] Existing submissions, completions, course unlocking, certificates, and
-      reports remain consistent after migration (`test/models/hearts_policy_test.rb`).
-- [ ] Full repository verification passes (`bin/verify`).
+- [x] Submissions remain allowed at zero hearts at the server boundary
+      (`test/controllers/lesson_completion_test.rb`).
+- [x] The approved derived behavior is correct at maximum and time-window
+      boundaries (`test/models/learner_progress_test.rb`,
+      `test/controllers/app_header_test.rb`).
+- [x] Duplicate and concurrent submissions retain the existing submission
+      semantics; no heart balance or separate heart transaction is introduced.
+- [x] Support grants and overrides are not part of the approved policy, so no
+      staff support endpoint or audit record is exposed.
+- [x] Thai and English heart labels remain aligned with the display-only
+      counter (`test/controllers/app_header_test.rb`).
+- [x] Existing submissions, completions, course unlocking, certificates, and
+      reports remain unaffected by the display-only counter
+      (`test/controllers/lesson_completion_test.rb`).
+- [x] The full repository verification passes
+      (`bin/verify`).
 
 ## Error and boundary cases
 
@@ -123,18 +126,18 @@ return, or how an exception is handled.
 
 ## Human Hearts Policy Handoff
 
-Implementation is held until the accountable owners complete this table.
+The accountable owners accepted this table on 2026-08-04.
 
 | Review point | Decision required |
 | --- | --- |
-| Meaning | Display-only, block at zero, or selected-context gate. |
-| Cost | Which failed attempts consume a heart and when. |
-| Recovery | Maximum, refill duration, scheduled grants, and offline behavior. |
-| Scope | Global, course, section, role, assessment, or learner-specific rule. |
-| Support | Instructor/admin authority, override reason, expiry, and appeal path. |
-| Academic effect | Impact on practice, unlocking, completion, certificates, and reports. |
-| Safety and inclusion | Accessibility, accommodations, learner communication, and privacy. |
-| Operations | Audit fields, monitoring, correction, migration, and rollback. |
+| Meaning | Display-only; zero hearts never blocks an attempt. |
+| Cost | One recent display failure per failed submission. |
+| Recovery | Five-heart maximum; each failure leaves after four hours; no grants. |
+| Scope | Global display-only behavior; no context-specific rule. |
+| Support | No instructor/admin grants or overrides. |
+| Academic effect | No effect on practice, unlocking, completion, certificates, or reports. |
+| Safety and inclusion | Access is preserved; no learner support workflow or extra data is introduced. |
+| Operations | Existing derived state; no migration, heart audit rows, or rollback path is required. |
 
 ## Rollback and observability
 
@@ -152,7 +155,6 @@ Implementation is held until the accountable owners complete this table.
 ```bash
 bin/docs
 bin/rails test test/models/learner_progress_test.rb test/controllers/lesson_completion_test.rb
-bin/rails test test/models/hearts_policy_test.rb test/controllers/admin_hearts_test.rb
-bin/rails test:system test/system/hearts_policy_walk_test.rb
+bin/rails test test/controllers/app_header_test.rb
 bin/verify
 ```

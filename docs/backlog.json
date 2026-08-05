@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T01:09:55+07:00",
+  "updated_at": "2026-08-04T06:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -765,7 +765,7 @@
     {
       "id": "M7-004",
       "title": "Persist approved admin feature flags with explicit runtime consumers",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M7",
@@ -816,23 +816,19 @@
     {
       "id": "M8-001",
       "title": "Define whether zero hearts blocks learner attempts and how recovery works",
-      "status": "blocked",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Academic Owner, and Tech Lead",
       "milestone": "M8",
       "depends_on": [],
-      "blocker": {
-        "summary": "The application displays a derived five-heart counter and passively refills it after four hours, but zero hearts does not currently block attempts and no academic policy defines blocking, refill, exceptions, or support.",
-        "decision_owner": "Product Owner and Academic Owner",
-        "next_action": "Review ADR-0016/SPEC-0016 and approve zero-heart meaning, heart cost, refill, affected attempt kinds, learner support, academic effects, and safety boundaries before implementation."
-      },
+      "blocker": null,
       "evidence": [
         {
-          "label": "M8 hearts policy architecture draft",
+          "label": "Accepted M8 hearts policy architecture",
           "url": "decisions/adr-0016-hearts-attempt-policy.html"
         },
         {
-          "label": "M8 hearts policy specification draft",
+          "label": "Accepted M8 hearts policy specification",
           "url": "specs/spec-m8-hearts-attempt-policy.html"
         },
         {
@@ -852,7 +848,7 @@
           "url": "specs/spec-m8-hearts-attempt-policy.html#human-hearts-policy-handoff"
         }
       ],
-      "updated_at": "2026-08-03T19:05:00+07:00"
+      "updated_at": "2026-08-04T06:00:00+07:00"
     },
     {
       "id": "M8-002",
@@ -2608,6 +2604,14 @@
       "from": "new",
       "to": "blocked",
       "summary": "Started the hearts-policy design handoff; implementation is held pending zero-heart meaning, cost, refill, affected attempts, support, academic effects, and safety policy.",
+      "evidence_url": "specs/spec-m8-hearts-attempt-policy.html"
+    },
+    {
+      "at": "2026-08-04T06:00:00+07:00",
+      "item_id": "M8-001",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved the display-only hearts policy: five-heart maximum, passive four-hour refill, attempts allowed at zero, and no instructor/admin grants or overrides. Existing behavior remains unchanged.",
       "evidence_url": "specs/spec-m8-hearts-attempt-policy.html"
     },
     {
