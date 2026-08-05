@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
-    <meta name="theme-color" content="#8f1830">
+    <meta name="theme-color" content="#17120F">
     <title>{{ page.title | default: site.title }} · {{ site.title }}</title>
     <meta name="description" content="{{ page.description | default: site.description | escape }}">
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   </head>
-  <body class="min-h-screen bg-stone-100 text-stone-900 antialiased">
+  <body class="min-h-screen bg-canvas text-ink antialiased">
     <a class="skip-link" href="#content">Skip to content</a>
 
     <header class="site-header">
@@ -23,12 +23,12 @@
         </a>
 
         <nav aria-label="Documentation">
-          <a href="{{ '/' | relative_url }}">Status</a>
-          <a href="{{ '/roadmap.html' | relative_url }}">Roadmap</a>
-          <a href="{{ '/feature-inventory.html' | relative_url }}">Features</a>
-          <a href="{{ '/development-flow.html' | relative_url }}">Flow</a>
-          <a href="{{ '/process.html' | relative_url }}">Process</a>
-          <a href="{{ '/tags.html' | relative_url }}">Tags</a>
+          <a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.url == '/index.html' %} aria-current="page"{% endif %}>Status</a>
+          <a href="{{ '/roadmap.html' | relative_url }}"{% if page.url == '/roadmap.html' %} aria-current="page"{% endif %}>Roadmap</a>
+          <a href="{{ '/feature-inventory.html' | relative_url }}"{% if page.url == '/feature-inventory.html' %} aria-current="page"{% endif %}>Features</a>
+          <a href="{{ '/development-flow.html' | relative_url }}"{% if page.url == '/development-flow.html' %} aria-current="page"{% endif %}>Flow</a>
+          <a href="{{ '/process.html' | relative_url }}"{% if page.url == '/process.html' %} aria-current="page"{% endif %}>Process</a>
+          <a href="{{ '/tags.html' | relative_url }}"{% if page.url == '/tags.html' %} aria-current="page"{% endif %}>Tags</a>
         </nav>
       </div>
     </header>

@@ -15,27 +15,27 @@ This is the current project status page. It is generated from the machine-readab
 {% assign queued_items = current_items | where: "status", "queued" %}
 
 <div class="status-overview my-7 grid grid-cols-2 gap-3 lg:grid-cols-3" aria-label="Current project summary">
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>Delivery state</span>
     <strong><span class="status status-{{ site.data.backlog.delivery_state }}">{{ site.data.backlog.delivery_state | replace: "_", " " | capitalize }}</span></strong>
   </div>
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>Current milestone</span>
     <strong><a href="{{ site.data.backlog.current_milestone.roadmap_url }}">{{ site.data.backlog.current_milestone.name | escape }}</a></strong>
   </div>
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>In progress</span>
     <strong>{{ in_progress_items.size }}</strong>
   </div>
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>Verification</span>
     <strong>{{ verification_items.size }}</strong>
   </div>
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>Queued</span>
     <strong>{{ queued_items.size }}</strong>
   </div>
-  <div class="rounded-xl border border-stone-200 bg-stone-100 p-4">
+  <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
     <span>Blocked</span>
     <strong><a href="#blockers-and-decisions">{{ blocked_items.size }}</a></strong>
   </div>
@@ -48,7 +48,7 @@ This is the current project status page. It is generated from the machine-readab
 
 ## Deployed revision
 
-<div class="revision-summary rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+<div class="revision-summary rounded-2xl border border-hairline bg-surface-4 p-5">
   <dl class="grid gap-4 sm:grid-cols-2">
     <div>
       <dt>Repository</dt>
