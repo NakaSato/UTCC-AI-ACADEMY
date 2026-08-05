@@ -274,9 +274,13 @@
         {
           "label": "Milestone 1",
           "url": "roadmap.html#milestone-1--reliable-account-recovery"
+        },
+        {
+          "label": "Mailpit staging verification",
+          "url": "runbooks/rb-mailpit-staging-verification.html"
         }
       ],
-      "updated_at": "2026-08-01T11:34:50+07:00"
+      "updated_at": "2026-08-05T12:32:23+07:00"
     },
     {
       "id": "MAIL-003",
@@ -297,9 +301,13 @@
         {
           "label": "Milestone 1 success criteria",
           "url": "roadmap.html#success-criteria"
+        },
+        {
+          "label": "Mailpit staging verification",
+          "url": "runbooks/rb-mailpit-staging-verification.html"
         }
       ],
-      "updated_at": "2026-08-01T11:34:50+07:00"
+      "updated_at": "2026-08-05T12:32:23+07:00"
     },
     {
       "id": "M2-001",

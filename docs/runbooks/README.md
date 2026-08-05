@@ -5,3 +5,7 @@
 
 Create a runbook from the [runbook template](../templates/runbook.md) before
 operating a production dependency or recovery procedure.
+
+## Runbooks
+
+- [RB-0001 — Verify production-shaped password reset through Mailpit staging](rb-mailpit-staging-verification.md) — draft; non-production SMTP evidence only
