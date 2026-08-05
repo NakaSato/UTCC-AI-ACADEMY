@@ -119,7 +119,7 @@ The Product Owner and Tech Lead approved the following choices for this slice:
 | Review point | Evidence | Accepted decision |
 | --- | --- | --- |
 | PDF renderer and dependency boundary | [ADR-0009 alternatives](../decisions/adr-0009-course-syllabus-pdf.md#alternatives) | Prawn adapter with bundled Noto Sans Thai. |
-| Course visibility and authorization | [Course document controller](../../app/controllers/course_documents_controller.rb) | Any authenticated learner may download a catalog course syllabus. |
+| Course visibility and authorization | Course document controller (`app/controllers/course_documents_controller.rb`) | Any authenticated learner may download a catalog course syllabus. |
 | Unmodeled-course behavior | [Boundary cases](#boundary-cases-and-unresolved-policy) | Unknown and unmodeled courses return `404`. |
 | Locale, filename, Thai font, and accessibility | [ADR-0009 consequences](../decisions/adr-0009-course-syllabus-pdf.md#consequences) | Requested supported locale, deterministic ASCII-safe filename, bundled Thai font. |
 | M6 scope boundary | [Excluded scope](#excluded) | SSO, certificates, sharing, and stored versions remain separate. |

@@ -125,11 +125,11 @@ checks against the following evidence and boundaries before acceptance:
 
 | Review point | Evidence | Accepted boundary |
 | --- | --- | --- |
-| Course-scoped shape, totals, mastery, and safe parameter fallback | [Model and controller tests](../../test/models/knowledge_map_test.rb) and [controller tests](../../test/controllers/knowledge_maps_controller_test.rb) | Selected-course isolation is required. |
-| Project mode shows the project plus sequential same-course prerequisites | [Project-mode model/controller coverage](../../test/models/knowledge_map_test.rb) | This is the accepted learner-facing project workflow. |
-| A catalog course without owned curriculum renders an empty safe map | [Unmodeled-course coverage](../../test/models/knowledge_map_test.rb) | Empty state is preferred to compatibility content. |
-| Browser walkthrough exposes distinct AI1101 and AI1102 maps | [System walkthrough](../../test/system/knowledge_map_walk_test.rb) | The two-course walkthrough is the acceptance path. |
-| “Mark as known” and settings controls are absent | [Controller control-boundary coverage](../../test/controllers/knowledge_maps_controller_test.rb) | Removal is the accepted learner experience. |
+| Course-scoped shape, totals, mastery, and safe parameter fallback | Model and controller tests (`test/models/knowledge_map_test.rb`) and controller tests (`test/controllers/knowledge_maps_controller_test.rb`) | Selected-course isolation is required. |
+| Project mode shows the project plus sequential same-course prerequisites | Project-mode model/controller coverage (`test/models/knowledge_map_test.rb`) | This is the accepted learner-facing project workflow. |
+| A catalog course without owned curriculum renders an empty safe map | Unmodeled-course coverage (`test/models/knowledge_map_test.rb`) | Empty state is preferred to compatibility content. |
+| Browser walkthrough exposes distinct AI1101 and AI1102 maps | System walkthrough (`test/system/knowledge_map_walk_test.rb`) | The two-course walkthrough is the acceptance path. |
+| “Mark as known” and settings controls are absent | Controller control-boundary coverage (`test/controllers/knowledge_maps_controller_test.rb`) | Removal is the accepted learner experience. |
 
 The approval is a human lifecycle decision; automated validation remains
 evidence rather than a substitute for review.

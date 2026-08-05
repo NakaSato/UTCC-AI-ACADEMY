@@ -33,7 +33,7 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
 > [Decision Records](README.md) ·
 > [M6 SSO specification](../specs/spec-m6-utcc-sso-account-linking.md) ·
 > [Roadmap Milestone 6](../roadmap.md#milestone-6--institutional-access-and-documents) ·
-> [Current local authentication](../../app/controllers/sessions_controller.rb)
+> Current local authentication: `app/controllers/sessions_controller.rb`
 
 ## Context
 
