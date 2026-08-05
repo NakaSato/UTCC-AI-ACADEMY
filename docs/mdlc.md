@@ -144,13 +144,14 @@ The reason to do any of this in a repo that Claude Code works in daily.
 Existing historical documentation is not being backfilled into artificial ADRs.
 `CLAUDE.md` remains the better record for decisions that predate this lifecycle.
 
-The active state is:
+The active state, as of 2026-08-05:
 
-1. **ADR-0001 records adoption** and is the first checked lifecycle document.
-2. **`bin/docs` implements D1–D4** and runs in local CI, remote CI, and documentation builds.
-3. **Templates exist for all conditional artifacts.** A template is copied only when its triggering event exists.
-4. **The first application deployment remains blocked on real infrastructure.** A release record and tested backup/restore runbook are required before it.
-5. **Postmortems are created only after an incident or material near miss.**
+1. **The decision and specification corpora are live.** 23 ADRs (`ADR-0001`–`ADR-0023`) — 11 `accepted`, 11 `draft`, one `superseded` — and 23 specs, 11 `accepted` and 12 `draft`. ADR-0001 records adoption and remains the first checked lifecycle document.
+2. **The supersede rule has been exercised once.** ADR-0002 (select a production email provider) carries `superseded_by: [ADR-0004]`, which defers production email instead. The direction that lost is kept, and D2 resolves the pointer in both directions.
+3. **`bin/docs` implements D1–D4** and runs in local CI, remote CI, and documentation builds. It has also grown three delegates — `script/validate-backlog`, `script/validate-markdown-graph` and `script/validate-skill-library` — so the single step named *"Docs: Backlog, schema, and references"* fails on a malformed backlog, a broken local link or an unregistered skill as well as on malformed frontmatter. A clean run currently reports 46 lifecycle documents checked with 0 warnings.
+4. **Templates exist for all six conditional artifacts**, plus an external-feature-proposal intake template that is deliberately not a lifecycle type — it routes an outside request through human product triage before any backlog work exists. A template is copied only when its triggering event exists.
+5. **Four of the six artifact folders are still empty, and correctly so.** `docs/runbooks/`, `docs/releases/`, `docs/postmortems/` and `docs/outcomes/` hold only their READMEs. The first application deployment remains blocked on real infrastructure — ADR-0021 (backup/restore verification) and ADR-0022 (production deployment boundary) are both still `draft`, and a release record plus a tested backup/restore runbook are required before it.
+6. **Postmortems are created only after an incident or material near miss.** There has not been one.
 
 ## The five that carry the rest
 
