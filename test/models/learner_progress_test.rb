@@ -45,6 +45,25 @@ class LearnerProgressTest < ActiveSupport::TestCase
     assert_equal 1, progress.applied
   end
 
+  test "prior knowledge counts toward progress and course completion only" do
+    course = courses(:ai1101)
+    course.topics.each do |topic|
+      PriorKnowledge.mark(user: @user, course:, topic:)
+    end
+
+    progress = LearnerProgress.new(@user.reload)
+    catalog_course = progress.courses.find { it.code == course.code }
+
+    assert_equal course.topics.size, progress.learned
+    assert_predicate catalog_course, :completed?
+    assert_equal 0, progress.xp
+    assert_equal 0, progress.gems
+    assert_equal 0, progress.applied
+    assert_equal 0, progress.projects_done
+    assert_equal 0, progress.certificates_earned
+    assert_empty LearnerProgress.new(@user).keys_for(course.code)
+  end
+
   test "xp and level follow the completions" do
     progress = complete(3)
     assert_equal 3 * LearnerProgress::XP_PER_LEARNED, progress.xp

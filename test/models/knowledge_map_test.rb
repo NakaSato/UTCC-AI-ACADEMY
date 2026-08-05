@@ -23,6 +23,17 @@ class KnowledgeMapTest < ActiveSupport::TestCase
     assert_equal 1, ai1102.learned
   end
 
+  test "map mastery includes course-scoped prior knowledge" do
+    PriorKnowledge.mark(user: users(:one), course: courses(:ai1102), topic: courses(:ai1102).topics.first)
+
+    ai1101 = KnowledgeMap.curriculum("AI1101", user: users(:one)).first
+    ai1102 = KnowledgeMap.curriculum("AI1102", user: users(:one)).first
+
+    assert_equal 0, ai1101.learned
+    assert_equal 1, ai1102.learned
+    assert ai1102.children.flat_map(&:children).first.known?
+  end
+
   test "project mode includes sequential prerequisites for selected-course projects" do
     root = KnowledgeMap.curriculum("AI1102", mode: "project").first
     project = Syllabus.topics("AI1102").find { it.kind == "project" }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-05T12:43:33+07:00",
+  "updated_at": "2026-08-05T23:44:18+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -902,23 +902,19 @@
     {
       "id": "M8-003",
       "title": "Define the meaning and downstream effects of marking prior knowledge",
-      "status": "blocked",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Academic Owner, and Tech Lead",
       "milestone": "M8",
       "depends_on": [],
-      "blocker": {
-      "summary": "The user approved that Mark as known contributes to academic progress and course completion; authority, evidence, provenance, reversibility, and remaining downstream effects are not defined.",
-        "decision_owner": "Product Owner and Academic Owner",
-      "next_action": "Define who may mark or verify prior knowledge, its provenance and reversal rules, and whether it affects XP, gems, streaks, leaderboards, reports, applied work, or certificates."
-      },
+      "blocker": null,
       "evidence": [
         {
-          "label": "M8 prior-knowledge architecture draft",
+          "label": "Accepted M8 prior-knowledge architecture",
           "url": "decisions/adr-0018-prior-knowledge-boundary.html"
         },
         {
-          "label": "M8 prior-knowledge specification draft",
+          "label": "Accepted M8 prior-knowledge specification",
           "url": "specs/spec-m8-prior-knowledge.html"
         },
         {
@@ -936,9 +932,13 @@
         {
           "label": "Prior-knowledge policy handoff",
           "url": "specs/spec-m8-prior-knowledge.html#human-prior-knowledge-policy-handoff"
+        },
+        {
+          "label": "Prior-knowledge implementation tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/prior_knowledges_controller_test.rb"
         }
       ],
-    "updated_at": "2026-08-04T02:10:00+07:00"
+      "updated_at": "2026-08-05T23:44:18+07:00"
     },
     {
       "id": "M9-001",
@@ -2685,6 +2685,14 @@
       "to": "complete",
       "summary": "The user approved deferring Helping Hand until a moderated community feature exists; the badge remains visible but unavailable and unearnable, with no community records, moderation workflow, staff override, or academic effect introduced.",
       "evidence_url": "specs/spec-m8-helping-hand-community.html"
+    },
+    {
+      "at": "2026-08-05T23:44:18+07:00",
+      "item_id": "M8-003",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved learner-owned, course-scoped, reversible prior-knowledge marks; they contribute to map progress and course completion only, while XP, gems, activity, awards, reports, applied work, certificates, and unlocking remain completion-based.",
+      "evidence_url": "specs/spec-m8-prior-knowledge.html"
     }
   ]
 }

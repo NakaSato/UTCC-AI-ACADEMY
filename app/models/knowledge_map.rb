@@ -1,11 +1,12 @@
 # The course-scoped knowledge map read model. Shape comes from Syllabus and
-# mastery comes from the selected learner's course completions; no map taxonomy
-# or mastery counters are stored separately.
+# mastery comes from the selected learner's completions and prior-knowledge
+# marks; no map taxonomy or mastery counters are stored separately.
 module KnowledgeMap
-  Node = Data.define(:id, :total, :learned, :leaf, :in_project, :children,
+  Node = Data.define(:id, :total, :learned, :known, :leaf, :in_project, :children,
                      :label, :course_code, :topic_key, :prerequisite_keys) do
     def name = label
     def leaf? = leaf
+    def known? = known
     def in_project? = in_project
     def prerequisite? = prerequisite_keys.any?
     def fully_learned? = learned >= total
@@ -29,7 +30,9 @@ module KnowledgeMap
       code = course.code
       return [ empty_course_node(course) ] unless course.course_modules.exists?
 
-      done_keys = user ? LearnerProgress.new(user).keys_for(code) : Set.new
+      progress = user ? LearnerProgress.new(user) : nil
+      done_keys = progress ? progress.map_keys_for(code) : Set.new
+      known_keys = progress ? progress.prior_knowledge_keys_for(code) : Set.new
       syllabus_topics = Syllabus.topics(code)
       project_keys = syllabus_topics.select { it.kind == "project" }.map(&:key).to_set
       visible_keys = visible_topic_keys(syllabus_topics, project_keys, mode)
@@ -42,6 +45,7 @@ module KnowledgeMap
             id: topic.key,
             total: 1,
             learned: topic.done? ? 1 : 0,
+            known: known_keys.include?(topic.key),
             leaf: true,
             in_project: topic.kind.to_s == "project",
             children: [],
@@ -56,6 +60,7 @@ module KnowledgeMap
           id: "#{code}-module-#{mod.number}",
           total: children.sum(&:total),
           learned: children.sum(&:learned),
+          known: false,
           leaf: false,
           in_project: false,
           children:,
@@ -70,6 +75,7 @@ module KnowledgeMap
         id: code,
         total: modules.sum(&:total),
         learned: modules.sum(&:learned),
+        known: false,
         leaf: false,
         in_project: false,
         children: modules,
@@ -127,6 +133,7 @@ module KnowledgeMap
           id: course.code,
           total: 0,
           learned: 0,
+          known: false,
           leaf: false,
           in_project: false,
           children: [],

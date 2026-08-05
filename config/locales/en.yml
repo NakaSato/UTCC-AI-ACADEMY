@@ -38,6 +38,9 @@ en:
     feature_setting_invalid: "That feature setting is not available"
     feature_setting_stale: "That feature setting changed elsewhere — reload before saving"
     feature_unavailable: "That feature is currently unavailable"
+    prior_knowledge_marked: "This topic now counts as known for course progress"
+    prior_knowledge_unmarked: "This topic no longer counts as prior knowledge"
+    prior_knowledge_invalid: "That topic could not be marked as prior knowledge"
     course_state_invalid: "That course state change is not allowed"
     role_self: "You cannot change your own role"
     role_invalid: "That role does not exist"
@@ -1107,6 +1110,8 @@ en:
     leaf_desc: "Read the short theory, then clear the exercise and coding task to close this topic on the map."
     start_topic: "Start this topic"
     mark_known: "Mark as known"
+    unmark_known: "Unmark as known"
+    known_desc: "This topic counts toward course progress and completion, but not XP, activity, awards, reports, applied work, or certificates."
     settings_label: "Map settings"
     home_crumb: "Back to catalog"
     modes:

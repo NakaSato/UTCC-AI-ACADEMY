@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -229,6 +229,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "prior_knowledges", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "marked_at", null: false
+    t.bigint "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["course_id"], name: "index_prior_knowledges_on_course_id"
+    t.index ["topic_id"], name: "index_prior_knowledges_on_topic_id"
+    t.index ["user_id", "course_id", "topic_id"], name: "index_prior_knowledges_on_user_id_and_course_id_and_topic_id", unique: true
+    t.index ["user_id", "course_id"], name: "index_prior_knowledges_on_user_id_and_course_id"
+    t.index ["user_id"], name: "index_prior_knowledges_on_user_id"
   end
 
   create_table "proctor_events", force: :cascade do |t|
@@ -488,6 +502,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
   add_foreign_key "enrollments", "users"
   add_foreign_key "lesson_integrity_settings", "courses"
   add_foreign_key "notifications", "users"
+  add_foreign_key "prior_knowledges", "courses"
+  add_foreign_key "prior_knowledges", "topics"
+  add_foreign_key "prior_knowledges", "users"
   add_foreign_key "proctor_events", "courses"
   add_foreign_key "proctor_events", "topics"
   add_foreign_key "proctor_events", "users"

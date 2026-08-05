@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :topic_completions, dependent: :destroy
+  has_many :prior_knowledges, dependent: :destroy
   has_many :submissions, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :academic_posts, foreign_key: :owner_id, dependent: :destroy,

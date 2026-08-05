@@ -11,7 +11,7 @@ module CourseCatalog
   # about a user. How much there is to do comes from that course's Syllabus.
   Course = Data.define(
     :code, :credits, :rating, :projects, :hours, :level, :core, :certificate,
-    :tags, :learners, :learned, :applied, :next_key
+    :tags, :learners, :learned, :applied, :academy_learned, :next_key
   ) do
     def topics = Syllabus.topic_count(code)
     def applied_topics = Syllabus.applied_topic_count(code)
@@ -25,6 +25,7 @@ module CourseCatalog
     # enrol button, so the first completed topic is the enrolment.
     def started? = learned.positive?
     def completed? = learned >= topics
+    def academy_completed? = academy_learned >= topics
     def percent = (learned * 100.0 / topics).round
     def applied_percent = (applied * 100.0 / applied_topics).round
 
@@ -70,6 +71,7 @@ module CourseCatalog
     def all(user: nil)
       records(user:).map do |record|
         Course.new(**attributes_for(record), learned: 0, applied: 0,
+                   academy_learned: 0,
                    next_key: Syllabus.topic_keys(record.code).first)
       end
     end

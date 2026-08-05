@@ -1,5 +1,5 @@
-# Everything the app knows about one learner's progress, counted off
-# topic_completions and submissions. It was the first screen-facing object
+# Everything the app knows about one learner's progress, counted off topic
+# completions, prior-knowledge marks, and submissions. It was the first screen-facing object
 # backed by real records rather than a frozen constant, and it absorbed the
 # rest of LearnerProfile piece by piece until that module could go.
 #
@@ -45,16 +45,28 @@ class LearnerProgress
     @completions ||= user ? user.topic_completions.includes(:course, :topic).to_a : []
   end
 
+  def prior_knowledges
+    @prior_knowledges ||= user ? user.prior_knowledges.includes(:course, :topic).to_a : []
+  end
+
   def any? = completions.any?
 
   # code => [learned, applied]
   def course_counts
-    @course_counts ||= completions.group_by(&:course_code).transform_values do |rows|
-      [ rows.size, rows.count(&:applied?) ]
+    @course_counts ||= begin
+      completion_groups = completions.group_by(&:course_code)
+      known_groups = prior_knowledges.group_by(&:course_code)
+      (completion_groups.keys | known_groups.keys).index_with do |code|
+        completion_rows = completion_groups.fetch(code, [])
+        known_keys = known_groups.fetch(code, []).map(&:topic_key)
+        [ (completion_rows.map(&:topic_key) | known_keys).size, completion_rows.count(&:applied?) ]
+      end
     end
   end
 
   def keys_for(code) = completions.select { it.course_code == code }.map(&:topic_key).to_set
+  def prior_knowledge_keys_for(code) = prior_knowledges.select { it.course_code == code }.map(&:topic_key).to_set
+  def map_keys_for(code) = keys_for(code) | prior_knowledge_keys_for(code)
 
   # ---- Courses ------------------------------------------------------------
 
@@ -63,7 +75,9 @@ class LearnerProgress
   def courses
     @courses ||= CourseCatalog.all(user:).map do |course|
       learned, applied = course_counts.fetch(course.code, [ 0, 0 ])
-      course.with(learned:, applied:, next_key: Syllabus.next_topic_key(keys_for(course.code), course.code))
+      academy_learned = completions.count { it.course_code == course.code }
+      course.with(learned:, applied:, academy_learned:,
+                  next_key: Syllabus.next_topic_key(keys_for(course.code), course.code))
     end
   end
 
@@ -78,7 +92,7 @@ class LearnerProgress
   # Counted across the courses actually started: a total that included the whole
   # catalogue would make every learner look permanently stalled.
 
-  def learned = completions.size
+  def learned = course_counts.values.sum(&:first)
   def applied = completions.count(&:applied?)
   def learned_total = started_courses.sum(&:topics)
   def applied_total = started_courses.sum(&:applied_topics)
@@ -93,8 +107,8 @@ class LearnerProgress
 
   # ---- XP, level and gems -------------------------------------------------
 
-  def xp = learned * XP_PER_LEARNED + applied * XP_PER_APPLIED
-  def gems = learned * GEMS_PER_LEARNED + applied * GEMS_PER_APPLIED
+  def xp = completions.size * XP_PER_LEARNED + applied * XP_PER_APPLIED
+  def gems = completions.size * GEMS_PER_LEARNED + applied * GEMS_PER_APPLIED
 
   def level = xp / XP_PER_LEVEL + 1
   def level_floor = (level - 1) * XP_PER_LEVEL
@@ -148,7 +162,7 @@ class LearnerProgress
   def projects_done = completions.count { it.applied? && project_keys(it.course_code).include?(it.topic_key) }
   def projects_total = started_courses.sum { project_keys(it.code).size }
 
-  def certificates_earned = courses.count { it.certificate && it.completed? }
+  def certificates_earned = courses.count { it.certificate && it.academy_completed? }
   def certificates_total = courses.count(&:certificate)
 
   # ---- Hearts -------------------------------------------------------------
@@ -274,7 +288,7 @@ class LearnerProgress
       @exercise_keys[course_code] ||= Syllabus.topics(course_code).select { it.kind == "exercise" }.map(&:key)
     end
 
-    def ten_topics? = learned >= 10
+    def ten_topics? = completions.size >= 10
 
     def first_project? = projects_done.positive?
 

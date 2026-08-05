@@ -70,6 +70,8 @@ Rails.application.routes.draw do
   # different question.
   patch "profile/password", to: "profiles#update_password", as: :profile_password
   get "map", to: "knowledge_maps#show", as: :knowledge_map
+  post "map/known", to: "prior_knowledges#create", as: :mark_topic_known
+  delete "map/known", to: "prior_knowledges#destroy", as: :unmark_topic_known
   get "progress", to: "progress#show", as: :progress
   get "leaderboard", to: "leaderboards#show", as: :leaderboard
   get "instructor", to: "instructor#show", as: :instructor

@@ -23,7 +23,7 @@ owner.
 - [SPEC-0015 — Persisted admin feature-flag settings](spec-m7-feature-flag-settings.md) — draft; supported-flag and runtime policy pending
 - [SPEC-0016 — Learner hearts attempt, refill, and support policy](spec-m8-hearts-attempt-policy.md) — draft; academic and product policy pending
 - [SPEC-0017 — Helping Hand award and learner community boundary](spec-m8-helping-hand-community.md) — accepted; Helping Hand deferred until a moderated community feature is approved
-- [SPEC-0018 — Learner-marked prior knowledge and downstream progress policy](spec-m8-prior-knowledge.md) — draft; academic and product policy pending
+- [SPEC-0018 — Learner-marked prior knowledge and downstream progress policy](spec-m8-prior-knowledge.md) — accepted; learner marks affect map progress and course completion only
 - [SPEC-0019 — Active-session visibility and revocation](spec-m9-session-visibility-and-revocation.md) — draft; security, privacy, authority, and retention policy pending
 - [SPEC-0020 — Critical-failure observability and alert ownership](spec-m9-critical-failure-observability.md) — draft; SLO, ownership, privacy, retention, and provider policy pending
 - [SPEC-0021 — Backup, restore, and recovery verification](spec-m9-backup-restore-verification.md) — draft; recovery target, provider, retention, storage, and drill policy pending

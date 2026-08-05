@@ -7,6 +7,7 @@ class Topic < ApplicationRecord
   belongs_to :course_module, inverse_of: :topics
   has_one :course, through: :course_module
   has_many :topic_completions, dependent: :destroy
+  has_many :prior_knowledges, dependent: :destroy
 
   # Which kinds count as "applied" rather than merely learned: the ones where
   # something gets built. The two My Learning bars are this split.

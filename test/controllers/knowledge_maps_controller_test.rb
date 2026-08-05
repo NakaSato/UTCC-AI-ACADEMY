@@ -41,6 +41,20 @@ class KnowledgeMapsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-map-learned]", text: "1"
   end
 
+  test "map totals include prior knowledge without exposing it in project mode" do
+    topic = courses(:ai1102).topics.first
+    PriorKnowledge.mark(user: users(:one), course: courses(:ai1102), topic:)
+
+    get knowledge_map_url(course: "AI1102", topic: topic.key)
+    assert_select "[data-map-learned]", text: "1"
+    assert_select "form[action=?]", mark_topic_known_path(course: "AI1102", topic: topic.key), count: 0
+    assert_select "form[action=?]", unmark_topic_known_path(course: "AI1102", topic: topic.key, mode: "course"), count: 1
+
+    get knowledge_map_url(course: "AI1102", mode: "project", topic: topic.key)
+    assert_no_match(/#{Regexp.escape(I18n.t("map.mark_known"))}/, response.body)
+    assert_no_match(/#{Regexp.escape(I18n.t("map.unmark_known"))}/, response.body)
+  end
+
   test "an unmodeled course never renders another course's map topics" do
     get knowledge_map_url(course: "AI2402")
 
