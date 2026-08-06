@@ -5,7 +5,7 @@ title: Production deployment, artifact, migration, and rollback contract
 status: draft
 owners: ["@platform-owner", "@tech-lead", "@security-owner", "@release-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -13,17 +13,24 @@ depends_on: [ADR-0022, ADR-0020, ADR-0021]
 implemented_by: []
 touches:
   - config/deploy.yml
+  - render.yaml
   - Dockerfile
-  - .github/workflows/ci.yml
+  - .github/workflows/release-artifact.yml
+  - .github/workflows/render-deploy.yml
   - bin/kamal
   - config/database.yml
   - config/environments/production.rb
   - docs/build-release.md
   - docs/releases
   - docs/runbooks
+  - docs/releases
   - db
   - lib
-enforced_by: []
+  - test/release
+enforced_by:
+  - test/release/artifact_provenance_test.rb
+  - test/release/deployment_configuration_test.rb
+  - test/release/release_gate_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-BLD-002, SKILL-BLD-003, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-BLD-002, SKILL-BLD-003]
@@ -31,10 +38,10 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-BLD-002, SKILL-BLD-003]
 
 # Production deployment, artifact, migration, and rollback contract
 
-> **Review state:** Draft and blocked on the real target, registry, domain/TLS,
-> secrets, process topology, release ownership, artifact provenance, migration
-> compatibility, rollback, and post-deploy policy. No production readiness is
-> claimed.
+> **Review state:** Draft with Render selected as the target on 2026-08-06.
+> Registry credential custody, deploy-hook configuration, provider backup and
+> storage evidence, migration review, and live release approval remain required.
+> No production readiness is claimed.
 
 > [Executable Specifications](README.md) ·
 > [M9 deployment decision](../decisions/adr-0022-production-deployment-boundary.md) ·
@@ -42,7 +49,7 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-BLD-002, SKILL-BLD-003]
 
 ## Problem
 
-The repository has a Dockerfile, CI gate, and placeholder Kamal configuration,
+The repository has a Dockerfile, CI gate, and Render image-backed configuration,
 but not a real production deployment contract. The database and storage have
 separate operational boundaries, while the release policy requires immutable
 artifacts, provenance, migration safety, rollback, manual approval, and
@@ -64,8 +71,8 @@ post-deploy verification.
 
 ### Excluded
 
-- Choosing a provider, host, registry, domain, region, or paid service without
-  the accountable human decision.
+- Adding provider credentials, deploy-hook secrets, or live database/storage
+  evidence to Git.
 - Deploying with the private placeholder host, localhost registry, example TLS,
   repository-held secrets, or mutable “latest” identity.
 - Rebuilding an image between verification, approval, and deployment.
@@ -107,10 +114,10 @@ post-deploy verification.
       (`test/release/deployment_configuration_test.rb`).
 - [ ] A release record names migration phases, compatibility, approval,
       rollback, owners, and numeric post-deploy checks
-      (`docs/releases/release-production-template.md`).
+      (`docs/releases/release-render-production-boundary.md`).
 - [ ] Staging or an approved pre-production target exercises deploy, migration,
       health, storage, jobs, WebSockets, mail-safe behavior, and rollback
-      (`test/release/deployment_walk_test.rb`).
+      (`docs/runbooks/rb-render-deployment.md`).
 - [ ] Failed deployment, migration, health, backup, or observability checks stop
       promotion and preserve an actionable evidence trail
       (`test/release/release_gate_test.rb`).
@@ -132,6 +139,17 @@ post-deploy verification.
   missed; image rollback alone is unsafe.
 - The rollback target is unavailable or its artifact no longer passes current
   security verification.
+
+## Render baseline
+
+The approved target boundary is the Singapore Render web service at
+academy.boring9.dev. It pulls a prebuilt linux/amd64 image from GHCR, runs one
+instance with an Active Storage disk, keeps the database external through
+DATABASE_URL, and runs Solid Queue inside Puma. Render runs bin/rails db:migrate
+as the pre-deploy command. GitHub Actions records the source commit, immutable
+digest, SBOM, Critical-vulnerability scan, signature, and build provenance.
+Production promotion is manual and passes the digest through the Render deploy
+hook. The service's release tag is only a bootstrap reference.
 
 ## Human Release Handoff
 

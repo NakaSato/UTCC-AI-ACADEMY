@@ -1,0 +1,43 @@
+name: Render Production Deploy
+
+# Promotion is deliberately manual. Configure the production environment with
+# required reviewers and store the Render deploy-hook URL as a secret before
+# using this workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_digest:
+        description: Full GHCR image reference with an immutable sha256 digest
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+
+    steps:
+      - name: Validate the immutable image reference
+        env:
+          IMAGE_DIGEST: ${{ inputs.image_digest }}
+        run: |
+          ruby -e 'abort("invalid image digest") unless /\Aghcr\.io\/nakasato\/utcc-ai-academy@sha256:[0-9a-f]{64}\z/.match?(ENV.fetch("IMAGE_DIGEST"))'
+
+      - name: Trigger the approved Render deploy hook
+        env:
+          IMAGE_DIGEST: ${{ inputs.image_digest }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          test -n "$RENDER_DEPLOY_HOOK_URL"
+          separator='?'
+          case "$RENDER_DEPLOY_HOOK_URL" in
+            *\?*) separator='&' ;;
+          esac
+          encoded="$(ruby -ruri -e 'puts URI.encode_www_form_component(ARGV.fetch(0))' "$IMAGE_DIGEST")"
+          curl --fail-with-body --silent --show-error --request POST \
+            "${RENDER_DEPLOY_HOOK_URL}${separator}imgURL=${encoded}" \
+            --output render-deploy-response.json
+          ruby -rjson -e 'puts JSON.parse(File.read("render-deploy-response.json")).fetch("id", "accepted")'

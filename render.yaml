@@ -1,70 +1,65 @@
-# Render blueprint — the second deploy target, beside Kamal in config/deploy.yml.
-# Both run the same Dockerfile and both point at the same external managed
-# Postgres through DATABASE_URL; what differs is who terminates TLS. Sync this
-# file with the dashboard via https://dashboard.render.com/blueprints rather than
-# editing the service by hand, so the port pair below cannot drift out of the repo.
+# Render blueprint — the approved production target.
+#
+# Render pulls the prebuilt image from GHCR. CI publishes a Git-SHA tag, signs
+# the resulting digest, and the manual production workflow deploys that digest
+# through the Render deploy hook. The "release" tag below is only the service's
+# bootstrap/default reference; it is never the release identity or rollback
+# target. A production deploy must use the digest workflow.
+#
+# The Render service runtime is immutable. If an existing dashboard service was
+# created with runtime: docker, create the image-backed service separately,
+# verify it, move the custom domain, and retire the old service only through the
+# approved release procedure.
 
 services:
   - type: web
     name: utcc-ai-academy
-    runtime: docker
-    dockerfilePath: ./Dockerfile
+    runtime: image
+
+    image:
+      url: ghcr.io/nakasato/utcc-ai-academy:release
+      creds:
+        fromRegistryCreds:
+          name: utcc-ai-academy-ghcr
+
     region: singapore
-    branch: main
-    autoDeploy: true
-
-    # One instance because that is the shape the app is built and sized for, not
-    # because the database forces it any more — Postgres takes concurrent writers
-    # and solid_cache, solid_queue and solid_cable are all safe across processes.
-    # Raising this is now a capacity decision rather than a rewrite.
     numInstances: 1
-
     plan: starter
 
-    # No disk. The database moved off the filesystem to the managed Postgres
-    # declared under `databases:` below, and nothing else in storage/ has to
-    # outlive a deploy. Adding Active Storage attachments served from local disk
-    # would mean mounting one again at /rails/storage.
+    # Production currently uses Rails local Active Storage. The disk is part
+    # of the authoritative recovery boundary in ADR-0021.
+    disk:
+      name: utcc-ai-academy-storage
+      mountPath: /rails/storage
+      sizeGB: 10
 
-    # /up is excluded from the http-to-https redirect in production.rb, which is what
-    # lets Render reach it from inside the network.
+    # Render reaches this endpoint before routing traffic to the service.
     healthCheckPath: /up
 
-    # Render issues the certificate and terminates TLS here; this name has to match
-    # `config.hosts` in production.rb or the app answers 403 to its own domain.
-    # Point academy.boring9.dev at the service with the CNAME Render shows once the
-    # blueprint syncs — the certificate is only issued after that resolves.
+    # Expand/migrate/contract releases run the migration before new traffic.
+    # This is safe only for backward-compatible migrations.
+    preDeployCommand: bin/rails db:migrate
+
+    # Render issues the certificate and terminates TLS here. The domain must
+    # match config.hosts in production.rb.
     domains:
       - academy.boring9.dev
 
     envVars:
-      # Decrypts config/credentials.yml.enc, which is where secret_key_base lives.
-      # config/master.key is gitignored and so is not in the image; without this the
-      # entrypoint's `db:prepare` aborts before the server ever starts.
-      # sync: false means the value is set in the dashboard, never committed here.
       - key: RAILS_MASTER_KEY
         sync: false
 
-      # Thruster fronts Puma. HTTP_PORT is the port Thruster itself listens on and
-      # PORT is how Render knows where to route; they have to agree. Thruster then
-      # hands Puma its own PORT (TARGET_PORT, 3000) inside the container.
       - key: HTTP_PORT
         value: 10000
+
       - key: PORT
         value: 10000
 
-      # Run the Solid Queue supervisor inside Puma — read by config/puma.rb. The only
-      # enqueued work in the app is the password-reset email, so it does not earn a
-      # worker service of its own.
+      # Run Solid Queue inside Puma until a worker split is approved.
       - key: SOLID_QUEUE_IN_PUMA
         value: true
 
-      # The whole database connection — host, port, database, credentials and
-      # sslmode — in one value, read by config/database.yml's production block.
-      #
-      # There is no `databases:` block in this blueprint: the database is an
-      # external managed Postgres (Aiven), not a Render one, so Render neither
-      # creates it nor knows its address. sync: false means the value is set in
-      # the dashboard and never committed here — it is a credential.
+      # External managed Postgres. The dashboard owns the complete URL and
+      # recovery provider; no database credential is committed here.
       - key: DATABASE_URL
         sync: false

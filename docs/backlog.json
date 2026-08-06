@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-06T18:37:07+07:00",
+  "updated_at": "2026-08-06T20:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1096,7 +1096,7 @@
     {
       "id": "M9-004",
       "title": "Define the production deployment, artifact, and rollback boundary",
-      "status": "blocked",
+      "status": "in_progress",
       "priority": 1,
       "owner": "Platform Owner, Tech Lead, Security Owner, and Release Owner",
       "milestone": "M9",
@@ -1105,9 +1105,9 @@
         "M9-003"
       ],
       "blocker": {
-        "summary": "The repository has a Dockerfile and placeholder Kamal configuration, but no real deployment target, registry, domain/TLS, secret boundary, immutable artifact provenance, migration rollout, rollback authority, or post-deploy evidence.",
+        "summary": "Render is selected and the repository now records the image, digest, migration, rollback, and post-deploy boundary; live registry credentials, deploy-hook custody, provider evidence, and release approval remain human-owned.",
         "decision_owner": "Platform Owner, Tech Lead, Security Owner, and Release Owner",
-        "next_action": "Review ADR-0022/SPEC-0022 and approve the real target, artifact/provenance controls, secrets, process topology, migration compatibility, release owners, rollback action, and numeric post-deploy checks before replacing placeholders."
+        "next_action": "Configure the Render registry credential, production environment reviewers, deploy-hook secret, database/storage evidence, and witnessed pre-production rollback before marking the item complete."
       },
       "evidence": [
         {
@@ -1133,9 +1133,21 @@
         {
           "label": "Deployment policy handoff",
           "url": "specs/spec-m9-production-deployment.html#human-release-handoff"
+        },
+        {
+          "label": "Render deployment runbook",
+          "url": "runbooks/rb-render-deployment.html"
+        },
+        {
+          "label": "Render release boundary record",
+          "url": "releases/release-render-production-boundary.html"
+        },
+        {
+          "label": "Artifact and deployment contract tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/release/deployment_configuration_test.rb"
         }
       ],
-      "updated_at": "2026-08-03T20:00:00+07:00"
+      "updated_at": "2026-08-06T20:30:00+07:00"
     },
     {
       "id": "M9-005",
@@ -2717,6 +2729,14 @@
       "to": "blocked",
       "summary": "Started the production-deployment design handoff; implementation is held pending the real target, artifact/provenance controls, secrets, process topology, migration compatibility, release ownership, rollback, and post-deploy policy.",
       "evidence_url": "specs/spec-m9-production-deployment.html"
+    },
+    {
+      "at": "2026-08-06T20:30:00+07:00",
+      "item_id": "M9-004",
+      "from": "blocked",
+      "to": "in_progress",
+      "summary": "The user selected Render. The repository now records the GHCR image boundary, immutable digest artifact workflow, manual Render promotion, pre-deploy migration, rollback, post-deploy checks, release record, and runbook; live credentials, provider evidence, and final release approval remain human-owned.",
+      "evidence_url": "releases/release-render-production-boundary.html"
     },
     {
       "at": "2026-08-03T20:10:00+07:00",
