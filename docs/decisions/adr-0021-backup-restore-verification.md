@@ -2,10 +2,10 @@
 id: ADR-0021
 type: adr
 title: Define backup, restore, and recovery verification
-status: draft
+status: accepted
 owners: ["@platform-owner", "@tech-lead", "@security-owner", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -19,7 +19,13 @@ touches:
   - docs/runbooks
   - docs/releases
   - lib
-enforced_by: []
+  - app/services/recovery
+enforced_by:
+  - test/operations/backup_contract_test.rb
+  - test/operations/restore_drill_test.rb
+  - test/operations/recovery_integrity_test.rb
+  - test/operations/restore_isolation_test.rb
+  - test/observability/recovery_signal_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-001, SKILL-ARCH-002, SKILL-BLD-003, SKILL-BLD-004, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-003, SKILL-BLD-003, SKILL-BLD-004]
@@ -27,10 +33,11 @@ min_reviewer_skills: [SKILL-ARCH-003, SKILL-BLD-003, SKILL-BLD-004]
 
 # Define backup, restore, and recovery verification
 
-> **Decision state:** Agent-prepared draft. The Platform Owner, Tech Lead,
-> Security Owner, and Privacy Owner must set recovery targets, approve the
-> provider/credential boundary, and witness a restore drill before recovery can
-> be treated as operational.
+> **Decision state:** Accepted by the user on 2026-08-06 for a provider-neutral
+> recovery baseline. PostgreSQL and Active Storage are recovered together under
+> a one-hour RPO, four-hour RTO, isolated target, integrity checks, and quarterly
+> drill cadence. Provider, retention, and production credential activation
+> remain human-owned.
 
 > [Decision Records](README.md) ·
 > [M9 recovery specification](../specs/spec-m9-backup-restore-verification.md) ·
@@ -68,28 +75,31 @@ snapshot that exists but has never been restored is not recovery evidence.
 
 ## Decision
 
-The recovery contract must cover the complete authoritative data set rather than
-only the primary database:
+The accepted recovery baseline covers the complete authoritative data set rather
+than only the primary database:
 
 1. Inventory PostgreSQL data, Active Storage blobs, deployment/configuration
    metadata, encryption keys, and any external provider state required to boot
    and serve the application.
-2. Define RPO, RTO, backup frequency, retention, regional/tenant isolation,
-   encryption, immutability, deletion, and credential ownership for each data
-   class.
-3. Select a provider-supported backup method and a separate or isolated restore
-   target; no restore drill may overwrite production.
+2. Use an RPO of at most one hour and an RTO of at most four hours. Verify
+   backup freshness at least hourly and exercise the recovery contract at least
+   quarterly and after provider, schema, migration, storage, or credential
+   boundary changes. Retention duration remains deferred.
+3. Require a provider-supported backup method for managed PostgreSQL and a
+   corresponding Active Storage backup at a compatible point, with a separate
+   or isolated restore target. No restore drill may overwrite production.
 4. Produce an executable runbook covering backup verification, isolated restore,
    schema/migration compatibility, blob/database consistency, secrets handling,
    smoke tests, escalation, and rollback to the source environment.
-5. Exercise the runbook on an approved cadence with sanitized or synthetic data
-   where possible, recording duration, recovered version, validation results,
-   gaps, and owner sign-off.
+5. Exercise the runbook on the approved quarterly cadence with sanitized or
+   synthetic data where possible, recording duration, recovered version,
+   validation results, gaps, and owner sign-off. The repository baseline uses
+   synthetic manifests and does not claim a witnessed production restore.
 6. Connect failed backup, stale backup, restore, and capacity signals to the
    observability contract in ADR-0020.
 
-The backup provider, exact targets, retention values, and restore credentials
-remain human-owned decisions and are not selected by this draft.
+The backup provider, exact production targets, retention values, and restore
+credentials remain human-owned decisions and are not selected by this baseline.
 
 ## Alternatives
 
@@ -114,7 +124,12 @@ retention, encryption, access review, and operational complexity.
 Reverting an image can restore code, not deleted or corrupted learner data. It
 is not a backup or restore strategy.
 
-No option or provider is selected by this draft.
+### Approved policy direction
+
+Provider-supported managed PostgreSQL recovery plus a corresponding Active
+Storage backup is selected as the policy shape. The repository implements the
+provider-neutral manifest, isolation, integrity, RPO/RTO, telemetry, and drill
+contract; provider commands and credentials require a later operational record.
 
 ## Consequences
 
@@ -126,6 +141,8 @@ No option or provider is selected by this draft.
   isolation, sanitization, access, and deletion are part of the procedure.
 - A restore drill can reveal provider, migration, capacity, or application gaps
   that must create bounded backlog work rather than being hidden as a pass.
+- The baseline intentionally does not add a backup service, credentials, or
+  production provider dependency to the application.
 
 ## Recovery boundary
 
@@ -150,3 +167,5 @@ No option or provider is selected by this draft.
   restored learner data to an unapproved actor.
 - A migration or release that cannot read the approved restored state is blocked
   from release until the compatibility gap has an accepted plan.
+- A synthetic contract test is not a witnessed provider restore; operational
+  readiness remains gated on human-owned provider evidence and sign-off.

@@ -76,6 +76,54 @@ module Observability
         runbook: "docs/runbooks/rb-critical-failure-observability.md#security-audit-failure",
         escalation: "Tech Lead immediately; preserve the learner-facing failure and investigate the transaction",
         suppression: "Group by event action and error class; do not suppress distinct actions"
+      },
+      {
+        event: "recovery.backup.failure",
+        metric: "recovery.backup.errors",
+        symptom: "A backup manifest is invalid or cannot meet the backup contract",
+        threshold: "Page Platform Owner on any failed backup or invalid backup evidence",
+        severity: "critical",
+        owner: "Platform Owner",
+        response_window: "Acknowledge within 15 minutes",
+        runbook: "docs/runbooks/rb-backup-restore-verification.md#backup-failure",
+        escalation: "Tech Lead when the approved RPO is at risk; Security Owner when encryption or access is affected",
+        suppression: "Group by backup class and reason; do not suppress an RPO breach"
+      },
+      {
+        event: "recovery.backup.stale",
+        metric: "recovery.backup.age",
+        symptom: "The newest backup is older than the approved one-hour RPO",
+        threshold: "Page Platform Owner when backup age exceeds 1 hour",
+        severity: "critical",
+        owner: "Platform Owner",
+        response_window: "Acknowledge within 15 minutes",
+        runbook: "docs/runbooks/rb-backup-restore-verification.md#stale-backup",
+        escalation: "Tech Lead when the next backup cannot recover the RPO; Security Owner when the backup boundary is compromised",
+        suppression: "One active incident per data class until freshness is restored"
+      },
+      {
+        event: "recovery.restore.failure",
+        metric: "recovery.restore.errors",
+        symptom: "An isolated restore cannot complete safely or within the four-hour RTO",
+        threshold: "Page Platform Owner on any unsafe target, failed restore, or RTO breach",
+        severity: "critical",
+        owner: "Platform Owner",
+        response_window: "Acknowledge within 15 minutes",
+        runbook: "docs/runbooks/rb-backup-restore-verification.md#restore-failure",
+        escalation: "Tech Lead immediately; Security Owner when isolation or credentials are affected",
+        suppression: "Group by drill and failure reason; never suppress an isolation failure"
+      },
+      {
+        event: "recovery.integrity.failure",
+        metric: "recovery.integrity.errors",
+        symptom: "Restored rows, schema, or referenced blobs fail validation",
+        threshold: "Page Platform Owner and Security Owner on any integrity failure",
+        severity: "critical",
+        owner: "Security Owner",
+        response_window: "Acknowledge within 15 minutes",
+        runbook: "docs/runbooks/rb-backup-restore-verification.md#integrity-failure",
+        escalation: "Tech Lead immediately; do not declare recovery readiness",
+        suppression: "Group by drill and failed check; do not suppress distinct integrity failures"
       }
     ].freeze
 

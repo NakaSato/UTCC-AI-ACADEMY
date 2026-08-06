@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-06T07:25:00+07:00",
+  "updated_at": "2026-08-06T18:37:07+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1041,18 +1041,14 @@
     {
       "id": "M9-003",
       "title": "Define backup, restore, and recovery verification",
-      "status": "blocked",
+      "status": "complete",
       "priority": 1,
       "owner": "Platform Owner, Tech Lead, Security Owner, and Privacy Owner",
       "milestone": "M9",
       "depends_on": [
         "M9-002"
       ],
-      "blocker": {
-        "summary": "Production uses an external managed PostgreSQL database and a separate local Active Storage volume, but no approved data inventory, RPO/RTO, backup provider contract, restore isolation, recovery runbook, or exercised drill exists.",
-        "decision_owner": "Platform Owner, Tech Lead, Security Owner, and Privacy Owner",
-        "next_action": "Review ADR-0021/SPEC-0021 and approve data classes, RPO/RTO, schedule, retention, encryption, restore target, credential boundary, runbook, and drill evidence before recovery is treated as operational."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M9 recovery architecture draft",
@@ -1081,9 +1077,21 @@
         {
           "label": "Recovery policy handoff",
           "url": "specs/spec-m9-backup-restore-verification.html#human-recovery-handoff"
+        },
+        {
+          "label": "Provider-neutral recovery contract",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/services/recovery/contract.rb"
+        },
+        {
+          "label": "Synthetic restore and isolation tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/operations/restore_drill_test.rb"
+        },
+        {
+          "label": "Backup and restore verification runbook",
+          "url": "runbooks/rb-backup-restore-verification.html"
         }
       ],
-      "updated_at": "2026-08-03T19:50:00+07:00"
+      "updated_at": "2026-08-06T18:37:07+07:00"
     },
     {
       "id": "M9-004",
@@ -2692,6 +2700,14 @@
       "from": "new",
       "to": "blocked",
       "summary": "Started the recovery design handoff; implementation is held pending the data inventory, RPO/RTO, backup provider, retention, storage consistency, restore isolation, runbook, and drill policy.",
+      "evidence_url": "specs/spec-m9-backup-restore-verification.html"
+    },
+    {
+      "at": "2026-08-06T18:37:07+07:00",
+      "item_id": "M9-003",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved the provider-neutral recovery baseline: complete PostgreSQL and Active Storage coverage, one-hour RPO, four-hour RTO, isolated targets, integrity checks, quarterly drills, and recovery telemetry; production provider, retention, and credential activation remain deferred.",
       "evidence_url": "specs/spec-m9-backup-restore-verification.html"
     },
     {

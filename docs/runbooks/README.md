@@ -10,3 +10,4 @@ operating a production dependency or recovery procedure.
 
 - [RB-0001 — Verify production-shaped password reset through Mailpit staging](rb-mailpit-staging-verification.md) — draft; non-production SMTP evidence only
 - [RB-0002 — Triage critical failure telemetry](rb-critical-failure-observability.md) — draft; provider-neutral contract and controlled verification only
+- [RB-0003 — Verify backup freshness and isolated restore evidence](rb-backup-restore-verification.md) — draft; provider-neutral contract and synthetic drill verification only
