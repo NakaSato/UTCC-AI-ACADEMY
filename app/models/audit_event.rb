@@ -56,6 +56,9 @@ class AuditEvent < ApplicationRecord
   # crash.
   def self.record(action, **params)
     create!(user: Current.user, action:, params:) if Current.user
+  rescue ActiveRecord::ActiveRecordError => error
+    Observability::Telemetry.emit("security.audit.failure", action:, error_class: error.class.name)
+    raise
   end
 
   # Derived, not stored: which actions are worth a second look is a display

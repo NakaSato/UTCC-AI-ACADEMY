@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-05T23:59:24+07:00",
+  "updated_at": "2026-08-06T07:25:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -992,16 +992,12 @@
     {
       "id": "M9-002",
       "title": "Define critical-failure observability and alert ownership",
-      "status": "blocked",
+      "status": "complete",
       "priority": 1,
       "owner": "Tech Lead, Platform Owner, Security Owner, and Privacy Owner",
       "milestone": "M9",
       "depends_on": [],
-      "blocker": {
-        "summary": "The app has a boot-only /up check, logs, Solid Queue, mail, WebSockets, and durable security records, but no approved critical symptom matrix, SLOs, telemetry contract, alert owners, runbooks, redaction, retention, or provider boundary.",
-        "decision_owner": "Tech Lead, Platform Owner, Security Owner, and Privacy Owner",
-        "next_action": "Review ADR-0020/SPEC-0020 and approve critical symptoms, thresholds, owners, runbooks, correlation fields, redaction, retention, destinations, and controlled-failure verification before instrumentation."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M9 observability architecture draft",
@@ -1026,9 +1022,21 @@
         {
           "label": "Observability policy handoff",
           "url": "specs/spec-m9-critical-failure-observability.html#human-observability-handoff"
+        },
+        {
+          "label": "Provider-neutral telemetry contract",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/app/services/observability/signal_catalog.rb"
+        },
+        {
+          "label": "Telemetry redaction and failure-signal tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/observability/redaction_test.rb"
+        },
+        {
+          "label": "Critical-failure triage runbook",
+          "url": "runbooks/rb-critical-failure-observability.html"
         }
       ],
-      "updated_at": "2026-08-03T19:40:00+07:00"
+      "updated_at": "2026-08-06T07:25:00+07:00"
     },
     {
       "id": "M9-003",
@@ -2668,6 +2676,14 @@
       "from": "new",
       "to": "blocked",
       "summary": "Started the critical-failure observability handoff; implementation is held pending symptom definitions, thresholds, owners, runbooks, telemetry privacy, retention, destinations, and controlled-failure verification.",
+      "evidence_url": "specs/spec-m9-critical-failure-observability.html"
+    },
+    {
+      "at": "2026-08-06T07:25:00+07:00",
+      "item_id": "M9-002",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved the provider-neutral observability baseline; redacted structured telemetry, correlation context, signal ownership/runbooks, controlled-failure coverage, and generic Thai/English behavior are implemented. Hosted destination and retention activation remain deferred.",
       "evidence_url": "specs/spec-m9-critical-failure-observability.html"
     },
     {

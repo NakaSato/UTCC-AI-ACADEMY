@@ -9,3 +9,4 @@ operating a production dependency or recovery procedure.
 ## Runbooks
 
 - [RB-0001 — Verify production-shaped password reset through Mailpit staging](rb-mailpit-staging-verification.md) — draft; non-production SMTP evidence only
+- [RB-0002 — Triage critical failure telemetry](rb-critical-failure-observability.md) — draft; provider-neutral contract and controlled verification only
