@@ -39,6 +39,9 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+!/app/assets/builds/katex.css
+!/app/assets/builds/fonts/
+!/app/assets/builds/fonts/*.woff2
 
 # Ignore macOS Finder metadata, anywhere in the tree.
 .DS_Store
