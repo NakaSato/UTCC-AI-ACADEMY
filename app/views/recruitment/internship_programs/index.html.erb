@@ -1,0 +1,44 @@
+<% content_for :title, "#{@public ? t("recruitment.internships.public_title") : @organization.name} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <% unless @public %>
+        <%= link_to t("recruitment.internships.back_to_organization"), recruitment_organization_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+      <% end %>
+      <h1 class="mt-3 text-32 font-bold tracking-[-0.035em] text-ink"><%= @public ? t("recruitment.internships.public_title") : t("recruitment.internships.management_title") %></h1>
+      <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= @public ? t("recruitment.internships.public_subtitle") : t("recruitment.internships.management_subtitle") %></p>
+    </div>
+    <% if !@public && @can_create %>
+      <%= link_to t("recruitment.internships.new"), new_recruitment_organization_internship_program_path(@organization), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <% end %>
+  </div>
+
+  <% if @programs.empty? %>
+    <section class="rounded-card border border-dashed border-hairline bg-surface-1 px-6 py-12 text-center">
+      <h2 class="text-20 font-bold text-ink"><%= @public ? t("recruitment.internships.empty_public") : t("recruitment.internships.empty") %></h2>
+    </section>
+  <% else %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <% @programs.each do |program| %>
+        <article class="rounded-card border border-hairline bg-surface-1 p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-12 text-muted"><%= @public ? program.organization.name : program.department %></p>
+              <h2 class="mt-1 text-20 font-semibold text-ink"><%= link_to program.name.presence || t("recruitment.internships.untitled"), @public ? recruitment_internship_path(program) : recruitment_organization_internship_program_path(@organization, program), class: "hover:text-brand" %></h2>
+            </div>
+            <% unless @public %>
+              <span class="rounded-full bg-surface-2 px-3 py-1 text-12 font-semibold text-muted"><%= t("recruitment.internships.status.#{program.status}") %></span>
+            <% end %>
+          </div>
+          <p class="mt-4 line-clamp-3 text-14 leading-relaxed text-muted"><%= program.description %></p>
+          <div class="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-12 text-muted">
+            <span><%= t("recruitment.internships.duration", count: program.duration_weeks) %></span>
+            <span><%= t("recruitment.internships.capacity", count: program.max_students) %></span>
+            <span><%= t("recruitment.internships.remote_policies.#{program.remote_policy}") %></span>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</main>

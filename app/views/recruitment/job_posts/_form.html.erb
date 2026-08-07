@@ -1,0 +1,67 @@
+<section class="rounded-card border border-hairline bg-surface-1 p-6 sm:p-8">
+  <%= form_with model: job_post, scope: :recruitment_job_post, url: form_url, method: form_method do |form| %>
+    <%= render "shared/form_errors", record: job_post %>
+    <%= form.hidden_field :lock_version %>
+
+    <div class="grid gap-5 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <%= form.label :title, t("recruitment.jobs.fields.title"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_field :title, maxlength: 200, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= form.label :summary, t("recruitment.jobs.fields.summary"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_area :summary, rows: 3, maxlength: 2_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= form.label :description, t("recruitment.jobs.fields.description"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_area :description, rows: 8, maxlength: 20_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= form.label :hiring_reason, t("recruitment.jobs.input_hiring_reason"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_area :hiring_reason, rows: 3, maxlength: 2_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :positions_count, t("recruitment.jobs.input_positions_count"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.number_field :positions_count, min: 1, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <% %i[ category department team seniority location ].each do |field| %>
+        <div>
+          <%= form.label field, t("recruitment.jobs.fields.#{field}"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.text_field field, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        </div>
+      <% end %>
+      <div>
+        <%= form.label :employment_type, t("recruitment.jobs.fields.employment_type"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.select :employment_type, Recruitment::JobPost::EMPLOYMENT_TYPES.map { |type| [ t("recruitment.jobs.employment_types.#{type}"), type ] }, {}, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :remote_policy, t("recruitment.jobs.fields.remote_policy"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.select :remote_policy, Recruitment::JobPost::REMOTE_POLICIES.map { |policy| [ t("recruitment.jobs.remote_policies.#{policy}"), policy ] }, {}, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :salary_min, t("recruitment.jobs.fields.salary_min"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.number_field :salary_min, min: 0, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :salary_max, t("recruitment.jobs.fields.salary_max"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.number_field :salary_max, min: 0, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :currency, t("recruitment.jobs.fields.currency"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_field :currency, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        <p class="mt-1 text-12 text-muted"><%= t("recruitment.jobs.field_help.salary") %></p>
+      </div>
+      <div>
+        <%= form.label :closes_on, t("recruitment.jobs.fields.closes_on"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.date_field :closes_on, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        <p class="mt-1 text-12 text-muted"><%= t("recruitment.jobs.field_help.closes_on") %></p>
+      </div>
+    </div>
+
+    <div class="mt-7 flex flex-wrap items-center gap-3">
+      <%= form.submit t("recruitment.jobs.save"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+      <%= link_to t("recruitment.cancel"), recruitment_organization_job_post_path(organization, job_post), class: "px-2 text-13 font-semibold text-muted hover:text-ink" if job_post.persisted? %>
+      <%= link_to t("recruitment.cancel"), recruitment_organization_job_posts_path(organization), class: "px-2 text-13 font-semibold text-muted hover:text-ink" unless job_post.persisted? %>
+    </div>
+  <% end %>
+</section>

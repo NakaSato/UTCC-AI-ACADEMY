@@ -1,0 +1,61 @@
+<% content_for :title, "#{t("recruitment.jobs.alert_preferences")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path, class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.jobs.alert_preferences") %></h1>
+    <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= t("recruitment.jobs.alert_preferences_subtitle") %></p>
+  </div>
+
+  <%= form_with model: @preference, scope: :recruitment_job_discovery_preference,
+        url: recruitment_job_discovery_preferences_path, class: "max-w-2xl space-y-6" do |form| %>
+    <% if @preference.errors.any? %>
+      <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert"><%= @preference.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <section class="rounded-card border border-hairline bg-surface-1 p-5">
+      <h2 class="text-18 font-semibold text-ink"><%= t("recruitment.jobs.alert_settings_title") %></h2>
+      <div class="mt-4 space-y-4">
+        <label class="flex items-start gap-3 text-13 text-ink">
+          <%= form.check_box :alert_consent, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand" %>
+          <span><%= t("recruitment.jobs.alert_consent") %><span class="mt-1 block text-12 text-muted"><%= t("recruitment.jobs.alert_consent_hint") %></span></span>
+        </label>
+        <label class="flex items-start gap-3 text-13 text-ink">
+          <%= form.check_box :alerts_enabled, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand" %>
+          <span><%= t("recruitment.jobs.alerts_enabled") %><span class="mt-1 block text-12 text-muted"><%= t("recruitment.jobs.alerts_enabled_hint") %></span></span>
+        </label>
+        <div>
+          <%= form.label :alert_frequency, t("recruitment.jobs.alert_frequency"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.select :alert_frequency, Recruitment::JobDiscoveryPreference::FREQUENCIES.map { |frequency| [ t("recruitment.jobs.alert_frequencies.#{frequency}"), frequency ] }, {}, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-card border border-hairline bg-surface-1 p-5">
+      <h2 class="text-18 font-semibold text-ink"><%= t("recruitment.jobs.discovery_preferences_title") %></h2>
+      <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.jobs.discovery_preferences_subtitle") %></p>
+      <div class="mt-4 space-y-4">
+        <div>
+          <%= form.label :search_query, t("recruitment.jobs.search_phrase"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.text_field :search_query, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+        </div>
+        <div>
+          <%= form.label :location, t("recruitment.jobs.location_preference"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.text_field :location, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <%= form.label :employment_type, t("recruitment.jobs.employment_preference"), class: "mb-2 block text-13 font-semibold text-ink" %>
+            <%= form.select :employment_type, [[t("recruitment.jobs.no_preference"), ""]] + Recruitment::JobPost::EMPLOYMENT_TYPES.map { |type| [ t("recruitment.jobs.employment_types.#{type}"), type ] }, {}, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+          </div>
+          <div>
+            <%= form.label :remote_policy, t("recruitment.jobs.remote_preference"), class: "mb-2 block text-13 font-semibold text-ink" %>
+            <%= form.select :remote_policy, [[t("recruitment.jobs.no_preference"), ""]] + Recruitment::JobPost::REMOTE_POLICIES.map { |policy| [ t("recruitment.jobs.remote_policies.#{policy}"), policy ] }, {}, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-ink" %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <%= form.submit t("recruitment.jobs.save_preferences"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
+  <% end %>
+</main>

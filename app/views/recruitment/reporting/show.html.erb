@@ -1,0 +1,43 @@
+<% content_for :title, "#{t("recruitment.reporting.title")} — #{@organization.name} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("recruitment.reporting.back_to_organization"), recruitment_organization_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.reporting.title") %></h1>
+    <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= t("recruitment.reporting.subtitle", organization: @organization.name) %></p>
+  </div>
+
+  <section class="rounded-card border border-hairline bg-surface-1 p-6">
+    <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.reporting.jobs_title") %></h2>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <% @summary.job_statuses.each do |cell| %>
+        <article class="rounded-xl border border-hairline bg-surface-2 p-4">
+          <p class="text-12 text-muted"><%= t("recruitment.jobs.status.#{cell.status}") %></p>
+          <p class="mt-2 text-24 font-bold text-ink"><%= cell.count %></p>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.reporting.applications_title") %></h2>
+        <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.reporting.applications_subtitle") %></p>
+      </div>
+      <div class="rounded-xl bg-surface-2 px-4 py-3 text-right">
+        <p class="text-11 text-muted"><%= t("recruitment.reporting.total_applications") %></p>
+        <p class="mt-1 text-20 font-bold text-ink"><%= @summary.application_total || t("recruitment.reporting.suppressed") %></p>
+      </div>
+    </div>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <% @summary.application_statuses.each do |cell| %>
+        <article class="rounded-xl border border-hairline bg-surface-2 p-4">
+          <p class="text-12 text-muted"><%= t("recruitment.applications.statuses.#{cell.status}") %></p>
+          <p class="mt-2 text-24 font-bold text-ink"><%= cell.suppressed ? t("recruitment.reporting.suppressed") : cell.count %></p>
+        </article>
+      <% end %>
+    </div>
+    <p class="mt-5 text-11 leading-relaxed text-muted"><%= @summary.source_label %> <%= @summary.uncertainty %></p>
+  </section>
+</main>

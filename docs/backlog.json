@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-06T20:30:00+07:00",
+  "updated_at": "2026-08-07T22:51:23+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1145,9 +1145,13 @@
         {
           "label": "Artifact and deployment contract tests",
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/release/deployment_configuration_test.rb"
+        },
+        {
+          "label": "Release-readiness review checklist",
+          "url": "releases/release-render-production-boundary.html#release-readiness-review-checklist"
         }
       ],
-      "updated_at": "2026-08-06T20:30:00+07:00"
+      "updated_at": "2026-08-07T22:51:23+07:00"
     },
     {
       "id": "M9-005",
@@ -1188,9 +1192,13 @@
         {
           "label": "Quality policy handoff",
           "url": "specs/spec-m9-curriculum-quality-budgets.html#human-quality-handoff"
+        },
+        {
+          "label": "Quality-budget decision worksheet",
+          "url": "specs/spec-m9-curriculum-quality-budgets.html#quality-budget-decision-worksheet"
         }
       ],
-      "updated_at": "2026-08-03T20:10:00+07:00"
+      "updated_at": "2026-08-07T22:51:23+07:00"
     },
     {
       "id": "AW-001",
@@ -1362,6 +1370,491 @@
         }
       ],
       "updated_at": "2026-08-02T14:43:20+07:00"
+    },
+    {
+      "id": "REC-001",
+      "title": "Implement recruitment foundation organization membership and candidate profiles",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "AI-M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Recruitment foundation specification",
+          "url": "specs/spec-recruitment-foundation-organization-profiles.html"
+        },
+        {
+          "label": "Organization membership ADR",
+          "url": "decisions/adr-0024-recruitment-organization-membership.html"
+        },
+        {
+          "label": "Focused model and controller tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/organizations_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-foundation-organization-profiles.html"
+        }
+      ],
+      "updated_at": "2026-08-07T02:44:44+07:00"
+    },
+    {
+      "id": "REC-002",
+      "title": "Implement secure in-app invitations for registered recruitment staff",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, and Security/Privacy owner",
+      "milestone": "AI-M1",
+      "depends_on": ["REC-001"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Recruitment invitation specification",
+          "url": "specs/spec-recruitment-invitations.html"
+        },
+        {
+          "label": "Secure in-app invitation ADR",
+          "url": "decisions/adr-0025-recruitment-in-app-invitations.html"
+        },
+        {
+          "label": "Focused invitation tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/organization_invitations_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-invitations.html"
+        }
+      ],
+      "updated_at": "2026-08-07T12:31:11+07:00"
+    },
+    {
+      "id": "REC-003",
+      "title": "Implement organization-scoped recruitment job management and publication workflow",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
+      "milestone": "AI-M2",
+      "depends_on": ["REC-001", "REC-002"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Job-management specification",
+          "url": "specs/spec-recruitment-job-management.html"
+        },
+        {
+          "label": "Job-post boundary ADR",
+          "url": "decisions/adr-0026-recruitment-job-post-boundary.html"
+        },
+        {
+          "label": "Focused job-management tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_posts_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-job-management.html"
+        }
+      ],
+      "updated_at": "2026-08-07T12:51:37+07:00"
+    },
+    {
+      "id": "REC-004",
+      "title": "Implement provider-neutral AI job suggestions with human review",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
+      "milestone": "AI-M3",
+      "depends_on": ["REC-003"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "AI job-creation specification",
+          "url": "specs/spec-recruitment-ai-job-creation.html"
+        },
+        {
+          "label": "Provider-neutral suggestion ADR",
+          "url": "decisions/adr-0027-provider-neutral-job-suggestions.html"
+        },
+        {
+          "label": "Focused suggestion tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_suggestions_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-ai-job-creation.html"
+        }
+      ],
+      "updated_at": "2026-08-07T19:30:00+07:00"
+    },
+    {
+      "id": "REC-005",
+      "title": "Implement organization-scoped internship programs, applications, and evaluations",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Academic owners",
+      "milestone": "AI-M4",
+      "depends_on": ["REC-001", "REC-003", "REC-004"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        },
+        {
+          "label": "Internship program boundary ADR",
+          "url": "decisions/adr-0028-recruitment-internship-program-boundary.html"
+        },
+        {
+          "label": "Focused internship tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/internship_programs_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        }
+      ],
+      "updated_at": "2026-08-07T20:10:00+07:00"
+    },
+    {
+      "id": "REC-006",
+      "title": "Extend candidate profiles with structured consented and portable data",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
+      "milestone": "AI-M5",
+      "depends_on": ["REC-001", "REC-004", "REC-005"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Candidate-profile specification",
+          "url": "specs/spec-recruitment-candidate-profile.html"
+        },
+        {
+          "label": "Candidate-profile data boundary ADR",
+          "url": "decisions/adr-0029-candidate-profile-data-boundary.html"
+        },
+        {
+          "label": "Focused candidate-profile tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/candidate_profiles_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-candidate-profile.html"
+        }
+      ],
+      "updated_at": "2026-08-07T21:15:00+07:00"
+    },
+    {
+      "id": "REC-007",
+      "title": "Implement candidate-controlled provider-neutral AI resume analysis",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
+      "milestone": "AI-M6",
+      "depends_on": ["REC-006"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Resume-analysis specification",
+          "url": "specs/spec-recruitment-resume-analysis.html"
+        },
+        {
+          "label": "Provider-neutral resume-analysis ADR",
+          "url": "decisions/adr-0030-provider-neutral-resume-analysis.html"
+        },
+        {
+          "label": "Focused resume-analysis tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/candidate_resume_analyses_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-resume-analysis.html"
+        }
+      ],
+      "updated_at": "2026-08-07T21:05:00+07:00"
+    },
+    {
+      "id": "REC-008",
+      "title": "Implement candidate-controlled job discovery, saved jobs, recommendations, and alerts",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
+      "milestone": "AI-M7",
+      "depends_on": ["REC-003", "REC-006", "REC-007"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Job-discovery specification",
+          "url": "specs/spec-recruitment-job-discovery.html"
+        },
+        {
+          "label": "Candidate-controlled discovery ADR",
+          "url": "decisions/adr-0031-candidate-controlled-job-discovery.html"
+        },
+        {
+          "label": "Focused job-discovery tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_discovery_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-job-discovery.html"
+        }
+      ],
+      "updated_at": "2026-08-07T21:40:00+07:00"
+    },
+    {
+      "id": "REC-009",
+      "title": "Implement candidate-owned explainable job match previews without consequential ranking",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, Data, and QA owners",
+      "milestone": "AI-M8",
+      "depends_on": ["REC-007", "REC-008"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Match-preview specification",
+          "url": "specs/spec-recruitment-match-preview.html"
+        },
+        {
+          "label": "Factor-preview boundary ADR",
+          "url": "decisions/adr-0032-factor-level-job-match-previews.html"
+        },
+        {
+          "label": "Focused match-preview tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_match_preview_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-match-preview.html"
+        }
+      ],
+      "updated_at": "2026-08-07T22:20:00+07:00"
+    },
+    {
+      "id": "REC-010",
+      "title": "Implement candidate-owned job applications and auditable recruitment pipeline stages",
+      "status": "verification",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, and QA owners",
+      "milestone": "AI-M9",
+      "depends_on": ["REC-003", "REC-006", "REC-009"],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Application-workflow specification",
+          "url": "specs/spec-recruitment-application-workflow.html"
+        },
+        {
+          "label": "Application workflow boundary ADR",
+          "url": "decisions/adr-0033-recruitment-application-workflow-boundary.html"
+        },
+        {
+          "label": "Focused application workflow tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_applications_controller_test.rb"
+        },
+        {
+          "label": "Repository verification",
+          "url": "specs/spec-recruitment-application-workflow.html"
+        }
+      ],
+      "updated_at": "2026-08-07T21:32:21+07:00"
+    },
+    {
+      "id": "REC-011",
+      "title": "Define the governed AI recruiter agent boundary for screening and hiring coordination",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, and QA owners",
+      "milestone": "AI-M10",
+      "depends_on": ["REC-009", "REC-010"],
+      "blocker": "Final production use still requires legal, security, recruitment-domain, privacy, data, and QA review",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 10",
+          "url": "roadmap.html#milestone-10--ai-recruiter-agent"
+        },
+        {
+          "label": "Recruiter-assistance specification",
+          "url": "specs/spec-recruiter-advisory-assistance.html"
+        },
+        {
+          "label": "Recruiter-assistance boundary ADR",
+          "url": "decisions/adr-0034-recruiter-advisory-next-action-assistance.html"
+        },
+        {
+          "label": "Focused recruiter-assistance tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/job_application_assistant_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-07T21:56:52+07:00"
+    },
+    {
+      "id": "REC-012",
+      "title": "Define the permissioned AI candidate agent boundary for search, applications, and career guidance",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, Data, and QA owners",
+      "milestone": "AI-M11",
+      "depends_on": ["REC-007", "REC-008"],
+      "blocker": "Final production use still requires legal, security, recruitment-domain, privacy, data, and QA review",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 11",
+          "url": "roadmap.html#milestone-11--ai-candidate-agent"
+        },
+        {
+          "label": "Candidate-assistance specification",
+          "url": "specs/spec-candidate-application-assistance.html"
+        },
+        {
+          "label": "Candidate-assistance boundary ADR",
+          "url": "decisions/adr-0035-candidate-application-preparation-assistance.html"
+        },
+        {
+          "label": "Focused candidate-assistance tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/candidate_application_assistant_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-07T22:08:36+07:00"
+    },
+    {
+      "id": "REC-013",
+      "title": "Define the AI internship agent boundary for matching, mentorship, progress, and evaluation",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Academic, Data, and QA owners",
+      "milestone": "AI-M12",
+      "depends_on": ["REC-005", "REC-007", "REC-009"],
+      "blocker": "Final production use still requires legal, academic, security, recruitment-domain, privacy, data, and QA review",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 12",
+          "url": "roadmap.html#milestone-12--ai-internship-agent"
+        },
+        {
+          "label": "Internship-assistance specification",
+          "url": "specs/spec-internship-application-assistance.html"
+        },
+        {
+          "label": "Internship-assistance boundary ADR",
+          "url": "decisions/adr-0036-internship-preparation-assistance.html"
+        },
+        {
+          "label": "Focused internship-assistance tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/internship_application_assistant_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-07T22:18:46+07:00"
+    },
+    {
+      "id": "REC-014",
+      "title": "Define trustworthy recruitment analytics and AI-effectiveness reporting",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Recruitment Domain, Data, Privacy, Security, and QA owners",
+      "milestone": "AI-M13",
+      "depends_on": ["REC-009", "REC-010"],
+      "blocker": "Final production use still requires privacy, security, recruitment-domain, data, and QA review of metric definitions",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 13",
+          "url": "roadmap.html#milestone-13--analytics-and-reporting"
+        },
+        {
+          "label": "Recruitment-reporting specification",
+          "url": "specs/spec-recruitment-reporting.html"
+        },
+        {
+          "label": "Recruitment-reporting boundary ADR",
+          "url": "decisions/adr-0037-privacy-safe-recruitment-reporting.html"
+        },
+        {
+          "label": "Focused reporting tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/reporting_controller_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-07T22:25:01+07:00"
+    },
+    {
+      "id": "REC-015",
+      "title": "Define consented recruitment notifications and participant communication history",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, and QA owners",
+      "milestone": "AI-M14",
+      "depends_on": ["REC-010"],
+      "blocker": "Final production use still requires consent, retention, moderation, notification, privacy, security, recruitment-domain, and QA review",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 14",
+          "url": "roadmap.html#milestone-14--notifications-and-communication"
+        },
+        {
+          "label": "Application-conversation specification",
+          "url": "specs/spec-recruitment-application-conversations.html"
+        },
+        {
+          "label": "Application-conversation boundary ADR",
+          "url": "decisions/adr-0038-in-app-application-conversations.html"
+        },
+        {
+          "label": "Focused application-conversation tests",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_applications_controller_test.rb"
+        }
+      ],
+      "updated_at": "2026-08-07T22:37:03+07:00"
+    },
+    {
+      "id": "REC-016",
+      "title": "Define governed enterprise recruitment integrations and adoption controls",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, Platform, and QA owners",
+      "milestone": "AI-M15",
+      "depends_on": ["REC-001", "REC-010", "REC-014", "REC-015"],
+      "blocker": "Design is prepared; implementation remains blocked pending Product Owner, legal, security, privacy, data, platform, recruitment-domain, and QA review of provider, tenant, consent, data-sharing, and operating decisions",
+      "evidence": [
+        {
+          "label": "AI Recruitment Platform roadmap — Milestone 15",
+          "url": "roadmap.html#milestone-15--enterprise-and-integration"
+        },
+        {
+          "label": "Enterprise integration boundary ADR",
+          "url": "decisions/adr-0039-governed-enterprise-integrations.html"
+        },
+        {
+          "label": "Enterprise integration specification",
+          "url": "specs/spec-recruitment-enterprise-integrations.html"
+        }
+      ],
+      "updated_at": "2026-08-07T22:45:00+07:00"
+    },
+    {
+      "id": "BIZ-001",
+      "title": "Define the Company Business Case Platform industry–university collaboration boundary",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security/Privacy, Academic, Recruitment Domain, and QA owners",
+      "milestone": "M10-CBP",
+      "depends_on": ["REC-001", "REC-003", "REC-005"],
+      "blocker": "Design is prepared; implementation remains blocked pending Product, academic, legal/privacy, security, recruitment-domain, industry-partner, and QA review of confidentiality, consent, IP, participant, storage, retention, and notification decisions",
+      "evidence": [
+        {
+          "label": "Company Business Case Platform roadmap",
+          "url": "roadmap.html#company-business-case-platform-roadmap"
+        },
+        {
+          "label": "Company business-case collaboration boundary ADR",
+          "url": "decisions/adr-0040-company-business-case-collaboration-boundary.html"
+        },
+        {
+          "label": "Company business-case collaboration specification",
+          "url": "specs/spec-company-business-case-collaboration.html"
+        }
+      ],
+      "updated_at": "2026-08-07T22:45:25+07:00"
     }
   ],
   "recently_completed": [

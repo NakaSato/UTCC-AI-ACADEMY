@@ -1,0 +1,128 @@
+<% content_for :title, "#{@organization.name} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("recruitment.back_to_organizations"), recruitment_organizations_path,
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="mb-2 font-mono text-12 text-muted"><%= @organization.slug %></p>
+        <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= @organization.name %></h1>
+      </div>
+      <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("recruitment.organizations.status.#{@organization.status}") %></span>
+    </div>
+    <%= link_to t("recruitment.jobs.management_title"), recruitment_organization_job_posts_path(@organization),
+          class: "mt-5 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
+    <%= link_to t("recruitment.internships.management_title"), recruitment_organization_internship_programs_path(@organization),
+          class: "mt-5 ml-2 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
+    <%= link_to t("recruitment.reporting.title"), reporting_recruitment_organization_path(@organization),
+          class: "mt-5 ml-2 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" if @can_view_reporting %>
+  </div>
+
+  <section class="rounded-card border border-hairline bg-surface-1 p-6">
+    <div class="mb-5 flex items-end justify-between gap-4">
+      <div>
+        <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.memberships.title") %></h2>
+        <p class="mt-1 text-13 text-muted"><%= t("recruitment.memberships.subtitle") %></p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-13">
+        <thead class="border-b border-hairline text-11 tracking-[0.1em] text-muted uppercase">
+          <tr>
+            <th class="pb-3 pr-4"><%= t("recruitment.memberships.member") %></th>
+            <th class="pb-3 pr-4"><%= t("recruitment.memberships.role") %></th>
+            <th class="pb-3"><%= t("recruitment.memberships.action") %></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-hairline">
+          <% @memberships.each do |membership| %>
+            <tr>
+              <td class="py-4 pr-4">
+                <div class="font-semibold text-ink"><%= membership.user.name %></div>
+                <div class="mt-0.5 text-12 text-muted"><%= membership.user.student_id %></div>
+              </td>
+              <td class="py-4 pr-4 text-muted"><%= t("recruitment.memberships.roles.#{membership.role}") %></td>
+              <td class="py-4">
+                <% unless membership.owner? %>
+                  <%= button_to t("recruitment.memberships.revoke"),
+                        membership_recruitment_organization_path(@organization, membership.user_id),
+                        method: :delete,
+                        class: "text-12 font-semibold text-red-700 hover:underline" %>
+                <% else %>
+                  <span class="text-12 text-muted"><%= t("recruitment.memberships.owner_protected") %></span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <% if Current.user.admin? %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.memberships.add_title") %></h2>
+      <p class="mt-1 text-13 text-muted"><%= t("recruitment.memberships.add_subtitle") %></p>
+
+      <%= form_with url: memberships_recruitment_organization_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
+        <div class="min-w-[220px] flex-1">
+          <%= label_tag "membership_user_id", t("recruitment.memberships.member"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= select_tag "membership[user_id]", options_from_collection_for_select(@users, :id, :name),
+                include_blank: t("recruitment.memberships.member_blank"),
+                required: true,
+                class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        </div>
+        <div class="min-w-[190px]">
+          <%= label_tag "membership_role", t("recruitment.memberships.role"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= select_tag "membership[role]", options_for_select(OrganizationMembership::ROLES.drop(1).map { |role| [ t("recruitment.memberships.roles.#{role}"), role ] }),
+                class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        </div>
+        <%= form.submit t("recruitment.memberships.add"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if @can_manage_invitations %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.memberships.invite_title") %></h2>
+      <p class="mt-1 text-13 text-muted"><%= t("recruitment.memberships.invite_subtitle") %></p>
+
+      <% if @invitees.any? %>
+        <%= form_with url: invitations_recruitment_organization_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
+          <div class="min-w-[220px] flex-1">
+            <%= label_tag "invitation_user_id", t("recruitment.memberships.member"), class: "mb-2 block text-13 font-semibold text-ink" %>
+            <%= select_tag "invitation[user_id]", options_from_collection_for_select(@invitees, :id, :name),
+                  include_blank: t("recruitment.memberships.member_blank"),
+                  required: true,
+                  class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+          </div>
+          <div class="min-w-[190px]">
+            <%= label_tag "invitation_role", t("recruitment.memberships.role"), class: "mb-2 block text-13 font-semibold text-ink" %>
+            <%= select_tag "invitation[role]", options_for_select(OrganizationInvitation::ROLES.map { |role| [ t("recruitment.memberships.roles.#{role}"), role ] }),
+                  class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+          </div>
+          <%= form.submit t("recruitment.memberships.invite"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+      <% else %>
+        <p class="mt-5 text-13 text-muted"><%= t("recruitment.memberships.no_invitees") %></p>
+      <% end %>
+
+      <div class="mt-8 border-t border-hairline pt-6">
+        <h3 class="text-16 font-semibold text-ink"><%= t("recruitment.memberships.pending_title") %></h3>
+        <% if @pending_invitations.any? %>
+          <ul class="mt-3 space-y-2 text-13 text-muted">
+            <% @pending_invitations.each do |invitation| %>
+              <li><%= t("recruitment.memberships.pending", name: invitation.invitee.name,
+                         role: t("recruitment.memberships.roles.#{invitation.role}"),
+                         date: l(invitation.expires_at.to_date, format: :long)) %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="mt-3 text-13 text-muted"><%= t("recruitment.memberships.pending_empty") %></p>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</main>

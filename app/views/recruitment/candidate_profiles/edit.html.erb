@@ -1,0 +1,179 @@
+<% content_for :title, "#{t("recruitment.candidate_profile.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= t("recruitment.candidate_profile.eyebrow") %></p>
+    <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.candidate_profile.title") %></h1>
+    <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("recruitment.candidate_profile.subtitle") %></p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path,
+            class: "inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
+      <%= link_to t("recruitment.candidate_profile.export"), recruitment_candidate_profile_export_path,
+            class: "inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
+    </div>
+  </div>
+
+  <%= form_with model: @profile, url: recruitment_candidate_profile_path, class: "max-w-2xl space-y-6" do |form| %>
+    <% if @profile.errors.any? %>
+      <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert">
+        <%= @profile.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :headline, t("recruitment.candidate_profile.fields.headline"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.text_field :headline, maxlength: 140, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <%= form.label :portfolio_url, t("recruitment.candidate_profile.fields.portfolio_url"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.url_field :portfolio_url, maxlength: 500, placeholder: "https://", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :github_url, t("recruitment.candidate_profile.fields.github_url"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.url_field :github_url, maxlength: 500, placeholder: "https://github.com/", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :linkedin_url, t("recruitment.candidate_profile.fields.linkedin_url"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.url_field :linkedin_url, maxlength: 500, placeholder: "https://linkedin.com/in/", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :salary_currency, t("recruitment.candidate_profile.fields.salary_currency"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.text_field :salary_currency, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 uppercase text-ink" %>
+      </div>
+      <div>
+        <%= form.label :salary_expectation_min, t("recruitment.candidate_profile.fields.salary_min"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.number_field :salary_expectation_min, min: 0, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+      <div>
+        <%= form.label :salary_expectation_max, t("recruitment.candidate_profile.fields.salary_max"), class: "mb-2 block text-13 font-semibold text-ink" %>
+        <%= form.number_field :salary_expectation_max, min: 0, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      </div>
+    </div>
+
+    <section class="border-t border-hairline pt-6">
+      <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.candidate_profile.facts_title") %></h2>
+      <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.candidate_profile.facts_subtitle") %></p>
+      <div class="mt-5 space-y-5">
+        <%= form.fields_for :facts do |fact_form| %>
+          <% fact = fact_form.object %>
+          <div class="rounded-xl border border-hairline bg-surface-2 p-4">
+            <%= fact_form.hidden_field :kind %>
+            <p class="text-13 font-semibold text-ink"><%= t("recruitment.candidate_profile.fact_kinds.#{fact.kind}") %></p>
+            <div class="mt-3 grid gap-3 sm:grid-cols-2">
+              <%= fact_form.text_field :title, placeholder: t("recruitment.candidate_profile.fact_title"), class: "w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+              <%= fact_form.text_field :organization, placeholder: t("recruitment.candidate_profile.fact_organization"), class: "w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+            </div>
+            <%= fact_form.text_area :detail, rows: 3, placeholder: t("recruitment.candidate_profile.fact_detail"), class: "mt-3 w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3 text-12 text-muted">
+              <span><%= t("recruitment.candidate_profile.fact_source") %>: <%= t("recruitment.candidate_profile.sources.#{fact.source}") %> · <%= t("recruitment.candidate_profile.fact_confidence", value: number_to_percentage(fact.confidence.to_f * 100, precision: 0)) %></span>
+              <% if fact.persisted? %>
+                <label class="flex items-center gap-2"><%= fact_form.check_box :_destroy, class: "h-4 w-4 rounded border-hairline text-brand" %><%= t("recruitment.candidate_profile.remove_fact") %></label>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="border-t border-hairline pt-6">
+      <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.candidate_profile.attachments_title") %></h2>
+      <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.candidate_profile.attachments_subtitle") %></p>
+      <div class="mt-5 space-y-4">
+        <div>
+          <%= form.label :resume, t("recruitment.candidate_profile.fields.resume"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.file_field :resume, accept: ".txt,.pdf,.doc,.docx,text/plain,application/pdf", class: "block w-full text-13 text-muted" %>
+          <% if @profile.resume.attached? %><p class="mt-2 text-12 text-muted"><%= @profile.resume.filename %></p><label class="mt-2 flex items-center gap-2 text-12 text-muted"><%= form.check_box :remove_resume, class: "h-4 w-4 rounded border-hairline text-brand" %><%= t("recruitment.candidate_profile.remove_resume") %></label><% end %>
+        </div>
+        <div>
+          <%= form.label :portfolio_files, t("recruitment.candidate_profile.fields.portfolio_files"), class: "mb-2 block text-13 font-semibold text-ink" %>
+          <%= form.file_field :portfolio_files, multiple: true, accept: ".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*", class: "block w-full text-13 text-muted" %>
+          <% if @profile.portfolio_files.attached? %><p class="mt-2 text-12 text-muted"><%= t("recruitment.candidate_profile.portfolio_count", count: @profile.portfolio_files.attachments.size) %></p><label class="mt-2 flex items-center gap-2 text-12 text-muted"><%= form.check_box :remove_portfolio_files, class: "h-4 w-4 rounded border-hairline text-brand" %><%= t("recruitment.candidate_profile.remove_portfolio_files") %></label><% end %>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-hairline pt-6">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.candidate_profile.analysis_title") %></h2>
+          <p class="mt-1 max-w-[58ch] text-13 leading-relaxed text-muted"><%= t("recruitment.candidate_profile.analysis_subtitle") %></p>
+        </div>
+        <% if @profile.resume.attached? %>
+          <%= button_to t("recruitment.candidate_profile.analyze_resume"), recruitment_candidate_profile_resume_analysis_path,
+                method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+      </div>
+      <% if @resume_analysis %>
+        <div class="mt-5 rounded-xl border border-hairline bg-surface-2 p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="text-13 font-semibold text-ink"><%= @resume_analysis.source_label %></p>
+              <p class="mt-1 text-12 text-muted"><%= @resume_analysis.uncertainty %></p>
+            </div>
+            <% if @resume_analysis.findings.any?(&:accepted?) && !@resume_analysis.applied? %>
+              <%= button_to t("recruitment.candidate_profile.apply_analysis"), recruitment_apply_candidate_resume_analysis_path(@resume_analysis),
+                    method: :post, class: "rounded-full border border-brand px-4 py-2 text-12 font-semibold text-brand hover:bg-brand hover:text-white" %>
+            <% end %>
+          </div>
+          <div class="mt-4 space-y-4">
+            <% @resume_analysis.findings.ordered.each do |finding| %>
+              <div class="rounded-lg border border-hairline bg-surface-1 p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <p class="text-13 font-semibold text-ink"><%= t("recruitment.candidate_profile.analysis_kinds.#{finding.kind}") %>: <%= finding.title %></p>
+                  <span class="text-11 text-muted"><%= finding.status %> · <%= number_to_percentage(finding.confidence.to_f * 100, precision: 0) %></span>
+                </div>
+                <p class="mt-2 text-13 leading-relaxed text-muted"><%= finding.detail %></p>
+                <p class="mt-2 text-12 leading-relaxed text-muted"><%= t("recruitment.candidate_profile.analysis_evidence") %>: <%= finding.evidence %></p>
+                <% if finding.actionable? %>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <%= form_with scope: :recruitment_candidate_resume_finding, url: recruitment_candidate_resume_analysis_finding_path(@resume_analysis, finding), method: :patch, class: "flex min-w-full flex-wrap gap-2" do |finding_form| %>
+                      <%= finding_form.text_field :title, value: finding.title, class: "min-w-[14rem] flex-1 rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-12 text-ink" %>
+                      <%= finding_form.text_field :detail, value: finding.detail, class: "min-w-[14rem] flex-1 rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-12 text-ink" %>
+                      <%= finding_form.submit t("recruitment.candidate_profile.correct"), class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand" %>
+                    <% end %>
+                    <%= button_to t("recruitment.candidate_profile.accept"), recruitment_accept_candidate_resume_analysis_finding_path(@resume_analysis, finding), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white" %>
+                    <%= button_to t("recruitment.candidate_profile.reject"), recruitment_reject_candidate_resume_analysis_finding_path(@resume_analysis, finding), method: :post, class: "rounded-full border border-red-200 px-3 py-2 text-12 font-semibold text-red-700" %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </section>
+
+    <div>
+      <%= form.label :summary, t("recruitment.candidate_profile.fields.summary"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.text_area :summary, rows: 7, maxlength: 2_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 leading-[1.6] text-ink" %>
+    </div>
+
+    <div>
+      <%= form.label :preferred_location, t("recruitment.candidate_profile.fields.preferred_location"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.text_field :preferred_location, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+    </div>
+
+    <div>
+      <%= form.label :visibility, t("recruitment.candidate_profile.fields.visibility"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.select :visibility,
+            CandidateProfile::VISIBILITIES.map { |visibility| [ t("recruitment.candidate_profile.visibility.#{visibility}"), visibility ] },
+            {},
+            class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <p class="mt-1.5 text-12 text-muted"><%= t("recruitment.candidate_profile.fields.visibility_hint") %></p>
+    </div>
+
+    <div class="rounded-xl border border-hairline bg-surface-2 p-4">
+      <label class="flex items-start gap-3 text-13 text-ink">
+        <%= form.check_box :application_data_reuse_consent, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand" %>
+        <span><%= t("recruitment.candidate_profile.fields.application_data_reuse_consent") %><span class="mt-1 block text-12 text-muted"><%= t("recruitment.candidate_profile.fields.application_data_reuse_hint") %></span></span>
+      </label>
+    </div>
+
+    <%= form.submit t("recruitment.save"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+  <% end %>
+
+  <div class="mt-10 flex flex-wrap gap-3 border-t border-hairline pt-6">
+    <%= button_to t("recruitment.candidate_profile.delete"), recruitment_candidate_profile_data_path, method: :delete, class: "rounded-full border border-red-200 px-4 py-2.5 text-13 font-semibold text-red-700 hover:border-red-400", form: { data: { turbo_confirm: t("recruitment.candidate_profile.delete_confirm") } } %>
+  </div>
+</main>

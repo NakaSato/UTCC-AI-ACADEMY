@@ -5,6 +5,55 @@ class User < ApplicationRecord
   has_many :prior_knowledges, dependent: :destroy
   has_many :submissions, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  has_many :created_organizations, class_name: "Organization", foreign_key: :creator_id,
+                                   dependent: :restrict_with_exception, inverse_of: :creator
+  has_many :organization_memberships, dependent: :restrict_with_exception,
+                                      inverse_of: :user
+  has_many :organizations, through: :organization_memberships
+  has_many :sent_organization_invitations, class_name: "OrganizationInvitation", foreign_key: :inviter_id,
+                                           dependent: :restrict_with_exception, inverse_of: :inviter
+  has_many :received_organization_invitations, class_name: "OrganizationInvitation", foreign_key: :invitee_id,
+                                               dependent: :restrict_with_exception, inverse_of: :invitee
+  has_many :created_recruitment_job_posts, class_name: "Recruitment::JobPost", foreign_key: :creator_id,
+                                           dependent: :restrict_with_exception, inverse_of: :creator
+  has_many :requested_job_post_suggestions, class_name: "Recruitment::JobPostSuggestion", foreign_key: :requested_by_id,
+                                            dependent: :restrict_with_exception, inverse_of: :requested_by
+  has_many :reviewed_job_post_suggestions, class_name: "Recruitment::JobPostSuggestion", foreign_key: :reviewed_by_id,
+                                           dependent: :nullify, inverse_of: :reviewed_by
+  has_many :created_internship_programs, class_name: "Recruitment::InternshipProgram", foreign_key: :creator_id,
+                                        dependent: :restrict_with_exception, inverse_of: :creator
+  has_many :mentored_internship_programs, class_name: "Recruitment::InternshipProgram", foreign_key: :mentor_id,
+                                         dependent: :nullify, inverse_of: :mentor
+  has_many :internship_applications, class_name: "Recruitment::InternshipApplication", foreign_key: :student_id,
+                                    dependent: :restrict_with_exception, inverse_of: :student
+  has_many :reviewed_internship_applications, class_name: "Recruitment::InternshipApplication", foreign_key: :reviewed_by_id,
+                                              dependent: :nullify, inverse_of: :reviewed_by
+  has_many :job_applications, class_name: "Recruitment::JobApplication", foreign_key: :candidate_id,
+                             dependent: :restrict_with_exception, inverse_of: :candidate
+  has_many :reviewed_job_applications, class_name: "Recruitment::JobApplication", foreign_key: :reviewed_by_id,
+                                      dependent: :nullify, inverse_of: :reviewed_by
+  has_many :job_application_events, class_name: "Recruitment::JobApplicationEvent", foreign_key: :actor_id,
+                                   dependent: :restrict_with_exception, inverse_of: :actor
+  has_many :sent_job_application_messages, class_name: "Recruitment::JobApplicationMessage", foreign_key: :sender_id,
+                                           dependent: :restrict_with_exception, inverse_of: :sender
+  has_many :internship_evaluations, class_name: "Recruitment::InternshipEvaluation", foreign_key: :evaluator_id,
+                                   dependent: :restrict_with_exception, inverse_of: :evaluator
+  has_many :requested_internship_program_suggestions, class_name: "Recruitment::InternshipProgramSuggestion",
+                                                     foreign_key: :requested_by_id, dependent: :restrict_with_exception,
+                                                     inverse_of: :requested_by
+  has_many :reviewed_internship_program_suggestions, class_name: "Recruitment::InternshipProgramSuggestion",
+                                                    foreign_key: :reviewed_by_id, dependent: :nullify,
+                                                    inverse_of: :reviewed_by
+  has_one :candidate_profile, dependent: :destroy, inverse_of: :user
+  has_many :requested_resume_analyses, class_name: "Recruitment::CandidateResumeAnalysis", foreign_key: :requested_by_id,
+                                      dependent: :restrict_with_exception, inverse_of: :requested_by
+  has_many :reviewed_resume_analyses, class_name: "Recruitment::CandidateResumeAnalysis", foreign_key: :reviewed_by_id,
+                                     dependent: :nullify, inverse_of: :reviewed_by
+  has_many :saved_jobs, class_name: "Recruitment::SavedJob", dependent: :destroy, inverse_of: :user
+  has_many :job_discovery_dismissals, class_name: "Recruitment::JobDiscoveryDismissal", dependent: :destroy,
+                                      inverse_of: :user
+  has_one :job_discovery_preference, class_name: "Recruitment::JobDiscoveryPreference", dependent: :destroy,
+                                     inverse_of: :user
   has_many :academic_posts, foreign_key: :owner_id, dependent: :destroy,
                             inverse_of: :owner
   has_many :academic_post_memberships, dependent: :destroy,

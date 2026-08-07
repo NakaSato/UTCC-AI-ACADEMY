@@ -1,0 +1,184 @@
+<% content_for :title, "#{@job_post.title.presence || t("recruitment.jobs.untitled")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <% if @public %>
+      <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path, class: "text-13 font-semibold text-brand hover:underline" %>
+    <% else %>
+      <%= link_to t("recruitment.jobs.back_to_organization"), recruitment_organization_job_posts_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <% end %>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="text-13 text-muted"><%= @organization&.name || @job_post.organization.name %></p>
+        <h1 class="mt-2 text-32 font-bold tracking-[-0.035em] text-ink"><%= @job_post.title.presence || t("recruitment.jobs.untitled") %></h1>
+      </div>
+      <% if @public && Current.user.student? %>
+        <% if @saved_job %>
+          <%= button_to t("recruitment.jobs.unsave"), recruitment_unsave_job_path(@job_post), method: :delete, class: "rounded-full border border-brand px-4 py-2.5 text-13 font-semibold text-brand" %>
+        <% else %>
+          <%= button_to t("recruitment.jobs.save_job"), recruitment_save_job_path(@job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
+        <% end %>
+      <% end %>
+      <% unless @public %>
+        <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("recruitment.jobs.status.#{@job_post.status}") %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @match_preview %>
+    <section class="mt-6 rounded-card border border-brand/20 bg-brand/5 p-6">
+      <div>
+        <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.jobs.match_preview_title") %></h2>
+        <p class="mt-1 max-w-2xl text-13 leading-relaxed text-muted"><%= t("recruitment.jobs.match_preview_subtitle") %></p>
+      </div>
+      <div class="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <% @match_preview.factors.each do |factor| %>
+          <article class="rounded-xl border border-hairline bg-surface-1 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-14 font-semibold text-ink"><%= t("recruitment.jobs.match_factors.#{factor.key}") %></h3>
+              <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("recruitment.jobs.match_states.#{factor.state}") %></span>
+            </div>
+            <p class="mt-3 text-13 leading-relaxed text-muted"><%= factor.evidence %></p>
+            <p class="mt-2 text-11 leading-relaxed text-muted"><%= t("recruitment.jobs.match_source") %>: <%= factor.source %></p>
+            <p class="mt-2 text-11 leading-relaxed text-muted"><%= t("recruitment.jobs.match_uncertainty") %>: <%= factor.uncertainty %></p>
+          </article>
+        <% end %>
+      </div>
+      <p class="mt-4 text-12 leading-relaxed text-muted"><%= @match_preview.uncertainty %></p>
+    </section>
+  <% end %>
+
+  <% if @public && Current.user.student? %>
+    <p class="mt-5 text-12 text-muted"><%= t("recruitment.jobs.recommendation_note") %></p>
+    <section class="mt-5 rounded-xl border border-hairline bg-surface-2 p-5">
+      <h2 class="text-17 font-semibold text-ink"><%= t("recruitment.jobs.application_title") %></h2>
+      <% if @application %>
+        <p class="mt-2 text-13 text-muted"><%= t("recruitment.jobs.application_status", status: t("recruitment.applications.statuses.#{@application.status}")) %></p>
+        <%= link_to t("recruitment.jobs.view_application"), recruitment_job_application_path(@application), class: "mt-4 inline-flex rounded-full border border-brand px-4 py-2.5 text-13 font-semibold text-brand" %>
+        <% if @application.candidate_withdrawable? %>
+          <%= button_to t("recruitment.jobs.withdraw_application"), recruitment_withdraw_job_application_path(@application), method: :post, class: "mt-4 ml-2 inline-flex rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" %>
+        <% end %>
+      <% else %>
+        <p class="mt-2 text-13 leading-relaxed text-muted"><%= t("recruitment.jobs.application_consent_hint") %></p>
+        <%= form_with url: recruitment_apply_job_path(@job_post), scope: :recruitment_job_application, method: :post, class: "mt-4 space-y-3" do |form| %>
+          <%= form.label :statement, t("recruitment.applications.statement"), class: "text-13 font-semibold text-ink" %>
+          <%= form.text_area :statement, rows: 4, maxlength: 10_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-13 text-ink" %>
+          <%= form.submit t("recruitment.jobs.apply"), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
+    <article class="rounded-card border border-hairline bg-surface-1 p-6 sm:p-8">
+      <p class="text-16 leading-relaxed text-muted"><%= @job_post.summary %></p>
+      <h2 class="mt-8 text-20 font-semibold text-ink"><%= t("recruitment.jobs.fields.description") %></h2>
+      <div class="mt-3 whitespace-pre-line text-14 leading-relaxed text-muted"><%= @job_post.description %></div>
+    </article>
+
+    <aside class="rounded-card border border-hairline bg-surface-1 p-6">
+      <dl class="space-y-4 text-13">
+        <% %i[ category department team seniority location employment_type remote_policy ].each do |field| %>
+          <div>
+            <dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.jobs.fields.#{field}") %></dt>
+            <dd class="mt-1 text-ink"><%= field == :employment_type ? t("recruitment.jobs.employment_types.#{@job_post.public_send(field)}") : field == :remote_policy ? t("recruitment.jobs.remote_policies.#{@job_post.public_send(field)}") : @job_post.public_send(field) %></dd>
+          </div>
+        <% end %>
+        <% if @job_post.salary_min || @job_post.salary_max %>
+          <div>
+            <dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.jobs.fields.salary_min") %></dt>
+            <dd class="mt-1 text-ink"><%= [ @job_post.salary_min, @job_post.salary_max ].compact.map { |salary| number_with_delimiter(salary) }.join(" – ") %> <%= @job_post.currency %></dd>
+          </div>
+        <% end %>
+        <% if @job_post.closes_on %>
+          <div>
+            <dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.jobs.fields.closes_on") %></dt>
+            <dd class="mt-1 text-ink"><%= l(@job_post.closes_on, format: :long) %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </aside>
+  </div>
+
+  <% if !@public && @can_review_suggestions %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.jobs.suggestions_title") %></h2>
+          <p class="mt-1 max-w-2xl text-13 leading-relaxed text-muted"><%= t("recruitment.jobs.suggestions_subtitle") %></p>
+        </div>
+        <% if @can_generate_suggestions %>
+          <%= button_to t("recruitment.jobs.generate_suggestions"), suggestions_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
+        <% end %>
+      </div>
+
+      <% if @suggestions.empty? %>
+        <p class="mt-5 text-13 text-muted"><%= t("recruitment.jobs.no_suggestions") %></p>
+      <% else %>
+        <div class="mt-6 space-y-5">
+          <% @suggestions.each do |suggestion| %>
+            <article class="rounded-xl border border-hairline bg-surface-2 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-15 font-semibold text-ink"><%= t("recruitment.jobs.kinds.#{suggestion.kind}") %></h3>
+                  <p class="mt-1 text-12 text-muted"><%= t("recruitment.jobs.suggestion_status.#{suggestion.status}") %> · <%= suggestion.provider %></p>
+                </div>
+                <span class="text-12 text-muted"><%= l(suggestion.generated_at, format: :short) %></span>
+              </div>
+              <div class="mt-4 whitespace-pre-line text-13 leading-relaxed text-muted"><%= suggestion.content %></div>
+              <dl class="mt-4 grid gap-2 text-12 text-muted sm:grid-cols-2">
+                <div><dt class="font-semibold"><%= t("recruitment.jobs.source") %></dt><dd><%= suggestion.source_label %></dd></div>
+                <div><dt class="font-semibold"><%= t("recruitment.jobs.uncertainty") %></dt><dd><%= suggestion.uncertainty %></dd></div>
+              </dl>
+
+              <% if suggestion.actionable? %>
+                <%= form_with url: recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), scope: :recruitment_job_post_suggestion, method: :patch, class: "mt-5" do |form| %>
+                  <%= form.text_area :content, value: suggestion.content, rows: 4, maxlength: 20_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                  <%= form.submit t("recruitment.jobs.edit_suggestion"), class: "mt-3 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand hover:border-brand" %>
+                <% end %>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <%= button_to t("recruitment.jobs.accept_suggestion"), accept_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white hover:bg-brand-dark" %>
+                  <%= button_to t("recruitment.jobs.reject_suggestion"), reject_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+                  <% if @can_generate_suggestions %>
+                    <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+                  <% end %>
+                </div>
+              <% elsif suggestion.status == "rejected" && @can_generate_suggestions %>
+                <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "mt-4 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if !@public && @can_review_applications %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.applications.pipeline_title") %></h2>
+          <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.applications.pipeline_subtitle") %></p>
+        </div>
+        <%= link_to t("recruitment.applications.open_pipeline"), recruitment_organization_job_post_applications_path(@organization, @job_post), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
+      </div>
+      <p class="mt-4 text-13 text-muted"><%= t("recruitment.applications.pipeline_count", count: @application_count) %></p>
+    </section>
+  <% end %>
+
+  <% unless @public %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <p class="text-13 text-muted"><%= t("recruitment.jobs.approval_note") %></p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <%= link_to t("recruitment.jobs.save"), edit_recruitment_organization_job_post_path(@organization, @job_post), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" if @can_edit %>
+        <%= button_to t("recruitment.jobs.submit"), submit_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_submit %>
+        <%= button_to t("recruitment.jobs.request_changes"), request_changes_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_request_changes %>
+        <%= button_to t("recruitment.jobs.publish"), publish_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_publish %>
+        <%= button_to t("recruitment.jobs.pause"), pause_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_pause %>
+        <%= button_to t("recruitment.jobs.close"), close_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_close %>
+        <%= button_to t("recruitment.jobs.archive"), archive_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_archive %>
+        <%= button_to t("recruitment.jobs.delete"), recruitment_organization_job_post_path(@organization, @job_post), method: :delete, class: "rounded-full border border-red-200 px-4 py-2.5 text-13 font-semibold text-red-700 hover:border-red-400", form: { data: { turbo_confirm: t("recruitment.jobs.delete") } } if @can_delete %>
+      </div>
+    </section>
+  <% end %>
+</main>
