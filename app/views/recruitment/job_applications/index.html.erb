@@ -1,0 +1,31 @@
+<% content_for :title, "#{@organization_view ? @job_post.title : t("recruitment.applications.my_title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to @organization_view ? t("recruitment.jobs.back_to_organization") : t("recruitment.jobs.public_title"), @organization_view ? recruitment_organization_job_post_path(@organization, @job_post) : recruitment_jobs_path, class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= @organization_view ? t("recruitment.applications.pipeline_title") : t("recruitment.applications.my_title") %></h1>
+    <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= @organization_view ? t("recruitment.applications.pipeline_subtitle") : t("recruitment.applications.my_subtitle") %></p>
+  </div>
+
+  <% if @applications.empty? %>
+    <section class="rounded-card border border-dashed border-hairline bg-surface-1 px-6 py-12 text-center">
+      <h2 class="text-20 font-bold text-ink"><%= t("recruitment.applications.empty") %></h2>
+    </section>
+  <% else %>
+    <div class="space-y-4">
+      <% @applications.each do |application| %>
+        <article class="rounded-card border border-hairline bg-surface-1 p-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-12 text-muted"><%= @organization_view ? application.candidate.name : application.job_post.organization.name %></p>
+              <h2 class="mt-1 text-20 font-semibold text-ink"><%= link_to application.job_post.title, (@organization_view ? recruitment_organization_job_post_application_path(@organization, @job_post, application) : recruitment_job_application_path(application)), class: "hover:text-brand" %></h2>
+            </div>
+            <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("recruitment.applications.statuses.#{application.status}") %></span>
+          </div>
+          <p class="mt-4 text-13 leading-relaxed text-muted"><%= t("recruitment.applications.next_action", action: t("recruitment.applications.next_actions.#{application.next_action}")) %></p>
+          <p class="mt-3 text-12 text-muted"><%= t("recruitment.applications.applied_at", date: l(application.applied_at, format: :long)) %></p>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</main>

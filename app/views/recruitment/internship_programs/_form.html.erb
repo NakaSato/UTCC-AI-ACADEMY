@@ -1,0 +1,49 @@
+<%= form_with model: [ @organization, @program ], class: "space-y-6" do |form| %>
+  <% if @program.errors.any? %>
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-13 text-red-800">
+      <%= @program.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, t("recruitment.internships.fields.name"), class: "text-13 font-semibold text-ink" %>
+      <%= form.text_field :name, maxlength: 200, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+    </div>
+    <div>
+      <%= form.label :department, t("recruitment.internships.fields.department"), class: "text-13 font-semibold text-ink" %>
+      <%= form.text_field :department, maxlength: 160, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+    </div>
+    <div>
+      <%= form.label :mentor_id, t("recruitment.internships.fields.mentor"), class: "text-13 font-semibold text-ink" %>
+      <%= form.collection_select :mentor_id, @mentors, :id, :name, { include_blank: t("recruitment.internships.fields.mentor_blank") }, { required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" } %>
+    </div>
+    <div>
+      <%= form.label :duration_weeks, t("recruitment.internships.fields.duration_weeks"), class: "text-13 font-semibold text-ink" %>
+      <%= form.number_field :duration_weeks, min: 1, max: 104, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+    </div>
+    <div>
+      <%= form.label :max_students, t("recruitment.internships.fields.max_students"), class: "text-13 font-semibold text-ink" %>
+      <%= form.number_field :max_students, min: 1, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+    </div>
+    <div>
+      <%= form.label :remote_policy, t("recruitment.internships.fields.remote_policy"), class: "text-13 font-semibold text-ink" %>
+      <%= form.select :remote_policy, Recruitment::InternshipProgram::REMOTE_POLICIES.map { |policy| [ t("recruitment.internships.remote_policies.#{policy}"), policy ] }, {}, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+    </div>
+    <div class="flex items-end gap-3 pb-2">
+      <%= form.check_box :paid, class: "h-4 w-4 rounded border-hairline text-brand" %>
+      <%= form.label :paid, t("recruitment.internships.fields.paid"), class: "text-13 font-semibold text-ink" %>
+    </div>
+    <% %i[ description required_skills learning_outcomes working_days certificate_policy equipment_provided ].each do |field| %>
+      <div class="sm:col-span-2">
+        <%= form.label field, t("recruitment.internships.fields.#{field}"), class: "text-13 font-semibold text-ink" %>
+        <%= form.text_area field, rows: field == :description ? 6 : 4, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <%= form.submit t("recruitment.internships.save"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white hover:bg-brand-dark" %>
+    <%= link_to t("recruitment.internships.cancel"), @program.persisted? ? recruitment_organization_internship_program_path(@organization, @program) : recruitment_organization_internship_programs_path(@organization), class: "rounded-full border border-hairline px-5 py-3 text-13 font-semibold text-brand hover:border-brand" %>
+  </div>
+<% end %>

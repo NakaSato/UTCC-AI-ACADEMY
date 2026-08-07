@@ -2,10 +2,10 @@
 id: ADR-0017
 type: adr
 title: Define the Helping Hand award and community interaction boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@academic-owner", "@tech-lead", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-05
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -19,7 +19,8 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/awards_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
@@ -27,9 +28,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
 
 # Define the Helping Hand award and community interaction boundary
 
-> **Decision state:** Agent-prepared draft. The Product Owner, Academic Owner,
-> and Privacy Owner must decide whether a learner-to-learner interaction is an
-> appropriate academy feature before the award is made earnable.
+> **Decision state:** Accepted by the user on 2026-08-05. Defer the Helping Hand
+> feature until an approved, moderated community feature exists. Keep the badge
+> visible but explicitly unavailable; it remains unearnable and introduces no
+> forum, peer-review, moderation, staff-override, or award-credit records.
 
 > [Decision Records](README.md) ·
 > [M8 community specification](../specs/spec-m8-helping-hand-community.md) ·
@@ -64,26 +66,22 @@ integrity concerns, privacy obligations, and an operational owner.
 
 ## Decision boundary
 
-The accountable owners must decide:
+The accepted deferral policy is:
 
-1. Whether the academy needs a forum, course Q&A, structured peer review,
-   instructor-led discussion, or no in-product community feature.
-2. What “helping” means educationally and what evidence qualifies: an accepted
-   answer, useful review, citation, explanation, or another behavior.
-3. Who may ask, answer, review, edit, hide, report, or moderate; whether student
-   and instructor identities are shown; and what visibility scope applies.
-4. Whether an answer needs instructor acceptance or another quality signal before
-   it contributes to the award.
-5. How spam, self-answering, duplicate answers, collusion, harassment, unsafe
-   advice, plagiarism, and personal data are handled.
-6. How edits, deletion, moderation, rejected answers, account removal, and
-   appeals affect the contribution and any already-earned award.
-7. Whether the award is removed, renamed, or retained while the feature remains
-   unavailable, and how Thai/English copy communicates the state.
-
-Until those decisions are accepted, the safe engineering baseline is to keep the
-award unearnable and avoid creating an unmoderated learner communication path.
-The existing copy should not be treated as evidence that a forum exists.
+1. Do not add a forum, course Q&A, structured peer review, instructor-led
+   discussion, or another learner-to-learner interaction feature in this scope.
+2. Keep `forum_helper?` false and do not create forum, peer-review,
+   contribution, moderation, reporting, or award-credit records or endpoints.
+3. Keep the Helping Hand badge visible, but use Thai and English copy that says
+   it is unavailable until a moderated community feature exists.
+4. Do not let the badge affect progress, grades, completion, certificates,
+   reports, access, notifications, or any other academic state.
+5. Do not add staff grants, moderation queues, retraction rules, or support
+   workflows for a feature that does not exist.
+6. Revisit this ADR before any community implementation. A future feature needs
+   a new or amended policy covering educational outcome, contribution evidence,
+   identity, visibility, moderation, safety, privacy, award semantics, and
+   operations.
 
 ## Alternatives
 
@@ -112,20 +110,23 @@ Learners review approved work using a rubric rather than open discussion. This
 can align better with pedagogy and academic writing, but needs assignment,
 anonymity, conflict, feedback-quality, and assessment rules.
 
-No option is selected by this draft.
+The remove-or-defer option is selected for the current increment. The other
+options remain future alternatives and require a separate approved policy before
+implementation.
 
 ## Consequences
 
 The community boundary has the following consequences:
 
-- Learner-authored content must be treated as untrusted input and rendered with
-  the same sanitization and authorization discipline as academic posts.
-- The public/learner/staff boundary must define which content and identity
-  fields are visible; private learner data must not enter award copy or logs.
-- A contribution record and an award calculation should be separate boundaries:
-  moderation or deletion must not silently rewrite immutable history.
-- A community feature creates an operational duty for reports, response times,
-  retention, takedown, and escalation. Without an owner, do not enable it.
+- The current increment adds no learner-authored content, community data,
+  migrations, moderation operations, or notification paths.
+- The badge remains a truthful, visible placeholder rather than promising a
+  forum that learners cannot use.
+- Progress, grades, completion, certificates, reports, access, and privacy
+  boundaries remain unchanged because no community evidence is introduced.
+- A future community feature will create an operational duty for reports,
+  response times, retention, takedown, and escalation. Without an owner, it
+  must remain disabled.
 
 ## Fitness Functions
 
@@ -137,4 +138,5 @@ The community boundary has the following consequences:
 - Learner-generated content is visible only to the approved audience, and
   moderation/report actions do not reveal reporter identity beyond policy.
 - The award hint, earned state, and community UI are consistent in English and
-  Thai and never describe an unavailable feature as active.
+  Thai and never describe an unavailable feature as active; the current copy and
+  unearnable rule are covered by `test/models/awards_test.rb`.

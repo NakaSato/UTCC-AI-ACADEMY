@@ -1,0 +1,43 @@
+<% content_for :title, "#{t("recruitment.organizations.new")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("recruitment.back_to_organizations"), recruitment_organizations_path,
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.organizations.new") %></h1>
+    <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("recruitment.organizations.new_subtitle") %></p>
+  </div>
+
+  <%= form_with model: @organization, url: recruitment_organizations_path, class: "max-w-2xl space-y-6" do |form| %>
+    <% if @organization.errors.any? %>
+      <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert">
+        <%= @organization.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :name, t("recruitment.organizations.fields.name"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.text_field :name, required: true, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+    </div>
+
+    <div>
+      <%= form.label :slug, t("recruitment.organizations.fields.slug"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= form.text_field :slug, maxlength: 80, placeholder: "example-company", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <p class="mt-1.5 text-12 text-muted"><%= t("recruitment.organizations.fields.slug_hint") %></p>
+    </div>
+
+    <div>
+      <%= label_tag "organization_owner_id", t("recruitment.organizations.fields.owner"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= select_tag "organization[owner_id]",
+            options_from_collection_for_select(@users, :id, :name),
+            include_blank: t("recruitment.organizations.fields.owner_blank"),
+            required: true,
+            class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= form.submit t("recruitment.save"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+      <%= link_to t("recruitment.cancel"), recruitment_organizations_path, class: "rounded-full border border-hairline px-5 py-2.5 text-13 font-semibold text-muted hover:text-ink" %>
+    </div>
+  <% end %>
+</main>

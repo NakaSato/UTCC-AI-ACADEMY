@@ -24,10 +24,27 @@ deprecate it.
 - [ADR-0014 — Define approval queue records and decision history](adr-0014-approval-queue-records.md) — draft; request and authority policy pending
 - [ADR-0015 — Define which admin feature flags are real and how settings persist](adr-0015-feature-flag-boundary.md) — draft; supported-flag and runtime policy pending
 - [ADR-0016 — Define the learner hearts attempt and refill policy](adr-0016-hearts-attempt-policy.md) — draft; academic and product policy pending
-- [ADR-0017 — Define the Helping Hand award and community interaction boundary](adr-0017-helping-hand-community-boundary.md) — draft; community, academic, privacy, and moderation policy pending
-- [ADR-0018 — Define the meaning and effects of learner-marked prior knowledge](adr-0018-prior-knowledge-boundary.md) — draft; academic and product policy pending
-- [ADR-0019 — Define active-session visibility and revocation](adr-0019-session-visibility-and-revocation.md) — draft; security, privacy, authority, and retention policy pending
-- [ADR-0020 — Define critical-failure observability and alert ownership](adr-0020-critical-failure-observability.md) — draft; SLO, ownership, privacy, retention, and provider policy pending
-- [ADR-0021 — Define backup, restore, and recovery verification](adr-0021-backup-restore-verification.md) — draft; recovery target, provider, retention, storage, and drill policy pending
+- [ADR-0017 — Define the Helping Hand award and community interaction boundary](adr-0017-helping-hand-community-boundary.md) — accepted; Helping Hand deferred until a moderated community feature is approved
+- [ADR-0018 — Define the meaning and effects of learner-marked prior knowledge](adr-0018-prior-knowledge-boundary.md) — accepted; learner marks affect map progress and course completion only
+- [ADR-0019 — Define active-session visibility and revocation](adr-0019-session-visibility-and-revocation.md) — accepted; own-account minimized session list and row-destruction revocation implemented
+- [ADR-0020 — Define critical-failure observability and alert ownership](adr-0020-critical-failure-observability.md) — accepted; provider-neutral redacted telemetry, signal ownership, and runbook baseline implemented
+- [ADR-0021 — Define backup, restore, and recovery verification](adr-0021-backup-restore-verification.md) — accepted; provider-neutral one-hour RPO/four-hour RTO recovery contract and isolated drill baseline implemented
 - [ADR-0022 — Define the production deployment, artifact, and rollback boundary](adr-0022-production-deployment-boundary.md) — draft; target, artifact, migration, rollback, and release policy pending
 - [ADR-0023 — Define curriculum-scale accessibility and performance quality budgets](adr-0023-curriculum-quality-budgets.md) — draft; accessibility, performance, audience, threshold, and waiver policy pending
+- [ADR-0024 — Use organization memberships for recruitment company access](adr-0024-recruitment-organization-membership.md) — draft; Product Owner and Tech Lead review pending
+- [ADR-0025 — Use secure in-app invitations for registered recruitment staff](adr-0025-recruitment-in-app-invitations.md) — draft; Product Owner, Tech Lead, and Security/Privacy review pending
+- [ADR-0026 — Keep job posts organization-scoped with explicit publication states](adr-0026-recruitment-job-post-boundary.md) — draft; Product, technical, security, and recruitment-domain review pending
+- [ADR-0027 — Persist provider-neutral job suggestions with human review](adr-0027-provider-neutral-job-suggestions.md) — draft; Product, technical, security, and recruitment-domain review pending
+- [ADR-0028 — Keep internship programs, applications, mentors, and evaluations organization-scoped](adr-0028-recruitment-internship-program-boundary.md) — draft; Product, technical, security, recruitment, and academic review pending
+- [ADR-0029 — Keep candidate profile data candidate-owned, portable, and provenance-aware](adr-0029-candidate-profile-data-boundary.md) — draft; Product, Privacy, Security, and Recruitment review pending
+- [ADR-0030 — Keep resume analysis provider-neutral, evidence-bound, and candidate-reviewed](adr-0030-provider-neutral-resume-analysis.md) — draft; Product, Privacy, Security, and Recruitment review pending
+- [ADR-0031 — Keep job discovery candidate-controlled and advisory](adr-0031-candidate-controlled-job-discovery.md) — draft; Product, Privacy, Security, and Recruitment review pending
+- [ADR-0032 — Start matching with candidate-owned factor previews instead of consequential ranking](adr-0032-factor-level-job-match-previews.md) — draft; Product, Privacy, Security, Recruitment, and QA review pending
+- [ADR-0033 — Keep recruitment applications candidate-owned with an auditable organization-scoped pipeline](adr-0033-recruitment-application-workflow-boundary.md) — draft; Product, Privacy, Security, Recruitment, and QA review pending
+- [ADR-0034 — Start the AI recruiter agent with advisory application next-action assistance](adr-0034-recruiter-advisory-next-action-assistance.md) — draft; Product, legal, Privacy, Security, Recruitment, Data, and QA review pending
+- [ADR-0035 — Start the AI candidate agent with candidate-controlled application preparation guidance](adr-0035-candidate-application-preparation-assistance.md) — draft; Product, legal, Privacy, Security, Recruitment, Data, and QA review pending
+- [ADR-0036 — Start the AI internship agent with student-controlled preparation guidance](adr-0036-internship-preparation-assistance.md) — draft; Product, Academic, legal, Privacy, Security, Recruitment, Data, and QA review pending
+- [ADR-0037 — Start recruitment analytics with organization-scoped aggregate reporting and small-cell suppression](adr-0037-privacy-safe-recruitment-reporting.md) — draft; Product, Privacy, Security, Recruitment, Data, and QA review pending
+- [ADR-0038 — Start recruitment communication with participant-scoped in-app application conversations](adr-0038-in-app-application-conversations.md) — draft; Product, Privacy, Security, Recruitment, and QA review pending
+- [ADR-0039 — Define a governed control boundary for enterprise recruitment integrations](adr-0039-governed-enterprise-integrations.md) — draft; Product, legal, Privacy, Security, Recruitment, Data, Platform, and QA review pending
+- [ADR-0040 — Define an invitation-only company business-case collaboration boundary](adr-0040-company-business-case-collaboration-boundary.md) — draft; Product, Security, Privacy, Academic, Recruitment, and QA review pending

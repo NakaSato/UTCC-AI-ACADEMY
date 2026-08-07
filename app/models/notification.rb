@@ -10,7 +10,8 @@ class Notification < ApplicationRecord
 
   belongs_to :user
 
-  KINDS = %w[ enrolled role_changed integrity_notice integrity_escalated academic_post_invitation ].freeze
+  KINDS = %w[ enrolled role_changed integrity_notice integrity_escalated academic_post_invitation
+              recruitment_organization_invitation recruitment_job_alert ].freeze
 
   validates :kind, inclusion: { in: KINDS }
 
@@ -21,9 +22,9 @@ class Notification < ApplicationRecord
   RECENT = 8
 
   # The one place a notification is written, and therefore the one place the
-  # bell has to be told. Every caller is in AdminController acting *on* somebody
-  # else, so the recipient is by definition looking at a different page than the
-  # one that caused this — see NotificationBell.
+  # bell has to be told. Every caller acts *on* somebody else, so the recipient
+  # is by definition looking at a different page than the one that caused this
+  # — see NotificationBell.
   def self.notify(user, kind, **params)
     return unless FeatureSetting.enabled?(:notifications)
 
@@ -35,15 +36,20 @@ class Notification < ApplicationRecord
   def text = I18n.t("notifications.#{kind}", **interpolations)
 
   def action_path
-    return unless kind == "academic_post_invitation"
-
-    Rails.application.routes.url_helpers.academic_post_invitation_path(params.fetch("token"))
+    case kind
+    when "academic_post_invitation"
+      Rails.application.routes.url_helpers.academic_post_invitation_path(params.fetch("token"))
+    when "recruitment_organization_invitation"
+      Rails.application.routes.url_helpers.recruitment_organization_invitation_path(params.fetch("token"))
+    when "recruitment_job_alert"
+      Rails.application.routes.url_helpers.recruitment_jobs_path
+    end
   end
 
   def action_label
-    return unless kind == "academic_post_invitation"
+    return unless %w[ academic_post_invitation recruitment_organization_invitation recruitment_job_alert ].include?(kind)
 
-    I18n.t("notifications.academic_post_invitation_action")
+    I18n.t("notifications.#{kind}_action")
   end
 
   private
@@ -53,7 +59,11 @@ class Notification < ApplicationRecord
     # so the sentence can name it in the reader's language, not the granter's.
     def interpolations
       values = params.symbolize_keys
-      values[:role] = I18n.t("admin.roles.#{values[:role]}") if values.key?(:role)
+      if values.key?(:role)
+        key = values[:role]
+        scope = I18n.exists?("admin.roles.#{key}") ? "admin.roles" : "recruitment.memberships.roles"
+        values[:role] = I18n.t("#{scope}.#{key}")
+      end
       values
     end
 end

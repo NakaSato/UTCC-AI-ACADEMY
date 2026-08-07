@@ -58,6 +58,87 @@ Rails.application.routes.draw do
   get "notifications", to: "notifications#show", as: :notifications
   # The bell's "mark all read" — one write, back to where you were.
   post "notifications/read", to: "notifications#read_all", as: :read_notifications
+  namespace :recruitment do
+    resources :organizations, only: %i[index new create show] do
+      get :reporting, on: :member, to: "reporting#show"
+      post :memberships, on: :member, to: "organizations#create_membership"
+      delete "memberships/:user_id", on: :member, to: "organizations#revoke_membership",
+             as: :membership
+      post :invitations, on: :member, to: "organization_invitations#create"
+      resources :job_posts, only: %i[index new create show edit update destroy] do
+        post :submit, on: :member
+        post :request_changes, on: :member
+        post :publish, on: :member
+        post :pause, on: :member
+        post :close, on: :member
+        post :archive, on: :member
+        post :suggestions, on: :member, to: "job_suggestions#create"
+        resources :suggestions, only: :update, controller: "job_suggestions" do
+          post :accept, on: :member
+          post :reject, on: :member
+          post :regenerate, on: :member
+        end
+        resources :applications, only: %i[index show], controller: "job_applications" do
+          post :transition, on: :member
+          post :message, on: :member
+        end
+      end
+      resources :internship_programs, only: %i[index new create show edit update] do
+        post :submit, on: :member
+        post :request_changes, on: :member
+        post :publish, on: :member
+        post :pause, on: :member
+        post :close, on: :member
+        post :archive, on: :member
+        post :suggestions, on: :member, to: "internship_suggestions#create"
+        resources :suggestions, only: :update, controller: "internship_suggestions" do
+          post :accept, on: :member
+          post :reject, on: :member
+          post :regenerate, on: :member
+        end
+        resources :applications, only: :index, controller: "internship_applications" do
+          post :accept, on: :member
+          post :reject, on: :member
+          resource :evaluation, only: %i[create update], controller: "internship_evaluations"
+        end
+      end
+    end
+    resources :jobs, only: %i[index show], controller: :job_posts
+    resources :job_applications, only: %i[index show], path: "job-applications", controller: :job_applications
+    post "jobs/:id/apply", to: "job_applications#create", as: :apply_job
+    post "job-applications/:id/withdraw", to: "job_applications#withdraw", as: :withdraw_job_application
+    post "job-applications/:id/messages", to: "job_applications#message", as: :message_job_application
+    post "jobs/:id/save", to: "saved_jobs#create", as: :save_job
+    delete "jobs/:id/save", to: "saved_jobs#destroy", as: :unsave_job
+    post "jobs/:id/dismiss", to: "job_discovery_dismissals#create", as: :dismiss_job_recommendation
+    delete "jobs/:id/dismiss", to: "job_discovery_dismissals#destroy", as: :undismiss_job_recommendation
+    resource :job_discovery_preferences, only: %i[edit update], path: "job-discovery/preferences",
+             controller: :job_discovery_preferences
+    resources :internships, only: %i[index show], controller: :internship_programs
+    post "internships/:id/apply", to: "internship_applications#create", as: :apply_internship
+    post "internship-applications/:id/withdraw", to: "internship_applications#withdraw",
+         as: :withdraw_internship_application
+    resource :candidate_profile, only: %i[edit update],
+             path: "candidate-profile", controller: :candidate_profiles
+    get "candidate-profile/export", to: "candidate_profiles#export", as: :candidate_profile_export
+    delete "candidate-profile", to: "candidate_profiles#destroy", as: :candidate_profile_data
+    post "candidate-profile/resume-analysis", to: "candidate_resume_analyses#create",
+         as: :candidate_profile_resume_analysis
+    patch "candidate-profile/resume-analysis/:analysis_id/findings/:id", to: "candidate_resume_analyses#update",
+          as: :candidate_resume_analysis_finding
+    post "candidate-profile/resume-analysis/:analysis_id/findings/:id/accept", to: "candidate_resume_analyses#accept",
+         as: :accept_candidate_resume_analysis_finding
+    post "candidate-profile/resume-analysis/:analysis_id/findings/:id/reject", to: "candidate_resume_analyses#reject",
+         as: :reject_candidate_resume_analysis_finding
+    post "candidate-profile/resume-analysis/:id/apply", to: "candidate_resume_analyses#apply",
+         as: :apply_candidate_resume_analysis
+    get "organization-invitations/:token", to: "organization_invitations#show",
+        as: :organization_invitation
+    post "organization-invitations/:token/accept", to: "organization_invitations#accept",
+         as: :accept_organization_invitation
+    post "organization-invitations/:token/decline", to: "organization_invitations#decline",
+         as: :decline_organization_invitation
+  end
   get "my-learning", to: "my_learning#show", as: :my_learning
   # The account's own details. One helper for both verbs, like the auth screens:
   # profile_path is the link and the form action. This is the only place an
@@ -69,7 +150,11 @@ Rails.application.routes.draw do
   # the reset flow under /reset-password is the signed-*out* way in and answers a
   # different question.
   patch "profile/password", to: "profiles#update_password", as: :profile_password
+  delete "profile/sessions", to: "sessions#destroy_other_sessions", as: :revoke_other_sessions
+  delete "profile/sessions/:token", to: "sessions#destroy_session", as: :revoke_profile_session
   get "map", to: "knowledge_maps#show", as: :knowledge_map
+  post "map/known", to: "prior_knowledges#create", as: :mark_topic_known
+  delete "map/known", to: "prior_knowledges#destroy", as: :unmark_topic_known
   get "progress", to: "progress#show", as: :progress
   get "leaderboard", to: "leaderboards#show", as: :leaderboard
   get "instructor", to: "instructor#show", as: :instructor

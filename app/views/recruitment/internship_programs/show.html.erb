@@ -1,0 +1,169 @@
+<% content_for :title, "#{@program.name.presence || t("recruitment.internships.untitled")} — UTCC AI Academy" %>
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to @public ? t("recruitment.internships.public_title") : t("recruitment.internships.back_to_programs"), @public ? recruitment_internships_path : recruitment_organization_internship_programs_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="text-13 text-muted"><%= @organization.name %></p>
+        <h1 class="mt-2 text-32 font-bold tracking-[-0.035em] text-ink"><%= @program.name.presence || t("recruitment.internships.untitled") %></h1>
+      </div>
+      <% unless @public %><span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("recruitment.internships.status.#{@program.status}") %></span><% end %>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
+    <article class="rounded-card border border-hairline bg-surface-1 p-6 sm:p-8">
+      <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.internships.fields.description") %></h2>
+      <div class="mt-3 whitespace-pre-line text-14 leading-relaxed text-muted"><%= @program.description %></div>
+      <h2 class="mt-8 text-20 font-semibold text-ink"><%= t("recruitment.internships.fields.learning_outcomes") %></h2>
+      <div class="mt-3 whitespace-pre-line text-14 leading-relaxed text-muted"><%= @program.learning_outcomes %></div>
+      <% if @public && Current.user&.student? %>
+        <section class="mt-8 rounded-xl border border-hairline bg-surface-2 p-5">
+          <h2 class="text-17 font-semibold text-ink"><%= t("recruitment.internships.application_title") %></h2>
+          <% if @application %>
+            <p class="mt-2 text-13 text-muted"><%= t("recruitment.internships.application_status", status: t("recruitment.internships.application_statuses.#{@application.status}")) %></p>
+            <% if @application.pending? || @application.accepted? %>
+              <%= button_to t("recruitment.internships.withdraw"), recruitment_withdraw_internship_application_path(@application), method: :post, class: "mt-4 rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" %>
+            <% end %>
+            <% if @internship_assistant %>
+              <section class="mt-6 rounded-xl border border-brand/20 bg-brand/5 p-5">
+                <h3 class="text-17 font-semibold text-ink"><%= t("recruitment.internships.assistant_title") %></h3>
+                <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.internships.assistant_subtitle") %></p>
+                <ul class="mt-4 space-y-3">
+                  <% @internship_assistant.items.each do |item| %>
+                    <li class="rounded-xl border border-hairline bg-surface-1 p-3">
+                      <p class="text-13 font-semibold text-ink"><%= t("recruitment.internships.assistant_items.#{item.key}") %></p>
+                      <p class="mt-1 text-11 text-muted"><%= t("recruitment.internships.assistant_source") %>: <%= item.source %></p>
+                    </li>
+                  <% end %>
+                </ul>
+                <p class="mt-4 text-11 leading-relaxed text-muted"><%= @internship_assistant.uncertainty %></p>
+              </section>
+            <% end %>
+          <% else %>
+            <%= form_with url: recruitment_apply_internship_path(@program), scope: :recruitment_internship_application, method: :post, class: "mt-4 space-y-3" do |form| %>
+              <%= form.label :statement, t("recruitment.internships.application_statement"), class: "text-13 font-semibold text-ink" %>
+              <%= form.text_area :statement, rows: 4, maxlength: 10_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-13 text-ink" %>
+              <%= form.submit t("recruitment.internships.apply"), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
+            <% end %>
+          <% end %>
+        </section>
+      <% end %>
+    </article>
+
+    <aside class="rounded-card border border-hairline bg-surface-1 p-6">
+      <dl class="space-y-4 text-13">
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.department") %></dt><dd class="mt-1 text-ink"><%= @program.department %></dd></div>
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.duration_weeks") %></dt><dd class="mt-1 text-ink"><%= t("recruitment.internships.duration", count: @program.duration_weeks) %></dd></div>
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.max_students") %></dt><dd class="mt-1 text-ink"><%= t("recruitment.internships.capacity", count: @program.max_students) %></dd></div>
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.mentor") %></dt><dd class="mt-1 text-ink"><%= @program.mentor&.name %></dd></div>
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.remote_policy") %></dt><dd class="mt-1 text-ink"><%= t("recruitment.internships.remote_policies.#{@program.remote_policy}") %></dd></div>
+        <div><dt class="text-11 font-semibold tracking-[0.1em] text-muted uppercase"><%= t("recruitment.internships.fields.paid") %></dt><dd class="mt-1 text-ink"><%= t("recruitment.internships.paid.#{@program.paid}") %></dd></div>
+      </dl>
+    </aside>
+  </div>
+
+  <% unless @public %>
+    <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+      <p class="text-13 text-muted"><%= t("recruitment.internships.approval_note") %></p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <%= link_to t("recruitment.internships.edit"), edit_recruitment_organization_internship_program_path(@organization, @program), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" if @can_edit %>
+        <%= button_to t("recruitment.internships.submit"), submit_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" if @can_submit %>
+        <%= button_to t("recruitment.internships.request_changes"), request_changes_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" if @can_request_changes %>
+        <%= button_to t("recruitment.internships.publish"), publish_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" if @can_publish %>
+        <%= button_to t("recruitment.internships.pause"), pause_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" if @can_pause %>
+        <%= button_to t("recruitment.internships.close"), close_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" if @can_close %>
+        <%= button_to t("recruitment.internships.archive"), archive_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" if @can_archive %>
+      </div>
+    </section>
+
+    <% if @can_review_suggestions %>
+      <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.internships.suggestions_title") %></h2>
+            <p class="mt-1 max-w-2xl text-13 leading-relaxed text-muted"><%= t("recruitment.internships.suggestions_subtitle") %></p>
+          </div>
+          <% if @can_generate_suggestions %>
+            <%= button_to t("recruitment.internships.generate_suggestions"), suggestions_recruitment_organization_internship_program_path(@organization, @program), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
+          <% end %>
+        </div>
+        <% if @suggestions.empty? %>
+          <p class="mt-5 text-13 text-muted"><%= t("recruitment.internships.no_suggestions") %></p>
+        <% else %>
+          <div class="mt-6 space-y-5">
+            <% @suggestions.each do |suggestion| %>
+              <article class="rounded-xl border border-hairline bg-surface-2 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 class="text-15 font-semibold text-ink"><%= t("recruitment.internships.suggestion_kinds.#{suggestion.kind}") %></h3>
+                    <p class="mt-1 text-12 text-muted"><%= t("recruitment.internships.suggestion_status.#{suggestion.status}") %> · <%= suggestion.provider %></p>
+                  </div>
+                  <span class="text-12 text-muted"><%= l(suggestion.generated_at, format: :short) %></span>
+                </div>
+                <div class="mt-4 whitespace-pre-line text-13 leading-relaxed text-muted"><%= suggestion.content %></div>
+                <dl class="mt-4 grid gap-2 text-12 text-muted sm:grid-cols-2">
+                  <div><dt class="font-semibold"><%= t("recruitment.internships.source") %></dt><dd><%= suggestion.source_label %></dd></div>
+                  <div><dt class="font-semibold"><%= t("recruitment.internships.uncertainty") %></dt><dd><%= suggestion.uncertainty %></dd></div>
+                </dl>
+                <% if suggestion.actionable? %>
+                  <%= form_with url: recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), scope: :recruitment_internship_program_suggestion, method: :patch, class: "mt-5" do |form| %>
+                    <%= form.text_area :content, value: suggestion.content, rows: 4, maxlength: 20_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                    <%= form.submit t("recruitment.internships.edit_suggestion"), class: "mt-3 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand" %>
+                  <% end %>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <%= button_to t("recruitment.internships.accept_suggestion"), accept_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white" %>
+                    <%= button_to t("recruitment.internships.reject_suggestion"), reject_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted" %>
+                    <% if @can_generate_suggestions %>
+                      <%= button_to t("recruitment.internships.regenerate_suggestion"), regenerate_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted" %>
+                    <% end %>
+                  </div>
+                <% elsif suggestion.status == "rejected" && @can_generate_suggestions %>
+                  <%= button_to t("recruitment.internships.regenerate_suggestion"), regenerate_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), method: :post, class: "mt-4 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted" %>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
+    <% if @can_review_applications %>
+      <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.internships.applications_title") %></h2>
+        <% if @applications.empty? %>
+          <p class="mt-4 text-13 text-muted"><%= t("recruitment.internships.no_applications") %></p>
+        <% else %>
+          <div class="mt-5 space-y-4">
+            <% @applications.each do |application| %>
+              <article class="rounded-xl border border-hairline bg-surface-2 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div><h3 class="text-15 font-semibold text-ink"><%= application.student.name %></h3><p class="mt-1 text-12 text-muted"><%= t("recruitment.internships.application_statuses.#{application.status}") %></p></div>
+                  <span class="text-12 text-muted"><%= l(application.applied_at, format: :short) %></span>
+                </div>
+                <p class="mt-3 whitespace-pre-line text-13 leading-relaxed text-muted"><%= application.statement.presence || t("recruitment.internships.no_statement") %></p>
+                <% if application.pending? %>
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    <%= button_to t("recruitment.internships.accept"), accept_recruitment_organization_internship_program_application_path(@organization, @program, application), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white" %>
+                    <%= button_to t("recruitment.internships.reject"), reject_recruitment_organization_internship_program_application_path(@organization, @program, application), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted" %>
+                  </div>
+                <% elsif application.accepted? %>
+                  <% evaluation = application.evaluation %>
+                  <%= form_with url: evaluation ? recruitment_organization_internship_program_application_evaluation_path(@organization, @program, application) : recruitment_organization_internship_program_application_evaluation_path(@organization, @program, application), scope: :recruitment_internship_evaluation, method: evaluation ? :patch : :post, class: "mt-4 space-y-3" do |form| %>
+                    <%= form.label :rating, t("recruitment.internships.evaluation.rating"), class: "text-12 font-semibold text-ink" %>
+                    <%= form.select :rating, (1..5).map { |rating| [ rating, rating ] }, { selected: evaluation&.rating }, class: "ml-2 rounded-lg border border-hairline bg-surface-1 px-2 py-1 text-12 text-ink" %>
+                    <%= form.label :learning_outcomes_met, t("recruitment.internships.evaluation.outcomes_met"), class: "ml-3 text-12 font-semibold text-ink" %>
+                    <%= form.select :learning_outcomes_met, [[t("recruitment.internships.yes"), true], [t("recruitment.internships.no"), false]], { selected: evaluation&.learning_outcomes_met }, class: "ml-2 rounded-lg border border-hairline bg-surface-1 px-2 py-1 text-12 text-ink" %>
+                    <%= form.text_area :feedback, value: evaluation&.feedback, rows: 3, required: true, placeholder: t("recruitment.internships.evaluation.feedback"), class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                    <%= form.text_area :next_steps, value: evaluation&.next_steps, rows: 3, required: true, placeholder: t("recruitment.internships.evaluation.next_steps"), class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                    <%= form.submit t("recruitment.internships.evaluation.submit"), class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand hover:border-brand" %>
+                  <% end %>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+  <% end %>
+</main>

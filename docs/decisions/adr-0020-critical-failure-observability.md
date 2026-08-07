@@ -2,10 +2,10 @@
 id: ADR-0020
 type: adr
 title: Define critical-failure observability and alert ownership
-status: draft
+status: accepted
 owners: ["@tech-lead", "@platform-owner", "@security-owner", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -21,7 +21,15 @@ touches:
   - config/recurring.yml
   - lib
   - docs/runbooks
-enforced_by: []
+  - app/services/observability
+  - config/initializers/observability.rb
+enforced_by:
+  - test/observability/telemetry_contract_test.rb
+  - test/observability/redaction_test.rb
+  - test/observability/failure_signals_test.rb
+  - test/observability/alert_ownership_test.rb
+  - test/observability/security_event_boundary_test.rb
+  - test/system/critical_failure_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-OPS-001, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-OPS-001, SKILL-SPEC-002]
@@ -29,10 +37,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-OPS-001, SKILL-SPEC-002]
 
 # Define critical-failure observability and alert ownership
 
-> **Decision state:** Agent-prepared draft. The Tech Lead, Platform Owner,
-> Security Owner, and Privacy Owner must decide which failures require action,
-> where signals may be sent, and who owns each response before instrumentation
-> or alerts are added.
+> **Decision state:** Accepted by the user on 2026-08-06 for a provider-neutral
+> observability baseline. Critical symptoms, signal ownership, redaction,
+> correlation, and controlled verification are implemented without selecting a
+> hosted vendor, paid plan, production destination, or new retention policy.
 
 > [Decision Records](README.md) ·
 > [M9 observability specification](../specs/spec-m9-critical-failure-observability.md) ·
@@ -69,8 +77,8 @@ risk without defining the user-visible failure or an owner who will respond.
 
 ## Decision
 
-The design must establish a provider-neutral observability contract before a
-provider or broad instrumentation is chosen:
+The accepted baseline establishes a provider-neutral observability contract
+before a provider or broad instrumentation is chosen:
 
 1. Define critical user-facing symptoms and the minimum RED/USE signals for
    HTTP requests, database health/capacity, Solid Queue jobs, mail delivery,
@@ -86,11 +94,11 @@ provider or broad instrumentation is chosen:
 5. Keep durable domain evidence (`AuditEvent`, proctor records, job failure
    records, mail delivery evidence) distinct from short-retention operational
    telemetry; one must not be treated as a substitute for the other.
-6. Validate signals with controlled failure tests before calling the production
-   path ready.
-
-The provider, storage location, retention duration, and alert channel remain
-human-owned decisions and are not selected by this draft.
+6. Validate signals with controlled failure tests before treating the
+   application path as instrumented.
+7. Keep provider, storage location, retention duration, and alert channel
+   outside this implementation. Those production-activation decisions remain
+   human-owned and must be recorded before live alerting is claimed.
 
 ## Alternatives
 
@@ -117,20 +125,25 @@ SLOs and privacy boundaries are approved.
 This keeps data in one boundary, but adds write load, retention pressure, and
 coupling between the user-facing path and its monitoring system.
 
-No provider or final implementation option is selected by this draft.
+### Approved policy direction
+
+Provider-neutral structured events and logs first is selected. The application
+owns the event vocabulary, safe fields, correlation context, alert metadata,
+and runbook links; a later Platform/Security/Privacy decision may connect those
+events to a collector or alert destination without changing the domain code.
 
 ## Consequences
 
 - Monitoring becomes an owned operational capability rather than a collection of
   ad hoc log lines.
-- Every alert adds response work; unowned or non-actionable alerts should not be
-  created.
+- Every actionable signal adds response work; unowned or non-actionable signals
+  should not be connected to paging.
 - Provider-neutral event names and redaction rules make later backend selection
   easier, but require disciplined schemas and compatibility tests.
 - Security and academic-integrity events may need separate access, retention,
   and escalation from ordinary application errors.
-- Controlled failure tests and runbooks become release evidence for critical
-  background and real-time paths.
+- Controlled failure tests and the triage runbook are evidence for the
+  instrumented paths, not evidence that a production collector is configured.
 
 ## Threat and privacy boundary
 
@@ -142,6 +155,9 @@ No provider or final implementation option is selected by this draft.
   untrusted caller, and alerts must not contain active reset links or cookies.
 - Sampling and aggregation must preserve incident usefulness without making
   learner-level tracking the default.
+- The provider-neutral baseline adds no database table and no new durable
+  telemetry store; existing application log retention remains unchanged until
+  a human-owned retention decision is recorded.
 
 ## Fitness Functions
 

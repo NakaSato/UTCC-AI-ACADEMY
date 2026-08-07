@@ -1,5 +1,6 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :session
+  attribute :request_id, :job_id
   delegate :user, to: :session, allow_nil: true
 
   # The whole syllabus, held for the length of one request. Reference data that

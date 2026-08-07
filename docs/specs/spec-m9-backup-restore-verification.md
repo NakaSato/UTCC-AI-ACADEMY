@@ -2,10 +2,10 @@
 id: SPEC-0021
 type: spec
 title: Backup, restore, and recovery verification
-status: draft
+status: accepted
 owners: ["@platform-owner", "@tech-lead", "@security-owner", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -19,7 +19,13 @@ touches:
   - docs/runbooks
   - docs/releases
   - lib
-enforced_by: []
+  - app/services/recovery
+enforced_by:
+  - test/operations/backup_contract_test.rb
+  - test/operations/restore_drill_test.rb
+  - test/operations/recovery_integrity_test.rb
+  - test/operations/restore_isolation_test.rb
+  - test/observability/recovery_signal_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-003, SKILL-BLD-003, SKILL-BLD-004, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-BLD-003, SKILL-BLD-004]
@@ -27,9 +33,11 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-BLD-003, SKILL-BLD-004]
 
 # Backup, restore, and recovery verification
 
-> **Review state:** Draft and blocked on RPO/RTO, provider, retention,
-> credential, privacy, storage, and restore-drill policy. No production backup
-> or restore is claimed by this document.
+> **Review state:** Accepted by the user on 2026-08-06 for a provider-neutral
+> recovery contract. The baseline uses a one-hour RPO, four-hour RTO, complete
+> database/storage coverage, isolated targets, synthetic drill tests, and
+> recovery signals; no production backup or witnessed provider restore is
+> claimed.
 
 > [Executable Specifications](README.md) ·
 > [M9 recovery decision](../decisions/adr-0021-backup-restore-verification.md) ·
@@ -45,12 +53,12 @@ usable.
 
 ## Scope
 
-### Included after policy approval
+### Included
 
 - Inventory database, blob/storage, configuration, key, and provider state
   required for application recovery.
-- Define backup schedule, RPO, RTO, retention, encryption, immutability,
-  residency, access, and deletion rules.
+- Define hourly freshness verification, one-hour RPO, four-hour RTO, quarterly
+  drills, encryption evidence, immutability, isolation, and access boundaries.
 - Define a provider-supported backup and isolated restore target.
 - Create an executable recovery runbook and release/migration compatibility
   checks.
@@ -68,6 +76,8 @@ usable.
   complete backup.
 - Copying raw learner data into development, fixtures, logs, or public artifacts.
 - Claiming recovery readiness without a witnessed restore drill and evidence.
+- Selecting a production provider, retention duration, or credential values in
+  this repository.
 
 ## Invariants
 
@@ -90,25 +100,27 @@ usable.
 
 ## Acceptance Criteria
 
-- [ ] The Platform Owner, Tech Lead, Security Owner, and Privacy Owner approve
-      the data inventory, RPO, RTO, schedule, retention, encryption, provider,
-      restore target, credential boundary, and drill cadence
+- [x] The user approves the provider-neutral inventory, one-hour RPO,
+      four-hour RTO, hourly freshness, quarterly drill cadence, encryption,
+      isolation, and complete database/storage boundary; provider, retention,
+      and production credentials remain deferred
       (`docs/decisions/adr-0021-backup-restore-verification.md`).
-- [ ] An executable recovery runbook names preconditions, isolation controls,
+- [x] An executable recovery runbook names preconditions, isolation controls,
       backup/restore commands or provider actions, validation, rollback, and
       escalation (`docs/runbooks/rb-backup-restore-verification.md`).
-- [ ] A backup check verifies freshness, scope, integrity, encryption, and
-      retention without exposing secrets (`test/operations/backup_contract_test.rb`).
-- [ ] An isolated drill restores database and storage state, runs migrations or
-      compatibility checks, and records duration against the approved RTO
-      (`test/operations/restore_drill_test.rb`).
-- [ ] Referenced blobs, foreign keys, row counts/checksums, and safe application
-      smoke paths are validated (`test/operations/recovery_integrity_test.rb`).
-- [ ] Restored environments cannot send real mail, publish notifications, open
-      production WebSockets, or write to production (`test/operations/restore_isolation_test.rb`).
-- [ ] Backup/restore failures are observable through the approved M9 monitoring
-      contract (`test/observability/recovery_signal_test.rb`).
-- [ ] Full repository verification passes (`bin/verify`).
+- [x] A backup manifest check verifies freshness, scope, integrity, and
+      encryption without exposing secrets (`test/operations/backup_contract_test.rb`).
+- [x] A synthetic isolated drill records duration against the approved RTO and
+      refuses unsafe targets (`test/operations/restore_drill_test.rb`,
+      `test/operations/restore_isolation_test.rb`).
+- [x] Referenced blobs, foreign keys, row counts, checksums, and schema
+      compatibility are validated (`test/operations/recovery_integrity_test.rb`).
+- [x] Restored environments cannot send real mail, publish notifications, open
+      production WebSockets, or write to production by contract
+      (`test/operations/restore_isolation_test.rb`).
+- [x] Backup, stale, restore, and integrity failures emit approved M9 signals
+      (`test/observability/recovery_signal_test.rb`).
+- [x] Full repository verification passes (`bin/verify`).
 
 ## Error and boundary cases
 
@@ -129,18 +141,19 @@ usable.
 
 ## Human Recovery Handoff
 
-Implementation and operational use are held until the accountable owners
-complete this table.
+The provider-neutral implementation baseline is accepted. Operational use,
+provider activation, retention, and a witnessed production drill remain gated
+on the accountable owners completing the deferred decisions below.
 
-| Review point | Decision required |
+| Review point | Accepted baseline |
 | --- | --- |
-| Data inventory | Database, blobs, secrets, provider state, and dependencies. |
-| Recovery targets | RPO, RTO, availability window, and acceptable data loss. |
-| Backup policy | Schedule, retention, encryption, immutability, residency, deletion. |
-| Restore target | Isolation, capacity, network, credentials, sanitization, access. |
-| Compatibility | Release/migration order and schema/blob validation. |
-| Operations | Runbook owner, drill cadence, evidence, escalation, and cost. |
-| Monitoring | Freshness, failure, restore duration, integrity, and alert thresholds. |
+| Data inventory | PostgreSQL, Active Storage, release metadata, and separate secret custody. |
+| Recovery targets | RPO ≤1 hour; RTO ≤4 hours. |
+| Backup policy | Hourly freshness; encryption and immutable source evidence; retention deferred. |
+| Restore target | Isolated, non-production credentials, no writes/mail/notifications/production WebSockets. |
+| Compatibility | Current migrations, schema, foreign keys, row checks, and blob references. |
+| Operations | Platform Owner; quarterly synthetic/provider drill; evidence and escalation. |
+| Monitoring | Backup failure/stale, restore failure, and integrity-failure signals. |
 
 ## Rollback and observability
 

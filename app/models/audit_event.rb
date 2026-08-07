@@ -23,6 +23,31 @@ class AuditEvent < ApplicationRecord
     feature_setting_changed
     lesson_integrity_setting_changed
     section_created section_updated enrolled unenrolled
+    recruitment_organization_created recruitment_membership_granted recruitment_membership_revoked
+    recruitment_invitation_created recruitment_invitation_accepted recruitment_invitation_declined
+    recruitment_job_post_created recruitment_job_post_updated recruitment_job_post_deleted
+    recruitment_job_post_submitted recruitment_job_post_changes_requested recruitment_job_post_published
+    recruitment_job_post_paused recruitment_job_post_closed recruitment_job_post_archived
+    recruitment_job_suggestions_generated recruitment_job_suggestion_edited
+    recruitment_job_suggestion_accepted recruitment_job_suggestion_rejected
+    recruitment_job_suggestion_regenerated
+    recruitment_internship_program_created recruitment_internship_program_updated
+    recruitment_internship_program_submitted recruitment_internship_program_changes_requested
+    recruitment_internship_program_published recruitment_internship_program_paused
+    recruitment_internship_program_closed recruitment_internship_program_archived
+    recruitment_internship_application_created recruitment_internship_application_accepted
+    recruitment_internship_application_rejected recruitment_internship_application_withdrawn
+    recruitment_internship_evaluation_submitted
+    recruitment_internship_suggestions_generated recruitment_internship_suggestion_edited
+    recruitment_internship_suggestion_accepted recruitment_internship_suggestion_rejected
+    recruitment_internship_suggestion_regenerated
+    recruitment_resume_analysis_generated recruitment_resume_finding_edited
+    recruitment_resume_finding_accepted recruitment_resume_finding_rejected
+    recruitment_resume_analysis_applied
+    recruitment_job_saved recruitment_job_unsaved recruitment_job_recommendation_dismissed
+    recruitment_job_discovery_preferences_updated
+    recruitment_job_application_created recruitment_job_application_withdrawn
+    recruitment_job_application_transitioned recruitment_job_application_message_created
     integrity_closed integrity_notified integrity_escalated
     landing_saved card_added card_removed
   ].freeze
@@ -30,7 +55,7 @@ class AuditEvent < ApplicationRecord
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
   WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
-              unenrolled integrity_escalated card_removed ].freeze
+              unenrolled integrity_escalated card_removed recruitment_membership_revoked ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50
@@ -56,6 +81,9 @@ class AuditEvent < ApplicationRecord
   # crash.
   def self.record(action, **params)
     create!(user: Current.user, action:, params:) if Current.user
+  rescue ActiveRecord::ActiveRecordError => error
+    Observability::Telemetry.emit("security.audit.failure", action:, error_class: error.class.name)
+    raise
   end
 
   # Derived, not stored: which actions are worth a second look is a display
@@ -71,13 +99,22 @@ class AuditEvent < ApplicationRecord
     # not keys and are stored as written.
     def interpolations
       values = params.symbolize_keys
-      values[:role] = I18n.t("admin.roles.#{values[:role]}") if values.key?(:role)
+      if values.key?(:role)
+        key = values[:role]
+        scope = I18n.exists?("admin.roles.#{key}") ? "admin.roles" : "recruitment.memberships.roles"
+        values[:role] = I18n.t("#{scope}.#{key}")
+      end
       values[:from] = I18n.t("admin.courses.state.#{values[:from]}") if values.key?(:from)
       values[:to] = I18n.t("admin.courses.state.#{values[:to]}") if values.key?(:to)
       values[:outcome] = I18n.t("admin.queue.status.#{values[:outcome]}") if values.key?(:outcome)
       values[:key] = I18n.t("admin.features.keys.#{values[:key]}") if values.key?(:key)
       %i[from_state to_state].each do |state|
         values[state] = I18n.t("admin.features.state.#{values[state]}") if values.key?(state)
+      end
+      %i[from_status to_status].each do |state|
+        if values.key?(state) && I18n.exists?("recruitment.jobs.status.#{values[state]}")
+          values[state] = I18n.t("recruitment.jobs.status.#{values[state]}")
+        end
       end
       values[:group] = I18n.t("admin.landing.sections.#{values[:group]}") if values.key?(:group)
       values

@@ -16,6 +16,9 @@ module ApplicationCable
         if session = Session.live.find_by(id: cookies.signed[:session_id])
           self.current_user = session.user
         end
+      rescue ActiveRecord::ActiveRecordError => error
+        Observability::Telemetry.emit("websocket.connection.failure", error_class: error.class.name)
+        reject_unauthorized_connection
       end
   end
 end

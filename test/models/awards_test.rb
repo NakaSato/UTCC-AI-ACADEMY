@@ -66,10 +66,20 @@ class AwardsTest < ActiveSupport::TestCase
     assert_not earned?("◈")
   end
 
-  test "Helping Hand is unearnable until a forum records an answer" do
+  test "Helping Hand stays unavailable while the community feature is deferred" do
     learn(Syllabus.topic_count)
 
     assert_not earned?("✚")
+
+    I18n.with_locale(:en) do
+      award = progress.awards.find { it[:glyph] == "✚" }
+      assert_equal "Unavailable until a moderated community feature exists", award[:hint]
+    end
+
+    I18n.with_locale(:th) do
+      award = progress.awards.find { it[:glyph] == "✚" }
+      assert_equal "ยังไม่เปิดใช้จนกว่าจะมีพื้นที่ชุมชนที่มีผู้ดูแล", award[:hint]
+    end
   end
 
   test "Persistent takes three fails before the pass" do

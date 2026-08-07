@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,6 +94,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "approval_decisions", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.bigint "approval_request_id", null: false
@@ -132,6 +138,47 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
     t.index ["created_at"], name: "index_audit_events_on_created_at"
     t.index ["user_id", "created_at"], name: "index_audit_events_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_audit_events_on_user_id"
+  end
+
+  create_table "candidate_profile_facts", force: :cascade do |t|
+    t.bigint "candidate_profile_id", null: false
+    t.decimal "confidence", precision: 4, scale: 3, default: "1.0", null: false
+    t.datetime "created_at", null: false
+    t.text "detail", default: "", null: false
+    t.string "kind", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "organization", default: "", null: false
+    t.integer "position", default: 0, null: false
+    t.string "source", default: "self_reported", null: false
+    t.string "title", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.index ["candidate_profile_id", "kind", "position"], name: "candidate_profile_facts_order"
+    t.check_constraint "confidence >= 0::numeric AND confidence <= 1::numeric", name: "candidate_profile_facts_confidence"
+    t.check_constraint "kind::text = ANY (ARRAY['education'::character varying, 'experience'::character varying, 'skill'::character varying, 'certification'::character varying, 'language'::character varying]::text[])", name: "candidate_profile_facts_kind"
+    t.check_constraint "source::text = ANY (ARRAY['self_reported'::character varying, 'document_extracted'::character varying, 'human_reviewed'::character varying]::text[])", name: "candidate_profile_facts_source"
+  end
+
+  create_table "candidate_profiles", force: :cascade do |t|
+    t.boolean "application_data_reuse_consent", default: false, null: false
+    t.datetime "consent_given_at"
+    t.datetime "created_at", null: false
+    t.string "github_url"
+    t.string "headline"
+    t.string "linkedin_url"
+    t.integer "lock_version", default: 0, null: false
+    t.string "portfolio_url"
+    t.string "preferred_location"
+    t.string "salary_currency", limit: 3, default: "THB", null: false
+    t.integer "salary_expectation_max"
+    t.integer "salary_expectation_min"
+    t.text "summary"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "visibility", default: "private", null: false
+    t.index ["user_id"], name: "index_candidate_profiles_on_user_id", unique: true
+    t.check_constraint "salary_expectation_max IS NULL OR salary_expectation_max >= 0", name: "candidate_profiles_salary_max"
+    t.check_constraint "salary_expectation_min IS NULL OR salary_expectation_max IS NULL OR salary_expectation_min <= salary_expectation_max", name: "candidate_profiles_salary_range"
+    t.check_constraint "salary_expectation_min IS NULL OR salary_expectation_min >= 0", name: "candidate_profiles_salary_min"
   end
 
   create_table "course_modules", force: :cascade do |t|
@@ -231,6 +278,64 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "organization_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.datetime "declined_at"
+    t.datetime "expires_at", null: false
+    t.bigint "invitee_id", null: false
+    t.bigint "inviter_id", null: false
+    t.bigint "organization_id", null: false
+    t.datetime "revoked_at"
+    t.string "role", default: "recruiter", null: false
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "updated_at", null: false
+    t.index ["invitee_id"], name: "index_organization_invitations_on_invitee_id"
+    t.index ["inviter_id"], name: "index_organization_invitations_on_inviter_id"
+    t.index ["organization_id", "invitee_id"], name: "organization_invitations_one_open", unique: true, where: "((accepted_at IS NULL) AND (declined_at IS NULL) AND (revoked_at IS NULL))"
+    t.index ["organization_id"], name: "index_organization_invitations_on_organization_id"
+    t.index ["token_digest"], name: "index_organization_invitations_on_token_digest", unique: true
+    t.check_constraint "NOT (accepted_at IS NOT NULL AND declined_at IS NOT NULL)", name: "organization_invitations_one_decision"
+    t.check_constraint "role::text = ANY (ARRAY['recruiter'::character varying, 'hiring_manager'::character varying, 'mentor'::character varying]::text[])", name: "organization_invitations_role"
+  end
+
+  create_table "organization_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "organization_id", null: false
+    t.string "role", default: "recruiter", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["organization_id", "user_id"], name: "index_organization_memberships_on_organization_and_user", unique: true
+    t.index ["organization_id"], name: "index_organization_memberships_on_active_owner", unique: true, where: "(((role)::text = 'owner'::text) AND ((status)::text = 'active'::text))"
+    t.index ["organization_id"], name: "index_organization_memberships_on_organization_id"
+  end
+
+  create_table "organizations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "creator_id", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_organizations_on_creator_id"
+    t.index ["slug"], name: "index_organizations_on_slug", unique: true
+  end
+
+  create_table "prior_knowledges", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "marked_at", null: false
+    t.bigint "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["course_id"], name: "index_prior_knowledges_on_course_id"
+    t.index ["topic_id"], name: "index_prior_knowledges_on_topic_id"
+    t.index ["user_id", "course_id", "topic_id"], name: "index_prior_knowledges_on_user_id_and_course_id_and_topic_id", unique: true
+    t.index ["user_id", "course_id"], name: "index_prior_knowledges_on_user_id_and_course_id"
+    t.index ["user_id"], name: "index_prior_knowledges_on_user_id"
+  end
+
   create_table "proctor_events", force: :cascade do |t|
     t.integer "course_id", null: false
     t.datetime "created_at", null: false
@@ -245,6 +350,283 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
     t.index ["user_id", "occurred_at"], name: "index_proctor_events_on_user_id_and_occurred_at"
     t.index ["user_id", "reviewed_at"], name: "index_proctor_events_on_user_id_and_reviewed_at"
     t.index ["user_id"], name: "index_proctor_events_on_user_id"
+  end
+
+  create_table "recruitment_candidate_resume_analyses", force: :cascade do |t|
+    t.datetime "applied_at"
+    t.bigint "candidate_profile_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "generated_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "provider", null: false
+    t.bigint "requested_by_id", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.jsonb "source_context", default: {}, null: false
+    t.string "source_label", null: false
+    t.string "status", default: "pending", null: false
+    t.text "uncertainty", null: false
+    t.datetime "updated_at", null: false
+    t.index ["candidate_profile_id", "generated_at"], name: "recruitment_resume_analyses_newest"
+    t.index ["candidate_profile_id"], name: "idx_on_candidate_profile_id_03073ab97e"
+    t.index ["requested_by_id"], name: "index_recruitment_candidate_resume_analyses_on_requested_by_id"
+    t.index ["reviewed_by_id"], name: "index_recruitment_candidate_resume_analyses_on_reviewed_by_id"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'reviewed'::character varying, 'applied'::character varying, 'rejected'::character varying]::text[])", name: "recruitment_resume_analyses_status"
+  end
+
+  create_table "recruitment_candidate_resume_findings", force: :cascade do |t|
+    t.bigint "analysis_id", null: false
+    t.bigint "applied_fact_id"
+    t.decimal "confidence", precision: 4, scale: 3, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.text "detail", default: "", null: false
+    t.text "evidence", default: "", null: false
+    t.boolean "inferred", default: false, null: false
+    t.string "kind", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.string "source_type", null: false
+    t.string "status", default: "pending", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["analysis_id"], name: "index_recruitment_candidate_resume_findings_on_analysis_id"
+    t.index ["applied_fact_id"], name: "index_recruitment_candidate_resume_findings_on_applied_fact_id"
+    t.index ["reviewed_by_id"], name: "index_recruitment_candidate_resume_findings_on_reviewed_by_id"
+    t.check_constraint "confidence >= 0::numeric AND confidence <= 1::numeric", name: "recruitment_resume_findings_confidence"
+    t.check_constraint "kind::text = ANY (ARRAY['skill'::character varying, 'tool'::character varying, 'experience'::character varying, 'seniority'::character varying, 'qualification'::character varying, 'ats_signal'::character varying, 'skill_gap'::character varying, 'strength'::character varying, 'uncertainty'::character varying]::text[])", name: "recruitment_resume_findings_kind"
+    t.check_constraint "source_type::text = ANY (ARRAY['resume_text'::character varying, 'resume_metadata'::character varying, 'rules_inference'::character varying]::text[])", name: "recruitment_resume_findings_source_type"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'edited'::character varying, 'accepted'::character varying, 'rejected'::character varying]::text[])", name: "recruitment_resume_findings_status"
+  end
+
+  create_table "recruitment_internship_applications", force: :cascade do |t|
+    t.datetime "applied_at", null: false
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "program_id", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.text "statement", default: "", null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["program_id", "status", "created_at"], name: "recruitment_internship_applications_program_status"
+    t.index ["program_id", "student_id"], name: "recruitment_internship_applications_one_per_student", unique: true
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'accepted'::character varying, 'rejected'::character varying, 'withdrawn'::character varying]::text[])", name: "recruitment_internship_applications_status"
+  end
+
+  create_table "recruitment_internship_evaluations", force: :cascade do |t|
+    t.bigint "application_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "evaluator_id", null: false
+    t.text "feedback", default: "", null: false
+    t.boolean "learning_outcomes_met"
+    t.integer "lock_version", default: 0, null: false
+    t.text "next_steps", default: "", null: false
+    t.integer "rating"
+    t.string "status", default: "draft", null: false
+    t.datetime "submitted_at"
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "recruitment_internship_evaluations_one_per_application", unique: true
+    t.check_constraint "rating IS NULL OR rating >= 1 AND rating <= 5", name: "recruitment_internship_evaluations_rating"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying]::text[])", name: "recruitment_internship_evaluations_status"
+  end
+
+  create_table "recruitment_internship_program_suggestions", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "generated_at", null: false
+    t.string "kind", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "model"
+    t.bigint "program_id", null: false
+    t.string "provider", null: false
+    t.bigint "requested_by_id", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.jsonb "source_context", default: {}, null: false
+    t.text "source_label", null: false
+    t.string "status", default: "pending", null: false
+    t.text "uncertainty", null: false
+    t.datetime "updated_at", null: false
+    t.index ["program_id", "kind"], name: "recruitment_internship_suggestions_one_actionable", unique: true, where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'edited'::character varying])::text[]))"
+    t.check_constraint "kind::text = ANY (ARRAY['description'::character varying, 'learning_roadmap'::character varying, 'mentor_guide'::character varying, 'evaluation_criteria'::character varying, 'final_project'::character varying]::text[])", name: "recruitment_internship_suggestions_kind"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'edited'::character varying, 'accepted'::character varying, 'rejected'::character varying]::text[])", name: "recruitment_internship_suggestions_status"
+  end
+
+  create_table "recruitment_internship_programs", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.string "certificate_policy", default: "", null: false
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.bigint "creator_id", null: false
+    t.string "department", default: "", null: false
+    t.text "description", default: "", null: false
+    t.integer "duration_weeks", default: 1, null: false
+    t.text "equipment_provided", default: "", null: false
+    t.text "learning_outcomes", default: "", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.integer "max_students", default: 1, null: false
+    t.bigint "mentor_id"
+    t.string "name", default: "", null: false
+    t.bigint "organization_id", null: false
+    t.boolean "paid", default: false, null: false
+    t.datetime "published_at"
+    t.string "remote_policy", default: "onsite", null: false
+    t.text "required_skills", default: "", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.text "working_days", default: "", null: false
+    t.index ["organization_id", "status", "updated_at"], name: "recruitment_internship_programs_management"
+    t.index ["organization_id"], name: "index_recruitment_internship_programs_on_organization_id"
+    t.index ["status", "published_at"], name: "recruitment_internship_programs_publication"
+    t.check_constraint "duration_weeks >= 1 AND duration_weeks <= 104", name: "recruitment_internship_programs_duration"
+    t.check_constraint "max_students > 0", name: "recruitment_internship_programs_capacity"
+    t.check_constraint "remote_policy::text = ANY (ARRAY['onsite'::character varying, 'hybrid'::character varying, 'remote'::character varying]::text[])", name: "recruitment_internship_programs_remote_policy"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'review'::character varying, 'published'::character varying, 'paused'::character varying, 'closed'::character varying, 'archived'::character varying]::text[])", name: "recruitment_internship_programs_status"
+  end
+
+  create_table "recruitment_job_application_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.bigint "job_application_id", null: false
+    t.text "note", default: "", null: false
+    t.datetime "occurred_at", null: false
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_application_id", "occurred_at", "id"], name: "recruitment_job_application_events_history"
+    t.check_constraint "from_status IS NULL OR (from_status::text = ANY (ARRAY['submitted'::character varying, 'screening'::character varying, 'interview'::character varying, 'offer'::character varying, 'accepted'::character varying, 'rejected'::character varying, 'withdrawn'::character varying]::text[]))", name: "recruitment_job_application_events_from_status"
+    t.check_constraint "to_status::text = ANY (ARRAY['submitted'::character varying, 'screening'::character varying, 'interview'::character varying, 'offer'::character varying, 'accepted'::character varying, 'rejected'::character varying, 'withdrawn'::character varying]::text[])", name: "recruitment_job_application_events_to_status"
+  end
+
+  create_table "recruitment_job_application_messages", force: :cascade do |t|
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.bigint "job_application_id", null: false
+    t.bigint "sender_id", null: false
+    t.datetime "sent_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_application_id", "sent_at", "id"], name: "recruitment_job_application_messages_history"
+    t.check_constraint "char_length(btrim(body)) > 0 AND char_length(body) <= 4000", name: "recruitment_job_application_messages_body"
+  end
+
+  create_table "recruitment_job_applications", force: :cascade do |t|
+    t.jsonb "application_snapshot", default: {}, null: false
+    t.datetime "applied_at", null: false
+    t.bigint "candidate_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "job_post_id", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.text "statement", default: "", null: false
+    t.string "status", default: "submitted", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "withdrawn_at"
+    t.index ["job_post_id", "candidate_id"], name: "recruitment_job_applications_one_per_candidate", unique: true
+    t.index ["job_post_id", "status", "created_at"], name: "recruitment_job_applications_pipeline"
+    t.check_constraint "status::text = ANY (ARRAY['submitted'::character varying, 'screening'::character varying, 'interview'::character varying, 'offer'::character varying, 'accepted'::character varying, 'rejected'::character varying, 'withdrawn'::character varying]::text[])", name: "recruitment_job_applications_status"
+  end
+
+  create_table "recruitment_job_discovery_dismissals", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "job_post_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "job_post_id"], name: "recruitment_discovery_dismissals_one_per_user", unique: true
+  end
+
+  create_table "recruitment_job_discovery_preferences", force: :cascade do |t|
+    t.boolean "alert_consent", default: false, null: false
+    t.datetime "alert_consent_given_at"
+    t.string "alert_frequency", default: "weekly", null: false
+    t.boolean "alerts_enabled", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "employment_type", default: "", null: false
+    t.datetime "last_alert_sent_at"
+    t.string "location", default: "", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "remote_policy", default: "", null: false
+    t.string "search_query", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "recruitment_discovery_preferences_one_per_user", unique: true
+    t.check_constraint "NOT alerts_enabled OR alert_consent", name: "recruitment_discovery_preferences_consent"
+    t.check_constraint "alert_frequency::text = ANY (ARRAY['daily'::character varying, 'weekly'::character varying]::text[])", name: "recruitment_discovery_preferences_frequency"
+  end
+
+  create_table "recruitment_job_post_suggestions", force: :cascade do |t|
+    t.text "content", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "generated_at", null: false
+    t.bigint "job_post_id", null: false
+    t.string "kind", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "model"
+    t.string "provider", null: false
+    t.bigint "requested_by_id", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.jsonb "source_context", default: {}, null: false
+    t.string "source_label", null: false
+    t.string "status", default: "pending", null: false
+    t.text "uncertainty", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_post_id", "kind"], name: "recruitment_job_suggestions_one_actionable", unique: true, where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'edited'::character varying])::text[]))"
+    t.index ["job_post_id"], name: "index_recruitment_job_post_suggestions_on_job_post_id"
+    t.index ["requested_by_id"], name: "index_recruitment_job_post_suggestions_on_requested_by_id"
+    t.index ["reviewed_by_id"], name: "index_recruitment_job_post_suggestions_on_reviewed_by_id"
+    t.check_constraint "kind::text = ANY (ARRAY['summary'::character varying, 'description'::character varying, 'requirements'::character varying, 'interview_questions'::character varying, 'inclusive_language'::character varying]::text[])", name: "recruitment_job_suggestions_kind"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'edited'::character varying, 'accepted'::character varying, 'rejected'::character varying]::text[])", name: "recruitment_job_suggestions_status"
+  end
+
+  create_table "recruitment_job_posts", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.string "category", default: "", null: false
+    t.datetime "closed_at"
+    t.date "closes_on"
+    t.datetime "created_at", null: false
+    t.bigint "creator_id", null: false
+    t.string "currency", limit: 3, default: "THB", null: false
+    t.string "department", default: "", null: false
+    t.text "description", default: "", null: false
+    t.string "employment_type", default: "full_time", null: false
+    t.text "hiring_reason", default: "", null: false
+    t.string "location", default: "", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "organization_id", null: false
+    t.integer "positions_count", default: 1, null: false
+    t.datetime "published_at"
+    t.string "remote_policy", default: "onsite", null: false
+    t.integer "salary_max"
+    t.integer "salary_min"
+    t.string "seniority", default: "", null: false
+    t.string "status", default: "draft", null: false
+    t.text "summary", default: "", null: false
+    t.string "team", default: "", null: false
+    t.string "title", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_recruitment_job_posts_on_creator_id"
+    t.index ["organization_id", "status", "updated_at"], name: "recruitment_job_posts_management"
+    t.index ["organization_id"], name: "index_recruitment_job_posts_on_organization_id"
+    t.index ["status", "closes_on", "published_at"], name: "recruitment_job_posts_candidate_visibility"
+    t.check_constraint "employment_type::text = ANY (ARRAY['full_time'::character varying, 'part_time'::character varying, 'internship'::character varying, 'contract'::character varying, 'freelance'::character varying]::text[])", name: "recruitment_job_posts_employment_type"
+    t.check_constraint "positions_count > 0", name: "recruitment_job_posts_positions_count"
+    t.check_constraint "remote_policy::text = ANY (ARRAY['onsite'::character varying, 'hybrid'::character varying, 'remote'::character varying]::text[])", name: "recruitment_job_posts_remote_policy"
+    t.check_constraint "salary_max IS NULL OR salary_max >= 0", name: "recruitment_job_posts_salary_max"
+    t.check_constraint "salary_min IS NULL OR salary_max IS NULL OR salary_min <= salary_max", name: "recruitment_job_posts_salary_range"
+    t.check_constraint "salary_min IS NULL OR salary_min >= 0", name: "recruitment_job_posts_salary_min"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'review'::character varying, 'published'::character varying, 'paused'::character varying, 'closed'::character varying, 'archived'::character varying]::text[])", name: "recruitment_job_posts_status"
+  end
+
+  create_table "recruitment_saved_jobs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "job_post_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "created_at"], name: "recruitment_saved_jobs_recent"
+    t.index ["user_id", "job_post_id"], name: "recruitment_saved_jobs_one_per_user", unique: true
   end
 
   create_table "sections", force: :cascade do |t|
@@ -478,19 +860,65 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_043000) do
   add_foreign_key "academic_post_revisions", "users", column: "author_id"
   add_foreign_key "academic_posts", "users", column: "owner_id"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "approval_decisions", "approval_requests"
   add_foreign_key "approval_decisions", "users", column: "actor_id"
   add_foreign_key "approval_requests", "courses"
   add_foreign_key "approval_requests", "users", column: "requester_id"
   add_foreign_key "audit_events", "users"
+  add_foreign_key "candidate_profile_facts", "candidate_profiles"
+  add_foreign_key "candidate_profiles", "users"
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
   add_foreign_key "lesson_integrity_settings", "courses"
   add_foreign_key "notifications", "users"
+  add_foreign_key "organization_invitations", "organizations"
+  add_foreign_key "organization_invitations", "users", column: "invitee_id"
+  add_foreign_key "organization_invitations", "users", column: "inviter_id"
+  add_foreign_key "organization_memberships", "organizations"
+  add_foreign_key "organization_memberships", "users"
+  add_foreign_key "organizations", "users", column: "creator_id"
+  add_foreign_key "prior_knowledges", "courses"
+  add_foreign_key "prior_knowledges", "topics"
+  add_foreign_key "prior_knowledges", "users"
   add_foreign_key "proctor_events", "courses"
   add_foreign_key "proctor_events", "topics"
   add_foreign_key "proctor_events", "users"
+  add_foreign_key "recruitment_candidate_resume_analyses", "candidate_profiles"
+  add_foreign_key "recruitment_candidate_resume_analyses", "users", column: "requested_by_id"
+  add_foreign_key "recruitment_candidate_resume_analyses", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_candidate_resume_findings", "candidate_profile_facts", column: "applied_fact_id"
+  add_foreign_key "recruitment_candidate_resume_findings", "recruitment_candidate_resume_analyses", column: "analysis_id"
+  add_foreign_key "recruitment_candidate_resume_findings", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_internship_applications", "recruitment_internship_programs", column: "program_id"
+  add_foreign_key "recruitment_internship_applications", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_internship_applications", "users", column: "student_id"
+  add_foreign_key "recruitment_internship_evaluations", "recruitment_internship_applications", column: "application_id"
+  add_foreign_key "recruitment_internship_evaluations", "users", column: "evaluator_id"
+  add_foreign_key "recruitment_internship_program_suggestions", "recruitment_internship_programs", column: "program_id"
+  add_foreign_key "recruitment_internship_program_suggestions", "users", column: "requested_by_id"
+  add_foreign_key "recruitment_internship_program_suggestions", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_internship_programs", "organizations"
+  add_foreign_key "recruitment_internship_programs", "users", column: "creator_id"
+  add_foreign_key "recruitment_internship_programs", "users", column: "mentor_id"
+  add_foreign_key "recruitment_job_application_events", "recruitment_job_applications", column: "job_application_id"
+  add_foreign_key "recruitment_job_application_events", "users", column: "actor_id"
+  add_foreign_key "recruitment_job_application_messages", "recruitment_job_applications", column: "job_application_id"
+  add_foreign_key "recruitment_job_application_messages", "users", column: "sender_id"
+  add_foreign_key "recruitment_job_applications", "recruitment_job_posts", column: "job_post_id"
+  add_foreign_key "recruitment_job_applications", "users", column: "candidate_id"
+  add_foreign_key "recruitment_job_applications", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_job_discovery_dismissals", "recruitment_job_posts", column: "job_post_id"
+  add_foreign_key "recruitment_job_discovery_dismissals", "users"
+  add_foreign_key "recruitment_job_discovery_preferences", "users"
+  add_foreign_key "recruitment_job_post_suggestions", "recruitment_job_posts", column: "job_post_id"
+  add_foreign_key "recruitment_job_post_suggestions", "users", column: "requested_by_id"
+  add_foreign_key "recruitment_job_post_suggestions", "users", column: "reviewed_by_id"
+  add_foreign_key "recruitment_job_posts", "organizations"
+  add_foreign_key "recruitment_job_posts", "users", column: "creator_id"
+  add_foreign_key "recruitment_saved_jobs", "recruitment_job_posts", column: "job_post_id"
+  add_foreign_key "recruitment_saved_jobs", "users"
   add_foreign_key "sections", "courses"
   add_foreign_key "sections", "users", column: "instructor_id"
   add_foreign_key "sessions", "users"

@@ -145,7 +145,23 @@
             <%= link_to t("map.start_topic"), lesson_path(course: @course.code, topic: @selected.topic_key),
                   class: "rounded-field bg-brand px-6 py-3 text-14-5 font-semibold text-white transition-colors
                           hover:bg-brand-deep" %>
+
+            <% if @mode == "course" && @selected.known? %>
+              <%= button_to t("map.unmark_known"), unmark_topic_known_path(course: @course.code,
+                    topic: @selected.topic_key, mode: @mode), method: :delete,
+                    class: "rounded-field border-[1.5px] border-hairline-2 px-6 py-3 text-14-5 font-semibold text-ink-4
+                            transition-colors hover:border-muted-3" %>
+            <% elsif @mode == "course" && !@selected.learned.positive? %>
+              <%= button_to t("map.mark_known"), mark_topic_known_path(course: @course.code,
+                    topic: @selected.topic_key, mode: @mode), method: :post,
+                    class: "rounded-field border-[1.5px] border-hairline-2 px-6 py-3 text-14-5 font-semibold text-ink-4
+                            transition-colors hover:border-muted-3" %>
+            <% end %>
           </div>
+
+          <% if @mode == "course" && @selected.known? %>
+            <p class="mt-3.5 text-13-5 leading-[1.55] text-muted"><%= t("map.known_desc") %></p>
+          <% end %>
         </div>
       <% end %>
 

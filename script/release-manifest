@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "optparse"
+require_relative "../lib/release/artifact"
+
+options = { specs: [] }
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: script/release-manifest [options]"
+  opts.on("--image IMAGE", "Registry repository without a tag") { |value| options[:image] = value }
+  opts.on("--digest DIGEST", "Immutable sha256 digest") { |value| options[:digest] = value }
+  opts.on("--commit SHA", "Full source Git commit") { |value| options[:source_commit] = value }
+  opts.on("--spec SPEC", "Specification identifier (repeatable)") { |value| options[:specs] << value }
+  opts.on("--environment NAME", "Release environment") { |value| options[:environment] = value }
+  opts.on("--sbom EVIDENCE", "SBOM evidence path or identifier") { |value| options[:sbom] = value }
+  opts.on("--vulnerability-scan EVIDENCE", "Vulnerability evidence path or identifier") { |value| options[:vulnerability_scan] = value }
+  opts.on("--signature EVIDENCE", "Signature evidence path or identifier") { |value| options[:signature] = value }
+  opts.on("--provenance EVIDENCE", "Provenance evidence path or identifier") { |value| options[:provenance] = value }
+  opts.on("--output PATH", "Write JSON to PATH instead of stdout") { |value| options[:output] = value }
+end
+
+parser.parse!
+manifest = Release::Artifact.new(**options.slice(:image, :digest, :source_commit, :specs, :environment, :sbom, :vulnerability_scan, :signature, :provenance)).to_json
+
+if options[:output]
+  File.write(options[:output], "#{manifest}\n")
+else
+  puts manifest
+end

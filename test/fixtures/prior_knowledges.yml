@@ -1,0 +1,2 @@
+# Deliberately empty. Prior-knowledge rows are created in focused tests so the
+# course-scoped and reversible behavior stays explicit.

@@ -2,10 +2,10 @@
 id: ADR-0018
 type: adr
 title: Define the meaning and effects of learner-marked prior knowledge
-status: draft
+status: accepted
 owners: ["@product-owner", "@academic-owner", "@tech-lead"]
 created: 2026-08-03
-updated: 2026-08-04
+updated: 2026-08-05
 review_by: 2026-08-10
 supersedes: []
 superseded_by: []
@@ -21,7 +21,12 @@ touches:
   - config/locales/en.yml
   - config/locales/th.yml
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/prior_knowledge_test.rb
+  - test/models/learner_progress_test.rb
+  - test/models/knowledge_map_test.rb
+  - test/controllers/prior_knowledges_controller_test.rb
+  - test/controllers/knowledge_maps_controller_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-001, SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-003, SKILL-HUM-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
@@ -29,10 +34,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
 
 # Define the meaning and effects of learner-marked prior knowledge
 
-> **Decision state:** The user approved on 2026-08-04 that “Mark as known”
-> counts toward academic progress and course completion. Authority, evidence,
-> provenance, reversibility, and the exact treatment of other downstream
-> signals remain open and must be defined before implementation.
+> **Decision state:** Accepted by the user on 2026-08-05. A learner may mark a
+> topic as known for the selected course, and may reverse that mark. It counts
+> toward knowledge-map progress and course completion only. It does not grant
+> XP, gems, streaks, awards, reports, applied work, certificates, or unlocking.
 
 > [Decision Records](README.md) ·
 > [M8 prior-knowledge specification](../specs/spec-m8-prior-knowledge.md) ·
@@ -67,26 +72,25 @@ instructor reporting, and academic integrity.
 
 ## Decision boundary
 
-The accountable owners must decide:
+The accepted policy is:
 
-1. Whether learners may mark a topic as known at all, or whether only an
-   instructor, placement assessment, or verified evidence may do so.
-2. Whether the mark is a private navigation preference, a course-scoped mastery
-   signal, or an official completion record.
-3. Whether it affects map display, next-topic navigation, prerequisites,
-   progress percentages, XP, gems, streaks, activity, leaderboards, instructor
-   reports, course completion, applied projects, or certificates.
-4. Whether the mark is reversible, whether the learner must complete an
-   assessment before unmarking, and how relearning is recorded.
-5. What provenance, timestamp, actor, reason, confidence, and review state are
-   stored; and who can correct or override the record.
-6. Whether the rule differs by course, topic kind, assessment, role, or
-   certificate-bearing course.
-7. How existing completion data remains distinct from any new prior-knowledge
-   data and how Thai/English copy communicates the difference.
-
-Until those decisions are accepted, the safe engineering baseline is to keep
-the current behavior: no prior-knowledge mutation and no inferred completion.
+1. A signed-in learner may create or reverse their own prior-knowledge mark for
+   a valid topic in the selected course. No staff verification or override path
+   is introduced in this increment.
+2. The mark is stored in a separate, course-scoped record with the learner,
+   course, topic, and timestamp. The database enforces foreign keys and one mark
+   per learner/course/topic; repeated requests are idempotent.
+3. The mark contributes to the knowledge map's learned total and the course's
+   academic progress and completion calculation. Existing academy completions
+   remain separate and are never rewritten.
+4. The mark does not affect lesson unlocking, next-topic navigation, XP, gems,
+   streaks, activity, awards, leaderboards, instructor reports, applied work,
+   certificates, or any other downstream signal.
+5. Reversal deletes only the learner's own prior-knowledge record. It leaves
+   academy completion, submission, and applied timestamps unchanged.
+6. Thai and English copy explain the exact limited effect. A future change to
+   authority, verification, scope, or downstream effects requires a new policy
+   review before implementation.
 
 ## Alternatives
 
@@ -117,31 +121,32 @@ screen and report must explain consistently.
 
 ### Approved policy direction
 
-“Mark as known” is an academic progress signal and contributes to course
-completion. This does not, by itself, define whether it also grants XP, gems,
-streaks, leaderboard credit, instructor-report facts, applied-project credit,
-or certificate eligibility. Those effects require explicit policy decisions.
+“Mark as known” is a learner-owned academic progress signal and contributes to
+course completion. It is deliberately excluded from XP, gems, streaks, activity,
+awards, leaderboards, reports, applied-project credit, certificates, and
+unlocking. The record remains separate from academy completion so the policy can
+be reversed without rewriting learning evidence.
 
 ## Consequences
 
-- A prior-knowledge record must not be added to `TopicCompletion` unless the
-  owners explicitly decide that it has the same academic meaning as a completed
-  topic.
-- If a new record is persisted, its actor, scope, lifecycle, correction, and
-  concurrency rules need database constraints and focused tests.
-- Any effect on unlocking or certificates changes the learner's academic path
-  and needs an explicit review rather than an inferred convenience behavior.
-- The knowledge map, learner progress, course catalog, reports, leaderboard,
-  and certificate logic must consume the same approved distinction.
+- A prior-knowledge record remains separate from `TopicCompletion`; completion
+  timestamps and applied timestamps are never copied or rewritten.
+- The persisted record's actor, course/topic scope, uniqueness, timestamp, and
+  concurrency behavior are enforced by foreign keys, a unique index, and focused
+  model/controller tests.
+- The knowledge map and course progress consume the approved union of completion
+  and prior-knowledge topics; XP, activity, awards, reports, and certificates
+  consume completion evidence only.
 
 ## Fitness Functions
 
-- A learner-marked topic cannot silently become a completion, applied project,
-  certificate, or report fact without an accepted policy and explicit provenance.
+- A learner-marked topic cannot silently become an applied project, certificate,
+  or report fact; its separate row preserves learner provenance and timestamp.
 - Repeated, stale, unauthorized, cross-course, and conflicting marks resolve
   according to one server-side rule and do not create duplicate state.
 - Every affected screen distinguishes prior knowledge from completed learning in
   Thai and English, or the approved policy treats them as the same state and the
   distinction is removed consistently.
 - Removing or disabling the feature preserves historical academy completions and
-  does not strand a learner behind an unapproved inferred state.
+  leaves the learner's completion evidence unchanged after prior-knowledge rows
+  are removed according to the approved rollback procedure.

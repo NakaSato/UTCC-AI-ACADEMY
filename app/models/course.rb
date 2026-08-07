@@ -7,6 +7,7 @@
 # foreign key says so.
 class Course < ApplicationRecord
   has_many :topic_completions, dependent: :destroy
+  has_many :prior_knowledges, dependent: :destroy
   has_many :course_modules, -> { order(:number) }, dependent: :restrict_with_exception
   has_many :topics, through: :course_modules
   has_many :sections, dependent: :restrict_with_exception

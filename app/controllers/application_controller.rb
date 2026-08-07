@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   # After Authentication, so `require_authentication` runs first and a signed-out
   # visitor still lands on /login rather than the catalog.
   include Authorization
+  before_action :set_observability_context
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -17,6 +18,10 @@ class ApplicationController < ActionController::Base
   helper_method :progress, :notification_bell
 
   private
+    def set_observability_context
+      Current.request_id = request.request_id
+    end
+
     def progress = Current.user&.progress || LearnerProgress.new(nil)
 
     def notification_bell = @notification_bell ||= NotificationBell.new(Current.user)

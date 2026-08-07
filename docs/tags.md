@@ -143,7 +143,6 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 - [External Feature Proposal](templates/external-feature-proposal.md)
 - [Milestone 1 Development-Flow Example](examples/milestone-1-reliable-account-recovery.md)
 - [Product Roadmap](roadmap.md)
-- [AI Recruitment Platform Roadmap](roadmap-ai-recruitment-platform.md)
 
 ## Process
 
@@ -159,7 +158,6 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 - [External Feature Proposal](templates/external-feature-proposal.md)
 - [Feature Inventory](feature-inventory.md)
 - [Product Roadmap](roadmap.md)
-- [AI Recruitment Platform Roadmap](roadmap-ai-recruitment-platform.md)
 
 ## Project
 
@@ -168,7 +166,6 @@ Root-level documents use `docs/tags.md#tag-name`; documents inside `docs/` use `
 ## Roadmap
 
 - [Product Roadmap](roadmap.md)
-- [AI Recruitment Platform Roadmap](roadmap-ai-recruitment-platform.md)
 - [Milestone 1 Development-Flow Example](examples/milestone-1-reliable-account-recovery.md)
 
 ## Refactoring

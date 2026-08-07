@@ -271,17 +271,17 @@ modify user-level skills.
 
 ## Current Delivery Reality
 
-The application has no confirmed production target, progressive delivery,
-feature-flag rollback, artifact signing, operating SLOs, uptime/error monitor,
-or production alert route. The CI workflow contains a single failed-`main`
-Slack sender, but it sends nothing until repository credentials identify the
-workspace and channel. Release templates therefore describe the required gate
-without claiming those controls currently exist. Before the first application
-deployment, the release owner must add:
+The application now has a selected Render production target, an image-backed
+service boundary, digest-based manual promotion, artifact evidence, and
+deployment/recovery runbooks. Progressive delivery, feature-flag rollback,
+operating SLOs, uptime/error monitoring, and a production alert route remain
+outside this slice. The CI workflow contains a failed-`main` Slack sender,
+but it sends nothing until repository credentials identify the workspace and
+channel. Before the first application deployment, the release owner must add:
 
-1. an immutable image tag tied to the Git commit;
-2. an SBOM and vulnerability scan;
+1. the Render registry credential and deploy-hook secret;
+2. a verified immutable image digest, SBOM, signature, and provenance;
 3. a tested database backup and restore runbook;
 4. health checks and rollback criteria;
-5. deployment ownership and credential custody.
+5. deployment ownership and credential custody;
 6. an actionable alert route with a named on-call owner and linked runbooks.

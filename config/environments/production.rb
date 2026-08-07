@@ -31,12 +31,10 @@ Rails.application.configure do
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   #
-  # Kamal's proxy terminates TLS and talks to Thruster over http, so without this
+  # Render terminates TLS before forwarding to Thruster. Kamal would do the same
+  # through its proxy if that deferred target is ever selected. Without this,
   # Rails believes every request arrived unencrypted. That is not only a cookie
-  # problem: `request.base_url` is what builds every canonical, hreflang and
-  # sitemap URL this app publishes, and a canonical announcing the http:// copy of
-  # a page it does not serve is worse than publishing none at all. Set alongside
-  # `proxy: ssl: true` in config/deploy.yml — the two are one decision.
+  # problem: request.base_url builds every canonical, hreflang and sitemap URL.
   config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
