@@ -44,4 +44,13 @@ class Recruitment::JobApplicationAssistantTest < ActiveSupport::TestCase
   test "does not return recruiter guidance outside the organization boundary" do
     assert_nil Recruitment::JobApplicationAssistant.call(application: @application, viewer: users(:student))
   end
+
+  test "does not return recruiter guidance for a suspended organization" do
+    job = Recruitment::JobPost.includes(:organization).find(@job.id)
+    job.organization
+    job.organization.update!(status: "suspended")
+    @application.job_post = job
+
+    assert_nil Recruitment::JobApplicationAssistant.call(application: @application, viewer: users(:two))
+  end
 end

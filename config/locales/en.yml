@@ -2112,6 +2112,8 @@ en:
       applications_subtitle: "Candidate identities and application text are not included. Small populations are suppressed."
       total_applications: "Total applications"
       suppressed: "Suppressed"
+      source_label: "Source: read-time aggregates from organization job-post and application workflow records."
+      uncertainty: "Uncertainty: these are descriptive workflow counts, not hiring quality, fairness, AI-effectiveness, or causal outcome measures. Application populations below %{minimum} are suppressed."
     memberships:
       title: "Organization members"
       subtitle: "Membership roles are scoped to this organization."

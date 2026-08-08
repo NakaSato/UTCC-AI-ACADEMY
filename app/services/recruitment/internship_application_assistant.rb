@@ -30,7 +30,8 @@ module Recruitment
     end
 
     def call
-      return unless @application&.student_id == @viewer&.id && @application.program.published?
+      return unless @viewer&.student? && @application&.student_id.present? && @application.student_id == @viewer.id
+      return unless Recruitment::InternshipProgram.published_for_candidates.where(id: @application.program_id).exists?
 
       Guidance.new(ITEMS.fetch(@application.status), UNCERTAINTY)
     end

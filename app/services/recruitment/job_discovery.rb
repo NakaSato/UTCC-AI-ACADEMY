@@ -2,6 +2,7 @@ module Recruitment
   class JobDiscovery
     Recommendation = Data.define(:job_post, :reasons, :uncertainty)
     FILTERS = %w[ query category employment_type location remote_policy ].freeze
+    MAX_SEARCH_LENGTH = 160
 
     def self.search(params)
       new(params:).search
@@ -32,7 +33,11 @@ module Recruitment
       scope = scope.where(category: normalized(:category)) if normalized(:category).present?
       scope = scope.where(employment_type: normalized(:employment_type)) if normalized(:employment_type).present?
       scope = scope.where(remote_policy: normalized(:remote_policy)) if normalized(:remote_policy).present?
-      scope = scope.where("LOWER(recruitment_job_posts.location) LIKE ?", "%#{normalized(:location)}%") if normalized(:location).present?
+      location = normalized(:location)
+      if location.present?
+        escaped_location = ActiveRecord::Base.sanitize_sql_like(location)
+        scope = scope.where("LOWER(recruitment_job_posts.location) LIKE ?", "%#{escaped_location}%")
+      end
       scope.order(published_at: :desc, id: :desc)
     end
 
@@ -56,7 +61,8 @@ module Recruitment
 
     private
       def normalized(key)
-        (@params[key] || @params[key.to_s]).to_s.strip.downcase
+        value = (@params[key] || @params[key.to_s]).to_s.strip.downcase
+        %i[ query location ].include?(key.to_sym) ? value.first(MAX_SEARCH_LENGTH) : value
       end
 
       def reasons_for(job, facts:, profile:, preference:)

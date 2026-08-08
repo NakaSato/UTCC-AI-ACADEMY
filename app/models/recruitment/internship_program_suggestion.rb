@@ -22,6 +22,7 @@ module Recruitment
     validates :generated_at, presence: true
     validate :requester_can_review
     validate :reviewer_can_review
+    validate :organization_is_active
 
     scope :newest_first, -> { order(generated_at: :desc, id: :desc) }
 
@@ -30,13 +31,13 @@ module Recruitment
     def actionable? = ACTIONABLE_STATUSES.include?(status)
 
     def edit!(new_content, reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_program?
 
       update!(content: new_content, status: "edited", reviewed_by: reviewer, reviewed_at: Time.current)
     end
 
     def accept!(reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_program? && program.editable?
 
       transaction do
         if kind == "description"
@@ -49,7 +50,7 @@ module Recruitment
     end
 
     def reject!(reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_program?
 
       update!(status: "rejected", reviewed_by: reviewer, reviewed_at: Time.current)
     end
@@ -57,6 +58,20 @@ module Recruitment
     private
       def set_generation_time
         self.generated_at ||= Time.current
+      end
+
+      def reviewable_program?
+        program.present? && organization_active? && !program.closed? && !program.archived?
+      end
+
+      def organization_is_active
+        return if program.blank? || organization_active?
+
+        errors.add(:program, :invalid)
+      end
+
+      def organization_active?
+        Organization.where(id: program.organization_id, status: "active").exists?
       end
 
       def requester_can_review

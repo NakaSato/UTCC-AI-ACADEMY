@@ -19,6 +19,7 @@ module Recruitment
     validates :student_id, uniqueness: { scope: :program_id }
     validate :student_account
     validate :reviewer_can_manage
+    validate :organization_is_active
 
     scope :newest_first, -> { order(created_at: :desc, id: :desc) }
     scope :accepted, -> { where(status: "accepted") }
@@ -69,6 +70,13 @@ module Recruitment
                                                                     role: Recruitment::InternshipProgram::REVIEWER_ROLES)
 
         errors.add(:reviewed_by, :invalid)
+      end
+
+      def organization_is_active
+        return if program.blank?
+        return if Organization.where(id: program.organization_id, status: "active").exists?
+
+        errors.add(:program, :invalid)
       end
   end
 end

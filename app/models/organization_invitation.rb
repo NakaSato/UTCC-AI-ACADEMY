@@ -6,6 +6,8 @@ class OrganizationInvitation < ApplicationRecord
   belongs_to :inviter, class_name: "User", inverse_of: :sent_organization_invitations
   belongs_to :invitee, class_name: "User", inverse_of: :received_organization_invitations
 
+  attr_reader :raw_token
+
   normalizes :role, with: ->(value) { value.to_s.strip.downcase }
 
   validates :token_digest, presence: true, uniqueness: true
@@ -19,8 +21,9 @@ class OrganizationInvitation < ApplicationRecord
   scope :pending, -> { where(accepted_at: nil, declined_at: nil, revoked_at: nil).where("expires_at > ?", Time.current) }
 
   before_validation :set_token_and_expiration, on: :create
+  before_validation :retire_expired_pending_invitation, on: :create
 
-  def token = token_digest
+  def token = raw_token
 
   def pending? = accepted_at.nil? && declined_at.nil? && revoked_at.nil?
 
@@ -57,8 +60,21 @@ class OrganizationInvitation < ApplicationRecord
 
   private
     def set_token_and_expiration
-      self.token_digest ||= Digest::SHA256.hexdigest(SecureRandom.urlsafe_base64(48))
+      return if token_digest.present?
+
+      @raw_token = SecureRandom.urlsafe_base64(48)
+      self.token_digest = Digest::SHA256.hexdigest(@raw_token)
       self.expires_at ||= EXPIRATION.from_now
+    end
+
+    def retire_expired_pending_invitation
+      return if organization.blank? || invitee_id.blank?
+
+      organization.invitations
+                 .where(invitee_id:)
+                 .where(accepted_at: nil, declined_at: nil, revoked_at: nil)
+                 .where("expires_at <= ?", Time.current)
+                 .update_all(revoked_at: Time.current)
     end
 
     def organization_is_active

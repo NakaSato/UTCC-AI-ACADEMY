@@ -17,7 +17,7 @@ module Recruitment
     validate :student_owner
     validate :consent_for_alerts
 
-    before_save :stamp_consent
+    before_validation :stamp_consent
 
     def alerts_due?
       return false unless alerts_enabled? && alert_consent?

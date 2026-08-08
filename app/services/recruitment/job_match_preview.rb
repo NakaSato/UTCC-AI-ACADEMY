@@ -17,7 +17,7 @@ module Recruitment
     end
 
     def call
-      return unless @user&.student? && @job_post&.visible_to_candidates?
+      return unless @user&.student? && discoverable_job?
 
       profile = @user.candidate_profile
       preference = @user.job_discovery_preference
@@ -54,7 +54,7 @@ module Recruitment
       end
 
       def salary_factor(profile)
-        return Factor.new("salary_fit", "unknown", "Salary expectations or the job range are incomplete.", "candidate_profile + job_post", "No salary conclusion is drawn from missing ranges.") if profile&.salary_expectation_min.blank? || profile.salary_expectation_max.blank? || @job_post.salary_min.blank? || @job_post.salary_max.blank?
+        return Factor.new("salary_fit", "unknown", "Salary expectations or the job range are incomplete or use different currencies.", "candidate_profile + job_post", "Currency conversion and total compensation are not evaluated.") if profile&.salary_expectation_min.blank? || profile.salary_expectation_max.blank? || @job_post.salary_min.blank? || @job_post.salary_max.blank? || profile.salary_currency != @job_post.currency
 
         overlaps = profile.salary_expectation_min <= @job_post.salary_max && @job_post.salary_min <= profile.salary_expectation_max
         Factor.new("salary_fit", overlaps ? "match" : "mismatch",
@@ -84,6 +84,10 @@ module Recruitment
 
       def learning_factor
         Factor.new("learning_fit", "unknown", "Learning or growth fit is not evaluated in this preview.", "job_post", "Learning goals and opportunity quality require human review.")
+      end
+
+      def discoverable_job?
+        Recruitment::JobPost.published_for_candidates.where(id: @job_post&.id).exists?
       end
   end
 end

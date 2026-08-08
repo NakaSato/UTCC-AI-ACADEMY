@@ -47,4 +47,25 @@ class Recruitment::InternshipProgramSuggestionTest < ActiveSupport::TestCase
     assert_equal "Existing description", @program.reload.description
     assert_predicate suggestion.reload, :actionable?
   end
+
+  test "non-description suggestions cannot be accepted against a published program" do
+    @program.transition_to!("review")
+    @program.transition_to!("published")
+    suggestion = @program.suggestions.create!(
+      requested_by: users(:two), kind: "learning_roadmap", content: "Replacement",
+      provider: "rules_preview", source_label: "Source", uncertainty: "Uncertain"
+    )
+
+    assert_raises(ActiveRecord::RecordInvalid) { suggestion.accept!(reviewer: users(:one)) }
+    assert_predicate suggestion.reload, :actionable?
+  end
+
+  test "suspended organizations cannot generate program suggestions" do
+    @organization.update!(status: "suspended")
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      Recruitment::InternshipSuggestionGenerator.call(program: @program, requested_by: users(:two))
+    end
+    assert_empty @program.suggestions
+  end
 end

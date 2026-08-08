@@ -39,9 +39,28 @@ class Recruitment::JobMatchPreviewTest < ActiveSupport::TestCase
     assert_equal "unknown", preview.factors.find { |factor| factor.key == "salary_fit" }.state
   end
 
+  test "different salary currencies remain unknown" do
+    profile = users(:one).create_candidate_profile!(salary_expectation_min: 35_000,
+                                                    salary_expectation_max: 45_000, salary_currency: "THB")
+    @job.update!(currency: "USD")
+
+    preview = Recruitment::JobMatchPreview.call(user: users(:one), job_post: @job)
+
+    assert_equal "unknown", preview.factors.find { |factor| factor.key == "salary_fit" }.state
+  end
+
   test "staff and hidden jobs have no candidate match preview" do
     assert_nil Recruitment::JobMatchPreview.call(user: users(:instructor), job_post: @job)
     @job.transition_to!("paused")
     assert_nil Recruitment::JobMatchPreview.call(user: users(:one), job_post: @job)
+  end
+
+  test "suspended organizations have no preview despite a stale job association" do
+    users(:one).create_candidate_profile!
+    job = Recruitment::JobPost.includes(:organization).find(@job.id)
+    job.organization
+    job.organization.update!(status: "suspended")
+
+    assert_nil Recruitment::JobMatchPreview.call(user: users(:one), job_post: job)
   end
 end

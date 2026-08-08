@@ -38,4 +38,20 @@ class Recruitment::InternshipApplicationAssistantTest < ActiveSupport::TestCase
     assert_nil Recruitment::InternshipApplicationAssistant.call(application: @application, viewer: users(:instructor))
     assert_nil Recruitment::InternshipApplicationAssistant.call(application: @application, viewer: users(:one))
   end
+
+  test "does not return guidance for an anonymous viewer or an unsaved application" do
+    assert_nil Recruitment::InternshipApplicationAssistant.call(application: @application, viewer: nil)
+
+    unsaved_application = Recruitment::InternshipApplication.new(status: "pending")
+    assert_nil Recruitment::InternshipApplicationAssistant.call(application: unsaved_application, viewer: nil)
+  end
+
+  test "does not return guidance after the program organization is suspended" do
+    program = Recruitment::InternshipProgram.includes(:organization).find(@program.id)
+    program.organization
+    program.organization.update!(status: "suspended")
+    @application.program = program
+
+    assert_nil Recruitment::InternshipApplicationAssistant.call(application: @application, viewer: users(:student))
+  end
 end

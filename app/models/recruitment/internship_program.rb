@@ -38,6 +38,7 @@ module Recruitment
     validates :status, inclusion: { in: STATUSES }
     validate :creator_can_manage
     validate :mentor_can_manage
+    validate :organization_is_active
 
     scope :published_for_candidates, -> do
       joins(:organization)
@@ -98,6 +99,13 @@ module Recruitment
         return if organization.memberships.active.exists?(user_id: mentor_id, role: %w[ owner hiring_manager mentor ])
 
         errors.add(:mentor, :invalid)
+      end
+
+      def organization_is_active
+        return if organization_id.blank?
+        return if Organization.where(id: organization_id, status: "active").exists?
+
+        errors.add(:organization, :invalid)
       end
   end
 end

@@ -9,10 +9,23 @@ class OrganizationInvitationTest < ActiveSupport::TestCase
   test "generates an opaque expiring token for a permitted invitee" do
     invitation = @organization.invitations.create!(inviter: users(:one), invitee: users(:two), role: "recruiter")
 
-    assert_match(/\A[0-9a-f]{64}\z/, invitation.token)
+    assert_operator invitation.token.length, :>=, 60
+    assert_not_equal invitation.token, invitation.token_digest
+    assert_equal Digest::SHA256.hexdigest(invitation.token), invitation.token_digest
+    assert_nil OrganizationInvitation.find(invitation.id).token
     assert_predicate invitation, :pending?
     assert_predicate invitation, :active?
     assert_in_delta 7.days.from_now.to_f, invitation.expires_at.to_f, 2.seconds
+  end
+
+  test "an expired pending invitation can be replaced" do
+    expired = @organization.invitations.create!(inviter: users(:one), invitee: users(:two), role: "mentor")
+    expired.update!(expires_at: 1.minute.ago)
+
+    replacement = @organization.invitations.create!(inviter: users(:one), invitee: users(:two), role: "recruiter")
+
+    assert_predicate replacement, :active?
+    assert expired.reload.revoked_at.present?
   end
 
   test "rejects admins, self invitations, non-owners, and owners as invitees" do

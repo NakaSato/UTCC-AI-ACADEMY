@@ -76,6 +76,34 @@ class Recruitment::CandidateProfilesControllerTest < ActionDispatch::Integration
     file&.unlink
   end
 
+  test "student can upload and remove portfolio files" do
+    files = 2.times.map do |index|
+      file = Tempfile.new([ "portfolio-#{index}", ".png" ])
+      file.write("portfolio image #{index}")
+      file.rewind
+      file
+    end
+
+    patch recruitment_candidate_profile_path, params: {
+      candidate_profile: {
+        portfolio_files: files.map do |file|
+          Rack::Test::UploadedFile.new(file.path, "image/png", original_filename: "portfolio.png")
+        end
+      }
+    }
+    profile = users(:one).reload.candidate_profile
+    assert_equal 2, profile.portfolio_files.attachments.size
+
+    patch recruitment_candidate_profile_path, params: { candidate_profile: { remove_portfolio_files: "1" } }
+
+    assert_empty users(:one).reload.candidate_profile.portfolio_files.attachments
+  ensure
+    files&.each do |file|
+      file.close
+      file.unlink
+    end
+  end
+
   test "student can delete profile data" do
     profile = users(:one).create_candidate_profile!(headline: "Delete me")
     profile.facts.create!(kind: "skill", title: "Ruby")

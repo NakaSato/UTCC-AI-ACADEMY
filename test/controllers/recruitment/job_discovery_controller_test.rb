@@ -42,6 +42,18 @@ class Recruitment::JobDiscoveryControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "duplicate save and dismiss requests are idempotent" do
+    post recruitment_save_job_path(@job)
+    assert_no_difference [ "Recruitment::SavedJob.count", "AuditEvent.count" ] do
+      post recruitment_save_job_path(@job)
+    end
+
+    post recruitment_dismiss_job_recommendation_path(@job)
+    assert_no_difference [ "Recruitment::JobDiscoveryDismissal.count", "AuditEvent.count" ] do
+      post recruitment_dismiss_job_recommendation_path(@job)
+    end
+  end
+
   test "alerts require consent and are rate limited on discovery visits" do
     patch recruitment_job_discovery_preferences_path, params: {
       recruitment_job_discovery_preference: {

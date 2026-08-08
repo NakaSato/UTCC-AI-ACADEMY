@@ -41,4 +41,13 @@ class Recruitment::InternshipApplicationTest < ActiveSupport::TestCase
     assert_not application.valid?
     assert_predicate application.errors[:reviewed_by], :any?
   end
+
+  test "a suspended organization rejects application writes" do
+    @organization.update!(status: "suspended")
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      @program.apply!(student: users(:student), statement: "I want to learn.")
+    end
+    assert_empty @program.applications
+  end
 end

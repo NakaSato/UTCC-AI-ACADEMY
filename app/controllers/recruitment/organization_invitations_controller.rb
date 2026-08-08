@@ -31,6 +31,7 @@ module Recruitment
 
     def show
       @invitation = invitation_for_current_user
+      @token = params[:token]
     end
 
     def accept
@@ -75,7 +76,8 @@ module Recruitment
       end
 
       def invitation_for_current_user
-        invitation = OrganizationInvitation.find_by!(token_digest: params[:token], invitee_id: Current.user.id)
+        token_digest = Digest::SHA256.hexdigest(params[:token].to_s)
+        invitation = OrganizationInvitation.find_by!(token_digest:, invitee_id: Current.user.id)
         raise ActiveRecord::RecordNotFound unless invitation.acceptable_for?(Current.user)
 
         invitation

@@ -19,6 +19,7 @@ module Recruitment
     validates :rating, :learning_outcomes_met, :feedback, :next_steps, presence: true, if: :submitted?
     validate :accepted_application
     validate :evaluator_can_review
+    validate :organization_is_active
 
     def draft? = status == "draft"
     def submitted? = status == "submitted"
@@ -46,6 +47,14 @@ module Recruitment
           (membership.role != "mentor" || application.program.mentor_id == evaluator_id)
 
         errors.add(:evaluator, :invalid)
+      end
+
+      def organization_is_active
+        return if application.blank?
+
+        errors.add(:application, :invalid) unless Organization.where(
+          id: application.program.organization_id, status: "active"
+        ).exists?
       end
   end
 end

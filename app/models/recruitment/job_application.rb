@@ -109,7 +109,11 @@ module Recruitment
     end
 
     def reviewer?(user)
-      user&.admin? || job_post.organization.memberships.active.exists?(user_id: user&.id, role: REVIEWER_ROLES)
+      return false unless user && job_post_id && Organization.active.where(id: job_post.organization_id).exists?
+      return true if user.admin?
+
+      OrganizationMembership.where(organization_id: job_post.organization_id, user_id: user.id,
+                                  status: "active", role: REVIEWER_ROLES).exists?
     end
 
     private
@@ -130,7 +134,9 @@ module Recruitment
 
       def submission_boundary
         return if job_post.blank? || candidate.blank?
-        return if job_post.visible_to_candidates? && candidate.student? && candidate.candidate_profile&.application_data_reuse_consent?
+        visible_job = Recruitment::JobPost.published_for_candidates.where(id: job_post_id).exists?
+        consented_profile = CandidateProfile.where(user_id: candidate_id, application_data_reuse_consent: true).exists?
+        return if visible_job && candidate.student? && consented_profile
 
         errors.add(:base, :invalid)
       end

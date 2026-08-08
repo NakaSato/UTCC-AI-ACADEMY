@@ -22,6 +22,7 @@ module Recruitment
     validates :generated_at, presence: true
     validate :requester_can_review
     validate :reviewer_can_review
+    validate :organization_is_active
 
     scope :newest_first, -> { order(generated_at: :desc, id: :desc) }
     scope :actionable, -> { where(status: ACTIONABLE_STATUSES) }
@@ -31,13 +32,13 @@ module Recruitment
     def actionable? = ACTIONABLE_STATUSES.include?(status)
 
     def edit!(new_content, reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_job?
 
       update!(content: new_content, status: "edited", reviewed_by: reviewer, reviewed_at: Time.current)
     end
 
     def accept!(reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_job? && job_post.editable?
 
       transaction do
         if %w[ summary description ].include?(kind)
@@ -50,7 +51,7 @@ module Recruitment
     end
 
     def reject!(reviewer:)
-      raise ActiveRecord::RecordInvalid, self unless actionable?
+      raise ActiveRecord::RecordInvalid, self unless actionable? && reviewable_job?
 
       update!(status: "rejected", reviewed_by: reviewer, reviewed_at: Time.current)
     end
@@ -58,6 +59,14 @@ module Recruitment
     private
       def set_generation_time
         self.generated_at ||= Time.current
+      end
+
+      def reviewable_job?
+        job_post.present? && job_post.organization.active? && !job_post.closed? && !job_post.archived?
+      end
+
+      def organization_is_active
+        errors.add(:job_post, :invalid) if job_post.present? && !job_post.organization.active?
       end
 
       def requester_can_review

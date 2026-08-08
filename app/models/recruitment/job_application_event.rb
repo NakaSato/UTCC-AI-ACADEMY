@@ -12,5 +12,8 @@ module Recruitment
     validates :from_status, inclusion: { in: Recruitment::JobApplication::STATUSES }, allow_nil: true
     validates :note, length: { maximum: 2_000 }
     validates :occurred_at, presence: true
+
+    before_update { throw :abort }
+    before_destroy { throw :abort }
   end
 end

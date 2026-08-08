@@ -22,7 +22,13 @@ class Recruitment::OrganizationReportingTest < ActiveSupport::TestCase
     assert_nil summary.application_total
     assert summary.application_statuses.all?(&:suppressed)
     assert_equal 1, summary.job_statuses.find { |cell| cell.status == "published" }.count
-    assert_match "descriptive workflow counts", summary.uncertainty
+    I18n.with_locale(:en) do
+      summary = Recruitment::OrganizationReporting.call(organization: @organization, viewer: users(:two))
+
+      assert_match "descriptive workflow counts", summary.uncertainty
+      assert_equal I18n.t("recruitment.reporting.source_label"), summary.source_label
+      assert_equal I18n.t("recruitment.reporting.uncertainty", minimum: 5), summary.uncertainty
+    end
   end
 
   test "shows exact application cells after the minimum reporting population" do
@@ -45,5 +51,12 @@ class Recruitment::OrganizationReportingTest < ActiveSupport::TestCase
   test "only an authorized hiring-team member can receive the report" do
     assert_nil Recruitment::OrganizationReporting.call(organization: @organization, viewer: users(:student))
     assert_nil Recruitment::OrganizationReporting.call(organization: @organization, viewer: users(:instructor))
+  end
+
+  test "does not trust a stale active organization object" do
+    stale_organization = Organization.find(@organization.id)
+    Organization.where(id: @organization.id).update_all(status: "suspended")
+
+    assert_nil Recruitment::OrganizationReporting.call(organization: stale_organization, viewer: users(:two))
   end
 end

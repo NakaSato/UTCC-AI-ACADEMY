@@ -15,11 +15,11 @@
 
     <div class="mt-8 flex flex-wrap gap-3">
       <%= button_to t("recruitment.invitation.accept"),
-            recruitment_accept_organization_invitation_path(@invitation.token),
+            recruitment_accept_organization_invitation_path(@token),
             method: :post,
             class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
       <%= button_to t("recruitment.invitation.decline"),
-            recruitment_decline_organization_invitation_path(@invitation.token),
+            recruitment_decline_organization_invitation_path(@token),
             method: :post,
             class: "rounded-full border border-hairline px-5 py-3 text-13 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
     </div>

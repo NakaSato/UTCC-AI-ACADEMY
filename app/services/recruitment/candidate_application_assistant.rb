@@ -36,7 +36,7 @@ module Recruitment
     end
 
     def call
-      return unless @application&.candidate_id == @viewer&.id
+      return unless @viewer&.student? && @application&.candidate_id.present? && @application.candidate_id == @viewer.id
 
       Guidance.new(ITEMS.fetch(@application.status), UNCERTAINTY)
     end

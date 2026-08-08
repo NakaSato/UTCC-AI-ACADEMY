@@ -15,6 +15,11 @@ class Recruitment::JobDiscoveryTest < ActiveSupport::TestCase
     assert_empty Recruitment::JobDiscovery.search(query: "ruby", remote_policy: "remote")
   end
 
+  test "search bounds and escapes free-text filters" do
+    assert_empty Recruitment::JobDiscovery.search(location: "%")
+    assert_empty Recruitment::JobDiscovery.search(query: "ruby" + ("x" * 160))
+  end
+
   test "recommendations explain profile evidence without a hiring score" do
     profile = users(:one).create_candidate_profile!
     profile.facts.create!(kind: "skill", title: "Ruby", detail: "Rails projects")
@@ -48,6 +53,16 @@ class Recruitment::JobDiscoveryTest < ActiveSupport::TestCase
     assert_not preference.alerts_due?
     preference.update!(last_alert_sent_at: 2.days.ago)
     assert_predicate preference, :alerts_due?
+  end
+
+  test "revoking alert consent disables alerts and clears its timestamp" do
+    preference = users(:one).create_job_discovery_preference!(alert_consent: true, alerts_enabled: true)
+
+    preference.update!(alert_consent: false)
+
+    assert_not preference.alert_consent?
+    assert_not preference.alerts_enabled?
+    assert_nil preference.alert_consent_given_at
   end
 
   private

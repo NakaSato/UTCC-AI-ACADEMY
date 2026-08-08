@@ -4,8 +4,8 @@ module Recruitment
 
     def create
       job = discoverable_job
-      Current.user.job_discovery_dismissals.create!(job_post: job)
-      AuditEvent.record("recruitment_job_recommendation_dismissed", job: job.title)
+      dismissal = Current.user.job_discovery_dismissals.find_or_create_by!(job_post: job)
+      AuditEvent.record("recruitment_job_recommendation_dismissed", job: job.title) if dismissal.previously_new_record?
       redirect_back fallback_location: recruitment_jobs_path, notice: t("flash.recruitment_job_dismissed")
     rescue ActiveRecord::RecordInvalid
       redirect_back fallback_location: recruitment_jobs_path, alert: t("flash.recruitment_job_dismiss_unavailable")

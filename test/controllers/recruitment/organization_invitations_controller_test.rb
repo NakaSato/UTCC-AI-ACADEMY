@@ -15,18 +15,21 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
     end
 
     invitation = @organization.invitations.order(:id).last
+    notification = users(:two).notifications.order(:id).last
+    token = notification.params.fetch("token")
     assert_redirected_to recruitment_organization_path(@organization)
-    assert_equal "recruitment_organization_invitation", users(:two).notifications.order(:id).last.kind
-    assert_equal recruitment_organization_invitation_path(invitation.token), users(:two).notifications.order(:id).last.action_path
+    assert_equal "recruitment_organization_invitation", notification.kind
+    assert_equal recruitment_organization_invitation_path(token), notification.action_path
+    assert_equal Digest::SHA256.hexdigest(token), invitation.token_digest
 
     sign_out
     sign_in_as users(:two)
-    get recruitment_organization_invitation_path(invitation.token)
+    get recruitment_organization_invitation_path(token)
     assert_response :success
-    assert_select "form[action=?]", recruitment_accept_organization_invitation_path(invitation.token)
+    assert_select "form[action=?]", recruitment_accept_organization_invitation_path(token)
 
     assert_difference "OrganizationMembership.count", 1 do
-      post recruitment_accept_organization_invitation_path(invitation.token)
+      post recruitment_accept_organization_invitation_path(token)
     end
 
     assert_redirected_to recruitment_organization_path(@organization)

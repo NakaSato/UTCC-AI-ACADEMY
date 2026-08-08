@@ -36,4 +36,11 @@ class Recruitment::CandidateApplicationAssistantTest < ActiveSupport::TestCase
     assert_nil Recruitment::CandidateApplicationAssistant.call(application: @application, viewer: users(:two))
     assert_nil Recruitment::CandidateApplicationAssistant.call(application: @application, viewer: users(:one))
   end
+
+  test "never returns guidance for an anonymous viewer or an unsaved application" do
+    assert_nil Recruitment::CandidateApplicationAssistant.call(application: @application, viewer: nil)
+
+    unsaved_application = Recruitment::JobApplication.new(status: "submitted")
+    assert_nil Recruitment::CandidateApplicationAssistant.call(application: unsaved_application, viewer: nil)
+  end
 end

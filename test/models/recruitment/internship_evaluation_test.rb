@@ -61,4 +61,16 @@ class Recruitment::InternshipEvaluationTest < ActiveSupport::TestCase
     assert_not evaluation.valid?
     assert_predicate evaluation.errors[:evaluator], :any?
   end
+
+  test "a suspended organization rejects evaluation writes" do
+    @organization.update!(status: "suspended")
+    assert_not @organization.active?
+    evaluation = @application.build_evaluation(
+      evaluator: users(:instructor), status: "submitted", rating: 3, learning_outcomes_met: true,
+      feedback: "Feedback", next_steps: "Next"
+    )
+
+    assert_raises(ActiveRecord::RecordInvalid) { evaluation.submit! }
+    assert_nil @application.reload.evaluation
+  end
 end

@@ -4,8 +4,8 @@ module Recruitment
 
     def create
       job = discoverable_job
-      Current.user.saved_jobs.create!(job_post: job)
-      AuditEvent.record("recruitment_job_saved", job: job.title)
+      saved_job = Current.user.saved_jobs.find_or_create_by!(job_post: job)
+      AuditEvent.record("recruitment_job_saved", job: job.title) if saved_job.previously_new_record?
       redirect_back fallback_location: recruitment_jobs_path, notice: t("flash.recruitment_job_saved")
     rescue ActiveRecord::RecordInvalid
       redirect_back fallback_location: recruitment_jobs_path, alert: t("flash.recruitment_job_save_unavailable")

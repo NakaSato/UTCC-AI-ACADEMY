@@ -64,4 +64,25 @@ class Recruitment::JobPostSuggestionTest < ActiveSupport::TestCase
     assert_equal "Existing summary", @job_post.reload.summary
     assert_predicate suggestion.reload, :actionable?
   end
+
+  test "no suggestion kind can be accepted against a published job" do
+    @job_post.transition_to!("review")
+    @job_post.transition_to!("published")
+    suggestion = @job_post.suggestions.create!(
+      requested_by: users(:two), kind: "requirements", content: "Replacement",
+      provider: "rules_preview", source_label: "Source", uncertainty: "Uncertain"
+    )
+
+    assert_raises(ActiveRecord::RecordInvalid) { suggestion.accept!(reviewer: users(:one)) }
+    assert_predicate suggestion.reload, :actionable?
+  end
+
+  test "suspended organizations cannot generate suggestions" do
+    @organization.update!(status: "suspended")
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      Recruitment::JobSuggestionGenerator.call(job_post: @job_post, requested_by: users(:two))
+    end
+    assert_empty @job_post.suggestions
+  end
 end

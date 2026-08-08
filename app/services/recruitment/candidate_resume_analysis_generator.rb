@@ -70,10 +70,10 @@ module Recruitment
 
           values = match[2].split(/[,;|]/).map { |value| value.strip }.select { |value| value.length.between?(2, 240) }
           values = [ match[2].strip ] if values.empty?
-          values.first(12).each_with_index do |value, index|
+          values.first(12).each do |value|
             findings << {
               kind:, title: value, detail: "Detected under the #{label} section.", evidence: line,
-              source_type: "resume_text", confidence: 0.75, inferred: false, position: findings.length + index
+              source_type: "resume_text", confidence: 0.75, inferred: false, position: findings.length
             }
           end
         end

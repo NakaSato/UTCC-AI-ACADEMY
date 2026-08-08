@@ -22,28 +22,33 @@ module Recruitment
     def call
       return unless reporter?
 
+      organization_id = @organization.id
       applications = Recruitment::JobApplication.joins(:job_post)
-                                                 .where(recruitment_job_posts: { organization_id: @organization.id })
+                                                 .where(recruitment_job_posts: { organization_id: })
       total = applications.count
       suppressed = total < MIN_REPORTING_CELL_SIZE
       Summary.new(
-        Recruitment::JobPost::STATUSES.map { |status| JobStatus.new(status, @organization.job_posts.where(status:).count) },
+        Recruitment::JobPost::STATUSES.map do |status|
+          JobStatus.new(status, Recruitment::JobPost.where(organization_id:, status:).count)
+        end,
         suppressed ? nil : total,
         suppressed,
         Recruitment::JobApplication::STATUSES.map do |status|
           ApplicationStatusCell.new(status, suppressed ? nil : applications.where(status:).count, suppressed)
         end,
-        SOURCE_LABEL,
-        UNCERTAINTY
+        I18n.t("recruitment.reporting.source_label"),
+        I18n.t("recruitment.reporting.uncertainty", minimum: MIN_REPORTING_CELL_SIZE)
       )
     end
 
     private
       def reporter?
-        return false unless @organization&.active?
-        return true if @viewer&.admin?
+        organization_id = @organization&.id
+        return false unless organization_id.present? && Organization.active.where(id: organization_id).exists?
+        return true if User.where(id: @viewer&.id, role: "admin").exists?
 
-        @organization.memberships.active.exists?(user_id: @viewer&.id, role: REPORTER_ROLES)
+        OrganizationMembership.where(organization_id:, user_id: @viewer&.id,
+                                     status: "active", role: REPORTER_ROLES).exists?
       end
   end
 end

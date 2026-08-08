@@ -40,6 +40,17 @@ class Recruitment::JobApplicationTest < ActiveSupport::TestCase
     end
   end
 
+  test "submission refuses a suspended organization despite a stale job association" do
+    job = Recruitment::JobPost.includes(:organization).find(@job.id)
+    job.organization
+    job.organization.update!(status: "suspended")
+
+    assert_raises ActiveRecord::RecordInvalid do
+      Recruitment::JobApplication.submit!(job_post: job, candidate: users(:student), statement: "No longer visible")
+    end
+    assert_empty Recruitment::JobApplication.where(job_post: job)
+  end
+
   test "reviewer transitions are explicit, evented, and reversible where allowed" do
     application = Recruitment::JobApplication.submit!(job_post: @job, candidate: users(:student), statement: "Ready")
 
@@ -90,5 +101,14 @@ class Recruitment::JobApplicationTest < ActiveSupport::TestCase
 
     assert_predicate application.reload, :withdrawn?
     assert_equal "withdrawn", application.events.order(:id).last.to_status
+  end
+
+  test "application events are append-only" do
+    application = Recruitment::JobApplication.submit!(job_post: @job, candidate: users(:student), statement: "Ready")
+    event = application.events.sole
+
+    assert_not event.update(note: "Rewritten")
+    assert_not event.destroy
+    assert_equal "submitted", event.reload.to_status
   end
 end

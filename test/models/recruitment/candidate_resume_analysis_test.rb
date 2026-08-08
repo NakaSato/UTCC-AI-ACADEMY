@@ -17,6 +17,7 @@ class Recruitment::CandidateResumeAnalysisTest < ActiveSupport::TestCase
     assert_not skill.inferred?
     assert_equal "Skills: Ruby, Rails", skill.evidence
     assert_in_delta 0.75, skill.confidence.to_f, 0.001
+    assert_equal [ 0, 1, 2, 3, 4 ], analysis.findings.ordered.pluck(:position)
     assert_includes analysis.uncertainty, "not a hiring judgment"
   end
 

@@ -17,7 +17,7 @@ module Recruitment
       end
 
       def job_is_discoverable
-        errors.add(:job_post, :invalid) unless job_post&.visible_to_candidates?
+        errors.add(:job_post, :invalid) unless Recruitment::JobPost.published_for_candidates.where(id: job_post_id).exists?
       end
   end
 end
