@@ -27,6 +27,10 @@ this file. Product Owner and Engineering Manager decisions may reorder items
 when evidence, capacity, risk, or learning value changes; the opportunity cost
 must be recorded when that happens.
 
+Statuses mirror `backlog.json`: **Complete** items carry recorded owner
+approval, **In review** items are defined and awaiting verification, and the
+remaining labels are planning states.
+
 ### Ordering principles
 
 1. Establish the working platform and access boundary.
@@ -46,34 +50,34 @@ must be recorded when that happens.
 | ---: | --- | --- | --- | --- | --- |
 | 0 | UTCC M0 | Successful Platform Baseline | The end-to-end academy workflow is operational | None | Complete |
 | 1 | UTCC M1 | Reliable Account Recovery | Students can recover access in production | UTCC M0 | Now |
-| 2 | AI M1 | Foundation | Recruitment users, organizations, profiles, permissions, consent, and audit boundaries exist | UTCC M1, shared identity | Proposed |
+| 2 | AI M1 | Foundation | Recruitment users, organizations, profiles, permissions, consent, and audit boundaries exist | UTCC M1, shared identity | Complete |
 | 3 | Ecosystem M13 | Public Feature Request and Core Team Development Platform | Public users can submit proposals and receive traceable product decisions | Existing proposal intake, roadmap governance | Proposed |
 | 4 | Ecosystem M14 | Core Team Internal Work Dashboard | Core team work is privately managed through Markdown records linked to governed Slack collaboration | Ecosystem M13, repository lifecycle, Slack policy | Proposed |
-| 5 | UTCC M2 | First Real Topic | One production-quality bilingual topic proves the content model | UTCC M0, M1 | Next |
-| 6 | UTCC M3 | Complete Foundation Course | Every topic in the first course has unique approved learning content | UTCC M2 | Next |
-| 7 | UTCC M4 | Course-Specific Curricula | Courses can have distinct modules, topics, and requirements | UTCC M3 | Next |
-| 8 | UTCC M5 | Real Knowledge Map | The map reflects curriculum relationships and learner progress | UTCC M4 | Next |
-| 9 | UTCC M10 | Academic Writing | Students and teachers can create, review, and publish academic posts | UTCC M0, content and role decisions | Next |
+| 5 | UTCC M2 | First Real Topic | One production-quality bilingual topic proves the content model | UTCC M0, M1 | Complete |
+| 6 | UTCC M3 | Complete Foundation Course | Every topic in the first course has unique approved learning content | UTCC M2 | Complete |
+| 7 | UTCC M4 | Course-Specific Curricula | Courses can have distinct modules, topics, and requirements | UTCC M3 | Complete |
+| 8 | UTCC M5 | Real Knowledge Map | The map reflects curriculum relationships and learner progress | UTCC M4 | Complete |
+| 9 | UTCC M10 | Academic Writing | Students and teachers can create, review, and publish academic posts | UTCC M0, content and role decisions | Complete |
 | 10 | Ecosystem M12 | Technical Blog Translation Platform | Approved technical knowledge can be reviewed and published in multiple languages | UTCC M10, content model, editorial policy | Proposed |
 | 11 | UTCC M6 | Institutional Access and Documents | UTCC SSO and syllabus/document workflows work end to end | UTCC M4, institutional decisions | Later |
-| 12 | UTCC M7 | Operational Admin Controls | Administrative metrics, courses, approvals, and feature controls are trustworthy | UTCC M6, admin policy | Later |
-| 13 | UTCC M8 | Community and Pedagogy Decisions | Social and prior-knowledge behaviors have approved academic rules | Teaching-policy decisions | Later |
-| 14 | Ecosystem M10 | Company Business Case Platform | Companies and invited students collaborate on real business challenges | AI M1, company and confidentiality policy | Proposed |
-| 15 | AI M2 | Job Management | Companies can manage and publish structured jobs and programs | AI M1 | Proposed |
-| 16 | AI M3 | AI Job Creation | AI helps produce quality job specifications with human approval | AI M2 | Proposed |
-| 17 | AI M4 | Internship Management | Internship programs, applications, mentorship, and evaluation are supported | AI M1, M2 | Proposed |
+| 12 | UTCC M7 | Operational Admin Controls | Administrative metrics, courses, approvals, and feature controls are trustworthy | UTCC M6, admin policy | Complete |
+| 13 | UTCC M8 | Community and Pedagogy Decisions | Social and prior-knowledge behaviors have approved academic rules | Teaching-policy decisions | Complete |
+| 14 | Ecosystem M10 | Company Business Case Platform | Companies and invited students collaborate on real business challenges | AI M1, company and confidentiality policy | In review |
+| 15 | AI M2 | Job Management | Companies can manage and publish structured jobs and programs | AI M1 | Complete |
+| 16 | AI M3 | AI Job Creation | AI helps produce quality job specifications with human approval | AI M2 | Complete |
+| 17 | AI M4 | Internship Management | Internship programs, applications, mentorship, and evaluation are supported | AI M1, M2 | Complete |
 | 18 | Ecosystem M11 | Student Internship Request Platform | Students can request internships and complete a supported learning cycle | Ecosystem M10, AI M1, institutional internship policy | Proposed |
-| 19 | AI M5 | Candidate Profile | Candidates have structured, consented, searchable profiles | AI M1 | Proposed |
-| 20 | AI M6 | AI Resume Analysis | Candidate data, skills, and gaps can be extracted with reviewable AI assistance | AI M5 | Proposed |
-| 21 | AI M7 | Job Discovery | Candidates can find relevant opportunities | AI M2, M5 | Proposed |
-| 22 | AI M8 | AI Matching Engine | Candidates and opportunities receive explainable matching recommendations | AI M6, M7 | Proposed |
-| 23 | AI M9 | Recruitment Workflow | Applications move through interview and offer stages | AI M2, M5 | Proposed |
-| 24 | AI M10 | AI Recruiter Agent | Recruiters receive governed assistance across screening and coordination | AI M8, M9 | Proposed |
-| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | Proposed |
-| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | Proposed |
-| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | Proposed |
-| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | Proposed |
-| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | Proposed |
+| 19 | AI M5 | Candidate Profile | Candidates have structured, consented, searchable profiles | AI M1 | Complete |
+| 20 | AI M6 | AI Resume Analysis | Candidate data, skills, and gaps can be extracted with reviewable AI assistance | AI M5 | Complete |
+| 21 | AI M7 | Job Discovery | Candidates can find relevant opportunities | AI M2, M5 | Complete |
+| 22 | AI M8 | AI Matching Engine | Candidates and opportunities receive explainable matching recommendations | AI M6, M7 | Complete |
+| 23 | AI M9 | Recruitment Workflow | Applications move through interview and offer stages | AI M2, M5 | Complete |
+| 24 | AI M10 | AI Recruiter Agent | Recruiters receive governed assistance across screening and coordination | AI M8, M9 | Complete |
+| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | In review |
+| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | In review |
+| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | In review |
+| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | In review |
+| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | In review |
 
 ### Cross-cutting lane
 
@@ -176,7 +180,7 @@ A student who has added an email address can request and receive a password-rese
 
 ## Milestone 2 — First real topic
 
-**Status: Next**
+**Status: Complete**
 
 ### Goal
 
@@ -206,7 +210,7 @@ This is the first implementation target after account recovery because it proves
 
 ## Milestone 3 — Complete foundation course
 
-**Status: Next**
+**Status: Complete**
 
 ### Goal
 
@@ -233,7 +237,7 @@ Give every current AI1101 topic its own approved bilingual lesson and assessment
 
 ## Milestone 4 — Course-specific curricula
 
-**Status: Next**
+**Status: Complete**
 
 ### Goal
 
@@ -260,7 +264,7 @@ Allow each course to own a different syllabus instead of sharing one module and 
 
 ## Milestone 5 — Real knowledge map
 
-**Status: Next**
+**Status: Complete**
 
 ### Goal
 
@@ -311,7 +315,7 @@ Complete the university-facing access and document workflows.
 
 ## Milestone 7 — Operational admin controls
 
-**Status: Later**
+**Status: Complete**
 
 ### Goal
 
@@ -337,7 +341,7 @@ Replace the remaining placeholder admin tabs with trustworthy operational tools.
 
 ## Milestone 8 — Community and pedagogy decisions
 
-**Status: Later**
+**Status: Complete**
 
 ### Goal
 
@@ -384,7 +388,7 @@ Resolve features whose implementation depends on teaching policy rather than eng
 
 ## Milestone 10 — Academic writing
 
-**Status: Next**
+**Status: Complete**
 
 ### Goal
 
