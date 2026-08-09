@@ -2,10 +2,10 @@
 id: ADR-0024
 type: adr
 title: Use organization memberships for recruitment company access
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -39,9 +39,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. The Product Owner confirmed this boundary for
-> implementation; the accountable Product Owner and Tech Lead still review the
-> durable record before the increment is accepted.
+> **Decision state:** Accepted by the user on 2026-08-08 for the first
+> recruitment implementation slice: organization memberships, scoped access,
+> candidate-profile privacy, and audit boundaries.
 
 ## Context
 

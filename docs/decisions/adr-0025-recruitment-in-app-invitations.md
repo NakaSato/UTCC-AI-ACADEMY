@@ -2,10 +2,10 @@
 id: ADR-0025
 type: adr
 title: Use secure in-app invitations for registered recruitment staff
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -39,9 +39,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. The increment is implemented for review; the
-> Product Owner, Tech Lead, and Security/Privacy owner still own acceptance of
-> the durable boundary.
+> **Decision state:** Accepted by the user on 2026-08-08 for the registered-user
+> in-app invitation boundary, including intended-invitee privacy, one-time
+> state transitions, membership creation, token redaction, and audit behavior.
 
 ## Context
 

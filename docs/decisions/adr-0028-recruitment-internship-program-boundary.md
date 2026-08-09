@@ -2,10 +2,10 @@
 id: ADR-0028
 type: adr
 title: Keep internship programs, applications, mentors, and evaluations organization-scoped
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@academic-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-22
 supersedes: []
 superseded_by: []
@@ -51,9 +51,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, technical, security/privacy, recruitment,
-> and academic owners must review the program policy, student eligibility,
-> capacity rules, evaluation retention, and certificate implications.
+> **Decision state:** Accepted by the user on 2026-08-08 for organization-scoped
+> internship programs, student applications, capacity/review rules, mentor
+> evaluations, provider-neutral suggestions, and audit boundaries.
 
 ## Context
 

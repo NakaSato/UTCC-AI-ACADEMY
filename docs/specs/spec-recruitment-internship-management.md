@@ -2,10 +2,10 @@
 id: SPEC-0028
 type: spec
 title: Organization-scoped internship programs, student applications, and evaluations
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@academic-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-22
 supersedes: []
 superseded_by: []
@@ -59,8 +59,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-004, SKILL-TEST-001, SKILL-AI-0
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft. Academic and Product owners must confirm student
-> eligibility, paid/unpaid policy, evaluation retention, and certificate rules.
+> **Review state:** Accepted by the user on 2026-08-08 for the first internship
+> implementation slice. Student eligibility, compensation, evaluation
+> retention, and certificate implications remain bounded by this specification.
 
 ## Problem
 
@@ -129,18 +130,18 @@ students or let a race exceed program capacity.
 
 ## Acceptance Criteria
 
-- [ ] An authorized organization user can create and publish a complete
+- [x] An authorized organization user can create and publish a complete
       internship program.
-- [ ] A student can see published programs, apply once, view status, and
+- [x] A student can see published programs, apply once, view status, and
       withdraw their own application.
-- [ ] A reviewer can accept or reject applications, and capacity cannot be
+- [x] A reviewer can accept or reject applications, and capacity cannot be
       exceeded.
-- [ ] An assigned mentor can submit and update one structured evaluation for an
+- [x] An assigned mentor can submit and update one structured evaluation for an
       accepted participant.
-- [ ] Mentors and non-members cannot access another organization’s management
+- [x] Mentors and non-members cannot access another organization’s management
       records.
-- [ ] Program and application transitions are auditable in English and Thai.
-- [ ] Authors can generate, edit, accept, reject, and regenerate labelled
+- [x] Program and application transitions are auditable in English and Thai.
+- [x] Authors can generate, edit, accept, reject, and regenerate labelled
       provider-neutral program suggestions without automatic publication.
 
 ## Error and Boundary Cases

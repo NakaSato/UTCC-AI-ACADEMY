@@ -2,10 +2,10 @@
 id: SPEC-0032
 type: spec
 title: Candidate-owned explainable job match preview
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -81,12 +81,12 @@ eligibility decision.
 
 ## Acceptance Criteria
 
-- [ ] A student with a visible job can inspect all six factor explanations.
-- [ ] Each factor displays evidence, source, state, and limitation.
-- [ ] Missing profile data is presented as unknown rather than rejection.
-- [ ] Staff and hidden jobs receive no candidate match preview.
-- [ ] No numeric score or eligibility decision is rendered.
-- [ ] The service remains provider-neutral and introduces no new external data
+- [x] A student with a visible job can inspect all six factor explanations.
+- [x] Each factor displays evidence, source, state, and limitation.
+- [x] Missing profile data is presented as unknown rather than rejection.
+- [x] Staff and hidden jobs receive no candidate match preview.
+- [x] No numeric score or eligibility decision is rendered.
+- [x] The service remains provider-neutral and introduces no new external data
       store or model dependency.
 
 ## Boundary Cases

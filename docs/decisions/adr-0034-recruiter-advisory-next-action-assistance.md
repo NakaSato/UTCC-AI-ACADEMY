@@ -2,10 +2,10 @@
 id: ADR-0034
 type: adr
 title: Start the AI recruiter agent with advisory application next-action assistance
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -36,9 +36,10 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This slice is implementation-approved by the user
-> for local verification; Product, legal, Security, Recruitment, Privacy, Data,
-> and QA owners must review it before production or consequential use.
+> **Decision state:** Accepted by the user on 2026-08-09 for the provider-neutral
+> advisory next-action boundary and local verification. Legal, Security,
+> Recruitment, Privacy, Data, and QA review remains required before production
+> or consequential use.
 
 ## Context
 

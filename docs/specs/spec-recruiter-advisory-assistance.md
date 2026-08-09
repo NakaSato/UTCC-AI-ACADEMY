@@ -2,10 +2,10 @@
 id: SPEC-0034
 type: spec
 title: Provider-neutral advisory recruiter next-action assistance
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -90,13 +90,13 @@ employment decision.
 
 ## Acceptance Criteria
 
-- [ ] An authorized recruiter sees an advisory next action and its source.
-- [ ] A stage past its threshold is marked for attention without changing the
+- [x] An authorized recruiter sees an advisory next action and its source.
+- [x] A stage past its threshold is marked for attention without changing the
       application status.
-- [ ] Terminal stages return a close-record action without an attention flag.
-- [ ] Candidate and unauthorized users cannot access the recruiter panel.
-- [ ] The service has no external provider, persistence, or side effect.
-- [ ] English and Thai copy explain that a human recruiter remains responsible.
+- [x] Terminal stages return a close-record action without an attention flag.
+- [x] Candidate and unauthorized users cannot access the recruiter panel.
+- [x] The service has no external provider, persistence, or side effect.
+- [x] English and Thai copy explain that a human recruiter remains responsible.
 
 ## Verification
 

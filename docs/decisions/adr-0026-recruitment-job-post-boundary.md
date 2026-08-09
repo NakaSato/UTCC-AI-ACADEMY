@@ -2,10 +2,10 @@
 id: ADR-0026
 type: adr
 title: Keep job posts organization-scoped with explicit publication states
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -39,9 +39,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. The first M2 vertical slice is implemented for
-> review; Product, technical, security, and recruitment-domain owners still
-> accept the durable policy.
+> **Decision state:** Accepted by the user on 2026-08-08 for the first M2
+> vertical slice: organization-scoped job posts, explicit publication states,
+> lifecycle transitions, authorization, validation, and audit boundaries.
 
 ## Context
 

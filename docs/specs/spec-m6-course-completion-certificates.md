@@ -2,11 +2,11 @@
 id: SPEC-0011
 type: spec
 title: Course-completion certificate policy and artifact
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-02
-updated: 2026-08-02
-review_by: 2026-08-09
+updated: 2026-08-08
+review_by: 2026-08-15
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0011, SPEC-0003]
@@ -17,7 +17,8 @@ touches:
   - app/views/my_learning/show.html.erb
   - config/routes.rb
   - db/migrate
-enforced_by: []
+enforced_by:
+  - test/models/awards_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-002, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
@@ -25,9 +26,10 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Course-completion certificate policy and artifact
 
-> **Review state:** Draft and blocked on academic/institutional policy. This
-> specification does not authorize certificate issuance merely because a course
-> row has `certificate: true`.
+> **Review state:** Accepted deferral as of 2026-08-08. M6 does not issue a
+> certificate artifact merely because a course row has `certificate: true`;
+> completion counters remain truthful telemetry and no certificate claim is
+> exposed.
 
 > [Executable Specifications](README.md) ·
 > [M6 certificate architecture decision](../decisions/adr-0011-course-completion-certificates.md) ·
@@ -40,6 +42,13 @@ The academy can count completed certificate-marked courses, but it has no
 approved rule or artifact for issuing a certificate. Showing a downloadable
 document without an issuer, identity, evidence, and revocation policy could
 misrepresent learner progress as an institutional credential.
+
+## Accepted M6 policy
+
+The user approved deferring certificate issuance for M6. The application keeps
+the existing completion state and certificate-course counters, but adds no
+certificate record, artifact, download, verification endpoint, issuer claim, or
+revocation workflow. Reopening issuance requires a new accepted policy decision.
 
 ## Scope after policy approval
 
@@ -108,10 +117,11 @@ misrepresent learner progress as an institutional credential.
 
 ## Human Academic Review Handoff
 
-Implementation is held until the Product Owner and Academic Owner decide what
-the credential means and the Tech Lead records a safe technical boundary. The
-agent can expose options and testable controls, but cannot declare academic
-authority or decide what employers and students may rely on.
+Future certificate implementation is held until the Product Owner and Academic
+Owner decide what the credential means and the Tech Lead records a safe
+technical boundary. The current M6 deferral is the approved policy; the agent
+cannot declare academic authority or decide what employers and students may
+rely on.
 
 | Review point | Evidence | Decision required |
 | --- | --- | --- |
@@ -121,7 +131,7 @@ authority or decide what employers and students may rely on.
 | Verification, revocation, correction, and replacement | [ADR-0011 alternatives](../decisions/adr-0011-course-completion-certificates.md#alternatives) | Choose authenticated-only, public verification, or defer issuance. |
 | Signing, privacy, retention, and operations | [ADR-0011 human decisions](../decisions/adr-0011-course-completion-certificates.md#human-decisions-required) | Name key, privacy, retention, support, and incident owners. |
 
-Until these choices are recorded, the application must keep the existing
+While the deferral remains active, the application must keep the existing
 completion count truthful and must not expose a certificate download or
 verification claim.
 

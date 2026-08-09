@@ -2,10 +2,10 @@
 id: ADR-0029
 type: adr
 title: Keep candidate profile data candidate-owned, portable, and provenance-aware
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -41,8 +41,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, Privacy, Security, and Recruitment owners
-> must confirm visibility, retention, application reuse, and deletion policy.
+> **Decision state:** Accepted by the user on 2026-08-08 for candidate-owned,
+> portable, provenance-aware profile data, consented visibility/reuse,
+> bounded attachments, export/delete controls, and privacy boundaries.
 
 ## Context
 

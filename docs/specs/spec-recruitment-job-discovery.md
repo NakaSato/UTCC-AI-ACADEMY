@@ -2,10 +2,10 @@
 id: SPEC-0031
 type: spec
 title: Candidate-controlled search, saved jobs, recommendations, and alerts
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -97,13 +97,13 @@ decision or sending unwanted communication.
 
 ## Acceptance Criteria
 
-- [ ] Candidates can search and filter published jobs.
-- [ ] Students can save and remove jobs from their own saved list.
-- [ ] Students can dismiss and restore recommendations.
-- [ ] Recommendations show explicit reasons and uncertainty without a score.
-- [ ] Students can consent to, configure, and stop in-app alerts.
-- [ ] A repeated visit before the configured interval creates no second alert.
-- [ ] Staff and other students cannot access or mutate another student's state.
+- [x] Candidates can search and filter published jobs.
+- [x] Students can save and remove jobs from their own saved list.
+- [x] Students can dismiss and restore recommendations.
+- [x] Recommendations show explicit reasons and uncertainty without a score.
+- [x] Students can consent to, configure, and stop in-app alerts.
+- [x] A repeated visit before the configured interval creates no second alert.
+- [x] Staff and other students cannot access or mutate another student's state.
 
 ## Boundary Cases
 

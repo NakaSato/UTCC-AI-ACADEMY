@@ -2,10 +2,10 @@
 id: SPEC-0033
 type: spec
 title: Candidate-owned recruitment applications and auditable pipeline stages
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -108,17 +108,17 @@ represented in the persisted contract.
 
 ## Acceptance Criteria
 
-- [ ] A consented student can submit once and see `submitted` plus a next action.
-- [ ] A student without consent, without a profile, or applying to a hidden or
+- [x] A consented student can submit once and see `submitted` plus a next action.
+- [x] A student without consent, without a profile, or applying to a hidden or
       expired job is refused without creating a record.
-- [ ] The candidate can see only their own applications and can withdraw only
+- [x] The candidate can see only their own applications and can withdraw only
       from an allowed stage.
-- [ ] An authorized recruiter can list and inspect applications for their job;
+- [x] An authorized recruiter can list and inspect applications for their job;
       an unrelated member or outsider receives no application data.
-- [ ] An authorized recruiter can move an application through allowed stages;
+- [x] An authorized recruiter can move an application through allowed stages;
       invalid transitions and stale versions are refused.
-- [ ] Each submission, transition, and withdrawal has an event and audit entry.
-- [ ] The UI renders the current stage and candidate next action in English and
+- [x] Each submission, transition, and withdrawal has an event and audit entry.
+- [x] The UI renders the current stage and candidate next action in English and
       Thai.
 
 ## Threat and Privacy Notes

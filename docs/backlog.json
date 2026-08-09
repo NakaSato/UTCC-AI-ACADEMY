@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-07T22:51:23+07:00",
+  "updated_at": "2026-08-09T00:11:59+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -293,9 +293,9 @@
         "MAIL-002"
       ],
       "blocker": {
-        "summary": "Real-mailbox verification cannot start while MAIL-002 production delivery is blocked by the accepted email deferral.",
+        "summary": "Real-mailbox verification is intentionally deferred and skipped for the current delivery horizon; Mailpit remains the approved local/staging verification boundary.",
         "decision_owner": "Product Owner",
-        "next_action": "Wait for a future accepted production-provider decision and MAIL-002 implementation."
+        "next_action": "Do not schedule real-mailbox verification. Reopen only after the Product Owner approves a production provider and credential owner, MAIL-002 is implemented, and a witnessed mailbox test is authorized."
       },
       "evidence": [
         {
@@ -307,7 +307,7 @@
           "url": "runbooks/rb-mailpit-staging-verification.html"
         }
       ],
-      "updated_at": "2026-08-05T12:32:23+07:00"
+      "updated_at": "2026-08-08T21:49:38+07:00"
     },
     {
       "id": "M2-001",
@@ -561,9 +561,9 @@
         "M6-001"
       ],
       "blocker": {
-        "summary": "The SSO/account-linking boundary is drafted, but UTCC provider metadata, protocol, identity claims, linking policy, and emergency-access ownership are not approved.",
+        "summary": "SSO is intentionally deferred and skipped for the current delivery horizon; the disabled local-authentication boundary remains the approved state. No provider contract, callback, account-linking, or credential flow is authorized.",
         "decision_owner": "Product Owner, Tech Lead, Security Owner, and UTCC identity owner",
-        "next_action": "Provide the institutional provider contract and approve ADR-0010/SPEC-0010 before any callback or credential flow is implemented."
+        "next_action": "Do not schedule implementation. Reopen only if the Product Owner and UTCC identity owner provide and approve a provider contract, identity/linking policy, emergency-access policy, and security review."
       },
       "evidence": [
         {
@@ -587,23 +587,19 @@
           "url": "specs/spec-m6-utcc-sso-account-linking.html#human-identity-review-handoff"
         }
       ],
-      "updated_at": "2026-08-02T22:15:00+07:00"
+      "updated_at": "2026-08-08T16:14:27+07:00"
     },
     {
       "id": "M6-003",
       "title": "Define course-completion certificate policy and artifact",
-      "status": "blocked",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, and Academic Owner",
       "milestone": "M6",
       "depends_on": [
         "M6-001"
       ],
-      "blocker": {
-        "summary": "Certificate counts exist, but no academic issuer, completion evidence rule, identity disclosure, verification, or revocation policy is approved.",
-        "decision_owner": "Product Owner and Academic Owner",
-        "next_action": "Review ADR-0011/SPEC-0011 and decide whether the certificate flag represents an official credential, a completion record, or deferred catalog metadata."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M6 certificate policy architecture draft",
@@ -626,7 +622,7 @@
           "url": "specs/spec-m6-course-completion-certificates.html#human-academic-review-handoff"
         }
       ],
-      "updated_at": "2026-08-02T22:25:00+07:00"
+      "updated_at": "2026-08-08T16:25:12+07:00"
     },
     {
       "id": "M7-001",
@@ -1156,18 +1152,14 @@
     {
       "id": "M9-005",
       "title": "Define curriculum-scale accessibility and performance quality budgets",
-      "status": "blocked",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, QA Owner, and Accessibility Owner",
       "milestone": "M9",
       "depends_on": [
         "M9-002"
       ],
-      "blocker": {
-        "summary": "The repository has selected query-budget tests and browser walkthroughs, but no approved accessibility target, supported device/assistive-technology matrix, user-facing performance budgets, route coverage, waiver authority, or trend owner exists.",
-        "decision_owner": "Product Owner, Tech Lead, QA Owner, and Accessibility Owner",
-        "next_action": "Review ADR-0023/SPEC-0023 and approve supported audiences, critical journeys, accessibility target, latency/payload/query budgets, measurement environment, release response, waivers, and remediation ownership before adding gates."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "M9 curriculum-quality architecture draft",
@@ -1198,7 +1190,7 @@
           "url": "specs/spec-m9-curriculum-quality-budgets.html#quality-budget-decision-worksheet"
         }
       ],
-      "updated_at": "2026-08-07T22:51:23+07:00"
+      "updated_at": "2026-08-08T22:10:32+07:00"
     },
     {
       "id": "AW-001",
@@ -1374,7 +1366,7 @@
     {
       "id": "REC-001",
       "title": "Implement recruitment foundation organization membership and candidate profiles",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner and Tech Lead",
       "milestone": "AI-M1",
@@ -1398,12 +1390,12 @@
           "url": "specs/spec-recruitment-foundation-organization-profiles.html"
         }
       ],
-      "updated_at": "2026-08-07T02:44:44+07:00"
+      "updated_at": "2026-08-08T22:29:45+07:00"
     },
     {
       "id": "REC-002",
       "title": "Implement secure in-app invitations for registered recruitment staff",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, and Security/Privacy owner",
       "milestone": "AI-M1",
@@ -1427,12 +1419,12 @@
           "url": "specs/spec-recruitment-invitations.html"
         }
       ],
-      "updated_at": "2026-08-07T12:31:11+07:00"
+      "updated_at": "2026-08-08T22:42:51+07:00"
     },
     {
       "id": "REC-003",
       "title": "Implement organization-scoped recruitment job management and publication workflow",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
       "milestone": "AI-M2",
@@ -1456,12 +1448,12 @@
           "url": "specs/spec-recruitment-job-management.html"
         }
       ],
-      "updated_at": "2026-08-07T12:51:37+07:00"
+      "updated_at": "2026-08-08T22:53:03+07:00"
     },
     {
       "id": "REC-004",
       "title": "Implement provider-neutral AI job suggestions with human review",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
       "milestone": "AI-M3",
@@ -1485,12 +1477,12 @@
           "url": "specs/spec-recruitment-ai-job-creation.html"
         }
       ],
-      "updated_at": "2026-08-07T19:30:00+07:00"
+      "updated_at": "2026-08-08T22:59:17+07:00"
     },
     {
       "id": "REC-005",
       "title": "Implement organization-scoped internship programs, applications, and evaluations",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Academic owners",
       "milestone": "AI-M4",
@@ -1514,12 +1506,12 @@
           "url": "specs/spec-recruitment-internship-management.html"
         }
       ],
-      "updated_at": "2026-08-07T20:10:00+07:00"
+      "updated_at": "2026-08-08T23:02:15+07:00"
     },
     {
       "id": "REC-006",
       "title": "Extend candidate profiles with structured consented and portable data",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M5",
@@ -1543,12 +1535,12 @@
           "url": "specs/spec-recruitment-candidate-profile.html"
         }
       ],
-      "updated_at": "2026-08-07T21:15:00+07:00"
+      "updated_at": "2026-08-08T23:06:18+07:00"
     },
     {
       "id": "REC-007",
       "title": "Implement candidate-controlled provider-neutral AI resume analysis",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M6",
@@ -1572,12 +1564,12 @@
           "url": "specs/spec-recruitment-resume-analysis.html"
         }
       ],
-      "updated_at": "2026-08-07T21:05:00+07:00"
+      "updated_at": "2026-08-08T23:29:40+07:00"
     },
     {
       "id": "REC-008",
       "title": "Implement candidate-controlled job discovery, saved jobs, recommendations, and alerts",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M7",
@@ -1601,12 +1593,12 @@
           "url": "specs/spec-recruitment-job-discovery.html"
         }
       ],
-      "updated_at": "2026-08-07T21:40:00+07:00"
+      "updated_at": "2026-08-08T23:41:47+07:00"
     },
     {
       "id": "REC-009",
       "title": "Implement candidate-owned explainable job match previews without consequential ranking",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, Data, and QA owners",
       "milestone": "AI-M8",
@@ -1630,12 +1622,12 @@
           "url": "specs/spec-recruitment-match-preview.html"
         }
       ],
-      "updated_at": "2026-08-07T22:20:00+07:00"
+      "updated_at": "2026-08-08T23:46:46+07:00"
     },
     {
       "id": "REC-010",
       "title": "Implement candidate-owned job applications and auditable recruitment pipeline stages",
-      "status": "verification",
+      "status": "complete",
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, and QA owners",
       "milestone": "AI-M9",
@@ -1659,17 +1651,17 @@
           "url": "specs/spec-recruitment-application-workflow.html"
         }
       ],
-      "updated_at": "2026-08-07T21:32:21+07:00"
+      "updated_at": "2026-08-09T00:08:37+07:00"
     },
     {
       "id": "REC-011",
       "title": "Define the governed AI recruiter agent boundary for screening and hiring coordination",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, and QA owners",
       "milestone": "AI-M10",
       "depends_on": ["REC-009", "REC-010"],
-      "blocker": "Final production use still requires legal, security, recruitment-domain, privacy, data, and QA review",
+      "blocker": null,
       "evidence": [
         {
           "label": "AI Recruitment Platform roadmap — Milestone 10",
@@ -1688,7 +1680,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/job_application_assistant_test.rb"
         }
       ],
-      "updated_at": "2026-08-07T21:56:52+07:00"
+      "updated_at": "2026-08-09T00:11:59+07:00"
     },
     {
       "id": "REC-012",
@@ -1804,7 +1796,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/job_applications_controller_test.rb"
         }
       ],
-      "updated_at": "2026-08-07T22:37:03+07:00"
+      "updated_at": "2026-08-08T17:08:18+07:00"
     },
     {
       "id": "REC-016",
@@ -1855,6 +1847,35 @@
         }
       ],
       "updated_at": "2026-08-07T22:45:25+07:00"
+    },
+    {
+      "id": "WEB-001",
+      "title": "Create a public contributor profile presentation landing page",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner / Frontend reviewer",
+      "milestone": "M1",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Contributor presentation route",
+          "url": "/contributors"
+        },
+        {
+          "label": "Contributor page coverage",
+          "url": "test/controllers/contributors_test.rb"
+        },
+        {
+          "label": "Full verification gate",
+          "url": "bin/verify"
+        },
+        {
+          "label": "Human content and visual approval",
+          "url": "/contributors"
+        }
+      ],
+      "updated_at": "2026-08-08T13:44:13+07:00"
     }
   ],
   "recently_completed": [
@@ -3254,6 +3275,166 @@
       "to": "complete",
       "summary": "The user approved learner-owned, course-scoped, reversible prior-knowledge marks; they contribute to map progress and course completion only, while XP, gems, activity, awards, reports, applied work, certificates, and unlocking remain completion-based.",
       "evidence_url": "specs/spec-m8-prior-knowledge.html"
+    },
+    {
+      "at": "2026-08-08T13:30:00+07:00",
+      "item_id": "WEB-001",
+      "from": "new",
+      "to": "verification",
+      "summary": "Implemented the public bilingual contributor presentation page, role-based profile cards, page-specific navigation, crawler metadata, focused controller coverage, and the full repository verification gate; human content and visual review remain.",
+      "evidence_url": "/contributors"
+    },
+    {
+      "at": "2026-08-08T13:44:13+07:00",
+      "item_id": "WEB-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved the contributor page content and final visual presentation after automated verification passed.",
+      "evidence_url": "/contributors"
+    },
+    {
+      "at": "2026-08-08T16:14:27+07:00",
+      "item_id": "M6-002",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "The user requested that SSO remain disabled and be skipped for the current delivery horizon; the backlog records this as an intentional deferral because 'skipped' is not an allowed lifecycle status.",
+      "evidence_url": "decisions/adr-0010-utcc-sso-account-linking.html"
+    },
+    {
+      "at": "2026-08-08T16:25:12+07:00",
+      "item_id": "M6-003",
+      "from": "blocked",
+      "to": "complete",
+      "summary": "The user approved deferring certificate issuance in M6; completion counters remain truthful telemetry, with no certificate artifact, download, verification, issuer, or revocation workflow introduced.",
+      "evidence_url": "specs/spec-m6-course-completion-certificates.html"
+    },
+    {
+      "at": "2026-08-08T17:08:18+07:00",
+      "item_id": "REC-015",
+      "from": "verification",
+      "to": "verification",
+      "summary": "Verified participant-scoped in-app application conversations: focused tests passed (13 tests, 80 assertions), bin/docs passed, and the full bin/verify gate passed; retention, moderation, notification, and production communication policy remain human-owned.",
+      "evidence_url": "specs/spec-recruitment-application-conversations.html"
+    },
+    {
+      "at": "2026-08-08T21:49:38+07:00",
+      "item_id": "MAIL-003",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "The user requested that real-mailbox verification remain skipped for the current delivery horizon; the backlog records this as an intentional deferral because 'skipped' is not an allowed lifecycle status.",
+      "evidence_url": "runbooks/rb-mailpit-staging-verification.html"
+    },
+    {
+      "at": "2026-08-08T22:02:55+07:00",
+      "item_id": "M9-005",
+      "from": "blocked",
+      "to": "blocked",
+      "summary": "The user approved all candidate quality-budget defaults; the repository now contains a draft policy source, journey/accessibility/performance/waiver/telemetry contract tests, and a semantic landmark system walk. Final named-owner acceptance remains required before production gating.",
+      "evidence_url": "specs/spec-m9-curriculum-quality-budgets.html"
+    },
+    {
+      "at": "2026-08-08T22:08:56+07:00",
+      "item_id": "M9-005",
+      "from": "blocked",
+      "to": "verification",
+      "summary": "The user requested that M9-005 not remain blocked; the implemented draft quality baseline is now in verification, with final Product, Tech, QA, and Accessibility owner acceptance retained as the verification gate rather than a delivery blocker.",
+      "evidence_url": "specs/spec-m9-curriculum-quality-budgets.html"
+    },
+    {
+      "at": "2026-08-08T22:10:32+07:00",
+      "item_id": "M9-005",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved the M9-005 repository quality baseline. The implemented policy and automated evidence are accepted; manual accessibility/content review and production release-gate activation remain separately documented follow-up decisions.",
+      "evidence_url": "specs/spec-m9-curriculum-quality-budgets.html"
+    },
+    {
+      "at": "2026-08-08T22:29:45+07:00",
+      "item_id": "REC-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-001. Organization membership, candidate-profile privacy boundaries, authorization, audit behavior, focused test evidence, and the first recruitment implementation slice are accepted.",
+      "evidence_url": "specs/spec-recruitment-foundation-organization-profiles.html"
+    },
+    {
+      "at": "2026-08-08T22:42:51+07:00",
+      "item_id": "REC-002",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-002. Registered-user in-app invitations, intended-invitee privacy, one-time acceptance/decline, membership creation, token redaction, and audit behavior are accepted; external onboarding and production email remain outside this slice.",
+      "evidence_url": "specs/spec-recruitment-invitations.html"
+    },
+    {
+      "at": "2026-08-08T22:53:03+07:00",
+      "item_id": "REC-003",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-003. Organization-scoped job authoring, review/publication states, candidate visibility boundaries, lifecycle transitions, authorization, validation, and audit behavior are accepted.",
+      "evidence_url": "specs/spec-recruitment-job-management.html"
+    },
+    {
+      "at": "2026-08-08T22:59:17+07:00",
+      "item_id": "REC-004",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-004. Provider-neutral, labelled job suggestions with provenance, uncertainty, reversible human review, publication protection, authorization, validation, and audit behavior are accepted; no external AI provider is selected.",
+      "evidence_url": "specs/spec-recruitment-ai-job-creation.html"
+    },
+    {
+      "at": "2026-08-08T23:02:15+07:00",
+      "item_id": "REC-005",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-005. Organization-scoped internship programs, student applications, capacity and review rules, mentor evaluations, provider-neutral suggestions, authorization, bilingual audit behavior, and lifecycle boundaries are accepted.",
+      "evidence_url": "specs/spec-recruitment-internship-management.html"
+    },
+    {
+      "at": "2026-08-08T23:06:18+07:00",
+      "item_id": "REC-006",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-006. Candidate-owned structured profile data, consented visibility and reuse, provenance-aware facts, bounded attachments, export/delete controls, authorization, and privacy boundaries are accepted.",
+      "evidence_url": "specs/spec-recruitment-candidate-profile.html"
+    },
+    {
+      "at": "2026-08-08T23:29:40+07:00",
+      "item_id": "REC-007",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-007. Candidate-controlled provider-neutral resume analysis, evidence/confidence/provenance handling, explicit finding review, binary-input disclosure, privacy boundaries, and audit behavior are accepted; no production model provider is selected.",
+      "evidence_url": "specs/spec-recruitment-resume-analysis.html"
+    },
+    {
+      "at": "2026-08-08T23:41:47+07:00",
+      "item_id": "REC-008",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-008. Candidate-controlled job search, saved and dismissed jobs, explainable advisory recommendations, consented in-app alerts, rate limiting, and cross-user privacy boundaries are accepted.",
+      "evidence_url": "specs/spec-recruitment-job-discovery.html"
+    },
+    {
+      "at": "2026-08-08T23:46:46+07:00",
+      "item_id": "REC-009",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-009. Candidate-owned factor explanations, evidence/source/uncertainty states, unknown handling, hidden-job privacy, provider neutrality, and the prohibition on numeric or consequential ranking are accepted.",
+      "evidence_url": "specs/spec-recruitment-match-preview.html"
+    },
+    {
+      "at": "2026-08-09T00:08:37+07:00",
+      "item_id": "REC-010",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-010. Candidate-owned consented applications, organization-scoped recruiter review, allowed pipeline transitions, withdrawal, bilingual next actions, event history, and audit behavior are accepted.",
+      "evidence_url": "specs/spec-recruitment-application-workflow.html"
+    },
+    {
+      "at": "2026-08-09T00:11:59+07:00",
+      "item_id": "REC-011",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-011 as a governed advisory boundary. Provider-neutral next-action assistance, source/uncertainty disclosure, deterministic attention flags, access control, bilingual human-responsibility copy, and the prohibition on consequential hiring decisions are accepted; production use remains subject to the documented legal, security, privacy, data, QA, and recruitment review.",
+      "evidence_url": "specs/spec-recruiter-advisory-assistance.html"
     }
   ]
 }

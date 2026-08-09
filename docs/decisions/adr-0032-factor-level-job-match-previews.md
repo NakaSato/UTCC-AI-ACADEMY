@@ -2,10 +2,10 @@
 id: ADR-0032
 type: adr
 title: Start matching with candidate-owned factor previews instead of consequential ranking
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -38,9 +38,10 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, Privacy, Security, Recruitment, and QA
-> owners must approve any numeric score, recruiter-facing candidate view,
-> override policy, evaluation dataset, or screening use.
+> **Decision state:** Accepted by the user on 2026-08-08 for candidate-owned,
+> factor-level, provider-neutral job-match previews. Numeric scores,
+> recruiter-facing candidate views, override policies, screening use, and other
+> consequential ranking remain prohibited.
 
 ## Context
 

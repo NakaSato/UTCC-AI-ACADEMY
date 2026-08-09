@@ -2,10 +2,10 @@
 id: ADR-0031
 type: adr
 title: Keep job discovery candidate-controlled and advisory
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -44,8 +44,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, Privacy, Security, and Recruitment owners
-> must approve alert delivery, retention, evaluation, and any future ranking use.
+> **Decision state:** Accepted by the user on 2026-08-08 for candidate-controlled
+> search, saved/dismissed jobs, explainable advisory recommendations, consented
+> in-app alerts, and privacy boundaries. No consequential ranking is authorized.
 
 ## Context
 

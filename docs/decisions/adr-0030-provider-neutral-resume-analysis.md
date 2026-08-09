@@ -2,10 +2,10 @@
 id: ADR-0030
 type: adr
 title: Keep resume analysis provider-neutral, evidence-bound, and candidate-reviewed
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -43,9 +43,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, Privacy, Security, and Recruitment owners
-> must approve the provider, retention, subgroup measurement, and downstream-use
-> policy before a production model is connected.
+> **Decision state:** Accepted by the user on 2026-08-08 for the provider-neutral,
+> evidence-bound, candidate-reviewed resume-analysis boundary. No production
+> model provider or consequential downstream use is selected or authorized.
 
 ## Context
 

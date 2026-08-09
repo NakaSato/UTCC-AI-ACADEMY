@@ -2,10 +2,10 @@
 id: ADR-0033
 type: adr
 title: Keep recruitment applications candidate-owned with an auditable organization-scoped pipeline
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -38,9 +38,10 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. Product, Privacy, Security, Recruitment, and QA
-> owners must approve the application disclosure, retention, and stage policy
-> before production use.
+> **Decision state:** Accepted by the user on 2026-08-09 for candidate-owned
+> consented applications, organization-scoped recruiter review, explicit stage
+> transitions, withdrawal, bilingual next actions, event history, and audit
+> boundaries.
 
 ## Context
 

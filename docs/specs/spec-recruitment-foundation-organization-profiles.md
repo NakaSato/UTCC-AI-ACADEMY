@@ -2,10 +2,10 @@
 id: SPEC-0024
 type: spec
 title: Recruitment foundation organization membership and candidate profiles
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -50,9 +50,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-003, SKILL-TEST-001]
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft for Product Owner and Tech Lead review. This
-> specification records the first implementation slice; it does not accept the
-> full AI Recruitment Platform roadmap.
+> **Review state:** Accepted by the user on 2026-08-08 for the first
+> implementation slice. This specification does not accept the full AI
+> Recruitment Platform roadmap.
 
 ## Problem
 
@@ -106,23 +106,23 @@ candidate data to other users.
 
 ## Acceptance Criteria
 
-- [ ] An administrator can create an organization and assign one non-admin
+- [x] An administrator can create an organization and assign one non-admin
       account as its owner (test/controllers/recruitment/organizations_controller_test.rb).
-- [ ] A student or instructor cannot create an organization or grant a
+- [x] A student or instructor cannot create an organization or grant a
       membership (test/controllers/recruitment/organizations_controller_test.rb).
-- [ ] An administrator can grant recruiter, hiring-manager, or mentor
+- [x] An administrator can grant recruiter, hiring-manager, or mentor
       membership and can revoke a non-owner membership
       (test/controllers/recruitment/organizations_controller_test.rb).
-- [ ] A duplicate membership and a second active owner are rejected by the
+- [x] A duplicate membership and a second active owner are rejected by the
       model/database boundary (test/models/organization_membership_test.rb).
-- [ ] A member can view their organization, while a non-member receives a safe
+- [x] A member can view their organization, while a non-member receives a safe
       not-found response (test/controllers/recruitment/organizations_controller_test.rb).
-- [ ] A student can create and update a private candidate profile, and another
+- [x] A student can create and update a private candidate profile, and another
       authenticated user cannot read it (test/controllers/recruitment/candidate_profiles_controller_test.rb).
-- [ ] Candidate profile visibility cannot grant access through an organization
+- [x] Candidate profile visibility cannot grant access through an organization
       route because no such route exists in this slice
       (test/controllers/recruitment/candidate_profiles_controller_test.rb).
-- [ ] Organization creation and membership changes produce audit events
+- [x] Organization creation and membership changes produce audit events
       (test/controllers/recruitment/organizations_controller_test.rb).
 
 ## Error and Boundary Cases

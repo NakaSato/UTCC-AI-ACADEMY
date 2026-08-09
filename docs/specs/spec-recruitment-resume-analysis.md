@@ -42,6 +42,10 @@ min_reviewer_skills: [SKILL-ARCH-004, SKILL-TEST-001, SKILL-AI-001, SKILL-AI-002
 
 # Candidate-Controlled Provider-Neutral Resume Analysis
 
+> **Review state:** Accepted by the user on 2026-08-08 for the first
+> provider-neutral, candidate-reviewed implementation slice. No production model
+> provider or consequential downstream use is authorized.
+
 > [Executable Specifications](README.md) ·
 > [Resume-analysis boundary ADR](../decisions/adr-0030-provider-neutral-resume-analysis.md) ·
 > [Candidate-profile specification](spec-recruitment-candidate-profile.md) ·
@@ -110,14 +114,14 @@ The source types mean:
 
 ## Acceptance Criteria
 
-- [ ] A student can request an analysis only after attaching a resume.
-- [ ] A student can inspect evidence, confidence, source type, and uncertainty.
-- [ ] A student can correct, accept, or reject findings before application.
-- [ ] Accepted compatible findings become provenance-aware profile facts only when
+- [x] A student can request an analysis only after attaching a resume.
+- [x] A student can inspect evidence, confidence, source type, and uncertainty.
+- [x] A student can correct, accept, or reject findings before application.
+- [x] Accepted compatible findings become provenance-aware profile facts only when
       the student explicitly applies them.
-- [ ] Unsupported binary files disclose that their text was not parsed.
-- [ ] Another student or staff account cannot read or mutate the analysis.
-- [ ] Analysis and review actions are audited.
+- [x] Unsupported binary files disclose that their text was not parsed.
+- [x] Another student or staff account cannot read or mutate the analysis.
+- [x] Analysis and review actions are audited.
 
 ## Verification
 

@@ -2,10 +2,10 @@
 id: SPEC-0029
 type: spec
 title: Structured, consented, and portable candidate profiles
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -45,8 +45,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-004, SKILL-TEST-001, SKILL-AI-0
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft. Privacy and Product owners must confirm retention,
-> disclosure, application reuse, and attachment policy.
+> **Review state:** Accepted by the user on 2026-08-08 for the first structured
+> candidate-profile implementation slice, including consent, portability,
+> provenance, attachment, export, and deletion boundaries.
 
 ## Problem
 
@@ -92,13 +93,13 @@ not receive data without an explicit visibility and reuse decision.
 
 ## Acceptance Criteria
 
-- [ ] A student can save and correct structured profile fields and repeatable
+- [x] A student can save and correct structured profile fields and repeatable
       facts.
-- [ ] A student can upload/remove resume and portfolio files within limits.
-- [ ] A student can choose visibility and application-data reuse independently.
-- [ ] Fact export preserves source and confidence metadata.
-- [ ] A student can download an export and permanently delete their profile.
-- [ ] Other students and staff cannot access the profile self-service data.
+- [x] A student can upload/remove resume and portfolio files within limits.
+- [x] A student can choose visibility and application-data reuse independently.
+- [x] Fact export preserves source and confidence metadata.
+- [x] A student can download an export and permanently delete their profile.
+- [x] Other students and staff cannot access the profile self-service data.
 
 ## Boundary Cases
 

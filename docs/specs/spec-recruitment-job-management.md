@@ -2,10 +2,10 @@
 id: SPEC-0026
 type: spec
 title: Recruitment organization job management and publication workflow
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -42,9 +42,8 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-TEST
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft for Product Owner, Tech Lead, Security/Privacy, and
-> recruitment-domain review. This is the first M2 slice, not the full hiring
-> workflow.
+> **Review state:** Accepted by the user on 2026-08-08 for the first M2
+> implementation slice. This is not the full hiring workflow.
 
 ## Problem
 
@@ -120,23 +119,23 @@ Draft ──submit──> Review ──publish──> Published ──pause─�
 
 ## Acceptance Criteria
 
-- [ ] An authorized organization member can create and edit a structured draft
+- [x] An authorized organization member can create and edit a structured draft
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
-- [ ] A mentor and a non-member cannot mutate or read organization job posts
+- [x] A mentor and a non-member cannot mutate or read organization job posts
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
-- [ ] A recruiter can submit a complete draft for review, while only an owner
+- [x] A recruiter can submit a complete draft for review, while only an owner
       or hiring manager can publish it
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
-- [ ] Published jobs are visible through the candidate-facing surface, while
+- [x] Published jobs are visible through the candidate-facing surface, while
       drafts, paused, closed, archived, and expired jobs are not
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
-- [ ] Pause, close, archive, request-changes, and draft-only delete enforce the
+- [x] Pause, close, archive, request-changes, and draft-only delete enforce the
       lifecycle and role rules
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
-- [ ] Invalid salary ranges, missing publication fields, unknown statuses, and
+- [x] Invalid salary ranges, missing publication fields, unknown statuses, and
       illegal transitions are rejected without partial writes
       (`test/models/recruitment/job_post_test.rb`).
-- [ ] Job creation, updates, publication, and closure are auditable without
+- [x] Job creation, updates, publication, and closure are auditable without
       storing candidate or secret data
       (`test/controllers/recruitment/job_posts_controller_test.rb`).
 

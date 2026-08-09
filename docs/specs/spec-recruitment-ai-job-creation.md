@@ -2,10 +2,10 @@
 id: SPEC-0027
 type: spec
 title: Provider-neutral recruitment job suggestions and human review
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -45,9 +45,9 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-004, SKILL-AI-002, SKILL-TEST-0
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft for Product Owner, Tech Lead, Security/Privacy, and
-> Recruitment Domain review. The first provider is a labelled local preview,
-> not an external AI integration.
+> **Review state:** Accepted by the user on 2026-08-08 for the first
+> provider-neutral implementation slice. The provider is a labelled local
+> preview, not an external AI integration.
 
 ## Problem
 
@@ -112,22 +112,22 @@ inventing a model provider or sending candidate data to an external service.
 
 ## Acceptance Criteria
 
-- [ ] An authorized job author can generate labelled suggestions from employer
+- [x] An authorized job author can generate labelled suggestions from employer
       inputs (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
-- [ ] A suggestion displays its provider, source, uncertainty, and review state
+- [x] A suggestion displays its provider, source, uncertainty, and review state
       (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
-- [ ] An author can edit and accept a summary suggestion, which updates an
+- [x] An author can edit and accept a summary suggestion, which updates an
       editable job without publishing it
       (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
-- [ ] An author can reject and regenerate a suggestion without changing the
+- [x] An author can reject and regenerate a suggestion without changing the
       job status (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
-- [ ] Mentors and non-members cannot generate or review suggestions
+- [x] Mentors and non-members cannot generate or review suggestions
       (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
-- [ ] Suggestions reject invalid kinds, statuses, blank content, and invalid
+- [x] Suggestions reject invalid kinds, statuses, blank content, and invalid
       provenance (`test/models/recruitment/job_post_suggestion_test.rb`).
-- [ ] Published jobs cannot be overwritten by accepting a suggestion
+- [x] Published jobs cannot be overwritten by accepting a suggestion
       (`test/models/recruitment/job_post_suggestion_test.rb`).
-- [ ] Generation and review actions are auditable
+- [x] Generation and review actions are auditable
       (`test/controllers/recruitment/job_suggestions_controller_test.rb`).
 
 ## Error and Boundary Cases

@@ -2,10 +2,10 @@
 id: ADR-0027
 type: adr
 title: Persist provider-neutral job suggestions with human review
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -41,10 +41,9 @@ agent_writable: true
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This increment creates the review boundary and a
-> rules-based preview provider; a human Product, Technical, Security/Privacy,
-> and Recruitment Domain review is required before connecting an external AI
-> provider.
+> **Decision state:** Accepted by the user on 2026-08-08 for the provider-neutral
+> rules-based preview and human-review boundary. No external AI provider is
+> selected or authorized by this decision.
 
 ## Context
 

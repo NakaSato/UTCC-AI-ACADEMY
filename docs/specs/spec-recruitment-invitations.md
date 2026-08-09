@@ -2,10 +2,10 @@
 id: SPEC-0025
 type: spec
 title: Recruitment organization invitations for registered users
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -43,8 +43,8 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-TEST
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Review state:** Draft for Product Owner, Tech Lead, and Security/Privacy
-> review. This spec covers registered-user invitations only; it does not accept
+> **Review state:** Accepted by the user on 2026-08-08 for the first invitation
+> slice. This spec covers registered-user invitations only; it does not accept
 > external company onboarding or email delivery.
 
 ## Problem
@@ -95,21 +95,21 @@ allow a copied invitation token to be redeemed by another account.
 
 ## Acceptance Criteria
 
-- [ ] An active organization owner can invite an existing non-admin user with a
+- [x] An active organization owner can invite an existing non-admin user with a
       permitted role and the invitee receives an in-app notification
       (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
-- [ ] A non-owner member cannot create an invitation, and an administrator can
+- [x] A non-owner member cannot create an invitation, and an administrator can
       create one (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
-- [ ] An invitation is visible and actionable only to its intended invitee
+- [x] An invitation is visible and actionable only to its intended invitee
       (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
-- [ ] The invitee can accept once and receives an organization membership with
+- [x] The invitee can accept once and receives an organization membership with
       the invited role (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
-- [ ] The invitee can decline once without receiving organization access
+- [x] The invitee can decline once without receiving organization access
       (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
-- [ ] Duplicate pending invitations, invalid roles, administrator invitees,
+- [x] Duplicate pending invitations, invalid roles, administrator invitees,
       self-invitations, and expired tokens are rejected
       (`test/models/organization_invitation_test.rb`).
-- [ ] Invitation state transitions and membership creation are auditable, and
+- [x] Invitation state transitions and membership creation are auditable, and
       token values do not appear in audit parameters
       (`test/controllers/recruitment/organization_invitations_controller_test.rb`).
 

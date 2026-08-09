@@ -2,11 +2,11 @@
 id: ADR-0011
 type: adr
 title: Define course-completion certificate policy
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-02
-updated: 2026-08-02
-review_by: 2026-08-09
+updated: 2026-08-08
+review_by: 2026-08-15
 supersedes: []
 superseded_by: []
 depends_on: [SPEC-0003]
@@ -25,10 +25,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Define course-completion certificate policy
 
-> **Decision state:** Agent-prepared draft. The Product Owner and academic owner
-> must decide whether a course completion is an institutional certificate, what
-> evidence it represents, who may issue it, and whether third parties may verify
-> it before any certificate artifact is generated.
+> **Decision state:** Accepted by the user on 2026-08-08 as a deferral. M6 will
+> not generate, issue, download, verify, or revoke certificate artifacts. The
+> existing completion counter remains truthful progress telemetry, not proof of
+> an institutional credential.
 
 > [Decision Records](README.md) ·
 > [M6 certificate specification](../specs/spec-m6-course-completion-certificates.md) ·
@@ -59,6 +59,11 @@ credential that employers or universities may rely on.
 5. If the policy is not approved, the interface may show course completion but
    must not present it as a downloadable or verifiable certificate.
 
+The user approved the deferral alternative on 2026-08-08. A future certificate
+policy requires a new accepted decision covering academic meaning, issuer,
+evidence, identity disclosure, verification, revocation, privacy, retention,
+and operational ownership before any artifact work resumes.
+
 ## Alternatives
 
 ### Completion letter without verification
@@ -74,7 +79,7 @@ authenticated verification response. It supports trust and revocation, but
 requires issuer authority, identity proof, privacy policy, key custody,
 verification availability, and a lifecycle for corrections and withdrawal.
 
-### Do not generate a certificate in M6
+### Selected for M6 — do not generate a certificate
 
 Keeps the current completion count honest and avoids an institutional claim until
 academic policy exists. It delays the learner-facing document but is the safest
@@ -107,6 +112,8 @@ default when ownership is unresolved.
 ## Fitness Functions
 
 - `bin/docs` validates the decision record and its human-review metadata.
+- The accepted M6 deferral keeps completion counts truthful and exposes no
+  certificate download or verification claim.
 - Future tests must prove certificate eligibility, identity disclosure,
   revocation/correction behavior, and that non-certificate courses cannot issue
   an artifact.
