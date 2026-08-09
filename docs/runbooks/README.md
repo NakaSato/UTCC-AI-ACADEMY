@@ -12,3 +12,4 @@ operating a production dependency or recovery procedure.
 - [RB-0002 — Triage critical failure telemetry](rb-critical-failure-observability.md) — draft; provider-neutral contract and controlled verification only
 - [RB-0003 — Verify backup freshness and isolated restore evidence](rb-backup-restore-verification.md) — draft; provider-neutral contract and synthetic drill verification only
 - [RB-0004 — Deploy and roll back the Render production image](rb-render-deployment.md) — draft; target and release procedure, no live credentials
+- [RB-0005 — Upgrade the production PostgreSQL database from 17 to 18](rb-postgres-18-upgrade.md) — draft; provider-dashboard procedure, dev/test already on 18
