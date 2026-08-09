@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T15:20:00+07:00",
+  "updated_at": "2026-08-09T16:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1982,6 +1982,41 @@
         }
       ],
       "updated_at": "2026-08-09T15:20:00+07:00"
+    },
+    {
+      "id": "INT-001",
+      "title": "Define the student-initiated internship request, placement, and progress boundary",
+      "status": "verification",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security Owner, Privacy Owner, Academic Owner, Recruitment Domain Owner, and QA Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "BIZ-002"
+      ],
+      "blocker": {
+        "summary": "ADR-0041 and SPEC-0041 are drafted and record that the roadmap M11 first slice is already shipped as SPEC-0028; the genuine remainder is student-initiated requests, placements, progress reports, and faculty oversight. Nothing is authorized yet.",
+        "decision_owner": "Product Owner and Academic Owner",
+        "next_action": "Answer ADR-0041 human decision 1 — whether a student may direct a request at a company with no published position. A no withdraws the request layer and reduces the scope to placements, progress reporting, and faculty oversight over the existing application."
+      },
+      "evidence": [
+        {
+          "label": "Student internship request boundary ADR",
+          "url": "decisions/adr-0041-student-internship-request-boundary.html"
+        },
+        {
+          "label": "Student internship request specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Shipped internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        },
+        {
+          "label": "M11 roadmap context",
+          "url": "roadmap.html#milestone-m11--student-internship-request-platform"
+        }
+      ],
+      "updated_at": "2026-08-09T16:00:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3605,6 +3640,14 @@
       "to": "complete",
       "summary": "The user asked for a company-side user role. A global company account role was rejected because ADR-0040 decision 1 forbids one, so the role was added on the existing organization membership axis instead: company_reviewer joins owner, recruiter, hiring_manager, and mentor. It runs business cases alongside the single active owner (BusinessCase::MANAGER_ROLES), and carries the recruitment authoring, application-review, and reporting reach of the hiring roles, but deliberately not job publication-approval authority, which stays with owner and hiring_manager. ADR-0024, ADR-0025, ADR-0038, SPEC-0024, SPEC-0025, SPEC-0040, and the job-management, reporting, and conversation specs were amended to match; the invitation role check constraint was migrated.",
       "evidence_url": "decisions/adr-0024-recruitment-organization-membership.html"
+    },
+    {
+      "at": "2026-08-09T16:00:00+07:00",
+      "item_id": "INT-001",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Drafted ADR-0041 and SPEC-0041 for the M11 Student Internship Request Platform and scoped them against the shipped internship domain. The roadmap baseline was corrected: company positions and evaluations already exist under SPEC-0028, so M11 recommended first slice is largely implemented. The genuine remainder is a student-initiated request to a company with no published position, a placement record separating an approved request from a finished internship, periodic progress reports, and an explicit faculty actor. Documents, academic credit, interviews, email, notifications, and REST APIs are excluded. Eleven human decisions are recorded and the first is blocking: if a request must always target a published position, the request layer is withdrawn because that is the shipped application.",
+      "evidence_url": "decisions/adr-0041-student-internship-request-boundary.html"
     }
   ]
 }

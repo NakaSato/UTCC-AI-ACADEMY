@@ -1577,10 +1577,25 @@ Platform M11 AI Candidate Agent.
 
 **Status:** Proposal — not implemented
 
-No internship-request, internship-position, assignment, weekly-report, or
-evaluation workflow exists in the current application. The requirements below
-describe the proposed future capability and require Product Owner, university,
-company-partner, security/privacy, and technical review before execution.
+Corrected 2026-08-09: company internship **positions and evaluations already
+exist** and ship under
+[SPEC-0028](specs/spec-recruitment-internship-management.md) —
+`Recruitment::InternshipProgram` with capacity and a mentor,
+`Recruitment::InternshipApplication` (one student application per published
+program, with accept, reject, and withdraw), and one
+`Recruitment::InternshipEvaluation` per accepted application. What does not
+exist is a student-initiated **request** to a company that has published no
+position, a **placement** record for the internship after acceptance, a
+**progress report**, and any **faculty** actor in the internship path.
+
+Consequently the recommended first vertical slice in §12 below is already
+largely implemented. The genuine remainder is scoped by
+[ADR-0041](decisions/adr-0041-student-internship-request-boundary.md) and
+[SPEC-0041](specs/spec-student-internship-requests.md), which are drafts: they
+authorize no route, record, upload, or academic decision, and ADR-0041's first
+human decision determines whether the request layer is built at all. The
+requirements below still require Product Owner, university, company-partner,
+security/privacy, and technical review before execution.
 
 ### 1. Executive Summary
 

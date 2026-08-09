@@ -1,0 +1,300 @@
+---
+id: ADR-0041
+type: adr
+title: Define a student-initiated internship request, placement, and progress boundary
+status: draft
+owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
+created: 2026-08-09
+updated: 2026-08-09
+review_by: 2026-08-21
+supersedes: []
+superseded_by: []
+depends_on: [ADR-0024, ADR-0028, ADR-0033, ADR-0036, ADR-0040]
+implemented_by:
+  - SPEC-0041
+touches:
+  - app/models
+  - app/services
+  - app/controllers
+  - app/views
+  - config/routes.rb
+  - config/locales/en.yml
+  - config/locales/th.yml
+  - db/migrate
+  - test
+  - docs/runbooks
+enforced_by: []
+agent_writable: true
+requires_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC-001, SKILL-SPEC-002]
+min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
+---
+
+# Define a Student-Initiated Internship Request, Placement, and Progress Boundary
+
+> **Decision state:** Draft for Product Owner, Tech Lead, Security Owner,
+> Privacy Owner, Academic Owner, Recruitment Domain Owner, and QA Owner review.
+> This record authorizes no internship-request route, placement record, progress
+> report, document upload, faculty workflow, notification, or academic decision.
+> One of the human decisions below determines whether the central capability is
+> built at all.
+
+> [Decision Records](README.md) ·
+> [Student internship request specification](../specs/spec-student-internship-requests.md) ·
+> [Existing internship management](../specs/spec-recruitment-internship-management.md) ·
+> [Student Internship Request Platform roadmap](../roadmap.md#milestone-m11--student-internship-request-platform) ·
+> [Project Development Flow](../development-flow.md)
+
+## Context
+
+The M11 roadmap track proposes a Student Internship Request Platform. Before
+designing it, the existing internship capability has to be stated accurately,
+because the roadmap's own baseline is wrong on two counts.
+
+The roadmap says "No internship-request, internship-position, assignment,
+weekly-report, or evaluation workflow exists in the current application."
+Positions and evaluations do exist. ADR-0028 and SPEC-0028 ship
+`Recruitment::InternshipProgram` (a company-owned position with capacity, a
+mentor, a draft/review/published/paused/closed/archived lifecycle, and
+publication gated on completeness), `Recruitment::InternshipApplication` (a
+student-created application with pending/accepted/rejected/withdrawn status,
+one per student per program, capacity-checked acceptance), and
+`Recruitment::InternshipEvaluation` (one structured evaluation per accepted
+application, written by the assigned mentor or an authorized reviewer).
+SPEC-0036 adds advisory, provider-neutral preparation guidance for the student.
+
+This matters because the roadmap's recommended first vertical slice —
+"Complete student profile → select partner position → submit request → company
+review → auditable approve/reject decision" — is, with the exception of the
+profile-completeness gate, **already implemented**. Building it again as a
+second internship domain would produce two overlapping request models, two
+capacity rules, and two places where a student's internship outcome lives.
+
+What genuinely does not exist is narrower and clearer:
+
+1. A request a student can initiate toward a company that has **published no
+   position** — the "company-directed request" the roadmap contrasts with a
+   vacancy-first portal.
+2. A **placement** record: the approved, in-progress internship itself, with a
+   planned/active/completed lifecycle distinct from the request decision. Today
+   an `accepted` application is the terminal company-side state, so an approved
+   request and a finished internship are indistinguishable.
+3. **Progress reporting**: periodic activity, hours, outcomes, blockers, and
+   supervisor acknowledgement. Nothing in the repository records these.
+4. A **faculty actor** in the internship path. The internship domain authorizes
+   entirely through company `OrganizationMembership` roles; the `instructor`
+   account role grants no internship authority, and `users.faculty` is only a
+   free-text profile string.
+
+## Problem frame
+
+- **Affected users:** Students seeking an internship the catalogue does not
+  cover, company supervisors hosting them, faculty accountable for academic
+  eligibility and oversight, and the operators responsible for student
+  document privacy.
+- **Current behavior:** A student may apply only to an already-published
+  program, and only one application per program. There is no way to approach a
+  company without a position, no record of the internship after acceptance, no
+  progress log, and no academic participation.
+- **Failure risk:** A duplicate internship domain that contradicts SPEC-0028; a
+  student's résumé or portfolio exposed to a company that never hosted them; an
+  approved request silently read as a completed internship; a progress report
+  or evaluation treated as an academic grade without an academic decision.
+- **Design outcome:** One internship domain in which company positions and
+  applications stay where they are, and a new bounded context owns
+  student-initiated requests, placements, and progress — with academic
+  consequences remaining human decisions.
+
+## Decision
+
+1. **Do not re-implement position publication or program applications.**
+   `Recruitment::InternshipProgram`, `Recruitment::InternshipApplication`, and
+   `Recruitment::InternshipEvaluation` remain the single authority for
+   company-published positions, applications against them, and the existing
+   end-of-internship evaluation. M11 adds no second position model and no
+   second application model.
+
+2. **A request is a distinct record only where it does something an application
+   cannot: address a company with no published position.** If the Product Owner
+   and academic owner decide (decision 1 below) that a request must always
+   target a published position, then this record's request layer is withdrawn
+   and M11 reduces to placements, progress reporting, and faculty oversight
+   built on the existing application. That reduction is the expected outcome of
+   a "no" answer, not a failure.
+
+3. **A placement is separate from the decision that produced it.** Approval
+   creates a placement in a `planned` state; a placement moves to `active` and
+   then `completed` only through explicit, authorized action. No approval, and
+   no report, ever marks an internship complete by implication.
+
+4. **Requests and placements are private to their participants.** A student
+   reads only their own; a company reads only those addressed to it; a faculty
+   reviewer reads only those they are assigned to. Organization membership alone
+   is not access, and an unauthorized identifier discloses nothing — the same
+   fail-closed rule ADR-0040 established for business cases.
+
+5. **Faculty authority is an explicit assignment, never an account role.** As
+   with business-case mentors, holding `instructor` grants nothing; an
+   assignment record scoped to the request or placement does. Which account
+   role may hold such an assignment is decision 2 below.
+
+6. **No student documents are accepted until the document contract exists.**
+   Résumés, portfolios, and deliverables are the roadmap's most sensitive
+   payload and the platform has no upload surface for them. Private storage,
+   authorization-rechecked expiring access, type and size limits, scanning,
+   retention, export, deletion, and consent must all be recorded first. Until
+   then requests carry structured text only.
+
+7. **Progress reports are evidence, not assessment.** A report records what the
+   student did and what a supervisor acknowledged. It produces no score, no
+   ranking, no completion, and no academic record.
+
+8. **Nothing here touches academic records.** SPEC-0028 already excludes
+   academic credit and its invariants forbid any action that alters academic
+   records; this record inherits that. Whether an evaluation, a report, or a
+   completed placement carries credit or hours is an institutional decision
+   recorded outside the platform before any such field exists.
+
+9. **Interviews, email, notifications beyond the existing in-app bell, REST
+   APIs, and AI matching or evaluation assistance are out of the first slice.**
+   Email stays deferred under ADR-0004.
+
+10. **The new context gets its own namespace.** Every shipped internship model,
+    table, controller, route, and locale key is prefixed `recruitment_` /
+    `Recruitment::` / `recruitment.internships`, and the `/internships` path is
+    taken by program browsing. The new records therefore live in their own
+    top-level namespace with their own table prefix and route scope, so no
+    reader has to guess which internship domain a name belongs to.
+
+## Proposed bounded context
+
+| Context | Owns | Must not own |
+| --- | --- | --- |
+| Recruitment internship management (SPEC-0028) | Company positions, capacity, applications against a position, the existing per-application evaluation | Student-initiated requests without a position, placements, progress reports, faculty authority |
+| Student internship requests (this record) | Student-initiated requests, company-directed requests, request decisions, placements, progress reports, faculty assignment and academic review | Position publication, program applications, candidate profiles, course grades, credit |
+| Organization identity (ADR-0024) | Users, organizations, memberships, company roles | Request-specific or placement-specific access grants |
+| Academic platform | Courses, enrolments, progress, grades | Internship request content, company data, placement evidence |
+| Platform administration | Support access, configuration, audit evidence | Unbounded reading of student documents or company request content |
+
+## Trust boundaries and minimum controls
+
+| Boundary | Valuable assets | Minimum control | Failure behavior |
+| --- | --- | --- | --- |
+| Student → company request | Résumé, portfolio, learning goals, personal data | Explicit student submission with recorded consent scope | No company read before submission; withdrawal stops further access |
+| Company → request queue | Other students' requests, competitor-visible data | Membership plus request-scoped authorization | Safe not-found; no cross-company request disclosure |
+| Faculty → request/placement | Student academic standing, company data | Explicit assignment plus academic-owner policy | No access from `instructor` alone |
+| Request → placement | Approval authority, internship reality | Separate authorized transition, never implied by approval | An approved request is not an internship |
+| Placement → progress report | Hours, activity, supervisor feedback | Author is the placed student; acknowledgement is the supervisor | Report is evidence only; no score, no completion, no credit |
+| Any record → academic outcome | Credit, hours, transcript | Human institutional decision outside the platform | No field exists to hold it in the first slice |
+| Documents → storage | Résumés, portfolios, deliverables | Deferred entirely until the document contract is recorded | No upload surface exists; enforced by test |
+
+## Alternatives
+
+### Extend `Recruitment::InternshipApplication` with the new states
+
+The roadmap proposes Draft, Submitted, Under Review, Interview, Approved,
+Rejected, and Completed against the shipped `pending/accepted/rejected/
+withdrawn`. Adding them here would make one record mean both "I am asking" and
+"I am interning", and `Completed` on an application is exactly the conflation
+the roadmap itself warns against. Rejected — but note that if decision 1
+returns "no", extending the application with a *draft* state and adding
+placements alongside it becomes the cheapest correct design.
+
+### Build the roadmap's recommended first slice as written
+
+Rejected as largely redundant: position selection, request submission, company
+review, and an audited approve/reject decision are SPEC-0028's shipped
+application flow. Only the profile-completeness gate and the company-directed
+request are new.
+
+### Give faculty access through the `instructor` account role
+
+Rejected for the same reason ADR-0040 rejected it for mentors: a role held for
+teaching a course is not consent to read a specific student's internship
+documents and a company's request content.
+
+### Accept résumés and portfolios in the first slice
+
+Rejected. These are the highest-sensitivity records in the track and would
+commit the platform to a storage, scanning, retention, and consent contract
+that does not exist. Structured text first.
+
+### Create a separate faculty or company identity store
+
+Rejected, consistent with ADR-0040 decision 1 and SPEC-0024: one `User`
+identity, with authority expressed as memberships and assignments.
+
+## Consequences
+
+- One internship domain gains a second bounded context, so every future
+  internship change starts by asking which context owns it. The alternative —
+  two overlapping request models — is worse.
+- The answer to decision 1 can shrink this record substantially. That is
+  intended: the boundary is written so a "no" removes a layer rather than
+  invalidating the design.
+- A placement lifecycle separate from the request decision means more records
+  than a single status column, and in exchange an approved request can never be
+  mistaken for a finished internship.
+- Faculty oversight becomes an explicit, auditable assignment rather than an
+  implicit consequence of teaching.
+- Because documents are deferred, the first slice cannot satisfy the roadmap's
+  résumé and portfolio requirements. Those wait for their own contract.
+- Academic credit stays outside the platform, so the institution keeps the
+  authority the roadmap says it must keep.
+
+## Fitness Functions
+
+- `bin/docs` validates this record's lifecycle metadata, skill references, and
+  links.
+- No internship-request, placement, or progress-report route, model, or table
+  ships before the human decisions below are recorded; a design-gate test
+  enforces this.
+- No business-case-style upload surface exists for student documents: no
+  attachment route and no Active Storage attachment on any record in this
+  context, enforced by test.
+- A request, placement, progress report, and faculty assignment always resolves
+  to exactly one student and one company, and a non-participant receives a safe
+  not-found.
+- No request decision, placement transition, or progress report writes to
+  course progress, grades, certificates, or a recruitment application stage.
+- An approved request never sets a placement to `completed`, and no report
+  transition marks an internship complete.
+- Consequential actions produce privacy-safe audit evidence carrying no
+  document content, personal identifiers beyond the acting user, or free-text
+  student data.
+
+## Human decisions required
+
+The agent can draft models and controls but cannot decide these. Decision 1
+determines whether the request layer is built at all.
+
+1. **Whether a student may direct a request at a company with no published
+   position.** If not, the request layer here is withdrawn and M11 becomes
+   placements, progress reporting, and faculty oversight over the existing
+   application.
+2. Which account role represents faculty for internship purposes, whether
+   `instructor` is that role, who may assign a faculty reviewer, and what
+   academic eligibility and approval authority they hold.
+3. Student eligibility, whether a student may hold more than one active
+   request, and how withdrawal, duplicate requests, expiry, and rejection
+   behave — including whether a rejected student may re-approach the same
+   company, which the shipped one-application-per-program index forbids today.
+4. Company verification: which organizations may receive requests, and whether
+   faculty or administrator approval precedes that.
+5. The document contract for résumés, portfolios, and deliverables — formats,
+   scanning, size limits, private storage, retention, export, deletion,
+   post-internship access, and consent — before any upload exists.
+6. Report cadence, required fields, whether hours are recorded, who
+   acknowledges a report, and what happens when reports are missed.
+7. Visibility: which reports, deliverables, evaluations, and scores each of
+   student, company supervisor, faculty, and administrator may read.
+8. Whether any internship result affects academic credit or hours, and if so
+   the institutional record that holds it — this platform holds none until
+   decided.
+9. Whether interviews are scheduled and persisted in the platform, and whether
+   evaluation gains the roadmap's seven rubric dimensions by extending
+   SPEC-0028's evaluation or by a placement-scoped record.
+10. Notification policy and the production email owner, if reminders are in
+    scope; email remains deferred under ADR-0004.
+11. Retention, export, and deletion for requests, placements, reports, and
+    audit evidence, and the cross-track data-model decision for student, skill,
+    company, and outcome data shared with the recruitment platform.
