@@ -80,6 +80,11 @@ module AdminConsole
   ROLE_FILTERS = [ :all, *User::ROLES.map(&:to_sym) ].freeze
   LEVEL_FILTERS = %i[ all info warn ].freeze
 
+  # What an admin can create a console account as. Two of the three are roles on
+  # the user; "company" is not, and never becomes one — a company account is an
+  # ordinary account plus an active organization membership. See ADR-0024.
+  CONSOLE_ACCESS = %w[ instructor admin company ].freeze
+
   # ---- Audit log ------------------------------------------------------------
 
   # The rows are NOT here any more — they are `audit_events`, written by the

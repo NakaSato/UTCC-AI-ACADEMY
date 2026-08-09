@@ -51,3 +51,10 @@
 <%= render "shared/auth_sso" %>
 
 <p class="mt-6.5 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("auth.login.help") %></p>
+
+<%# The way to the other door. Without it /console is a URL you have to be told
+    about, and the people it is for are the ones least likely to be told. %>
+<p class="mt-4 text-14">
+  <%= link_to t("auth.login.console_link"), console_path,
+        class: "font-medium text-brand hover:text-brand-deep" %>
+</p>

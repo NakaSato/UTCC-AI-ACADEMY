@@ -1,5 +1,10 @@
 <%# The ink half of the auth split: brand, the pitch, and the disclaimer the
-    language toggle sits beside. %>
+    language toggle sits beside.
+
+    `scope` picks which pitch — "auth" for the student screens, "auth.console"
+    for the staff and company one, which is selling something else entirely. The
+    brand, the disclaimer and the footer are the site's and do not move. %>
+<% scope = local_assigns.fetch(:scope, "auth") %>
 <div class="flex flex-col justify-between gap-12 bg-chrome px-8 py-12 sm:px-12 lg:px-16 lg:py-14">
   <div class="flex items-center gap-4">
     <%= image_tag "utcc-eng-shield.svg", alt: "UTCC",
@@ -17,14 +22,14 @@
 
   <div class="max-w-[460px]">
     <h1 class="mb-4 text-32 leading-[1.18] font-bold tracking-[-0.03em] text-balance text-canvas lg:text-40">
-      <%= t("auth.hero_title") %>
+      <%= t("#{scope}.hero_title") %>
     </h1>
     <p class="mb-8 text-16-5 leading-[1.65] text-balance text-on-chrome-soft">
-      <%= t("auth.hero_body") %>
+      <%= t("#{scope}.hero_body") %>
     </p>
 
     <ul class="flex flex-col gap-3.5">
-      <% t("auth.points").each do |point| %>
+      <% t("#{scope}.points").each do |point| %>
         <li class="flex items-center gap-3.5">
           <span aria-hidden="true"
                 class="grid size-[22px] flex-none place-items-center rounded-full bg-brand text-11 text-white">✓</span>

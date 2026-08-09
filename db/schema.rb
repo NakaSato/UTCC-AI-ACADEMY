@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1016,11 +1016,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_180000) do
     t.string "name", null: false
     t.string "password_digest", null: false
     t.string "role", default: "student", null: false
-    t.string "student_id", null: false
+    t.string "student_id"
     t.integer "study_year"
     t.datetime "updated_at", null: false
+    t.string "username"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["student_id"], name: "index_users_on_student_id", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "academic_post_invitations", "academic_posts"

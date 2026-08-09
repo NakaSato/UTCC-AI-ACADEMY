@@ -1,0 +1,5 @@
+# Deliberately empty. Every test that needs an organization builds its own, so
+# there is nothing to name here — but the file has to exist, because a table the
+# seeds write and the fixtures do not know about is never cleared between them.
+# CI replants the seeds and then runs the system tests, and a leftover seeded
+# organization would outlive the users its memberships point at.

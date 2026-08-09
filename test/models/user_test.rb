@@ -11,11 +11,77 @@ class UserTest < ActiveSupport::TestCase
     assert_equal("2011071730001", user.student_id)
   end
 
-  test "student_id is required" do
+  # Required at sign-up and nowhere else: an admin-created console account has no
+  # student card. RegistrationsController is what saves in this context.
+  test "student_id is required to sign up" do
     user = User.new(name: "ว่าง", student_id: "", password: "secret-password1")
 
-    assert_not(user.valid?)
+    assert_not(user.valid?(:registration))
     assert_predicate(user.errors[:student_id], :any?)
+  end
+
+  test "an account with no identifier at all is invalid" do
+    user = User.new(name: "ไร้ชื่อเรียก", password: "secret-password1")
+
+    assert_not(user.valid?)
+    assert_predicate(user.errors[:base], :any?)
+  end
+
+  test "a username or an email address is identifier enough" do
+    [ { username: "console-one" }, { email_address: "console@example.com" } ].each do |identity|
+      user = User.new(name: "คอนโซล", password: "secret-password1", **identity)
+
+      assert_predicate(user, :valid?, "#{identity.inspect} should be enough to identify an account")
+    end
+  end
+
+  test "downcases and strips username, and blanks it to nil" do
+    assert_equal("wichai", User.new(username: " WICHAI ").username)
+    assert_nil(User.new(username: "  ").username)
+  end
+
+  test "username must be unique" do
+    duplicate = User.new(name: "ซ้ำ", username: users(:console_instructor).username,
+                         password: "secret-password1")
+
+    assert_not(duplicate.valid?)
+    assert_predicate(duplicate.errors[:username], :any?)
+  end
+
+  # The all-digit rule is load-bearing rather than cosmetic: console sign-in
+  # reads an all-digit entry as a student ID, so an all-digit username would be
+  # a name nobody could sign in with.
+  test "username must be 3-30 characters, lowercase, and contain a letter" do
+    # "Wichai" is absent on purpose: the normalizer downcases before any of this
+    # runs, so a capital is corrected rather than refused.
+    [ "ab", "a" * 31, "12345", "wichai wong", "wichai!", "-wichai", "wichai-" ].each do |bad|
+      user = User.new(name: "x", username: bad, password: "secret-password1")
+
+      assert_not(user.valid?, "#{bad.inspect} should be rejected")
+      assert_predicate(user.errors[:username], :any?)
+    end
+
+    [ "abc", "wichai", "utcc-admin", "north.star_1" ].each do |good|
+      user = User.new(name: "x", username: good, password: "secret-password1")
+
+      assert_predicate(user, :valid?, "#{good.inspect} should be accepted")
+    end
+  end
+
+  # What every screen prints where it used to print the student ID.
+  test "identifier falls back from student ID to username to email" do
+    assert_equal(users(:student).student_id, users(:student).identifier)
+    assert_equal("console-teacher", users(:console_instructor).identifier)
+    assert_equal("no-name@example.com", User.new(email_address: "no-name@example.com").identifier)
+  end
+
+  # An admin relays it once; the policy has to accept it every time.
+  test "a generated temporary password satisfies the password policy" do
+    20.times do
+      user = User.new(name: "x", username: "console-generated", password: User.generate_temporary_password)
+
+      assert_predicate(user, :valid?, "#{user.password.inspect} should satisfy the policy")
+    end
   end
 
   test "student_id must be unique" do

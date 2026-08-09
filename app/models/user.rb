@@ -117,26 +117,39 @@ class User < ApplicationRecord
   # NoMethodError instead of reporting anything. Nothing assigns it.
   attr_accessor :current_password
 
-  normalizes :student_id, with: ->(id) { id.strip.downcase }
-  # `presence` matters as much as the downcasing: the column carries a unique
-  # index and most accounts have no address, so a cleared field has to come back
-  # as NULL. Stored as "" it would collide with every other account that cleared
-  # it — and `allow_blank` on the uniqueness validation means nothing would
+  # `presence` matters as much as the downcasing: each of these columns carries a
+  # unique index and each is now optional, so a cleared field has to come back as
+  # NULL. Stored as "" it would collide with every other account that cleared
+  # it — and `allow_blank` on the uniqueness validations means nothing would
   # catch it before the index did. Same for faculty, which is free text a
   # student can empty out on the profile screen.
+  normalizes :student_id, with: ->(id) { id.strip.downcase.presence }
+  normalizes :username, with: ->(u) { u.strip.downcase.presence }
   normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
   normalizes :faculty, with: ->(f) { f.strip.presence }
 
   validates :name, presence: true, length: { maximum: 60 }
-  # The student ID is what sign-in authenticates on, so it is the required
-  # identifier: exactly 13 digits, as printed on the student card. allow_blank on
-  # format: presence already reports a blank one, and without it the student sees
-  # the same field flagged twice.
+  # The student ID is what a learner signs in with: exactly 13 digits, as printed
+  # on the student card. It is required at sign-up — the `:registration` context
+  # is what RegistrationsController saves in — and optional everywhere else,
+  # because an instructor, an administrator, or a company member has no student
+  # card and is created by an admin rather than by signing up.
   STUDENT_ID_FORMAT = /\A\d{13}\z/
+  # 3–30 characters of lowercase letters, digits, dot, dash, and underscore,
+  # starting and ending with a letter or digit. The lookahead requires at least
+  # one letter, and that is load-bearing rather than cosmetic: console sign-in
+  # reads an all-digit entry as a student ID, so an all-digit username would be
+  # a name nobody could sign in with.
+  USERNAME_FORMAT = /\A(?=[a-z0-9._-]*[a-z])[a-z0-9][a-z0-9._-]{1,28}[a-z0-9]\z/
 
-  validates :student_id, presence: true,
-                         uniqueness: { case_sensitive: false },
-                         format: { with: STUDENT_ID_FORMAT, allow_blank: true }
+  validates :student_id, presence: true, on: :registration
+  validates :student_id, uniqueness: { case_sensitive: false },
+                         format: { with: STUDENT_ID_FORMAT }, allow_blank: true
+  validates :username, uniqueness: { case_sensitive: false },
+                       format: { with: USERNAME_FORMAT }, allow_blank: true
+  # Three columns can name an account and at least one of them must, or nothing
+  # can sign in as it and no screen has anything to print beside its name.
+  validate :is_identifiable
   # Sign-up does not ask for an email, so most accounts have none. The column
   # stays unique for the accounts that do — password reset is the only thing
   # that needs it, and it can only reach a student who has one.
@@ -165,6 +178,28 @@ class User < ApplicationRecord
   # a gate written against this predicate needs no second rule for admins.
   def staff? = instructor? || admin?
 
+  # A revoked membership is not a membership — `active` is what keeps a former
+  # recruiter out of the company screens their organization still owns.
+  def company_member? = organization_memberships.active.exists?
+
+  # Who /console is for: an account with work outside the student experience,
+  # either because an admin granted it a staff role or because a company added
+  # it to an organization. Everyone else is a learner and signs in at /login.
+  def console_access? = staff? || company_member?
+
+  # What to print where a screen used to print the student ID. A learner still
+  # shows their ID; a console account shows the handle it signs in with.
+  def identifier = student_id.presence || username.presence || email_address
+
+  # The first password of an admin-created console account, shown to the admin
+  # once and never stored in the clear. Built rather than taken straight from
+  # `alphanumeric` so it always satisfies the policy above — a run of twelve
+  # letters would be rejected for having no digit.
+  def self.generate_temporary_password
+    letter = ("a".."z").to_a[SecureRandom.random_number(26)]
+    "#{letter}#{SecureRandom.alphanumeric(10)}#{SecureRandom.random_number(10)}"
+  end
+
   # Every progress figure the app shows, counted off this user's completions.
   # Memoised per instance: one request asks it for six different cuts.
   def progress = @progress ||= LearnerProgress.new(self)
@@ -181,6 +216,12 @@ class User < ApplicationRecord
   end
 
   private
+    def is_identifiable
+      return if student_id.present? || username.present? || email_address.present?
+
+      errors.add(:base, :missing_identifier)
+    end
+
     # Each rule adds its own message, so a student fixing one problem is not
     # ambushed by the next one on the following submit.
     def password_is_hard_to_guess

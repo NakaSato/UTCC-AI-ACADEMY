@@ -15,8 +15,15 @@ class AdminController < ApplicationController
       @users = @users.where(role: @role) unless @role == :all
       if @query.present?
         needle = "%#{User.sanitize_sql_like(@query)}%"
-        @users = @users.where("name LIKE :q OR student_id LIKE :q", q: needle)
+        # All three identifier columns, because a console account has no student
+        # ID and would otherwise be unfindable by anything but its name.
+        @users = @users.where(
+          "name LIKE :q OR student_id LIKE :q OR username LIKE :q OR email_address LIKE :q", q: needle
+        )
       end
+      # For the create-account form's organization select — a company account is
+      # an account plus a membership, so it needs somewhere to be a member of.
+      @organizations = Organization.active.order(:name)
     in :sections then load_sections
     # Which group of the landing page is open is the URL, like every other bit
     # of screen state; an unknown one simply opens nothing.
@@ -286,6 +293,45 @@ class AdminController < ApplicationController
     redirect_to admin_path(tab: :integrity), notice: t("flash.integrity_closed", name: user.name)
   end
 
+  # The only way a console account comes into existence. Sign-up produces
+  # learners and nothing else, and an organization invitation can only reach an
+  # account that already exists, so without this an instructor or a company
+  # member could only be made from a Rails console.
+  #
+  # No student ID is asked for and none is set: the account is named by its
+  # username, its email address, or both — see User#is_identifiable.
+  def create_console_account
+    access = params[:access].to_s
+    unless AdminConsole::CONSOLE_ACCESS.include?(access)
+      redirect_to admin_path(tab: :users), alert: t("flash.console_account_invalid")
+      return
+    end
+
+    organization = Organization.active.find_by(id: params[:organization_id]) if access == "company"
+    if access == "company" && organization.nil?
+      redirect_to admin_path(tab: :users), alert: t("flash.console_account_no_organization")
+      return
+    end
+
+    # Generated, never chosen: the admin relays it once and the account owner
+    # changes it on /profile. Only the digest is stored.
+    password = User.generate_temporary_password
+    user = User.new(console_account_params)
+    user.role = access if User::ROLES.include?(access)
+    user.password = password
+
+    User.transaction do
+      user.save!
+      organization&.memberships&.create!(user:, role: params[:membership_role].to_s, status: "active")
+      AuditEvent.record("console_account_created", identifier: user.identifier, name: user.name, access:)
+    end
+
+    redirect_to admin_path(tab: :users),
+                notice: t("flash.console_account_created", identifier: user.identifier, password:)
+  rescue ActiveRecord::RecordInvalid => invalid
+    redirect_to admin_path(tab: :users), alert: invalid.record.errors.full_messages.to_sentence
+  end
+
   def update
     user = User.find(params[:id])
 
@@ -307,6 +353,14 @@ class AdminController < ApplicationController
     end
   end
   private
+    # :role is absent on purpose and must stay absent — the access level comes
+    # from the whitelisted `access` param, so a posted role cannot mint an admin
+    # by a name the form never offered. :student_id is absent for the same
+    # reason as on sign-up, inverted: this screen makes accounts that have none.
+    def console_account_params
+      params.expect(console_account: [ :name, :username, :email_address ])
+    end
+
     # One posted field, or nil where the form did not carry it. Dug by hand
     # rather than with `params.dig`, which raises when a request posts a string
     # where the form posts a hash — and anything but a string is not an answer.

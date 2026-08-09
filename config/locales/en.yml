@@ -46,6 +46,12 @@ en:
     password_changed: "Your password has been changed"
     password_throttled: "Too many attempts — please try again later"
     login_throttled: "Too many sign-in attempts — please try again later"
+    console_account_created: "Created %{identifier} — the first password is %{password}. It is shown once."
+    console_account_invalid: "That access level is not one this screen grants"
+    console_account_no_organization: "A company account needs an active organization"
+    # One message for a wrong password and for an account the console is not for,
+    # so the screen cannot be asked which accounts are staff.
+    console_login_failed: "Those sign-in details do not open the console"
     reset_throttled: "Too many link requests — please try again later"
     signup_throttled: "Please try again later"
     forbidden: "That screen is for teaching staff only"
@@ -1454,6 +1460,7 @@ en:
     internship_placement_cancelled: "Cancelled %{student}'s internship at %{organization}"
     internship_progress_report_submitted: "Submitted a weekly internship report at %{organization} for the week of %{week}"
     internship_progress_report_acknowledged: "Acknowledged %{student}'s weekly report at %{organization} for the week of %{week}"
+    console_account_created: "Created console account %{identifier} for %{name} (%{access})"
     role_changed: "Set %{name} to %{role}"
     course_state_changed: "Changed %{course} from %{from} to %{to}"
     approval_decided: "%{outcome} the %{course} lifecycle request from %{from} to %{to}"
@@ -1623,7 +1630,7 @@ en:
         - "Open the Teaching console"
         - "Open this console"
         - "Grant roles"
-    users_search_ph: "Search name or student ID"
+    users_search_ph: "Search name, ID, username, or email"
     courses_search_ph: "Search code or course name"
     filter_all: "All"
     features:
@@ -1715,7 +1722,23 @@ en:
     title: "User management"
     subtitle: "Grant the instructor view and the admin screen · UTCC AI Academy"
     roster_title: "All accounts"
-    th_id: "Student ID"
+    console_account:
+      title: "Create a console account"
+      subtitle: "For teaching staff, administrators, and company members. These accounts have no student ID — they sign in at /console with a username or an email address."
+      name: "Full name"
+      username: "Username"
+      email: "Email address"
+      access_label: "Access"
+      access:
+        instructor: "Instructor"
+        admin: "Administrator"
+        company: "Company member"
+      organization: "Organization"
+      no_organization: "— none —"
+      membership_role: "Role in the organization"
+      password_note: "A first password is generated and shown once on the next screen. Relay it to the account owner, who changes it on their profile. The organization and its role are read only for a company member."
+      submit: "Create account"
+    th_id: "Identifier"
     th_name: "Name"
     th_role: "Role"
     th_change: "Change role"
@@ -1790,6 +1813,21 @@ en:
       subtitle: "Use the same student ID and password as the university registration system."
       submit: "Sign in"
       help: "Faculty and staff sign in with their staff account; the instructor view unlocks automatically."
+      console_link: "Teaching staff, administrator, or company? Use the console →"
+    # The staff and company screen at /console. It carries its own hero copy
+    # because the student pitch beside it is selling a course, not a console.
+    console:
+      hero_title: "The UTCC AI Academy console"
+      hero_body: "One sign-in for teaching staff, administrators, and the companies hiring and mentoring our students."
+      points:
+        - "Teaching: sections, learner progress, and grades"
+        - "Administration: accounts, courses, and the approval queue"
+        - "Companies: job posts, internships, and applicants"
+      title: "Console sign in"
+      subtitle: "For teaching staff, administrators, and company accounts."
+      submit: "Sign in to the console"
+      help: "Console access is granted — an administrator assigns a staff role, and a company adds you to its organization."
+      student_link: "Are you a student? Sign in here"
     register:
       title: "Create your student account"
       subtitle: "Register with your full name and student ID."
@@ -1814,6 +1852,8 @@ en:
       email_hint: "Use your @utcc.ac.th address"
       student_id: "Student ID"
       student_id_hint: "13 digits, as printed on your student card"
+      identifier: "Username or email"
+      identifier_hint: "The username or email address on your account. A student ID works too, if yours has one."
       password: "Password"
       password_hint: "At least 8 characters, with letters and digits"
       password_confirmation: "Confirm password"
@@ -2964,6 +3004,7 @@ en:
       user:
         email_address: "University email"
         student_id: "Student ID"
+        username: "Username"
         name: "Full name"
         password: "Password"
         password_confirmation: "Confirm password"
@@ -2975,8 +3016,12 @@ en:
       models:
         user:
           attributes:
+            base:
+              missing_identifier: "needs a student ID, a username, or an email address"
             student_id:
               invalid: "must be exactly 13 digits"
+            username:
+              invalid: "must be 3–30 characters of lowercase letters, digits, dot, dash, or underscore, and contain a letter"
             current_password:
               invalid: "is not the password you are signed in with"
             password:

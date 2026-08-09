@@ -6,6 +6,12 @@ Rails.application.routes.draw do
   post "login",  to: "sessions#create"
   delete "logout", to: "sessions#destroy", as: :logout
 
+  # The staff and company way in. Same shape as /login — one path, one helper,
+  # both verbs — and a separate screen because it asks for a different credential
+  # and opens a different set of screens. See ConsoleSessionsController.
+  get  "console", to: "console_sessions#new",    as: :console
+  post "console", to: "console_sessions#create"
+
   get  "register", to: "registrations#new",    as: :register
   post "register", to: "registrations#create"
 
@@ -239,6 +245,9 @@ Rails.application.routes.draw do
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin
   patch "admin/users/:id", to: "admin#update", as: :admin_user
+  # Where a console account comes from. Sign-up produces learners only, so an
+  # instructor, an administrator, or a company member is made here or nowhere.
+  post "admin/console-accounts", to: "admin#create_console_account", as: :admin_console_accounts
   patch "admin/courses/:id/state", to: "admin#update_course_state", as: :admin_course_state
   post "admin/approvals/:id/decision", to: "admin#decide_approval", as: :admin_approval_decision
   patch "admin/features/:key", to: "admin#update_feature_setting", as: :admin_feature_setting

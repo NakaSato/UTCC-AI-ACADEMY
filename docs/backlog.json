@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T18:30:00+07:00",
+  "updated_at": "2026-08-09T21:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2067,6 +2067,50 @@
         }
       ],
       "updated_at": "2026-08-09T18:30:00+07:00"
+    },
+    {
+      "id": "AUTH-010",
+      "title": "Add a console sign-in door for staff, administrators, and company members",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Security Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Console sign-in specification",
+          "url": "specs/spec-console-sign-in.html"
+        },
+        {
+          "label": "Console sign-in boundary ADR",
+          "url": "decisions/adr-0042-console-sign-in-boundary.html"
+        }
+      ],
+      "updated_at": "2026-08-09T19:20:00+07:00"
+    },
+    {
+      "id": "AUTH-011",
+      "title": "Identify console accounts by username or email and create them from /admin",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Security Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "AUTH-010"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Console account identity specification",
+          "url": "specs/spec-console-account-identity.html"
+        },
+        {
+          "label": "Console account identity ADR",
+          "url": "decisions/adr-0043-console-account-identity.html"
+        }
+      ],
+      "updated_at": "2026-08-09T21:00:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3722,6 +3766,22 @@
       "to": "complete",
       "summary": "The user recorded the increment 2 decisions and the slice was implemented. A placement carries exactly one origin and may come from either an approved InternshipRequest or an accepted Recruitment::InternshipApplication, so the shipped application path is tracked too rather than left half-finished; the origin is read-only and a placement never mutates an application, its status, or its evaluation, which SPEC-0028 still owns. Lifecycle is planned, active, completed, and cancelled behind guarded transitions with a required cancellation reason, so a placement never claims more than happened. Weekly progress reports record activities, hours, outcomes, and blockers, one per placement per week enforced by a unique index, append-only once submitted, authored only by the placed student while the placement is active, and acknowledged by an active company decider without rewriting the student text. Hours are evidence only and no field holds academic credit. Visibility is the placed student plus the organization active deciders; faculty and administrators remain outside pending decisions 2 and 7.",
       "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-09T19:20:00+07:00",
+      "item_id": "AUTH-010",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Shipped /console, a second sign-in screen for accounts with work outside the student experience. Console access is a staff role or an active organization membership, so revoking a membership closes the door with no other action. One identifier field takes a 13-digit ID or the email address on the account; an entry containing @ authenticates on email_address and anything else on student_id, while /login keeps its student-ID-only rule. An account without console access is refused before any session exists and reads exactly like a wrong password, so the screen cannot be asked which accounts are staff. Sign-in lands on /admin, /instructor, or the recruitment organizations index unless a deep link was stashed first. The session, cookie, 30-day expiry, and remember-me behaviour are the ones /login already creates; the screen adds the same two rate-limit keys, its own bilingual hero copy, and a noindex plus robots.txt disallow.",
+      "evidence_url": "specs/spec-console-sign-in.html"
+    },
+    {
+      "at": "2026-08-09T21:00:00+07:00",
+      "item_id": "AUTH-011",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The user ruled that console accounts carry no student ID and are named by email or username, and chose an admin creation screen over shell-only onboarding. users.student_id is now nullable and required only under a :registration validation context, so every learner still has one while an instructor or recruiter has none. A unique users.username column joins student_id and email_address as the three columns that can identify an account, at least one of which every account must hold; User#identifier is what screens print where they printed the student ID, and the admin roster searches all three. Console sign-in tells the three apart by shape alone, which is why a username must contain a letter — an all-digit one would be read as a student ID and could never sign in. /admin gained a create-console-account form: name plus username and/or email, one whitelisted access level, never a role read from posted attributes, and for a company member an ordinary account plus an active organization membership written in the same transaction, leaving the role column student exactly as ADR-0024 requires. The first password is generated to satisfy the password policy, shown once in a flash, and stored only as a digest — not in the audit row, not in a log, not in an email. Creation is audited at warn level. Seeds now build the three console accounts by username and upgrade a database seeded before the change in place.",
+      "evidence_url": "specs/spec-console-account-identity.html"
     }
   ]
 }

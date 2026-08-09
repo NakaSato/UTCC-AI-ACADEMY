@@ -47,3 +47,5 @@ owner.
 - [SPEC-0039 — Governed enterprise recruitment integrations and adoption controls](spec-recruitment-enterprise-integrations.md) — accepted; Product, legal, Privacy, Security, Recruitment, Data, Platform, and QA reviewed and accepted
 - [SPEC-0040 — Invitation-only company business-case collaboration and project workspace boundary](spec-company-business-case-collaboration.md) — accepted; Product, Security, Privacy, Academic, Recruitment, and QA reviewed and accepted
 - [SPEC-0041 — Student-initiated internship requests, placements, and progress reporting](spec-student-internship-requests.md) — accepted; increment 1 implemented and scoped against the shipped SPEC-0028 internship management
+- [SPEC-0042 — Console sign-in for teaching staff, administrators, and company members](spec-console-sign-in.md) — accepted; second sign-in door at /console over the one shared session mechanism
+- [SPEC-0043 — Console account identity, admin-created accounts, and the identifier model](spec-console-account-identity.md) — accepted; three identifier columns, at least one required, and an admin creation screen

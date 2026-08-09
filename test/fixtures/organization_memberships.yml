@@ -1,0 +1,3 @@
+# Empty for the same reason as organizations.yml: the seeds grant a company
+# membership, fixtures replace the users it points at, and without this file
+# nothing deletes the row in between.

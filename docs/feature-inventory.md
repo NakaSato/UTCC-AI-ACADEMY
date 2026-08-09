@@ -31,6 +31,16 @@ This inventory reflects the routes, controllers, models, views, and documented b
 - Student registration using a 13-digit student ID
 - Terms acceptance during registration
 - Student-ID/password login
+- Three identifier columns — student ID, username, email — at least one required per account
+- Console login at `/console` for teaching staff, administrators, and company members:
+  - Username or email address as the identifier (a student ID still works for accounts that have one)
+  - Accounts without a staff role or an active company membership are refused without a session
+  - Each role lands on its own console, unless a deep link was stashed first
+- Admin-created console accounts:
+  - Instructor, administrator, or company member, chosen from a whitelist
+  - No student ID; a company account is created with its active organization membership in one transaction
+  - A generated first password, shown to the admin once and stored only as a digest
+  - Audited as a privilege change
 - "Remember me" sessions
 - Logout
 - 30-day absolute session expiry
@@ -46,8 +56,9 @@ This inventory reflects the routes, controllers, models, views, and documented b
   - Student
   - Instructor
   - Admin
+  - Company reach through active organization memberships rather than a role
 - Login, registration, password-reset, grading, and incident-report rate limits
-- Login protection by both IP address and student ID
+- Login protection by both IP address and student ID, on `/login` and `/console` alike
 - Sensitive parameter filtering
 - Return to the originally requested page after login
 

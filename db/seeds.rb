@@ -122,13 +122,10 @@ puts "Seeded #{LandingCard.count} landing cards across #{landing_cards.size} col
 # ---- Demo accounts ----------------------------------------------------------
 # Shared password, so this half is fenced to development and test.
 if Rails.env.local?
-  # One account per role, so every gate can be walked through by hand. `role` is
-  # left off the students: the column defaults to "student".
+  # Two learners, by student ID, the way sign-up makes them.
   {
     "2011071730001" => { name: "ณฐพร จิรวัฒนกุล", faculty: "บริหารธุรกิจ", study_year: 2 },
-    "2011071730002" => { name: "สมหญิง ใจดี", faculty: "วิศวกรรมศาสตร์", study_year: 1 },
-    "2011071730801" => { name: "ผศ. ดร. วิชัย ตั้งมั่น", faculty: "วิศวกรรมศาสตร์", role: "instructor" },
-    "2011071730802" => { name: "ผู้ดูแลระบบ", faculty: "วิศวกรรมศาสตร์", role: "admin" }
+    "2011071730002" => { name: "สมหญิง ใจดี", faculty: "วิศวกรรมศาสตร์", study_year: 1 }
   }.each do |student_id, attributes|
     # find_or_initialize rather than find_or_create: the password is set on every
     # run, so re-seeding an existing demo account resets it instead of leaving
@@ -136,6 +133,33 @@ if Rails.env.local?
     user = User.find_or_initialize_by(student_id: student_id)
     user.assign_attributes(attributes)
     # "password" itself is rejected now — see User::COMMON_PASSWORDS.
+    user.password = "utcc2026"
+    user.save!
+  end
+
+  # And three console accounts, by username, the way /admin makes them. None has
+  # a student ID: an instructor has no student card, and a recruiter has no
+  # reason to know a thirteen-digit number. The company account carries no role
+  # either — company reach is an active OrganizationMembership, never a column on
+  # the user (ADR-0024) — so its membership is granted further down.
+  #
+  # `legacy_student_id` is only for upgrading a database seeded before console
+  # accounts existed: the row is found by the ID it used to have, and the ID is
+  # then cleared. A fresh database never matches it.
+  [
+    { username: "wichai", name: "ผศ. ดร. วิชัย ตั้งมั่น", email_address: "wichai@utcc.ac.th",
+      faculty: "วิศวกรรมศาสตร์", role: "instructor", legacy_student_id: "2011071730801" },
+    { username: "utcc-admin", name: "ผู้ดูแลระบบ", email_address: "admin@utcc.ac.th",
+      faculty: "วิศวกรรมศาสตร์", role: "admin", legacy_student_id: "2011071730802" },
+    { username: "northstar", name: "ชนิกานต์ พงศ์ธนา", email_address: "recruiter@northstar.co.th",
+      legacy_student_id: "2011071730901" }
+  ].each do |attributes|
+    attributes = attributes.dup
+    legacy = attributes.delete(:legacy_student_id)
+    user = User.find_by(username: attributes[:username]) ||
+           User.find_by(student_id: legacy) ||
+           User.new
+    user.assign_attributes(attributes.merge(student_id: nil))
     user.password = "utcc2026"
     user.save!
   end
@@ -167,7 +191,7 @@ if Rails.env.local?
   # within one, so without this both screens have nothing to be about. Five more
   # students than the two above, because a roster of two demonstrates nothing.
   section = Section.find_or_initialize_by(course: Course.find_by!(code: "AI1101"), term: "1/2569", code: "BA-2")
-  section.update!(instructor: User.find_by!(student_id: "2011071730801"))
+  section.update!(instructor: User.find_by!(username: "wichai"))
 
   cohort = {
     "2011071730003" => [ "ปัณณธร สุวรรณเวช", 9 ],
@@ -245,7 +269,28 @@ if Rails.env.local?
   puts "Seeded 1 section (#{section.label}) with #{section.students.count} students " \
        "and #{Submission.count} submissions"
 
-  puts "Seeded #{User.count} users — student 2011071730001, instructor 2011071730801, " \
-       "admin 2011071730802; password utcc2026 for all"
+  # ---- A company to sign in as -----------------------------------------------
+  # /console admits three populations and only two of them could be seeded before
+  # this: an organization with an active membership is what makes the third one
+  # exist. Built the way the app builds it — an admin creates the organization
+  # and names an owner — so the demo data matches what the screens produce.
+  #
+  # The slug is explicit because `derive_slug` parameterizes the name, and a Thai
+  # name parameterizes to nothing.
+  company = Organization.find_or_initialize_by(slug: "northstar")
+  company.update!(name: "บริษัท นอร์ทสตาร์ เทคโนโลยี จำกัด",
+                  creator: User.find_by!(username: "utcc-admin"),
+                  accepts_internship_requests: true)
+
+  # Owner rather than recruiter: it is the one role that opens both the hiring
+  # screens and the business-case workspace, so a single demo account can walk
+  # the whole company side.
+  recruiter = User.find_by!(username: "northstar")
+  company.memberships.find_or_initialize_by(user: recruiter).update!(role: "owner", status: "active")
+
+  puts "Seeded 1 organization (#{company.name}) with #{company.memberships.active.count} active member"
+
+  puts "Seeded #{User.count} users — student 2011071730001 at /login; " \
+       "instructor wichai, admin utcc-admin, company northstar at /console; password utcc2026 for all"
   puts "Seeded #{TopicCompletion.count} topic completions"
 end

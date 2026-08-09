@@ -13,7 +13,7 @@ class CrawlersController < ApplicationController
   # `require_authentication` and answers a redirect to `/`. Saying so costs one
   # line and saves a crawler from discovering it one 302 at a time.
   DISALLOWED = %w[
-    /login /register /forgot-password /reset-password
+    /login /register /console /forgot-password /reset-password
     /courses /lesson /my-learning /map /progress /leaderboard /instructor /admin
   ].freeze
 

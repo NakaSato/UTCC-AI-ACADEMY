@@ -40,3 +40,19 @@ admin_two:
   student_id: "2011071730998"
   password_digest: <%= password_digest %>
   role: admin
+
+# The two shapes an admin-created console account comes in: no student ID at
+# all, named by a username and an email. The three above predate /console and
+# keep their IDs, which is still a valid account — see User#is_identifiable.
+console_instructor:
+  name: อาจารย์ คอนโซล
+  username: console-teacher
+  email_address: teacher@utcc.ac.th
+  password_digest: <%= password_digest %>
+  role: instructor
+
+console_company:
+  name: ผู้ประสานงาน บริษัท
+  username: console-partner
+  email_address: partner@example.co.th
+  password_digest: <%= password_digest %>

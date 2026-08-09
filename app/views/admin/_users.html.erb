@@ -25,6 +25,78 @@
   <% end %>
 </div>
 
+<%# Where console accounts come from. Sign-up only ever produces a learner, so an
+    instructor, an administrator, or a company member is made here. No student ID
+    field: these accounts are named by username and email. %>
+<section class="mb-4 overflow-hidden rounded-card border border-hairline bg-surface">
+  <div class="px-6 pt-5.5 pb-1">
+    <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("admin.console_account.title") %></h2>
+    <p class="mt-1 text-13-5 leading-[1.6] text-muted"><%= t("admin.console_account.subtitle") %></p>
+  </div>
+
+  <%= form_with url: admin_console_accounts_path, class: "flex flex-col gap-3 px-6 py-5" do %>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.name") %></span>
+        <%= text_field_tag "console_account[name]", nil, required: true, maxlength: 60,
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.username") %></span>
+        <%= text_field_tag "console_account[username]", nil, maxlength: 30,
+              spellcheck: false, autocapitalize: "off", placeholder: "wichai",
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.email") %></span>
+        <%= email_field_tag "console_account[email_address]", nil, maxlength: 255,
+              spellcheck: false, autocapitalize: "off", placeholder: "you@utcc.ac.th",
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-3">
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.access_label") %></span>
+        <%= select_tag :access,
+              options_for_select(AdminConsole::CONSOLE_ACCESS.map { [ t("admin.console_account.access.#{it}"), it ] }),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+
+      <%# Both are read only when access is "company" — see the controller. %>
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.organization") %></span>
+        <%= select_tag :organization_id,
+              options_from_collection_for_select(@organizations, :id, :name),
+              include_blank: t("admin.console_account.no_organization"),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.membership_role") %></span>
+        <%= select_tag :membership_role,
+              options_for_select(OrganizationMembership::ROLES.map { [ t("recruitment.memberships.roles.#{it}"), it ] }),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                      transition-colors outline-none focus:border-brand" %>
+      </label>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="max-w-[62ch] text-12-5 leading-[1.6] text-muted-2"><%= t("admin.console_account.password_note") %></p>
+      <%= submit_tag t("admin.console_account.submit"),
+            class: "rounded-field bg-brand px-4 py-2 text-14 font-semibold whitespace-nowrap text-white
+                    transition-colors hover:bg-brand-deep" %>
+    </div>
+  <% end %>
+</section>
+
 <section class="overflow-hidden rounded-card border border-hairline bg-surface">
   <div class="px-6 pt-5.5 pb-4">
     <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("admin.roster_title") %></h2>
@@ -42,11 +114,11 @@
   <% @users.each do |user| %>
     <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-surface-5 px-4 py-3.5
                 sm:grid-cols-[136px_minmax(0,1fr)_112px_240px] sm:px-6">
-      <span class="hidden font-mono text-12-5 text-muted sm:block"><%= user.student_id %></span>
+      <span class="hidden font-mono text-12-5 text-muted sm:block"><%= user.identifier %></span>
 
       <span class="truncate text-14-5">
         <%= user.name %>
-        <span class="ml-1 text-12-5 text-muted-2 sm:hidden"><%= user.student_id %></span>
+        <span class="ml-1 text-12-5 text-muted-2 sm:hidden"><%= user.identifier %></span>
       </span>
 
       <span class="hidden sm:block">

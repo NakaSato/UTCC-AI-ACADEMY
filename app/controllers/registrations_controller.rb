@@ -19,7 +19,11 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     @accepted_terms = params[:terms] == "1"
 
-    if @accepted_terms && @user.save
+    # The `:registration` context is what makes the student ID required. It is
+    # optional on the model now, because an admin-created console account has no
+    # student card — but sign-up produces learners, and a learner without an ID
+    # could not sign in at /login.
+    if @accepted_terms && @user.save(context: :registration)
       start_new_session_for @user
       redirect_to after_authentication_url, notice: "ยินดีต้อนรับสู่ UTCC AI Academy"
     else

@@ -75,7 +75,7 @@ class IndexingTest < ActionDispatch::IntegrationTest
   test "the auth screens ask not to be indexed" do
     sign_out
 
-    [ login_path, register_path, forgot_password_path ].each do |path|
+    [ login_path, register_path, console_path, forgot_password_path ].each do |path|
       get path
 
       assert_equal [ "noindex, nofollow" ], css_select("meta[name=robots]").map { it["content"] }, path

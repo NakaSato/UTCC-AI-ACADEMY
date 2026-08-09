@@ -1,0 +1,57 @@
+<% content_for :title, "#{t("auth.console.title")} — UTCC AI Academy" %>
+
+<%# The staff and company sign-in. No tabs and no sign-up link: a console account
+    is granted — by an admin for a role, by a company through an organization
+    invitation — never self-served. %>
+<h1 class="mb-2 text-28 leading-[1.2] font-bold tracking-[-0.025em]"><%= t("auth.console.title") %></h1>
+<p class="mb-7 text-15 leading-[1.6] text-balance text-muted"><%= t("auth.console.subtitle") %></p>
+
+<%= form_with url: console_path do |form| %>
+  <div class="mb-5.5 flex flex-col gap-4">
+    <label class="flex flex-col gap-1.75">
+      <%# One field for both credentials — see ConsoleSessionsController#credentials.
+          No `pattern` here, unlike /login: what is valid depends on which of the
+          two was typed, and the server is the only thing that can say. %>
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.identifier") %></span>
+      <%= form.text_field :identifier, required: true, autofocus: true,
+            autocomplete: "username", placeholder: "you@utcc.ac.th",
+            maxlength: 255, spellcheck: false, autocapitalize: "off",
+            title: t("auth.fields.identifier_hint"),
+            value: params[:identifier],
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+      <span class="text-12-5 leading-[1.5] text-muted-2"><%= t("auth.fields.identifier_hint") %></span>
+    </label>
+
+    <label class="flex flex-col gap-1.75">
+      <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.password") %></span>
+      <%= form.password_field :password, required: true, maxlength: 72,
+            autocomplete: "current-password", placeholder: "••••••••",
+            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+    </label>
+  </div>
+
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <label class="flex items-center gap-2.5 text-14 text-ink-4">
+      <%= check_box_tag :remember_me, "1", true,
+            class: "size-4.5 rounded-[5px] border-[1.5px] border-hairline-3 accent-brand" %>
+      <span><%= t("auth.remember") %></span>
+    </label>
+    <%# Password reset needs an email address and most staff accounts have none,
+        but the flow is the same one — no second reset screen for the console. %>
+    <%= link_to t("auth.forgot_link"), forgot_password_path,
+          class: "text-14 font-medium text-brand hover:text-brand-deep" %>
+  </div>
+
+  <%= form.submit t("auth.console.submit"),
+        class: "mb-4 w-full cursor-pointer rounded-[12px] bg-brand py-3.5 text-15-5 font-semibold text-white
+                transition-colors hover:bg-brand-deep" %>
+<% end %>
+
+<p class="mt-6.5 text-13-5 leading-[1.6] text-balance text-muted-2"><%= t("auth.console.help") %></p>
+
+<p class="mt-4 text-14">
+  <%= link_to t("auth.console.student_link"), login_path,
+        class: "font-medium text-brand hover:text-brand-deep" %>
+</p>
