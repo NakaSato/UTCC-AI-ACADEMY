@@ -1,0 +1,41 @@
+<%= form_with model: business_case, url:, class: "max-w-2xl space-y-6" do |form| %>
+  <% if business_case.errors.any? %>
+    <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert">
+      <%= business_case.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
+    <%= t("business_cases.policy_notice") %>
+  </div>
+
+  <% if business_case.new_record? %>
+    <div>
+      <%= label_tag "business_case_organization_id", t("business_cases.fields.organization"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= select_tag "business_case[organization_id]",
+            options_from_collection_for_select(organizations, :id, :name, business_case.organization_id),
+            required: true,
+            class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title, t("business_cases.fields.title"), class: "mb-2 block text-13 font-semibold text-ink" %>
+    <%= form.text_field :title, size: nil, required: true, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+  </div>
+
+  <div>
+    <%= form.label :brief, t("business_cases.fields.brief"), class: "mb-2 block text-13 font-semibold text-ink" %>
+    <%= form.text_area :brief, rows: 4, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+  </div>
+
+  <div>
+    <%= form.label :requirements, t("business_cases.fields.requirements"), class: "mb-2 block text-13 font-semibold text-ink" %>
+    <%= form.text_area :requirements, rows: 8, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= form.submit t("business_cases.save"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <%= link_to t("business_cases.cancel"), business_cases_path, class: "rounded-full border border-hairline px-5 py-2.5 text-13 font-semibold text-muted hover:text-ink" %>
+  </div>
+<% end %>

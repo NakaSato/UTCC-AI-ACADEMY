@@ -1,0 +1,40 @@
+<% content_for :title, "#{t("business_cases.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= t("business_cases.eyebrow") %></p>
+      <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("business_cases.title") %></h1>
+      <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("business_cases.subtitle") %></p>
+    </div>
+    <% if @can_create %>
+      <%= link_to t("business_cases.new"), new_business_case_path,
+            class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <% end %>
+  </div>
+
+  <% if @owned_cases.empty? && @participating_cases.empty? %>
+    <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
+      <h2 class="text-18 font-semibold text-ink"><%= t("business_cases.empty_title") %></h2>
+      <p class="mt-2 text-14 text-muted"><%= t("business_cases.empty_body") %></p>
+    </div>
+  <% end %>
+
+  <% if @owned_cases.any? %>
+    <section class="mb-10">
+      <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("business_cases.owned_heading") %></h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <%= render partial: "business_case_card", collection: @owned_cases, as: :business_case %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @participating_cases.any? %>
+    <section>
+      <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("business_cases.participating_heading") %></h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <%= render partial: "business_case_card", collection: @participating_cases, as: :business_case %>
+      </div>
+    </section>
+  <% end %>
+</main>

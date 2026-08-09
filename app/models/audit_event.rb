@@ -50,12 +50,19 @@ class AuditEvent < ApplicationRecord
     recruitment_job_application_transitioned recruitment_job_application_message_created
     integrity_closed integrity_notified integrity_escalated
     landing_saved card_added card_removed
+    business_case_created business_case_updated business_case_published business_case_closed
+    business_case_invitation_created business_case_invitation_accepted business_case_invitation_declined
+    business_case_invitation_revoked
+    business_case_mentor_assigned business_case_participant_revoked
+    business_case_milestone_created business_case_milestone_completed
+    business_case_submission_created business_case_comment_created
   ].freeze
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
   WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
-              unenrolled integrity_escalated card_removed recruitment_membership_revoked ].freeze
+              unenrolled integrity_escalated card_removed recruitment_membership_revoked
+              business_case_closed business_case_participant_revoked ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50

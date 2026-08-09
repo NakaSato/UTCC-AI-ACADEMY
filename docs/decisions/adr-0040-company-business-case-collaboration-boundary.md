@@ -23,7 +23,8 @@ touches:
   - db/migrate
   - test
   - docs/runbooks
-enforced_by: []
+enforced_by:
+  - test/operations/business_case_boundary_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC-001, SKILL-SPEC-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC-002]
@@ -32,11 +33,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC
 # Define an Invitation-Only Company Business-Case Collaboration Boundary
 
 > **Decision state:** Accepted by the user on 2026-08-09 as the governing
-> collaboration boundary. No company business-case, project, invitation,
-> attachment, source-code, milestone, or submission workflow is authorized by
-> this record. Product, Security, Privacy, Academic, Recruitment Domain, and QA
-> owners must still approve the confidentiality, consent, intellectual-property,
-> retention, and participant rules before implementation.
+> collaboration boundary. On the same date the user recorded the Phase 1
+> review-handoff decisions in SPEC-0040 and authorized the invitation-only,
+> text-only collaboration slice: cases, invitations, participants, lifecycle,
+> milestones, submissions, comments, and audit events. Attachment and
+> source-code uploads, email delivery, administrator support and reporting
+> surfaces, recruitment conversion, and revenue or AI features remain
+> unauthorized until their own review decisions are recorded.
 
 > [Decision Records](README.md) ·
 > [Company business-case specification](../specs/spec-company-business-case-collaboration.md) ·

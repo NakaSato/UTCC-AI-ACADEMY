@@ -10,6 +10,7 @@ class Organization < ApplicationRecord
                        inverse_of: :organization
   has_many :internship_programs, class_name: "Recruitment::InternshipProgram", dependent: :restrict_with_exception,
                                  inverse_of: :organization
+  has_many :business_cases, dependent: :restrict_with_exception, inverse_of: :organization
   has_many :members, through: :memberships, source: :user
 
   normalizes :name, with: ->(value) { value.to_s.strip }

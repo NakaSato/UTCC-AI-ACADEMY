@@ -180,6 +180,29 @@ Rails.application.routes.draw do
   get "academic-post-invitations/:token", to: "academic_post_invitations#show", as: :academic_post_invitation
   post "academic-post-invitations/:token/accept", to: "academic_post_invitations#accept", as: :accept_academic_post_invitation
 
+  # Business-case collaboration (SPEC-0040, Phase 1). Invitation-only and
+  # text-only: the boundary test reads this delimited block to prove no file,
+  # mailer, or API surface ships before its review decisions exist.
+  resources :business_cases, path: "business-cases", only: %i[index new create show edit update] do
+    post :publish, on: :member
+    post :close, on: :member
+    post :invitations, on: :member, to: "business_case_invitations#create"
+    post :participants, on: :member, to: "business_case_participants#create"
+    delete "participants/:user_id", on: :member, to: "business_case_participants#revoke", as: :participant
+    post :milestones, on: :member, to: "business_case_milestones#create"
+    post "milestones/:milestone_id/complete", on: :member, to: "business_case_milestones#complete",
+         as: :complete_milestone
+    post "milestones/:milestone_id/submissions", on: :member, to: "business_case_submissions#create",
+         as: :milestone_submissions
+    post :comments, on: :member, to: "business_case_comments#create"
+  end
+  get "business-case-invitations/:token", to: "business_case_invitations#show", as: :business_case_invitation
+  post "business-case-invitations/:token/accept", to: "business_case_invitations#accept",
+       as: :accept_business_case_invitation
+  post "business-case-invitations/:token/decline", to: "business_case_invitations#decline",
+       as: :decline_business_case_invitation
+  # End business-case collaboration
+
   # /instructor needs the instructor or admin role, /admin the admin role — see
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin

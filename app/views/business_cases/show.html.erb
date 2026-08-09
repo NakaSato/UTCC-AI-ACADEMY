@@ -1,0 +1,229 @@
+<% content_for :title, "#{@business_case.title} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("business_cases.back"), business_cases_path,
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= @business_case.organization.name %></p>
+        <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= @business_case.title %></h1>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("business_cases.status.#{@business_case.status}") %></span>
+        <% if @manageable && @business_case.editable? %>
+          <%= link_to t("business_cases.edit"), edit_business_case_path(@business_case),
+                class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+        <% end %>
+        <% if @manageable && @business_case.draft? %>
+          <%= button_to t("business_cases.show.publish"), publish_business_case_path(@business_case),
+                params: { lock_version: @business_case.lock_version },
+                class: "rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+        <% if @manageable && !@business_case.closed? %>
+          <%= button_to t("business_cases.show.close"), close_business_case_path(@business_case),
+                params: { lock_version: @business_case.lock_version },
+                class: "rounded-full border border-red-200 px-4 py-2 text-13 font-semibold text-red-700 transition hover:bg-red-50" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-8 rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
+    <%= t("business_cases.policy_notice") %>
+  </div>
+
+  <div class="grid gap-8 lg:grid-cols-[2fr_1fr]">
+    <div class="space-y-8">
+      <% if @business_case.brief.present? %>
+        <section class="rounded-card border border-hairline bg-surface-1 p-6">
+          <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.brief_heading") %></h2>
+          <p class="mt-3 text-14 leading-[1.7] whitespace-pre-line text-muted"><%= @business_case.brief %></p>
+        </section>
+      <% end %>
+
+      <% if @business_case.requirements.present? %>
+        <section class="rounded-card border border-hairline bg-surface-1 p-6">
+          <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.requirements_heading") %></h2>
+          <p class="mt-3 text-14 leading-[1.7] whitespace-pre-line text-muted"><%= @business_case.requirements %></p>
+        </section>
+      <% end %>
+
+      <section class="rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.milestones_heading") %></h2>
+        <% if @milestones.empty? %>
+          <p class="mt-3 text-13 text-muted"><%= t("business_cases.show.milestones_empty") %></p>
+        <% end %>
+        <ol class="mt-4 space-y-4">
+          <% @milestones.each do |milestone| %>
+            <li class="rounded-xl border border-hairline p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-14 font-semibold text-ink"><%= milestone.position %>. <%= milestone.title %></h3>
+                  <% if milestone.description.present? %>
+                    <p class="mt-1.5 text-13 leading-[1.65] whitespace-pre-line text-muted"><%= milestone.description %></p>
+                  <% end %>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("business_cases.show.milestone_status.#{milestone.status}") %></span>
+                  <% if @manageable && milestone.open? && !@business_case.closed? %>
+                    <%= button_to t("business_cases.show.complete_milestone"),
+                          complete_milestone_business_case_path(@business_case, milestone_id: milestone.id),
+                          class: "rounded-full border border-hairline px-3 py-1 text-11 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+                  <% end %>
+                </div>
+              </div>
+              <% if @participant&.student? && milestone.open? && @business_case.open_for_submissions? %>
+                <%= form_with url: milestone_submissions_business_case_path(@business_case, milestone_id: milestone.id),
+                      scope: :submission, class: "mt-4 space-y-2" do |form| %>
+                  <%= form.label :body, t("business_cases.show.submission_body_label"), class: "block text-12 font-semibold text-ink" %>
+                  <%= form.text_area :body, rows: 3, required: true,
+                        class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                  <%= form.submit t("business_cases.show.submit_button"),
+                        class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+                <% end %>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+        <% if @manageable && !@business_case.closed? %>
+          <%= form_with url: milestones_business_case_path(@business_case), scope: :milestone, class: "mt-5 space-y-2 border-t border-hairline pt-5" do |form| %>
+            <%= form.label :title, t("business_cases.show.milestone_title_label"), class: "block text-12 font-semibold text-ink" %>
+            <%= form.text_field :title, size: nil, required: true, maxlength: 160,
+                  class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+            <%= form.label :description, t("business_cases.show.milestone_description_label"), class: "block text-12 font-semibold text-ink" %>
+            <%= form.text_area :description, rows: 2,
+                  class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+            <%= form.submit t("business_cases.show.add_milestone"),
+                  class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+          <% end %>
+        <% end %>
+      </section>
+
+      <section class="rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.submissions_heading") %></h2>
+        <% if @submissions.empty? %>
+          <p class="mt-3 text-13 text-muted"><%= t("business_cases.show.submissions_empty") %></p>
+        <% end %>
+        <ul class="mt-4 space-y-4">
+          <% @submissions.each do |submission| %>
+            <li class="rounded-xl border border-hairline p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-13 font-semibold text-ink">
+                  <%= submission.author.name %> · <%= submission.milestone.title %>
+                </p>
+                <p class="font-mono text-11 text-muted">
+                  <%= t("business_cases.show.version_label", version: submission.version) %> ·
+                  <%= l(submission.submitted_at, format: :short) %>
+                </p>
+              </div>
+              <p class="mt-2 text-13 leading-[1.65] whitespace-pre-line text-muted"><%= submission.body %></p>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+
+      <section class="rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.comments_heading") %></h2>
+        <% if @comments.empty? %>
+          <p class="mt-3 text-13 text-muted"><%= t("business_cases.show.comments_empty") %></p>
+        <% end %>
+        <ul class="mt-4 space-y-3">
+          <% @comments.each do |comment| %>
+            <li class="rounded-xl border border-hairline p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-13 font-semibold text-ink"><%= comment.author.name %></p>
+                <p class="font-mono text-11 text-muted"><%= l(comment.posted_at, format: :short) %></p>
+              </div>
+              <p class="mt-2 text-13 leading-[1.65] whitespace-pre-line text-muted"><%= comment.body %></p>
+            </li>
+          <% end %>
+        </ul>
+        <% if @business_case.open_for_comments? && (@manageable || @participant) %>
+          <%= form_with url: comments_business_case_path(@business_case), scope: :comment, class: "mt-5 space-y-2 border-t border-hairline pt-5" do |form| %>
+            <%= form.label :body, t("business_cases.show.comment_body_label"), class: "block text-12 font-semibold text-ink" %>
+            <%= form.text_area :body, rows: 3, required: true,
+                  class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+            <%= form.submit t("business_cases.show.comment_button"),
+                  class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+          <% end %>
+        <% end %>
+      </section>
+    </div>
+
+    <aside class="space-y-8">
+      <section class="rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.participants_heading") %></h2>
+        <% if @participants.empty? %>
+          <p class="mt-3 text-13 text-muted"><%= t("business_cases.show.participants_empty") %></p>
+        <% end %>
+        <ul class="mt-4 space-y-3">
+          <% @participants.each do |participant| %>
+            <li class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-13 font-semibold text-ink"><%= participant.user.name %></p>
+                <p class="text-11 text-muted"><%= t("business_cases.roles.#{participant.role}") %></p>
+              </div>
+              <% if @manageable %>
+                <%= button_to t("business_cases.show.revoke"),
+                      participant_business_case_path(@business_case, user_id: participant.user_id),
+                      method: :delete,
+                      class: "rounded-full border border-hairline px-3 py-1 text-11 font-semibold text-muted transition hover:border-red-300 hover:text-red-700" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+
+      <% if @manageable %>
+        <section class="rounded-card border border-hairline bg-surface-1 p-6">
+          <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.invitations_heading") %></h2>
+          <% if @business_case.open_for_invitations? %>
+            <%= form_with url: invitations_business_case_path(@business_case), scope: :invitation, class: "mt-4 space-y-2" do %>
+              <%= select_tag "invitation[user_id]",
+                    options_from_collection_for_select(@invitees, :id, :name),
+                    include_blank: t("business_cases.show.invite_blank"),
+                    required: true,
+                    class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+              <%= submit_tag t("business_cases.show.invite_button"),
+                    class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+            <% end %>
+          <% else %>
+            <%# A draft case is not open for invitations *yet*; a closed one never
+                will be again. One message for both reads as an error. %>
+            <p class="mt-3 text-13 text-muted">
+              <%= t(@business_case.draft? ? "business_cases.show.invitations_draft" : "business_cases.show.invitations_closed") %>
+            </p>
+          <% end %>
+          <% if @pending_invitations.any? %>
+            <ul class="mt-5 space-y-2 border-t border-hairline pt-4">
+              <% @pending_invitations.each do |invitation| %>
+                <li class="flex items-center justify-between gap-3 text-13">
+                  <span class="font-semibold text-ink"><%= invitation.invitee.name %></span>
+                  <span class="font-mono text-11 text-muted"><%= t("business_cases.show.pending_until", date: l(invitation.expires_at.to_date, format: :long)) %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </section>
+
+        <section class="rounded-card border border-hairline bg-surface-1 p-6">
+          <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.mentor_heading") %></h2>
+          <% if @business_case.closed? %>
+            <p class="mt-3 text-13 text-muted"><%= t("business_cases.show.invitations_closed") %></p>
+          <% else %>
+            <%= form_with url: participants_business_case_path(@business_case), scope: :participant, class: "mt-4 space-y-2" do %>
+              <%= select_tag "participant[user_id]",
+                    options_from_collection_for_select(@mentor_candidates, :id, :name),
+                    include_blank: t("business_cases.show.mentor_blank"),
+                    required: true,
+                    class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+              <%= submit_tag t("business_cases.show.assign_button"),
+                    class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+            <% end %>
+          <% end %>
+        </section>
+      <% end %>
+    </aside>
+  </div>
+</main>

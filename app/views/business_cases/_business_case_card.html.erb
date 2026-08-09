@@ -1,0 +1,13 @@
+<%= link_to business_case_path(business_case),
+      class: "rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand hover:shadow-sm" do %>
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h3 class="text-18 font-semibold text-ink"><%= business_case.title %></h3>
+      <p class="mt-1 text-13 text-muted"><%= business_case.organization.name %></p>
+    </div>
+    <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("business_cases.status.#{business_case.status}") %></span>
+  </div>
+  <% if business_case.brief.present? %>
+    <p class="mt-5 line-clamp-2 text-13 text-muted"><%= business_case.brief %></p>
+  <% end %>
+<% end %>

@@ -10,9 +10,32 @@ review_by: 2026-08-21
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0040, ADR-0024, ADR-0025, ADR-0033, ADR-0038]
-implemented_by: []
+implemented_by:
+  - app/models/business_case.rb
+  - app/models/business_case_invitation.rb
+  - app/models/business_case_participant.rb
+  - app/models/business_case_milestone.rb
+  - app/models/business_case_submission.rb
+  - app/models/business_case_comment.rb
+  - app/controllers/business_cases_controller.rb
+  - app/controllers/business_case_invitations_controller.rb
+  - app/controllers/business_case_participants_controller.rb
+  - app/controllers/business_case_milestones_controller.rb
+  - app/controllers/business_case_submissions_controller.rb
+  - app/controllers/business_case_comments_controller.rb
+  - db/migrate/20260809100000_create_business_case_collaboration.rb
 enforced_by:
-  - test/operations/business_case_gate_test.rb
+  - test/models/business_case_test.rb
+  - test/models/business_case_invitation_test.rb
+  - test/models/business_case_participant_test.rb
+  - test/models/business_case_milestone_test.rb
+  - test/models/business_case_submission_test.rb
+  - test/models/business_case_comment_test.rb
+  - test/controllers/business_cases_controller_test.rb
+  - test/controllers/business_case_invitations_controller_test.rb
+  - test/controllers/business_case_workspace_test.rb
+  - test/operations/business_case_boundary_test.rb
+  - test/system/business_case_walk_test.rb
 touches:
   - app/models
   - app/services
@@ -32,10 +55,12 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH
 # Invitation-Only Company Business-Case Collaboration and Project Workspace
 
 > **Review state:** Accepted by the user on 2026-08-09 as the governing design
-> gate. This specification authorizes no
-> business-case route, invitation, file upload, source-code exchange, milestone
-> transition, notification, or production company data. Implementation requires
-> the human decisions in the review handoff.
+> gate. On the same date the user recorded the Phase 1 review-handoff decisions
+> below and authorized the invitation-only, text-only collaboration slice:
+> cases, invitations, participants, lifecycle, milestones, submissions,
+> comments, and audit events. File and source-code uploads, email delivery,
+> administrator support and reporting surfaces, recruitment conversion, and
+> REST APIs remain unauthorized until their own review decisions are recorded.
 
 > [Executable Specifications](README.md) ·
 > [Company business-case ADR](../decisions/adr-0040-company-business-case-collaboration-boundary.md) ·
@@ -150,44 +175,47 @@ not approval to grant access.
 
 ## Acceptance Criteria
 
-These are design-gate criteria for the current slice. Implementation must add
-real enforcing tests and human-approved policy references before the spec can
-move beyond draft.
+The design-gate criteria below are satisfied by the Phase 1 implementation and
+its enforcing tests.
 
-- [ ] ADR-0040 records the organization/case boundary, alternatives, trust
+- [x] ADR-0040 records the organization/case boundary, alternatives, trust
       boundaries, consequences, fitness functions, and human decisions.
-- [ ] The model and access contract separates company organization membership,
-      case participants, faculty assignments, and administrator support access.
-- [ ] Invite-only behavior includes authenticated target matching, single-use
+- [x] The model and access contract separates company organization membership,
+      case participants, faculty assignments, and administrator support access
+      (`test/controllers/business_cases_controller_test.rb`).
+- [x] Invite-only behavior includes authenticated target matching, single-use
       acceptance, expiry, decline, replay rejection, and safe unauthorized
-      responses.
-- [ ] The case workflow defines draft, published, and closed behavior for
-      invitations, edits, milestones, submissions, and completion.
-- [ ] Milestones, submissions, feedback, and asset references are explicitly
-      separate from recruitment applications and academic course submissions.
-- [ ] The asset boundary states private storage, authorization-checked access,
+      responses (`test/models/business_case_invitation_test.rb`,
+      `test/controllers/business_case_invitations_controller_test.rb`).
+- [x] The case workflow defines draft, published, and closed behavior for
+      invitations, edits, milestones, submissions, and completion
+      (`test/models/business_case_test.rb`,
+      `test/controllers/business_case_workspace_test.rb`).
+- [x] Milestones, submissions, feedback, and asset references are explicitly
+      separate from recruitment applications and academic course submissions
+      (`test/models/business_case_submission_test.rb`).
+- [x] The asset boundary states private storage, authorization-checked access,
       scanning, size/type limits, retention, export, deletion, and ownership
-      decisions required before uploads.
-- [ ] The human review handoff records confidentiality, consent, IP, academic,
-      role, notification, support, and data-governance decisions.
-- [ ] `bin/docs` validates this specification's metadata, links, and skill
+      decisions required before uploads; Phase 1 accepts no uploads
+      (`test/operations/business_case_boundary_test.rb`).
+- [x] The human review handoff records confidentiality, consent, IP, academic,
+      role, notification, support, and data-governance decisions
+      (see the recorded decisions below).
+- [x] `bin/docs` validates this specification's metadata, links, and skill
       references.
 
-### Required future implementation evidence
+### Implementation evidence
 
-Before implementation is accepted, the spec owner must add real test paths for
-the following contracts:
-
-| Contract | Required evidence |
+| Contract | Evidence |
 | --- | --- |
-| Case and organization isolation | Model/request tests for cross-organization reads, writes, and identifier disclosure |
-| Invitation security | Tests for target matching, expiry, single-use acceptance, decline, replay, and authorization |
-| Role matrix | Request tests for company case roles, students, assigned faculty, administrators, and non-participants |
-| Lifecycle transitions | Model/service tests for draft, published, closed, milestone, submission, and completion rules |
-| Submission ownership | Tests proving author evidence is immutable and reviewers cannot overwrite student work |
-| Private assets | Storage/request tests for signed access, authorization recheck, scanning, limits, and public URL rejection |
-| Audit and privacy | Tests for redaction, access reasons, retention, export, deletion, and no cross-domain mutations |
-| Browser workflow | QA-owned system walkthrough for invitation acceptance, workspace progress, feedback, and closure |
+| Case and organization isolation | `test/models/business_case_test.rb`, `test/controllers/business_cases_controller_test.rb` |
+| Invitation security | `test/models/business_case_invitation_test.rb`, `test/controllers/business_case_invitations_controller_test.rb` |
+| Role matrix | `test/controllers/business_cases_controller_test.rb`, `test/models/business_case_participant_test.rb` |
+| Lifecycle transitions | `test/models/business_case_test.rb`, `test/models/business_case_milestone_test.rb`, `test/controllers/business_case_workspace_test.rb` |
+| Submission ownership | `test/models/business_case_submission_test.rb` |
+| Private assets | Phase 1 accepts no assets; `test/operations/business_case_boundary_test.rb` proves the absence of any upload, attachment, mailer, or API surface |
+| Audit and privacy | Audit assertions across the model and controller tests; cross-domain non-mutation in `test/controllers/business_cases_controller_test.rb` |
+| Browser workflow | `test/system/business_case_walk_test.rb` |
 
 ## Error and boundary cases
 
@@ -230,13 +258,49 @@ Recruitment Domain Owner, and QA Owner must record:
 6. Milestone acceptance, feedback versus grading, academic-credit treatment,
    completion, cancellation, and closure behavior.
 
+### Recorded decisions (2026-08-09, Phase 1)
+
+The user, acting as the accountable owners, recorded these decisions for the
+Phase 1 slice. Each later phase must reopen the corresponding decision before
+widening the boundary.
+
+1. **Data governance:** the platform accepts text-only case content. Company
+   confidential files, source code, and real customer/employee personal data
+   are prohibited; the case and invitation screens state this notice. Records
+   are append-only; deletion and export requests are routed to the policy
+   owner rather than executed in-app.
+2. **Intellectual property:** students retain ownership of their own
+   submissions. Portfolio use of case material requires company consent.
+   Case participation creates no compensation, employment, or
+   recruitment-conversion terms.
+3. **Role matrix:** active organization owners create, edit, publish, and
+   close cases, manage milestones, invite students, assign and revoke
+   mentors, and read all case content. Other organization roles have no case
+   access. Students gain access only through an accepted invitation and only
+   while their participant assignment is active. Mentors must hold the
+   instructor account role and an explicit owner-made assignment.
+   Administrators have no case-content access in Phase 1; reason-gated
+   support access requires a future review. All other requests fail closed
+   with a safe not-found response.
+4. **Invitation channel:** in-app notification records only, with a 7-day
+   expiry, single-use digest-stored tokens, and no email delivery while
+   ADR-0004 defers the production email provider.
+5. **Files:** no upload surface exists in Phase 1;
+   `test/operations/business_case_boundary_test.rb` enforces the absence.
+6. **Academic treatment:** company and mentor feedback is mentoring evidence,
+   not grading; case work carries no academic credit and cannot change course
+   progress, grades, or recruitment application stages.
+
 ## Rollback and observability
 
-This design slice has no runtime migration or external dependency to roll back.
-Before implementation, the release plan must define how to disable new case
-creation/invitations, revoke participant access, preserve audit evidence,
-quarantine assets, reconcile partial submissions, and return the platform to a
-no-business-case state without deleting required records.
+Phase 1 adds the `business_case_*` tables through a reversible migration and no
+external dependency. To disable the capability, remove the business-case routes
+(every controller path becomes unreachable while models, data, and audit
+evidence remain intact); participant access is revoked per case through the
+existing revocation action. There are no assets to quarantine in Phase 1.
+Submissions are append-only versions, so a partial write leaves prior evidence
+untouched. Dropping the tables is a data-destroying rollback and requires the
+release owner's explicit approval.
 
 Future operations must measure privacy-safe counts and latency for case creation,
 invitation acceptance/expiry, authorization failures, milestone transitions,
@@ -247,6 +311,17 @@ identifiers, source code, attachment content, and invitation tokens.
 ## Verification
 
 ```bash
+bin/rails test test/models/business_case_test.rb \
+  test/models/business_case_invitation_test.rb \
+  test/models/business_case_participant_test.rb \
+  test/models/business_case_milestone_test.rb \
+  test/models/business_case_submission_test.rb \
+  test/models/business_case_comment_test.rb \
+  test/controllers/business_cases_controller_test.rb \
+  test/controllers/business_case_invitations_controller_test.rb \
+  test/controllers/business_case_workspace_test.rb \
+  test/operations/business_case_boundary_test.rb
+bin/rails test:system TEST=test/system/business_case_walk_test.rb
 bin/docs
 git diff --check
 ```

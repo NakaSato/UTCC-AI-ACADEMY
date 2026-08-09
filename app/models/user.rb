@@ -70,6 +70,24 @@ class User < ApplicationRecord
                                      inverse_of: :author
   has_many :proposal_requests, dependent: :destroy, inverse_of: :user
 
+  has_many :owned_business_cases, class_name: "BusinessCase", foreign_key: :owner_id,
+                                  dependent: :restrict_with_exception, inverse_of: :owner
+  has_many :business_case_participations, class_name: "BusinessCaseParticipant",
+                                          dependent: :restrict_with_exception, inverse_of: :user
+  has_many :assigned_business_case_participants, class_name: "BusinessCaseParticipant",
+                                                 foreign_key: :assigned_by_id,
+                                                 dependent: :restrict_with_exception, inverse_of: :assigned_by
+  has_many :sent_business_case_invitations, class_name: "BusinessCaseInvitation",
+                                            foreign_key: :inviter_id, dependent: :restrict_with_exception,
+                                            inverse_of: :inviter
+  has_many :received_business_case_invitations, class_name: "BusinessCaseInvitation",
+                                                foreign_key: :invitee_id, dependent: :restrict_with_exception,
+                                                inverse_of: :invitee
+  has_many :business_case_submissions, foreign_key: :author_id, dependent: :restrict_with_exception,
+                                       inverse_of: :author
+  has_many :business_case_comments, foreign_key: :author_id, dependent: :restrict_with_exception,
+                                    inverse_of: :author
+
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments
   # The other side of the same table: what this user teaches, not what they take.

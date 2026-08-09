@@ -1,0 +1,12 @@
+<% content_for :title, "#{t("business_cases.new")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("business_cases.back"), business_cases_path,
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("business_cases.new") %></h1>
+    <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("business_cases.new_subtitle") %></p>
+  </div>
+
+  <%= render "form", business_case: @business_case, url: business_cases_path, organizations: @organizations %>
+</main>

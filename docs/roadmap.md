@@ -1127,7 +1127,9 @@ decisions.
 
 ## Company Business Case Platform Roadmap
 
-**Status:** Proposal — not implemented
+**Status:** Phase 1 implemented (2026-08-09) — invitation-only, text-only
+collaboration slice per SPEC-0040/ADR-0040; uploads, email, reporting, and
+later milestones remain proposals
 
 **Version:** 1.0
 **Platform:** Ruby on Rails
@@ -1139,7 +1141,7 @@ decisions.
 
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
-| M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Proposed | Existing identity and platform services |
+| M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
 | M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Proposed | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
 | M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | Proposed | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
@@ -1150,9 +1152,12 @@ decisions.
 M10 is scoped to this roadmap track. It does not replace UTCC Academy M10
 Academic Writing or AI Recruitment Platform M10 AI Recruiter Agent.
 
-No company, business-case, project-milestone, or project-submission models or
-routes exist in the current application; the requirements below describe the
-proposed future capability.
+Phase 1 of this milestone is implemented: organization-owned business cases
+with draft/published/closed lifecycle, single-use student invitations,
+participant and mentor assignments, milestones, append-only text submissions,
+comments, and audit events (SPEC-0040). File uploads, email delivery,
+administrator support/reporting, and the revenue and AI capabilities below
+remain proposed future work gated on their own review decisions.
 
 ### 1. Executive Summary
 

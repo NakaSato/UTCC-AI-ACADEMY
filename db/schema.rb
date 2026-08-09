@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_140500) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -138,6 +138,95 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_140500) do
     t.index ["created_at"], name: "index_audit_events_on_created_at"
     t.index ["user_id", "created_at"], name: "index_audit_events_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_audit_events_on_user_id"
+  end
+
+  create_table "business_case_comments", force: :cascade do |t|
+    t.bigint "author_id", null: false
+    t.text "body", null: false
+    t.bigint "business_case_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "posted_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_business_case_comments_on_author_id"
+    t.index ["business_case_id", "id"], name: "index_business_case_comments_on_business_case_id_and_id"
+  end
+
+  create_table "business_case_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.bigint "business_case_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "declined_at"
+    t.datetime "expires_at", null: false
+    t.bigint "invitee_id", null: false
+    t.bigint "inviter_id", null: false
+    t.datetime "revoked_at"
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_case_id", "invitee_id"], name: "business_case_invitations_one_open", unique: true, where: "((accepted_at IS NULL) AND (declined_at IS NULL) AND (revoked_at IS NULL))"
+    t.index ["business_case_id"], name: "index_business_case_invitations_on_business_case_id"
+    t.index ["invitee_id"], name: "index_business_case_invitations_on_invitee_id"
+    t.index ["inviter_id"], name: "index_business_case_invitations_on_inviter_id"
+    t.index ["token_digest"], name: "index_business_case_invitations_on_token_digest", unique: true
+    t.check_constraint "NOT (accepted_at IS NOT NULL AND declined_at IS NOT NULL)", name: "business_case_invitations_one_decision"
+  end
+
+  create_table "business_case_milestones", force: :cascade do |t|
+    t.bigint "business_case_id", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "position", null: false
+    t.string "status", default: "open", null: false
+    t.string "title", limit: 160, null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_case_id", "position"], name: "idx_on_business_case_id_position_628c92fe3a", unique: true
+    t.check_constraint "status::text = ANY (ARRAY['open'::character varying, 'completed'::character varying]::text[])", name: "business_case_milestones_status"
+  end
+
+  create_table "business_case_participants", force: :cascade do |t|
+    t.bigint "assigned_by_id"
+    t.bigint "business_case_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "revoked_at"
+    t.string "role", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["business_case_id", "user_id"], name: "business_case_participants_one_active", unique: true, where: "(revoked_at IS NULL)"
+    t.index ["business_case_id"], name: "index_business_case_participants_on_business_case_id"
+    t.index ["user_id"], name: "index_business_case_participants_on_user_id"
+    t.check_constraint "role::text = ANY (ARRAY['student'::character varying, 'mentor'::character varying]::text[])", name: "business_case_participants_role"
+  end
+
+  create_table "business_case_submissions", force: :cascade do |t|
+    t.bigint "author_id", null: false
+    t.text "body", null: false
+    t.bigint "business_case_id", null: false
+    t.bigint "business_case_milestone_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "submitted_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "version", default: 1, null: false
+    t.index ["author_id"], name: "index_business_case_submissions_on_author_id"
+    t.index ["business_case_id"], name: "index_business_case_submissions_on_business_case_id"
+    t.index ["business_case_milestone_id", "author_id", "version"], name: "business_case_submissions_one_version", unique: true
+    t.check_constraint "version >= 1", name: "business_case_submissions_version"
+  end
+
+  create_table "business_cases", force: :cascade do |t|
+    t.text "brief"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "organization_id", null: false
+    t.bigint "owner_id", null: false
+    t.datetime "published_at"
+    t.text "requirements"
+    t.string "status", default: "draft", null: false
+    t.string "title", limit: 160, null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id", "status"], name: "index_business_cases_on_organization_id_and_status"
+    t.index ["owner_id"], name: "index_business_cases_on_owner_id"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'published'::character varying, 'closed'::character varying]::text[])", name: "business_cases_status"
   end
 
   create_table "candidate_profile_facts", force: :cascade do |t|
@@ -883,6 +972,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_140500) do
   add_foreign_key "approval_requests", "courses"
   add_foreign_key "approval_requests", "users", column: "requester_id"
   add_foreign_key "audit_events", "users"
+  add_foreign_key "business_case_comments", "business_cases"
+  add_foreign_key "business_case_comments", "users", column: "author_id"
+  add_foreign_key "business_case_invitations", "business_cases"
+  add_foreign_key "business_case_invitations", "users", column: "invitee_id"
+  add_foreign_key "business_case_invitations", "users", column: "inviter_id"
+  add_foreign_key "business_case_milestones", "business_cases"
+  add_foreign_key "business_case_participants", "business_cases"
+  add_foreign_key "business_case_participants", "users"
+  add_foreign_key "business_case_participants", "users", column: "assigned_by_id"
+  add_foreign_key "business_case_submissions", "business_case_milestones"
+  add_foreign_key "business_case_submissions", "business_cases"
+  add_foreign_key "business_case_submissions", "users", column: "author_id"
+  add_foreign_key "business_cases", "organizations"
+  add_foreign_key "business_cases", "users", column: "owner_id"
   add_foreign_key "candidate_profile_facts", "candidate_profiles"
   add_foreign_key "candidate_profiles", "users"
   add_foreign_key "course_modules", "courses"
