@@ -62,7 +62,7 @@ remaining labels are planning states.
 | 11 | UTCC M6 | Institutional Access and Documents | UTCC SSO and syllabus/document workflows work end to end | UTCC M4, institutional decisions | Later |
 | 12 | UTCC M7 | Operational Admin Controls | Administrative metrics, courses, approvals, and feature controls are trustworthy | UTCC M6, admin policy | Complete |
 | 13 | UTCC M8 | Community and Pedagogy Decisions | Social and prior-knowledge behaviors have approved academic rules | Teaching-policy decisions | Complete |
-| 14 | Ecosystem M10 | Company Business Case Platform | Companies and invited students collaborate on real business challenges | AI M1, company and confidentiality policy | In review |
+| 14 | Ecosystem M10 | Company Business Case Platform | Companies and invited students collaborate on real business challenges | AI M1, company and confidentiality policy | Complete |
 | 15 | AI M2 | Job Management | Companies can manage and publish structured jobs and programs | AI M1 | Complete |
 | 16 | AI M3 | AI Job Creation | AI helps produce quality job specifications with human approval | AI M2 | Complete |
 | 17 | AI M4 | Internship Management | Internship programs, applications, mentorship, and evaluation are supported | AI M1, M2 | Complete |
@@ -73,11 +73,11 @@ remaining labels are planning states.
 | 22 | AI M8 | AI Matching Engine | Candidates and opportunities receive explainable matching recommendations | AI M6, M7 | Complete |
 | 23 | AI M9 | Recruitment Workflow | Applications move through interview and offer stages | AI M2, M5 | Complete |
 | 24 | AI M10 | AI Recruiter Agent | Recruiters receive governed assistance across screening and coordination | AI M8, M9 | Complete |
-| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | In review |
-| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | In review |
-| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | In review |
-| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | In review |
-| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | In review |
+| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | Complete |
+| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | Complete |
+| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | Complete |
+| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | Complete |
+| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | Complete |
 
 ### Cross-cutting lane
 
