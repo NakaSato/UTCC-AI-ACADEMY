@@ -11,7 +11,8 @@ supersedes: []
 superseded_by: []
 depends_on: [ADR-0039, ADR-0010, ADR-0024, ADR-0033, ADR-0037, ADR-0038]
 implemented_by: []
-enforced_by: []
+enforced_by:
+  - test/operations/enterprise_integration_gate_test.rb
 touches:
   - app/models
   - app/services
