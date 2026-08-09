@@ -54,38 +54,47 @@
   <%# The gamification strip: hearts remaining, refill timer, and which
       semester the counters belong to.
 
-      Hearts are a learner mechanic, so staff get the strip for its semester
-      context alone — a life counter reads as noise on /instructor, where the
-      lives it counts are nobody's. Same line the proctor takes: the bar is
-      mounted for `student?` and staff are left out of the mechanic. With the
-      counters gone the semester is the only thing left, so it stops hiding
-      itself on narrow screens. %>
-  <div class="border-t border-chrome-line-2 bg-chrome-deep">
-    <div class="mx-auto flex max-w-page items-center gap-4 px-4 py-[9px] sm:px-8">
-      <% if Current.user&.student? %>
-        <span class="text-12-5 font-medium text-on-chrome">
-          <%= t("chrome.hearts_left", count: progress.hearts, max: progress.hearts_max) %>
-        </span>
-        <div class="flex gap-1" aria-hidden="true">
-          <% progress.hearts_max.times do |index| %>
-            <span class="text-12 <%= index < progress.hearts ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
-          <% end %>
-        </div>
-        <%# Derived, and only when a heart is actually missing — the old copy
-            showed a hardcoded timer forever. %>
-        <% if (refill_at = progress.heart_refill_at) %>
-          <% minutes = ((refill_at - Time.current) / 60).ceil.clamp(0..) %>
-          <span class="hidden text-12-5 text-on-chrome-dim sm:inline">
-            <%= t("chrome.refill", hours: minutes / 60, minutes: minutes % 60) %>
+      Hearts are a learner mechanic, so everyone else gets the strip for its
+      semester context alone — a life counter reads as noise on /instructor,
+      where the lives it counts are nobody's. Same line the proctor takes. With
+      the counters gone the semester is the only thing left, so it stops hiding
+      itself on narrow screens.
+
+      Keyed on the workspace rather than on `student?`, because a company member
+      holds the student role — ask the role and a recruiter is handed a heart
+      counter for coursework they are not doing. See User#workspace.
+
+      The strip is academy context — a term and a section — so a company member
+      gets none of it rather than an empty bar announcing somebody else's
+      semester. Their workspace has no academic calendar in it at all. %>
+  <% unless current_workspace == :company %>
+    <div data-strip="academy" class="border-t border-chrome-line-2 bg-chrome-deep">
+      <div class="mx-auto flex max-w-page items-center gap-4 px-4 py-[9px] sm:px-8">
+        <% if current_workspace == :student %>
+          <span class="text-12-5 font-medium text-on-chrome">
+            <%= t("chrome.hearts_left", count: progress.hearts, max: progress.hearts_max) %>
           </span>
+          <div class="flex gap-1" aria-hidden="true">
+            <% progress.hearts_max.times do |index| %>
+              <span class="text-12 <%= index < progress.hearts ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
+            <% end %>
+          </div>
+          <%# Derived, and only when a heart is actually missing — the old copy
+              showed a hardcoded timer forever. %>
+          <% if (refill_at = progress.heart_refill_at) %>
+            <% minutes = ((refill_at - Time.current) / 60).ceil.clamp(0..) %>
+            <span class="hidden text-12-5 text-on-chrome-dim sm:inline">
+              <%= t("chrome.refill", hours: minutes / 60, minutes: minutes % 60) %>
+            </span>
+          <% end %>
         <% end %>
-      <% end %>
-      <span class="<%= class_names(
-                         "ml-auto text-12-5 text-on-chrome-dim",
-                         "hidden lg:inline" => Current.user&.student?
-                       ) %>">
-        <%= t("chrome.semester") %>
-      </span>
+        <span class="<%= class_names(
+                           "ml-auto text-12-5 text-on-chrome-dim",
+                           "hidden lg:inline" => current_workspace == :student
+                         ) %>">
+          <%= t("chrome.semester") %>
+        </span>
+      </div>
     </div>
-  </div>
+  <% end %>
 </header>

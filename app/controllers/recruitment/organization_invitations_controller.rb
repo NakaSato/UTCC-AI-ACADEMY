@@ -18,7 +18,7 @@ module Recruitment
       AuditEvent.record("recruitment_invitation_created", organization: organization.name,
                         member: invitee.name, role: invitation.role)
 
-      redirect_to recruitment_organization_path(organization),
+      redirect_to company_path(organization),
                   notice: t("flash.recruitment_invitation_sent", name: invitee.name)
     rescue ActiveRecord::RecordInvalid => error
       alert = if error.respond_to?(:record)
@@ -26,7 +26,7 @@ module Recruitment
       else
         t("flash.recruitment_invitee_missing")
       end
-      redirect_to recruitment_organization_path(organization), alert:
+      redirect_to company_path(organization), alert:
     end
 
     def show
@@ -39,7 +39,7 @@ module Recruitment
       invitation.accept!
       AuditEvent.record("recruitment_invitation_accepted", organization: invitation.organization.name,
                         member: Current.user.name, role: invitation.role)
-      redirect_to recruitment_organization_path(invitation.organization),
+      redirect_to company_path(invitation.organization),
                   notice: t("flash.recruitment_invitation_accepted")
     rescue ActiveRecord::RecordInvalid
       redirect_to recruitment_organization_invitation_path(params[:token]),
@@ -68,7 +68,7 @@ module Recruitment
       end
 
       def managed_organization
-        organization = Organization.active.find(params[:id])
+        organization = Organization.active.from_param!(params[:id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id, role: "owner")
 

@@ -59,6 +59,8 @@ This inventory reflects the routes, controllers, models, views, and documented b
   - Instructor
   - Admin
   - Company reach through active organization memberships rather than a role
+- Role-aware workspaces: navigation, gamification strip, and the `/` destination all follow the account's workspace
+- Company profiles at their own name (`/northstar`), with organizations addressed by name in every URL
 - Login, registration, password-reset, grading, and incident-report rate limits
 - Login protection by both IP address and student ID, on `/login` and `/console` alike
 - Sensitive parameter filtering

@@ -21,7 +21,7 @@
   <% else %>
     <div class="grid gap-4 md:grid-cols-2">
       <% @organizations.each do |organization| %>
-        <%= link_to recruitment_organization_path(organization),
+        <%= link_to company_path(organization),
               class: "rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand hover:shadow-sm" do %>
           <div class="flex items-start justify-between gap-4">
             <div>

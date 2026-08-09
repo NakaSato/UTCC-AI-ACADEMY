@@ -29,7 +29,7 @@ module Recruitment
                           member: owner.name, role: "owner")
       end
 
-      redirect_to recruitment_organization_path(@organization),
+      redirect_to company_path(@organization),
                   notice: t("flash.recruitment_organization_created", name: @organization.name)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => error
       @users = eligible_users
@@ -40,6 +40,11 @@ module Recruitment
 
     def show
       @organization = find_visible_organization
+      # One canonical address for a profile. The old id-based URL still resolves
+      # — bookmarks, and every link that predates the vanity route — but it
+      # answers by sending the reader to the name.
+      return redirect_to company_path(@organization) if params[:id]
+
       @memberships = @organization.memberships.active.includes(:user).order(:role, :id)
       @users = eligible_users
       @can_manage_invitations = can_manage_invitations?
@@ -50,31 +55,31 @@ module Recruitment
     end
 
     def create_membership
-      organization = Organization.find(params[:id])
+      organization = Organization.from_param!(params[:id])
       user = eligible_users.find(membership_params[:user_id])
       membership = organization.memberships.create!(user:, role: membership_params[:role])
       AuditEvent.record("recruitment_membership_granted", organization: organization.name,
                         member: user.name, role: membership.role)
 
-      redirect_to recruitment_organization_path(organization),
+      redirect_to company_path(organization),
                   notice: t("flash.recruitment_membership_granted", name: user.name)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => error
-      organization = Organization.find(params[:id])
+      organization = Organization.from_param!(params[:id])
       alert = error.respond_to?(:record) ? error.record.errors.full_messages.to_sentence : t("flash.recruitment_member_missing")
-      redirect_to recruitment_organization_path(organization), alert:
+      redirect_to company_path(organization), alert:
     end
 
     def revoke_membership
-      organization = Organization.find(params[:id])
+      organization = Organization.from_param!(params[:id])
       membership = organization.memberships.find_by!(user_id: params[:user_id])
       membership.revoke!
       AuditEvent.record("recruitment_membership_revoked", organization: organization.name,
                         member: membership.user.name, role: membership.role)
 
-      redirect_to recruitment_organization_path(organization),
+      redirect_to company_path(organization),
                   notice: t("flash.recruitment_membership_revoked", name: membership.user.name)
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_path(organization),
+      redirect_to company_path(organization),
                   alert: t("flash.recruitment_owner_revoke_forbidden")
     rescue ActiveRecord::RecordNotFound
       redirect_to recruitment_organizations_path, alert: t("flash.recruitment_member_missing")
@@ -104,8 +109,14 @@ module Recruitment
         Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id, role: "owner")
       end
 
+      # Two ways in, one record: /northstar carries the slug, and the nested
+      # workspace routes still carry the id.
       def find_visible_organization
-        organization = Organization.find(params[:id])
+        organization = if params[:slug]
+          Organization.find_by!(slug: params[:slug])
+        else
+          Organization.from_param!(params[:id])
+        end
         raise ActiveRecord::RecordNotFound unless organization.visible_to?(Current.user)
 
         organization

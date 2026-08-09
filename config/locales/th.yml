@@ -244,6 +244,9 @@ th:
       writing: "งานเขียนวิชาการ"
       instructor: "อาจารย์"
       admin: "ผู้ดูแล"
+      organizations: "หน่วยงาน"
+      business_cases: "โจทย์ธุรกิจ"
+      placements: "การฝึกงาน"
       sign_in: "เข้าสู่ระบบ"
     menu:
       profile: "โปรไฟล์ของฉัน"

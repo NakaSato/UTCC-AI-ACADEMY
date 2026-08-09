@@ -2,7 +2,7 @@
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to t("recruitment.reporting.back_to_organization"), recruitment_organization_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <%= link_to t("recruitment.reporting.back_to_organization"), company_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
     <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.reporting.title") %></h1>
     <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= t("recruitment.reporting.subtitle", organization: @organization.name) %></p>
   </div>

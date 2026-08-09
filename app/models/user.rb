@@ -187,6 +187,26 @@ class User < ApplicationRecord
   # it to an organization. Everyone else is a learner and signs in at /login.
   def console_access? = staff? || company_member?
 
+  # Which app this account is in — the one question the chrome and the front
+  # door both ask. Four answers, most specific first.
+  #
+  # Membership is checked before the role and that ordering is the whole point:
+  # a company member holds the *student* role, because company reach is an
+  # organization membership and never a column (ADR-0024). Ask `student?` first
+  # and a recruiter gets a learner's navigation and a heart counter.
+  #
+  # Memoised: the header asks twice per request and the answer costs a query.
+  WORKSPACES = %i[ admin instructor company student ].freeze
+
+  def workspace
+    @workspace ||=
+      if admin? then :admin
+      elsif instructor? then :instructor
+      elsif company_member? then :company
+      else :student
+      end
+  end
+
   # What to print where a screen used to print the student ID. A learner still
   # shows their ID; a console account shows the handle it signs in with.
   def identifier = student_id.presence || username.presence || email_address

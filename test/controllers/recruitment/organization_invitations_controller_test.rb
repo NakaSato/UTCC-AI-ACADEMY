@@ -17,7 +17,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
     invitation = @organization.invitations.order(:id).last
     notification = users(:two).notifications.order(:id).last
     token = notification.params.fetch("token")
-    assert_redirected_to recruitment_organization_path(@organization)
+    assert_redirected_to company_path(@organization)
     assert_equal "recruitment_organization_invitation", notification.kind
     assert_equal recruitment_organization_invitation_path(token), notification.action_path
     assert_equal Digest::SHA256.hexdigest(token), invitation.token_digest
@@ -32,7 +32,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
       post recruitment_accept_organization_invitation_path(token)
     end
 
-    assert_redirected_to recruitment_organization_path(@organization)
+    assert_redirected_to company_path(@organization)
     assert_equal "recruiter", @organization.memberships.find_by(user: users(:two)).role
   end
 
@@ -81,6 +81,6 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
       }
     end
 
-    assert_redirected_to recruitment_organization_path(@organization)
+    assert_redirected_to company_path(@organization)
   end
 end

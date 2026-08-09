@@ -90,8 +90,12 @@ class InternshipRequestsController < ApplicationController
     def notify_deciders(internship_request)
       internship_request.organization.memberships.active
                        .where(role: InternshipRequest::DECIDER_ROLES).includes(:user).find_each do |membership|
+        # The slug, not the row id: an organization is addressed by name in
+        # every URL now, and a notification's action path is a URL it has to
+        # still be able to build months later. The slug is set once at creation
+        # and nothing rewrites it.
         Notification.notify(membership.user, "internship_request_received",
-                            organization_id: internship_request.organization_id,
+                            organization_slug: internship_request.organization.slug,
                             organization: internship_request.organization.name,
                             student: Current.user.name)
       end

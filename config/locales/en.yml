@@ -243,6 +243,9 @@ en:
       writing: "Academic writing"
       instructor: "Instructor"
       admin: "Admin"
+      organizations: "Organizations"
+      business_cases: "Business cases"
+      placements: "Internships"
       sign_in: "Sign in"
     menu:
       profile: "My profile"

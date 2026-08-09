@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T22:00:00+07:00",
+  "updated_at": "2026-08-09T23:15:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2134,6 +2134,29 @@
         }
       ],
       "updated_at": "2026-08-09T22:00:00+07:00"
+    },
+    {
+      "id": "UX-001",
+      "title": "Split navigation, front doors, and company addresses by workspace",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, and Recruitment Domain Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "AUTH-011"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Role-aware workspaces specification",
+          "url": "specs/spec-role-aware-workspaces.html"
+        },
+        {
+          "label": "Role-aware workspaces ADR",
+          "url": "decisions/adr-0044-role-aware-workspaces.html"
+        }
+      ],
+      "updated_at": "2026-08-09T23:15:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3813,6 +3836,14 @@
       "to": "complete",
       "summary": "Closed the recovery gap AUTH-011 opened. A console account has no student ID and its first password is shown once, so a username-only account whose owner lost that password had no route back at all — /forgot-password keys on an email address. Creating a console account now requires one. Alongside it, an administrator can reissue a console account's password from the roster: a fresh generated password under the same one-flash, digest-only rule, every session of that account destroyed so a forgotten password that was actually a stolen one does not survive the recovery, and a warn-level audit row that names the identifier and omits the password. A learner is deliberately not eligible, because /forgot-password reaches them without an administrator reading their new password, and an admin cannot reissue their own. ADR-0043 had listed admin-issued resets as out of scope and was amended the same day to add both points.",
       "evidence_url": "specs/spec-console-account-identity.html"
+    },
+    {
+      "at": "2026-08-09T23:15:00+07:00",
+      "item_id": "UX-001",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The user asked for the navigation and dashboards to stop being the same thing for every role, and chose one shell with role-aware chrome over a second layout, and the navigation split before any new dashboard content. User#workspace now answers admin, instructor, company, or student — membership before role, which is the whole point, because a company member holds the student role and asking the role had been handing recruiters a learner's navigation and a heart counter for coursework they are not doing. The header rail, the burger drawer, the gamification strip, and the / destination all read that one predicate, and every navigation entry is a door its workspace can actually open. Separately the user asked for a company's profile to live at its name: /northstar rather than /recruitment/organizations/7. The vanity route is declared last so every real path wins, Organization::RESERVED_SLUGS forbids a name a real path would shadow with a test that keeps the list and the routes in step, to_param is the slug so the workspace routes behind the profile carry the name too, and the id-based URL redirects to the canonical one. Dashboard content per role — summary cards, counts, pipelines — is deliberately deferred to its own slice; each workspace lands on the best screen that exists today.",
+      "evidence_url": "specs/spec-role-aware-workspaces.html"
     }
   ]
 }

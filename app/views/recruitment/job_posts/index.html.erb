@@ -4,7 +4,7 @@
   <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
     <div>
       <% unless @public %>
-        <%= link_to t("recruitment.jobs.back_to_organization"), recruitment_organization_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+        <%= link_to t("recruitment.jobs.back_to_organization"), company_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
       <% end %>
       <h1 class="mt-3 text-32 font-bold tracking-[-0.035em] text-ink"><%= @public ? t("recruitment.jobs.public_title") : t("recruitment.jobs.management_title") %></h1>
     <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= @public ? t("recruitment.jobs.public_subtitle") : t("recruitment.jobs.management_subtitle") %></p>

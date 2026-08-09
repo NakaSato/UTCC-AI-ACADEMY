@@ -35,9 +35,32 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     # "เข้าสู่ระบบ" as the submit.
     find("input[type=submit]").click
 
+    # `/` is each workspace's own front door now, so where sign-in lands depends
+    # on who signed in — a company member goes to their company, not to a
+    # catalogue of courses they are not taking. See SPEC-0044.
+    #
     # Turbo changes the URL before Edge always exposes the replacement document.
-    # Waiting for both keeps callers from querying an outgoing, stale document.
-    assert_current_path root_path, wait: 10
-    assert_selector "h1", text: I18n.t("catalog.title"), wait: 10
+    # Waiting on the destination keeps callers from querying an outgoing, stale
+    # document, whichever destination it is.
+    assert_current_path workspace_home(user), wait: 10
+    assert_selector "h1", text: I18n.t("catalog.title"), wait: 10 if user.workspace == :student
   end
+
+  private
+    def workspace_home(user)
+      case user.workspace
+      in :admin then admin_path
+      in :instructor then instructor_path
+      in :company then company_home_path(user)
+      else root_path
+      end
+    end
+
+    # Mirrors HomeController#company_home: one organization means the company's
+    # own page, more than one means the list.
+    def company_home_path(user)
+      organizations = user.organizations.merge(Organization.active)
+
+      organizations.one? ? company_path(organizations.first) : recruitment_organizations_path
+    end
 end

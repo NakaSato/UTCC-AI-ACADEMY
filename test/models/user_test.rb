@@ -68,6 +68,29 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  # Membership before role, and that ordering is the point: a company member
+  # holds the student role, so asking `student?` first hands a recruiter a
+  # learner's navigation and a heart counter.
+  test "workspace answers membership before role" do
+    organization = Organization.create!(name: "Workspace Co", creator: users(:admin))
+    member = users(:console_company)
+    organization.memberships.create!(user: member, role: "recruiter")
+
+    assert_equal :student, users(:student).workspace
+    assert_equal :instructor, users(:instructor).workspace
+    assert_equal :admin, users(:admin).workspace
+    assert_equal :company, member.workspace
+    assert_predicate member, :student?
+  end
+
+  test "an instructor who is also a company member stays in the teaching app" do
+    organization = Organization.create!(name: "Both Co", creator: users(:admin))
+    instructor = users(:console_instructor)
+    organization.memberships.create!(user: instructor, role: "mentor")
+
+    assert_equal :instructor, instructor.workspace
+  end
+
   # What every screen prints where it used to print the student ID.
   test "identifier falls back from student ID to username to email" do
     assert_equal(users(:student).student_id, users(:student).identifier)

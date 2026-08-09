@@ -18,19 +18,30 @@ module ApplicationHelper
     I18n.available_locales.index_with { locale_url(it, path:) }
   end
 
-  # The dark header's primary nav. `Course` and `Lesson` are shortcuts into
-  # AI1101 — the course a student is currently working through.
-  #
-  # The instructor and admin entries are role-gated, matching the `allow_only`
-  # on each controller: a student is never shown a door they cannot open. Both
-  # the desktop nav and the burger drawer read this one list.
-  #
-  # An admin gets a nav of its own rather than the learning nav with two extra
-  # entries: `/` only redirects them back to /admin, so the catalog, the course
-  # shortcuts and the learner screens are not part of their app.
-  def app_nav_items
-    return admin_nav_items if Current.user&.admin?
+  # Which of the four apps the signed-in account is in. Signed out there is no
+  # header to fill, and the learner nav is the harmless default.
+  def current_workspace = Current.user&.workspace || :student
 
+  # The dark header's primary nav — one list per workspace, because these are
+  # four different jobs and not one job with extra buttons. A nav is a claim
+  # about what this app is for, and a recruiter reading "Lesson · Map · Ranking"
+  # is being told it is for something they will never do.
+  #
+  # Every entry is a door its workspace can actually open, matching the
+  # `allow_only` on each controller and, for the company entries, the membership
+  # scoping inside them. Both the desktop nav and the burger drawer read this.
+  def app_nav_items
+    case current_workspace
+    in :admin then admin_nav_items
+    in :instructor then instructor_nav_items
+    in :company then company_nav_items
+    else student_nav_items
+    end
+  end
+
+  # `Course` and `Lesson` are shortcuts into AI1101 — the course a student is
+  # currently working through.
+  def student_nav_items
     items = [
       [ t("chrome.nav.catalog"),     root_path ],
       [ t("chrome.nav.my_learning"), my_learning_path ],
@@ -42,15 +53,36 @@ module ApplicationHelper
     ]
 
     items.insert(-2, [ t("chrome.nav.ranking"), leaderboard_path ]) if FeatureSetting.enabled?(:leaderboard)
-    items << [ t("chrome.nav.instructor"), instructor_path ] if Current.user&.staff?
     items
   end
 
-  # The two staff screens, admin first — it is the admin's index.
+  # Admin first — it is the admin's index. Organizations because creating one
+  # and granting its first membership are admin-only actions.
   def admin_nav_items
     [
-      [ t("chrome.nav.admin"),      admin_path ],
-      [ t("chrome.nav.instructor"), instructor_path ]
+      [ t("chrome.nav.admin"),         admin_path ],
+      [ t("chrome.nav.instructor"),    instructor_path ],
+      [ t("chrome.nav.organizations"), recruitment_organizations_path ]
+    ]
+  end
+
+  # Short on purpose: this is everything an instructor has that a learner does
+  # not. Padding it with the catalog and the knowledge map would be padding it
+  # with screens about somebody else's coursework.
+  def instructor_nav_items
+    [
+      [ t("chrome.nav.instructor"), instructor_path ],
+      [ t("chrome.nav.writing"),    academic_posts_path ]
+    ]
+  end
+
+  # A company member's three: the organizations they belong to, the case work
+  # they run, and the students they have placed. None of it is coursework.
+  def company_nav_items
+    [
+      [ t("chrome.nav.organizations"),  recruitment_organizations_path ],
+      [ t("chrome.nav.business_cases"), business_cases_path ],
+      [ t("chrome.nav.placements"),     internship_placements_path ]
     ]
   end
 

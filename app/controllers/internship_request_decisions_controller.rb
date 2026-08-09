@@ -31,7 +31,7 @@ class InternshipRequestDecisionsController < ApplicationController
 
   private
     def decidable_organization
-      organization = Organization.active.find(params[:organization_id])
+      organization = Organization.active.from_param!(params[:organization_id])
       raise ActiveRecord::RecordNotFound unless organization.memberships.active
                                                             .exists?(user_id: Current.user.id,
                                                                      role: InternshipRequest::DECIDER_ROLES)

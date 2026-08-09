@@ -15,7 +15,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     organization = Organization.order(:id).last
-    assert_redirected_to recruitment_organization_path(organization)
+    assert_redirected_to company_path(organization)
     assert_equal "north-star", organization.slug
     assert_predicate organization.memberships.find_by(user: users(:one)), :owner?
     assert_equal "recruitment_organization_created", AuditEvent.order(:id).last(2).first.action
@@ -47,9 +47,13 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
 
     sign_out
     sign_in_as users(:one)
-    get recruitment_organization_path(organization)
+    get company_path(organization)
     assert_response :success
     assert_select "h1", "Member Org"
+
+    # The id-based URL still resolves and answers with the canonical one.
+    get recruitment_organization_path(organization)
+    assert_redirected_to company_path(organization)
 
     sign_out
     sign_in_as users(:two)
@@ -67,13 +71,13 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
       }
     end
     membership = organization.memberships.find_by!(user: users(:two))
-    assert_redirected_to recruitment_organization_path(organization)
+    assert_redirected_to company_path(organization)
     assert_equal "recruiter", membership.role
 
     assert_difference -> { organization.memberships.active.count }, -1 do
       delete membership_recruitment_organization_path(organization, users(:two).id)
     end
-    assert_redirected_to recruitment_organization_path(organization)
+    assert_redirected_to company_path(organization)
     assert_equal "revoked", membership.reload.status
   end
 
@@ -83,7 +87,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
 
     delete membership_recruitment_organization_path(organization, users(:one).id)
 
-    assert_redirected_to recruitment_organization_path(organization)
+    assert_redirected_to company_path(organization)
     assert_predicate membership.reload, :active?
   end
 end

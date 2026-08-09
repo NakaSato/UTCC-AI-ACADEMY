@@ -287,4 +287,17 @@ Rails.application.routes.draw do
   # The catalog for signed-in students, /admin for an admin, the public landing
   # page for everyone else.
   root "home#index"
+
+  # A company's profile is /northstar, not /recruitment/organizations/7 — the
+  # address a company would put on a page about itself. It is deliberately the
+  # LAST route in the file: every real path above wins, whatever an organization
+  # is called. Organization::RESERVED_SLUGS is the other half of that guarantee,
+  # so an organization can never be named something it could not be reached at,
+  # and `organization_slug_test.rb` proves the two lists agree.
+  #
+  # Only the profile moves. The workspace behind it — job posts, programs,
+  # applications, reporting — stays nested under /recruitment/organizations/:id,
+  # where being scoped to an organization is the point of the URL.
+  get "/:slug", to: "recruitment/organizations#show", as: :company,
+      constraints: { slug: /[a-z0-9]+(?:-[a-z0-9]+)*/ }
 end

@@ -33,7 +33,7 @@ module Recruitment
       end
 
       def load_evaluation_context
-        @organization = Organization.active.find(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:organization_id])
         @program = @organization.internship_programs.find(params[:internship_program_id])
         @application = @program.applications.find(params[:application_id])
         membership = @organization.memberships.active.find_by(user_id: Current.user.id)

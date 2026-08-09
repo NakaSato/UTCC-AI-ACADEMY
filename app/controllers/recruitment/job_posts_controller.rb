@@ -129,7 +129,7 @@ module Recruitment
       end
 
       def readable_organization
-        organization = Organization.active.find(params[:organization_id])
+        organization = Organization.active.from_param!(params[:organization_id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id)
 
@@ -141,7 +141,7 @@ module Recruitment
       end
 
       def authorizing_organization(roles)
-        organization = Organization.active.find(params[:organization_id])
+        organization = Organization.active.from_param!(params[:organization_id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id, role: roles)
 

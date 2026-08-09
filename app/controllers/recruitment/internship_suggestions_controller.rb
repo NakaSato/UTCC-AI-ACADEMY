@@ -59,7 +59,7 @@ module Recruitment
       end
 
       def load_program
-        @organization = Organization.active.find(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:organization_id])
         allowed = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                     role: InternshipProgram::AUTHOR_ROLES)
         raise ActiveRecord::RecordNotFound unless allowed

@@ -49,3 +49,4 @@ owner.
 - [SPEC-0041 — Student-initiated internship requests, placements, and progress reporting](spec-student-internship-requests.md) — accepted; increment 1 implemented and scoped against the shipped SPEC-0028 internship management
 - [SPEC-0042 — Console sign-in for teaching staff, administrators, and company members](spec-console-sign-in.md) — accepted; second sign-in door at /console over the one shared session mechanism
 - [SPEC-0043 — Console account identity, admin-created accounts, and the identifier model](spec-console-account-identity.md) — accepted; three identifier columns, at least one required, and an admin creation screen
+- [SPEC-0044 — Role-aware navigation, front doors, and company profile addresses](spec-role-aware-workspaces.md) — accepted; User#workspace drives the nav, the strip, and where / lands; organizations addressed by name

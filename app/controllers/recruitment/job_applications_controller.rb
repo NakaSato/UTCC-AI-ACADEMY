@@ -105,7 +105,7 @@ module Recruitment
       end
 
       def load_reviewable_job
-        @organization = Organization.active.find(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:organization_id])
         permitted = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                     role: Recruitment::JobApplication::REVIEWER_ROLES)
         raise ActiveRecord::RecordNotFound unless permitted
