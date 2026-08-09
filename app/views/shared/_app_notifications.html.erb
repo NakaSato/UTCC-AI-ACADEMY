@@ -51,7 +51,10 @@
         <div>
           <div class="text-13-5 leading-[1.45] text-ink"><%= notification.text %></div>
           <% if notification.action_path %>
+            <%# Out of the bell's frame: the destination is a whole screen, and a
+                frame-scoped visit would look like a link that does nothing. %>
             <%= link_to notification.action_label, notification.action_path,
+                  data: { turbo_frame: "_top" },
                   class: "mt-1 inline-block text-12-5 font-semibold text-brand hover:text-brand-deep" %>
           <% end %>
           <div class="mt-0.5 font-mono text-11 text-muted-2">
