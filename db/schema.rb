@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -385,7 +385,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_100000) do
     t.index ["organization_id"], name: "index_organization_invitations_on_organization_id"
     t.index ["token_digest"], name: "index_organization_invitations_on_token_digest", unique: true
     t.check_constraint "NOT (accepted_at IS NOT NULL AND declined_at IS NOT NULL)", name: "organization_invitations_one_decision"
-    t.check_constraint "role::text = ANY (ARRAY['recruiter'::character varying, 'hiring_manager'::character varying, 'mentor'::character varying]::text[])", name: "organization_invitations_role"
+    t.check_constraint "role::text = ANY (ARRAY['recruiter'::character varying, 'hiring_manager'::character varying, 'mentor'::character varying, 'company_reviewer'::character varying]::text[])", name: "organization_invitations_role"
   end
 
   create_table "organization_memberships", force: :cascade do |t|

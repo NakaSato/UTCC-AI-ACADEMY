@@ -56,7 +56,8 @@ boundary.
 
 - Plain-text messages stored on a job application.
 - Candidate access to their own conversation.
-- Owner, recruiter, or hiring-manager access for that application's organization.
+- Owner, recruiter, hiring-manager, or company-reviewer access for that
+  application's organization.
 - Chronological sender/timestamp history.
 - Audit events for message creation.
 
@@ -69,7 +70,7 @@ boundary.
 
 1. A message belongs to exactly one application and one sender.
 2. Only the application candidate or an active organization owner, recruiter,
-   or hiring manager can read or create messages.
+   hiring manager, or company reviewer can read or create messages.
 3. Mentors and unrelated organization members cannot access the conversation.
 4. Message creation never changes application status or stage history.
 5. Message body is non-empty, plain text, and at most 4,000 characters.

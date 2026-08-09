@@ -1,9 +1,10 @@
 class BusinessCasesController < ApplicationController
   def index
-    @owned_cases = BusinessCase.joins(organization: :memberships)
+    @managed_cases = BusinessCase.joins(organization: :memberships)
                                .merge(Organization.active)
                                .where(organization_memberships: { user_id: Current.user.id,
-                                                                  status: "active", role: "owner" })
+                                                                  status: "active",
+                                                                  role: BusinessCase::MANAGER_ROLES })
                                .includes(:organization)
                                .newest_first
     @participating_cases = BusinessCase.joins(:participants)
@@ -12,17 +13,17 @@ class BusinessCasesController < ApplicationController
                                        .includes(:organization)
                                        .newest_first
     @can_create = OrganizationMembership.active
-                                        .where(user_id: Current.user.id, role: "owner")
+                                        .where(user_id: Current.user.id, role: BusinessCase::MANAGER_ROLES)
                                         .joins(:organization).merge(Organization.active).exists?
   end
 
   def new
-    @organizations = owned_organizations
+    @organizations = case_managing_organizations
     @business_case = BusinessCase.new(organization: @organizations.first)
   end
 
   def create
-    organization = owned_organizations.find(business_case_params[:organization_id])
+    organization = case_managing_organizations.find(business_case_params[:organization_id])
     @business_case = organization.business_cases.new(business_case_params.except(:organization_id))
     @business_case.owner = Current.user
     @business_case.save!
@@ -30,7 +31,7 @@ class BusinessCasesController < ApplicationController
 
     redirect_to business_case_path(@business_case), notice: t("flash.business_case_created")
   rescue ActiveRecord::RecordInvalid
-    @organizations = owned_organizations
+    @organizations = case_managing_organizations
     render :new, status: :unprocessable_entity
   end
 
@@ -86,13 +87,13 @@ class BusinessCasesController < ApplicationController
       params.expect(business_case: [ :organization_id, :title, :brief, :requirements ])
     end
 
-    # Creating a case needs an organization this user actually owns; with none,
-    # the screen does not exist for them.
-    def owned_organizations
+    # Creating a case needs an organization whose cases this user may run; with
+    # none, the screen does not exist for them.
+    def case_managing_organizations
       organizations = Organization.active
                                   .joins(:memberships)
                                   .where(organization_memberships: { user_id: Current.user.id, status: "active",
-                                                                     role: "owner" })
+                                                                     role: BusinessCase::MANAGER_ROLES })
                                   .order(:name)
       raise ActiveRecord::RecordNotFound if organizations.empty?
 
@@ -125,7 +126,7 @@ class BusinessCasesController < ApplicationController
       redirect_to business_case_path(business_case), alert: t("flash.business_case_conflict")
     end
 
-    # Students see their own evidence; owners and mentors review everyone's.
+    # Students see their own evidence; case managers and mentors review everyone's.
     def visible_submissions
       submissions = @business_case.submissions.newest_first.includes(:author, :milestone)
       return submissions if @manageable || @participant&.mentor?

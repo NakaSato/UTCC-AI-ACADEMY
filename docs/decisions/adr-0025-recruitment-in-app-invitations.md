@@ -5,7 +5,7 @@ title: Use secure in-app invitations for registered recruitment staff
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -56,7 +56,8 @@ email-delivery dependency.
 
 - Invitations target existing registered non-admin users by account identity.
 - An active organization owner or administrator may create an invitation for a
-  recruiter, hiring manager, or mentor role.
+  recruiter, hiring manager, mentor, or company reviewer role — the membership
+  roles minus ownership, which is never invitable.
 - Each invitation has an opaque, expiring token, is delivered through the
   existing in-app notification bell, and is visible only to the intended user.
 - The intended user may accept or decline once. Accepting creates the scoped

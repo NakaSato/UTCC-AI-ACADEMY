@@ -55,7 +55,8 @@ team, so it can support a small in-app conversation.
 ## Decision
 
 - Store plain-text messages on the application and show them only to the
-  candidate or an active organization owner, recruiter, or hiring manager.
+  candidate or an active organization owner, recruiter, hiring manager, or
+  company reviewer.
 - Allow either participant boundary to send a message; the application state
   does not change when a message is sent.
 - Keep messages in chronological history with sender and timestamp.

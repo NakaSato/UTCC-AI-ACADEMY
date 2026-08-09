@@ -14,6 +14,18 @@ class OrganizationMembershipTest < ActiveSupport::TestCase
     assert_predicate admin_membership.errors[:user], :any?
   end
 
+  test "a company reviewer is a grantable, revocable, invitable role" do
+    membership = @organization.memberships.create!(user: users(:one), role: "company_reviewer")
+
+    assert_predicate membership, :company_reviewer?
+    assert_predicate membership, :active?
+    assert_includes OrganizationInvitation::ROLES, "company_reviewer",
+      "a company reviewer must be invitable; only ownership is withheld"
+
+    membership.revoke!
+    assert_not_predicate membership.reload, :active?
+  end
+
   test "a user can have only one membership in an organization" do
     @organization.memberships.create!(user: users(:one), role: "recruiter")
     duplicate = @organization.memberships.new(user: users(:one), role: "mentor")

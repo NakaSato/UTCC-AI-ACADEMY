@@ -5,7 +5,7 @@ title: Recruitment organization invitations for registered users
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -79,7 +79,8 @@ allow a copied invitation token to be redeemed by another account.
 1. An invitation belongs to one organization, inviter, and existing invitee.
 2. The inviter is an administrator or active owner of the organization.
 3. The invitee is not an administrator and cannot be the inviter.
-4. Invitation roles are limited to recruiter, hiring-manager, and mentor.
+4. Invitation roles are limited to recruiter, hiring-manager, mentor, and
+   company-reviewer — every membership role except ownership.
 5. Only one pending invitation exists for an organization/invitee pair; the
    database enforces this for concurrent requests.
 6. The token is stored only as a digest, is generated at creation, and expires

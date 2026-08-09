@@ -4,8 +4,8 @@ module Recruitment
 
     STATUSES = %w[ draft review published paused closed archived ].freeze
     REMOTE_POLICIES = %w[ onsite hybrid remote ].freeze
-    AUTHOR_ROLES = %w[ owner recruiter hiring_manager ].freeze
-    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor ].freeze
+    AUTHOR_ROLES = %w[ owner recruiter hiring_manager company_reviewer ].freeze
+    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor company_reviewer ].freeze
     TRANSITIONS = {
       "draft" => %w[ review archived ],
       "review" => %w[ draft published archived ],

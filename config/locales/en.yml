@@ -2272,7 +2272,7 @@ en:
     cancel: "Cancel"
     empty_title: "No business cases yet"
     empty_body: "Cases you own or participate in will appear here once an organization owner creates one or invites you."
-    owned_heading: "Cases you manage"
+    managed_heading: "Cases you manage"
     participating_heading: "Cases you participate in"
     policy_notice: "Text only — no file or source-code uploads, no company-confidential documents, and no real customer or employee personal data. Students keep ownership of their own submissions; portfolio use needs the company's consent. Feedback here is mentoring, not grading, and carries no academic credit."
     status:
@@ -2380,6 +2380,7 @@ en:
         recruiter: "Recruiter"
         hiring_manager: "Hiring manager"
         mentor: "Mentor"
+        company_reviewer: "Company reviewer"
       invite_title: "Invite organization staff"
       invite_subtitle: "The invitation expires after seven days and must be accepted by the invited account."
       invite: "Send invitation"

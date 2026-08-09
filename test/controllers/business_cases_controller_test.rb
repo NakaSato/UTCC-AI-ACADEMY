@@ -203,6 +203,37 @@ class BusinessCasesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a company reviewer runs the case surfaces the owner can" do
+    @organization.memberships.create!(user: users(:student), role: "company_reviewer")
+    sign_in_as users(:student)
+
+    get new_business_case_path
+    assert_response :success
+
+    assert_difference "BusinessCase.count", 1 do
+      post business_cases_path, params: {
+        business_case: { organization_id: @organization.id, title: "Reviewer challenge" }
+      }
+    end
+    created = BusinessCase.order(:id).last
+
+    post publish_business_case_path(created), params: { lock_version: created.lock_version }
+    assert_predicate created.reload, :published?
+
+    assert_difference "BusinessCaseInvitation.count", 1 do
+      post invitations_business_case_path(created), params: { invitation: { user_id: users(:two).id } }
+    end
+
+    # The owner's existing case is in the same organization, so it is theirs to run too.
+    get business_case_path(@business_case)
+    assert_response :success
+
+    get business_cases_path
+    assert_response :success
+    assert_includes response.body, "Reviewer challenge"
+    assert_includes response.body, "Confidential margin study"
+  end
+
   test "case work never mutates recruitment applications or academic progress" do
     job = @organization.job_posts.create!(creator: users(:one), title: "Analyst", summary: "Evidence first.",
                                           description: "Work with the team.", category: "Product",

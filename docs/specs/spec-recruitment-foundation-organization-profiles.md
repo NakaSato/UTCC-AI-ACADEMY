@@ -5,7 +5,7 @@ title: Recruitment foundation organization membership and candidate profiles
 status: accepted
 owners: ["@product-owner", "@tech-lead"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -17,6 +17,7 @@ implemented_by:
   - app/controllers/recruitment/organizations_controller.rb
   - app/controllers/recruitment/candidate_profiles_controller.rb
   - db/migrate/20260807090000_create_recruitment_foundation.rb
+  - db/migrate/20260809140000_allow_company_reviewer_invitations.rb
   - test/models/organization_test.rb
   - test/models/organization_membership_test.rb
   - test/models/candidate_profile_test.rb
@@ -68,7 +69,7 @@ candidate data to other users.
 
 - Admin-created organizations with a unique slug.
 - One active organization owner and membership roles for recruiter,
-  hiring-manager, and mentor.
+  hiring-manager, mentor, and company-reviewer.
 - Admin-only creation, member granting, and non-owner membership revocation.
 - Organization index and detail views for administrators and active members.
 - A private, student-owned candidate profile with headline, summary, preferred
@@ -110,9 +111,10 @@ candidate data to other users.
       account as its owner (test/controllers/recruitment/organizations_controller_test.rb).
 - [x] A student or instructor cannot create an organization or grant a
       membership (test/controllers/recruitment/organizations_controller_test.rb).
-- [x] An administrator can grant recruiter, hiring-manager, or mentor
-      membership and can revoke a non-owner membership
-      (test/controllers/recruitment/organizations_controller_test.rb).
+- [x] An administrator can grant recruiter, hiring-manager, mentor, or
+      company-reviewer membership and can revoke a non-owner membership
+      (test/controllers/recruitment/organizations_controller_test.rb,
+      test/models/organization_membership_test.rb).
 - [x] A duplicate membership and a second active owner are rejected by the
       model/database boundary (test/models/organization_membership_test.rb).
 - [x] A member can view their organization, while a non-member receives a safe

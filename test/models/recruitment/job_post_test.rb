@@ -101,6 +101,19 @@ class Recruitment::JobPostTest < ActiveSupport::TestCase
     assert_empty Recruitment::JobPost.published_for_candidates
   end
 
+  test "a company reviewer authors job posts but does not hold approval authority" do
+    @organization.memberships.create!(user: users(:instructor), role: "company_reviewer")
+
+    job = @organization.job_posts.create!(job_attributes.merge(creator: users(:instructor)))
+
+    assert_predicate job, :draft?
+    assert_includes Recruitment::JobPost::AUTHOR_ROLES, "company_reviewer"
+    assert_not_includes Recruitment::JobPost::APPROVER_ROLES, "company_reviewer",
+      "publication approval stays with the owner and hiring manager"
+    assert_includes Recruitment::JobApplication::REVIEWER_ROLES, "company_reviewer"
+    assert_includes Recruitment::OrganizationReporting::REPORTER_ROLES, "company_reviewer"
+  end
+
   test "only drafts can be deleted" do
     draft = @organization.job_posts.create!(job_attributes.merge(creator: users(:two)))
     assert_difference "Recruitment::JobPost.count", -1 do

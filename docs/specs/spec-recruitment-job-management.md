@@ -5,7 +5,7 @@ title: Recruitment organization job management and publication workflow
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -99,8 +99,9 @@ Draft ──submit──> Review ──publish──> Published ──pause─�
    cannot be changed through the job-post form.
 2. Job status is limited to draft, review, published, paused, closed, or
    archived, and the database rejects unknown values.
-3. Only active organization members with owner, recruiter, or hiring-manager
-   roles can author or view organization job posts; mentors are read-only.
+3. Only active organization members with owner, recruiter, hiring-manager, or
+   company-reviewer roles can author or view organization job posts; mentors are
+   read-only. Publication approval is narrower: owner and hiring-manager only.
 4. Publication is allowed only from review and only when title, summary,
    description, employment type, location, remote policy, category, and
    seniority are present.

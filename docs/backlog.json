@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T14:06:00+07:00",
+  "updated_at": "2026-08-09T15:20:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1955,6 +1955,33 @@
         }
       ],
       "updated_at": "2026-08-09T14:06:00+07:00"
+    },
+    {
+      "id": "BIZ-003",
+      "title": "Add the company-reviewer organization membership role",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner, Tech Lead, Security Owner, and Recruitment Domain Owner",
+      "milestone": "M10-CBP",
+      "depends_on": [
+        "BIZ-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Organization membership ADR",
+          "url": "decisions/adr-0024-recruitment-organization-membership.html"
+        },
+        {
+          "label": "Recruitment foundation specification",
+          "url": "specs/spec-recruitment-foundation-organization-profiles.html"
+        },
+        {
+          "label": "Company business-case collaboration specification",
+          "url": "specs/spec-company-business-case-collaboration.html"
+        }
+      ],
+      "updated_at": "2026-08-09T15:20:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3570,6 +3597,14 @@
       "to": "complete",
       "summary": "The user recorded the Phase 1 review-handoff decisions for BIZ-001 (text-only content with no confidential files or real personal data, student-retained IP with consent-gated portfolio use, owner-only case management with invitation-scoped student access and explicitly assigned mentors, admin case access denied pending a reason-gated support surface, in-app-only invitations with 7-day expiry, mentoring-not-grading feedback with no academic credit) and the Phase 1 slice was implemented: organization-owned business cases with draft/published/closed lifecycle, single-use digest-stored invitations, participant assignments, milestones, append-only immutable student submissions, immutable comments, audit events, and bilingual UI, each enforced by dedicated model, controller, boundary, and system tests. Uploads, email delivery, admin support/reporting, recruitment conversion, and REST APIs remain gated.",
       "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-09T15:20:00+07:00",
+      "item_id": "BIZ-003",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "The user asked for a company-side user role. A global company account role was rejected because ADR-0040 decision 1 forbids one, so the role was added on the existing organization membership axis instead: company_reviewer joins owner, recruiter, hiring_manager, and mentor. It runs business cases alongside the single active owner (BusinessCase::MANAGER_ROLES), and carries the recruitment authoring, application-review, and reporting reach of the hiring roles, but deliberately not job publication-approval authority, which stays with owner and hiring_manager. ADR-0024, ADR-0025, ADR-0038, SPEC-0024, SPEC-0025, SPEC-0040, and the job-management, reporting, and conversation specs were amended to match; the invitation role check constraint was migrated.",
+      "evidence_url": "decisions/adr-0024-recruitment-organization-membership.html"
     }
   ]
 }

@@ -4,7 +4,8 @@ class BusinessCaseSubmissionsController < ApplicationController
     milestone = business_case.milestones.find(params[:milestone_id])
     submission = business_case.submissions.create!(milestone:, author: Current.user,
                                                    body: submission_params[:body])
-    business_case.organization.memberships.active.where(role: "owner").includes(:user).find_each do |membership|
+    business_case.organization.memberships.active
+                 .where(role: BusinessCase::MANAGER_ROLES).includes(:user).find_each do |membership|
       Notification.notify(membership.user, "business_case_submission_received",
                           id: business_case.id, business_case: business_case.title,
                           milestone: milestone.title, member: Current.user.name)

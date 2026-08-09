@@ -54,7 +54,7 @@ the product claims hiring, fairness, or AI effectiveness outcomes.
 ### Included
 
 - Organization report route for administrators and active owner/recruiter/
-  hiring-manager members.
+  hiring-manager/company-reviewer members.
 - Job-post status counts.
 - Application status cells with a minimum reporting cell size of five.
 - Total application count suppressed when the in-scope total is below five.
@@ -68,8 +68,8 @@ the product claims hiring, fairness, or AI effectiveness outcomes.
 
 ## Invariants
 
-1. Only an administrator or active organization owner, recruiter, or
-   hiring-manager member can access the report.
+1. Only an administrator or active organization owner, recruiter,
+   hiring-manager, or company-reviewer member can access the report.
 2. All queries are scoped to the requested organization.
 3. The report contains no candidate identity or free-text application data.
 4. Application totals and each status cell are suppressed when the total

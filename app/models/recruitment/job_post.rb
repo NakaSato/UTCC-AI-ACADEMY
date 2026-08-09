@@ -5,7 +5,9 @@ module Recruitment
     STATUSES = %w[ draft review published paused closed archived ].freeze
     EMPLOYMENT_TYPES = %w[ full_time part_time internship contract freelance ].freeze
     REMOTE_POLICIES = %w[ onsite hybrid remote ].freeze
-    AUTHOR_ROLES = %w[ owner recruiter hiring_manager ].freeze
+    AUTHOR_ROLES = %w[ owner recruiter hiring_manager company_reviewer ].freeze
+    # Publication approval stays with the two accountable roles; a company
+    # reviewer drafts and reviews but does not approve its own posting.
     APPROVER_ROLES = %w[ owner hiring_manager ].freeze
     TRANSITIONS = {
       "draft" => %w[ review archived ],

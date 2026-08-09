@@ -106,6 +106,38 @@ class BusinessCaseTest < ActiveSupport::TestCase
     assert_not @business_case.accessible_to?(users(:instructor))
   end
 
+  test "a company reviewer manages cases alongside the single organization owner" do
+    @organization.memberships.create!(user: users(:student), role: "company_reviewer")
+
+    assert @business_case.manageable_by?(users(:student))
+    assert @business_case.accessible_to?(users(:student))
+
+    reviewer_case = @organization.business_cases.create!(owner: users(:student), title: "Reviewer-owned case")
+    assert_predicate reviewer_case, :draft?
+
+    reviewer_case.transition_to!("published", actor: users(:student))
+    assert_predicate reviewer_case, :published?
+  end
+
+  test "recruiter and mentor memberships still open no case" do
+    @organization.memberships.create!(user: users(:instructor), role: "mentor")
+
+    [ users(:two), users(:instructor) ].each do |user|
+      assert_not @business_case.manageable_by?(user), "#{user.name} must not manage the case"
+      assert_not @business_case.accessible_to?(user), "#{user.name} must not read the case"
+    end
+  end
+
+  test "a revoked company reviewer loses case management" do
+    membership = @organization.memberships.create!(user: users(:student), role: "company_reviewer")
+    assert @business_case.manageable_by?(users(:student))
+
+    membership.revoke!
+
+    assert_not @business_case.reload.manageable_by?(users(:student))
+    assert_raises(ActiveRecord::RecordInvalid) { @business_case.transition_to!("published", actor: users(:student)) }
+  end
+
   test "a suspended organization closes management and collaboration" do
     @business_case.transition_to!("published", actor: users(:one))
     @organization.update!(status: "suspended")

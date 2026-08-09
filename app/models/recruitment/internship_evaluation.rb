@@ -3,7 +3,7 @@ module Recruitment
     self.table_name = "recruitment_internship_evaluations"
 
     STATUSES = %w[ draft submitted ].freeze
-    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor ].freeze
+    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor company_reviewer ].freeze
 
     belongs_to :application, class_name: "Recruitment::InternshipApplication", inverse_of: :evaluation
     belongs_to :evaluator, class_name: "User", inverse_of: :internship_evaluations

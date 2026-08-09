@@ -4,6 +4,10 @@
 # invitation, mentors through an explicit assignment — and nobody else, admins
 # included, until a reason-gated support surface exists (SPEC-0040).
 class BusinessCase < ApplicationRecord
+  # The company side of a case: the organization's single active owner, plus any
+  # company reviewer they have added. Recruiter and mentor memberships stay out
+  # — organization membership alone must not open a confidential case.
+  MANAGER_ROLES = %w[ owner company_reviewer ].freeze
   STATUSES = %w[ draft published closed ].freeze
   TRANSITIONS = {
     "draft" => %w[ published closed ],
@@ -57,7 +61,8 @@ class BusinessCase < ApplicationRecord
   def manageable_by?(user)
     return false unless user && Organization.active.where(id: organization_id).exists?
 
-    OrganizationMembership.where(organization_id:, user_id: user.id, status: "active", role: "owner").exists?
+    OrganizationMembership.where(organization_id:, user_id: user.id, status: "active",
+                                 role: MANAGER_ROLES).exists?
   end
 
   def accessible_to?(user)
@@ -93,7 +98,7 @@ class BusinessCase < ApplicationRecord
 
     def owner_holds_active_ownership
       return if owner.blank? || organization.blank?
-      return if organization.memberships.active.exists?(user_id: owner_id, role: "owner")
+      return if organization.memberships.active.exists?(user_id: owner_id, role: MANAGER_ROLES)
 
       errors.add(:owner, :invalid)
     end

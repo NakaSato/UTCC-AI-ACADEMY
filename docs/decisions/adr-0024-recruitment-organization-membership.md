@@ -5,7 +5,7 @@ title: Use organization memberships for recruitment company access
 status: accepted
 owners: ["@product-owner", "@tech-lead"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -59,7 +59,11 @@ and the current audit, session, storage, and notification boundaries.
 - A recruitment company is represented by an Organization.
 - Access is represented by OrganizationMembership rows joining an existing User
   to an organization.
-- Membership roles are owner, recruiter, hiring_manager, and mentor.
+- Membership roles are owner, recruiter, hiring_manager, mentor, and
+  company_reviewer. The last was added on 2026-08-09 so company-side staff can
+  run business cases (SPEC-0040) without holding the organization's single
+  active ownership; it carries the recruitment authoring and review reach of the
+  hiring roles but not publication-approval authority.
 - The first slice lets an existing administrator create an organization,
   assign its owner, grant a member role, and revoke a non-owner membership.
 - A user can belong to multiple organizations without changing the global User

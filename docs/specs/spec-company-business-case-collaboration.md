@@ -134,7 +134,7 @@ as recruitment application, course submission, or general academic records.
 
 | Actor | Case access | Write access | Explicit boundary |
 | --- | --- | --- | --- |
-| Company owner/reviewer | Cases in the organization allowed by case role | Create/manage cases, invite students, review work according to approved matrix | Organization membership alone must not expose restricted case assets if the case matrix says otherwise |
+| Company owner/reviewer | Cases in the organization allowed by case role — the `owner` and `company_reviewer` memberships | Create/manage cases, invite students, review work according to approved matrix | Organization membership alone must not expose restricted case assets if the case matrix says otherwise; recruiter and mentor memberships are excluded |
 | Invited student | Accepted invitations only | Accept/decline invitation, submit own work, ask questions, view permitted feedback | Cannot discover or access another case or student submission |
 | Faculty mentor | Explicitly assigned cases only | Mentor feedback and progress support according to academic policy | Instructor role alone grants no case access |
 | Administrator | Support/reporting scope only | Configuration or documented support actions | Every content access requires reason, least privilege, and audit evidence |
@@ -273,12 +273,16 @@ widening the boundary.
    submissions. Portfolio use of case material requires company consent.
    Case participation creates no compensation, employment, or
    recruitment-conversion terms.
-3. **Role matrix:** active organization owners create, edit, publish, and
-   close cases, manage milestones, invite students, assign and revoke
-   mentors, and read all case content. Other organization roles have no case
-   access. Students gain access only through an accepted invitation and only
+3. **Role matrix:** active organization members holding the owner or
+   company-reviewer role create, edit, publish, and close cases, manage
+   milestones, invite students, assign and revoke mentors, and read all case
+   content. Recruiter and mentor memberships have no case access — organization
+   membership alone never opens a case. (Amended 2026-08-09: the company
+   reviewer role was added because an organization has only one active owner,
+   so company-side case work had nowhere else to live; see ADR-0024.)
+   Students gain access only through an accepted invitation and only
    while their participant assignment is active. Mentors must hold the
-   instructor account role and an explicit owner-made assignment.
+   instructor account role and an explicit assignment made by a case manager.
    Administrators have no case-content access in Phase 1; reason-gated
    support access requires a future review. All other requests fail closed
    with a safe not-found response.

@@ -1,5 +1,9 @@
 class OrganizationMembership < ApplicationRecord
-  ROLES = %w[ owner recruiter hiring_manager mentor ].freeze
+  # `company_reviewer` is the company-side counterpart to the hiring roles: it
+  # carries the same recruitment authoring and review reach, and additionally
+  # runs business cases, which `owner` alone could do — and an organization has
+  # only one active owner, so case work had nowhere else to live.
+  ROLES = %w[ owner recruiter hiring_manager mentor company_reviewer ].freeze
   STATUSES = %w[ active revoked ].freeze
 
   belongs_to :organization, inverse_of: :memberships
@@ -18,6 +22,8 @@ class OrganizationMembership < ApplicationRecord
   def active? = status == "active"
 
   def owner? = role == "owner"
+
+  def company_reviewer? = role == "company_reviewer"
 
   def revoke!
     raise ActiveRecord::RecordInvalid, self if owner? && active?
