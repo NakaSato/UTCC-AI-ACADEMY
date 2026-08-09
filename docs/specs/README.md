@@ -46,4 +46,4 @@ owner.
 - [SPEC-0038 — Participant-scoped in-app recruitment application conversations](spec-recruitment-application-conversations.md) — draft; Product, Privacy, Security, Recruitment, and QA review pending
 - [SPEC-0039 — Governed enterprise recruitment integrations and adoption controls](spec-recruitment-enterprise-integrations.md) — draft; Product, legal, Privacy, Security, Recruitment, Data, Platform, and QA review pending
 - [SPEC-0040 — Invitation-only company business-case collaboration and project workspace boundary](spec-company-business-case-collaboration.md) — draft; Product, Security, Privacy, Academic, Recruitment, and QA review pending
-- [SPEC-0041 — Student-initiated internship requests, placements, and progress reporting](spec-student-internship-requests.md) — draft; Product, Security, Privacy, Academic, Recruitment, and QA review pending; scoped against the shipped SPEC-0028 internship management
+- [SPEC-0041 — Student-initiated internship requests, placements, and progress reporting](spec-student-internship-requests.md) — accepted; increment 1 implemented and scoped against the shipped SPEC-0028 internship management

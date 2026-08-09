@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T16:00:00+07:00",
+  "updated_at": "2026-08-09T17:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1986,18 +1986,14 @@
     {
       "id": "INT-001",
       "title": "Define the student-initiated internship request, placement, and progress boundary",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security Owner, Privacy Owner, Academic Owner, Recruitment Domain Owner, and QA Owner",
       "milestone": "M11-SIR",
       "depends_on": [
         "BIZ-002"
       ],
-      "blocker": {
-        "summary": "ADR-0041 and SPEC-0041 are drafted and record that the roadmap M11 first slice is already shipped as SPEC-0028; the genuine remainder is student-initiated requests, placements, progress reports, and faculty oversight. Nothing is authorized yet.",
-        "decision_owner": "Product Owner and Academic Owner",
-        "next_action": "Answer ADR-0041 human decision 1 — whether a student may direct a request at a company with no published position. A no withdraws the request layer and reduces the scope to placements, progress reporting, and faculty oversight over the existing application."
-      },
+      "blocker": null,
       "evidence": [
         {
           "label": "Student internship request boundary ADR",
@@ -2016,7 +2012,34 @@
           "url": "roadmap.html#milestone-m11--student-internship-request-platform"
         }
       ],
-      "updated_at": "2026-08-09T16:00:00+07:00"
+      "updated_at": "2026-08-09T17:10:00+07:00"
+    },
+    {
+      "id": "INT-002",
+      "title": "Implement increment 1 of student-initiated internship requests",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security Owner, Privacy Owner, Academic Owner, Recruitment Domain Owner, and QA Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Student internship request specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Student internship request boundary ADR",
+          "url": "decisions/adr-0041-student-internship-request-boundary.html"
+        },
+        {
+          "label": "M11 roadmap context",
+          "url": "roadmap.html#milestone-m11--student-internship-request-platform"
+        }
+      ],
+      "updated_at": "2026-08-09T17:10:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3648,6 +3671,22 @@
       "to": "verification",
       "summary": "Drafted ADR-0041 and SPEC-0041 for the M11 Student Internship Request Platform and scoped them against the shipped internship domain. The roadmap baseline was corrected: company positions and evaluations already exist under SPEC-0028, so M11 recommended first slice is largely implemented. The genuine remainder is a student-initiated request to a company with no published position, a placement record separating an approved request from a finished internship, periodic progress reports, and an explicit faculty actor. Documents, academic credit, interviews, email, notifications, and REST APIs are excluded. Eleven human decisions are recorded and the first is blocking: if a request must always target a published position, the request layer is withdrawn because that is the shipped application.",
       "evidence_url": "decisions/adr-0041-student-internship-request-boundary.html"
+    },
+    {
+      "at": "2026-08-09T17:10:00+07:00",
+      "item_id": "INT-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user answered ADR-0041 decision 1 yes: a student may direct a request at a company that has published no position, so the request layer is built. Four shaping decisions were recorded with it — requests are strictly position-less so no second application model appears, a company must opt in before it can be targeted, a student may hold one open request per organization and may re-approach after a decision, and faculty oversight plus placements and progress reports are deferred to later increments. Documents, academic credit, interviews, email, and REST APIs remain excluded.",
+      "evidence_url": "decisions/adr-0041-student-internship-request-boundary.html"
+    },
+    {
+      "at": "2026-08-09T17:10:00+07:00",
+      "item_id": "INT-002",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "Implemented increment 1: an organization opt-in switch held by the owner and company-reviewer roles, a position-less InternshipRequest with draft, submitted, under_review, approved, rejected, and withdrawn states behind guarded transitions, one open request per student per organization enforced by a partial unique index that permits re-approach after a decision, a rejection reason required by both model and database check constraint, immutability once decided, in-app notification to deciders on submission and to the student on a decision, privacy-safe audit events, and bilingual copy. Mentors cannot decide; drafts are invisible to the company. Enforced by model, student-controller, decision-controller, boundary, and system tests, including proof that no placement, progress-report, faculty, upload, mailer, API, or academic-credit surface exists.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
     }
   ]
 }

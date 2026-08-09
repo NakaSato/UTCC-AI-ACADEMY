@@ -1,0 +1,42 @@
+<% content_for :title, "#{t("internship_requests.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= t("internship_requests.eyebrow") %></p>
+      <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_requests.title") %></h1>
+      <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("internship_requests.subtitle") %></p>
+    </div>
+    <%= link_to t("internship_requests.new"), new_internship_request_path,
+          class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+  </div>
+
+  <div class="mb-8 rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
+    <%= t("internship_requests.positionless_notice") %>
+  </div>
+
+  <% if @requests.empty? %>
+    <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
+      <h2 class="text-18 font-semibold text-ink"><%= t("internship_requests.empty_title") %></h2>
+      <p class="mt-2 text-14 text-muted"><%= t("internship_requests.empty_body") %></p>
+    </div>
+  <% else %>
+    <ul class="space-y-4">
+      <% @requests.each do |internship_request| %>
+        <li>
+          <%= link_to internship_request_path(internship_request),
+                class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand hover:shadow-sm" do %>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 class="text-18 font-semibold text-ink"><%= internship_request.organization.name %></h2>
+                <p class="mt-1 text-13 text-muted"><%= l(internship_request.created_at, format: :short) %></p>
+              </div>
+              <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("internship_requests.status.#{internship_request.status}") %></span>
+            </div>
+            <p class="mt-4 line-clamp-2 text-13 text-muted"><%= internship_request.motivation %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</main>

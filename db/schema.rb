@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -322,6 +322,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_140000) do
     t.index ["key", "scope"], name: "index_feature_settings_on_key_and_scope", unique: true
   end
 
+  create_table "internship_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "decided_at"
+    t.bigint "decided_by_id"
+    t.text "decision_reason"
+    t.text "learning_goals", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.text "motivation", null: false
+    t.bigint "organization_id", null: false
+    t.datetime "reviewed_at"
+    t.string "status", default: "draft", null: false
+    t.bigint "student_id", null: false
+    t.datetime "submitted_at"
+    t.datetime "updated_at", null: false
+    t.datetime "withdrawn_at"
+    t.index ["decided_by_id"], name: "index_internship_requests_on_decided_by_id"
+    t.index ["organization_id", "status"], name: "index_internship_requests_on_organization_id_and_status"
+    t.index ["organization_id", "student_id"], name: "internship_requests_one_open", unique: true, where: "((decided_at IS NULL) AND (withdrawn_at IS NULL))"
+    t.index ["student_id", "status"], name: "index_internship_requests_on_student_id_and_status"
+    t.check_constraint "status::text <> 'rejected'::text OR decision_reason IS NOT NULL AND decision_reason <> ''::text", name: "internship_requests_rejection_reason"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'under_review'::character varying, 'approved'::character varying, 'rejected'::character varying, 'withdrawn'::character varying]::text[])", name: "internship_requests_status"
+  end
+
   create_table "landing_cards", force: :cascade do |t|
     t.string "collection", null: false
     t.datetime "created_at", null: false
@@ -401,6 +424,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_140000) do
   end
 
   create_table "organizations", force: :cascade do |t|
+    t.boolean "accepts_internship_requests", default: false, null: false
     t.datetime "created_at", null: false
     t.bigint "creator_id", null: false
     t.string "name", null: false
@@ -991,6 +1015,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_140000) do
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "internship_requests", "organizations"
+  add_foreign_key "internship_requests", "users", column: "decided_by_id"
+  add_foreign_key "internship_requests", "users", column: "student_id"
   add_foreign_key "lesson_integrity_settings", "courses"
   add_foreign_key "notifications", "users"
   add_foreign_key "organization_invitations", "organizations"

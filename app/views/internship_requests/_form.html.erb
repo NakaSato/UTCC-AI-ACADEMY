@@ -1,0 +1,39 @@
+<%= form_with model: internship_request, url:, class: "max-w-2xl space-y-6" do |form| %>
+  <% if internship_request.errors.any? %>
+    <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert">
+      <%= internship_request.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
+    <%= t("internship_requests.positionless_notice") %>
+  </div>
+
+  <% if internship_request.new_record? %>
+    <div>
+      <%= label_tag "internship_request_organization_id", t("internship_requests.fields.organization"), class: "mb-2 block text-13 font-semibold text-ink" %>
+      <%= select_tag "internship_request[organization_id]",
+            options_from_collection_for_select(organizations, :id, :name, internship_request.organization_id),
+            required: true,
+            class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <p class="mt-1.5 text-12 text-muted"><%= t("internship_requests.fields.organization_hint") %></p>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :motivation, t("internship_requests.fields.motivation"), class: "mb-2 block text-13 font-semibold text-ink" %>
+    <%= form.text_area :motivation, rows: 6, required: true,
+          class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+  </div>
+
+  <div>
+    <%= form.label :learning_goals, t("internship_requests.fields.learning_goals"), class: "mb-2 block text-13 font-semibold text-ink" %>
+    <%= form.text_area :learning_goals, rows: 6, required: true,
+          class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= form.submit t("internship_requests.save"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <%= link_to t("internship_requests.cancel"), internship_requests_path, class: "rounded-full border border-hairline px-5 py-2.5 text-13 font-semibold text-muted hover:text-ink" %>
+  </div>
+<% end %>

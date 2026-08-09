@@ -1,0 +1,12 @@
+<% content_for :title, "#{t("internship_requests.edit")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("internship_requests.back"), internship_request_path(@internship_request),
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_requests.edit") %></h1>
+  </div>
+
+  <%= render "form", internship_request: @internship_request,
+        url: internship_request_path(@internship_request), organizations: nil %>
+</main>

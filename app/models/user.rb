@@ -87,6 +87,10 @@ class User < ApplicationRecord
                                        inverse_of: :author
   has_many :business_case_comments, foreign_key: :author_id, dependent: :restrict_with_exception,
                                     inverse_of: :author
+  has_many :internship_requests, foreign_key: :student_id, dependent: :restrict_with_exception,
+                                 inverse_of: :student
+  has_many :decided_internship_requests, class_name: "InternshipRequest", foreign_key: :decided_by_id,
+                                         dependent: :nullify, inverse_of: :decided_by
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

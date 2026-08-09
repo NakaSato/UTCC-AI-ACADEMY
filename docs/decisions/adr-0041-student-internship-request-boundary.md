@@ -2,7 +2,7 @@
 id: ADR-0041
 type: adr
 title: Define a student-initiated internship request, placement, and progress boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-09
 updated: 2026-08-09
@@ -23,7 +23,8 @@ touches:
   - db/migrate
   - test
   - docs/runbooks
-enforced_by: []
+enforced_by:
+  - test/operations/internship_request_boundary_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC-001, SKILL-SPEC-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
@@ -31,12 +32,14 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
 
 # Define a Student-Initiated Internship Request, Placement, and Progress Boundary
 
-> **Decision state:** Draft for Product Owner, Tech Lead, Security Owner,
-> Privacy Owner, Academic Owner, Recruitment Domain Owner, and QA Owner review.
-> This record authorizes no internship-request route, placement record, progress
-> report, document upload, faculty workflow, notification, or academic decision.
-> One of the human decisions below determines whether the central capability is
-> built at all.
+> **Decision state:** Accepted by the user on 2026-08-09 as the governing
+> boundary. Decision 1 was answered **yes** — a student may direct a request at
+> a company that has published no position — so the request layer is built. The
+> recorded decisions below authorize increment 1 only: student-initiated,
+> strictly position-less requests and a recorded company decision. Placements,
+> progress reports, faculty oversight, document uploads, interviews, rubric
+> evaluation, email, REST APIs, and any academic-credit field remain
+> unauthorized and each needs its own recorded decision.
 
 > [Decision Records](README.md) ·
 > [Student internship request specification](../specs/spec-student-internship-requests.md) ·
@@ -114,12 +117,12 @@ What genuinely does not exist is narrower and clearer:
    second application model.
 
 2. **A request is a distinct record only where it does something an application
-   cannot: address a company with no published position.** If the Product Owner
-   and academic owner decide (decision 1 below) that a request must always
-   target a published position, then this record's request layer is withdrawn
-   and M11 reduces to placements, progress reporting, and faculty oversight
-   built on the existing application. That reduction is the expected outcome of
-   a "no" answer, not a failure.
+   cannot: address a company with no published position.** Decision 1 was
+   answered yes, so the request layer exists — and it is strictly position-less.
+   A request holds no program reference at all, which is what keeps it from
+   becoming a second application model. Had the answer been no, this layer would
+   have been withdrawn and M11 reduced to placements, progress reporting, and
+   faculty oversight over the existing application.
 
 3. **A placement is separate from the decision that produced it.** Approval
    creates a placement in a `planned` state; a placement moves to `active` and
@@ -262,15 +265,54 @@ identity, with authority expressed as memberships and assignments.
   document content, personal identifiers beyond the acting user, or free-text
   student data.
 
-## Human decisions required
+## Recorded decisions (2026-08-09, increment 1)
 
-The agent can draft models and controls but cannot decide these. Decision 1
-determines whether the request layer is built at all.
+The user, acting as the accountable owners, answered the blocking decision and
+the four that shape increment 1. Everything else in the list below stays open.
 
-1. **Whether a student may direct a request at a company with no published
-   position.** If not, the request layer here is withdrawn and M11 becomes
-   placements, progress reporting, and faculty oversight over the existing
-   application.
+1. **Company-directed requests are authorized (decision 1: yes).** A student may
+   direct a request at a company that has published no position.
+2. **A request is strictly position-less.** It carries no reference to a
+   `Recruitment::InternshipProgram` and no association to one exists. A student
+   who wants a published position uses the shipped application path in
+   SPEC-0028. This resolves the "it cannot be both" question in decision 2 of
+   the domain-model section: there is exactly one path per situation, so no
+   second application model appears.
+3. **A company opts in before it can be targeted.** An organization is a valid
+   target only once an accountable member switches on acceptance of internship
+   requests. A company never receives an unsolicited request through a channel
+   it did not agree to.
+4. **One open request per student per organization, and re-approach is
+   allowed.** A student may hold open requests at several companies at once, and
+   after a decision or withdrawal may approach the same company again. This is
+   deliberately looser than the shipped one-application-per-program unique
+   index, which blocks re-application permanently.
+5. **Faculty oversight is deferred (decision 2 deferred).** Increment 1 has no
+   faculty actor, because academic-eligibility and visibility policy does not
+   exist in writing. The `instructor` role continues to grant nothing here.
+6. **Placements and progress reports are deferred (increment 2).** Approval
+   records a decision and nothing more. An approved request is explicitly not an
+   internship and not a completed one; no record in increment 1 may imply
+   either.
+7. **Documents stay excluded (decision 5 unchanged).** No résumé, portfolio, or
+   deliverable upload surface exists. Requests carry structured text, and the
+   interface says so.
+8. **No academic credit (decision 8: none).** No field in this context holds
+   credit or hours, inheriting SPEC-0028's exclusion.
+9. **In-app notification only (decision 10).** The existing bell notifies
+   deciders on submission and the student on a decision. Email stays deferred
+   under ADR-0004.
+10. **Append-only retention.** Requests and decisions are preserved as evidence;
+    export and deletion requests route to the policy owner rather than being
+    executed in-app.
+
+## Human decisions still required
+
+The agent can draft models and controls but cannot decide these. Decision 1 has
+been answered; the rest remain open and gate their own increments.
+
+1. ~~Whether a student may direct a request at a company with no published
+   position.~~ **Answered yes on 2026-08-09; the request layer is built.**
 2. Which account role represents faculty for internship purposes, whether
    `instructor` is that role, who may assign a faculty reviewer, and what
    academic eligibility and approval authority they hold.

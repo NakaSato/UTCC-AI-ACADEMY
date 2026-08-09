@@ -1,0 +1,91 @@
+<% content_for :title, "#{t("internship_requests.queue_title")} — #{@organization.name}" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("internship_requests.back_to_organization"), recruitment_organization_path(@organization),
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_requests.queue_title") %></h1>
+    <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted">
+      <%= t("internship_requests.queue_subtitle", name: @organization.name, count: @awaiting) %>
+    </p>
+  </div>
+
+  <% if @can_change_settings %>
+    <section class="mb-8 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-16 font-semibold text-ink"><%= t("internship_requests.settings_heading") %></h2>
+      <p class="mt-2 text-13 leading-[1.65] text-muted"><%= t("internship_requests.settings_body") %></p>
+      <%= button_to organization_internship_request_settings_path(@organization),
+            method: :patch,
+            params: { accepts_internship_requests: !@organization.accepts_internship_requests },
+            class: "mt-4 rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" do %>
+        <%= @organization.accepts_internship_requests? ? t("internship_requests.close_requests") : t("internship_requests.open_requests") %>
+      <% end %>
+      <p class="mt-3 text-12 text-muted">
+        <%= @organization.accepts_internship_requests? ? t("internship_requests.settings_open") : t("internship_requests.settings_closed") %>
+      </p>
+    </section>
+  <% end %>
+
+  <% if @requests.empty? %>
+    <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
+      <h2 class="text-18 font-semibold text-ink"><%= t("internship_requests.queue_empty_title") %></h2>
+      <p class="mt-2 text-14 text-muted"><%= t("internship_requests.queue_empty_body") %></p>
+    </div>
+  <% else %>
+    <ul class="space-y-4">
+      <% @requests.each do |internship_request| %>
+        <li class="rounded-card border border-hairline bg-surface-1 p-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 class="text-18 font-semibold text-ink"><%= internship_request.student.name %></h2>
+              <p class="mt-1 text-13 text-muted"><%= l(internship_request.created_at, format: :short) %></p>
+            </div>
+            <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("internship_requests.status.#{internship_request.status}") %></span>
+          </div>
+
+          <% if internship_request.status == "draft" %>
+            <p class="mt-4 text-13 text-muted"><%= t("internship_requests.draft_hidden") %></p>
+          <% else %>
+            <dl class="mt-4 space-y-3 text-13">
+              <div>
+                <dt class="font-semibold text-ink"><%= t("internship_requests.fields.motivation") %></dt>
+                <dd class="mt-1 leading-[1.65] whitespace-pre-line text-muted"><%= internship_request.motivation %></dd>
+              </div>
+              <div>
+                <dt class="font-semibold text-ink"><%= t("internship_requests.fields.learning_goals") %></dt>
+                <dd class="mt-1 leading-[1.65] whitespace-pre-line text-muted"><%= internship_request.learning_goals %></dd>
+              </div>
+            </dl>
+          <% end %>
+
+          <% if internship_request.submitted? || internship_request.under_review? %>
+            <div class="mt-5 flex flex-wrap items-start gap-3 border-t border-hairline pt-5">
+              <% if internship_request.submitted? %>
+                <%= button_to t("internship_requests.start_review"), review_internship_request_path(internship_request),
+                      class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+              <% end %>
+              <%= button_to t("internship_requests.approve"), approve_internship_request_path(internship_request),
+                    class: "rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+              <%= form_with url: reject_internship_request_path(internship_request), class: "flex flex-wrap items-start gap-2" do %>
+                <%= text_field_tag :decision_reason, nil, size: nil, required: true, maxlength: 5_000,
+                      placeholder: t("internship_requests.reject_reason_placeholder"),
+                      class: "w-[260px] rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+                <%= submit_tag t("internship_requests.reject"),
+                      class: "rounded-full border border-red-200 px-4 py-2 text-13 font-semibold text-red-700 transition hover:bg-red-50" %>
+              <% end %>
+            </div>
+          <% elsif internship_request.decided? %>
+            <p class="mt-4 border-t border-hairline pt-4 text-13 text-muted">
+              <%= t("internship_requests.decision_recorded",
+                    outcome: t("internship_requests.status.#{internship_request.status}"),
+                    date: l(internship_request.decided_at, format: :short)) %>
+              <% if internship_request.decision_reason.present? %>
+                — <%= internship_request.decision_reason %>
+              <% end %>
+            </p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</main>

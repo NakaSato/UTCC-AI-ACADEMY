@@ -1142,7 +1142,7 @@ later milestones remain proposals
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
 | M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
-| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Proposed | M10 company boundary, shared identity, and institutional internship policy |
+| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increment 1 implemented | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
 | M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | Proposed | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
 | M14 | Core Team Internal Work Dashboard | Core team members can manage private Markdown work records and connect them to governed Slack collaboration | Proposed | Core-team identity, repository lifecycle records, Slack policy, and M13 proposal decisions |
@@ -1575,7 +1575,10 @@ boundaries established by M10; it does not replace UTCC Academy M10 Academic
 Writing, AI Recruitment Platform M4 Internship Management, or AI Recruitment
 Platform M11 AI Candidate Agent.
 
-**Status:** Proposal — not implemented
+**Status:** Increment 1 implemented (2026-08-09) — student-initiated,
+position-less internship requests to companies that opt in, with a recorded
+company decision. Placements, progress reports, faculty oversight, documents,
+and academic credit remain proposals.
 
 Corrected 2026-08-09: company internship **positions and evaluations already
 exist** and ship under
@@ -1591,11 +1594,14 @@ position, a **placement** record for the internship after acceptance, a
 Consequently the recommended first vertical slice in §12 below is already
 largely implemented. The genuine remainder is scoped by
 [ADR-0041](decisions/adr-0041-student-internship-request-boundary.md) and
-[SPEC-0041](specs/spec-student-internship-requests.md), which are drafts: they
-authorize no route, record, upload, or academic decision, and ADR-0041's first
-human decision determines whether the request layer is built at all. The
-requirements below still require Product Owner, university, company-partner,
-security/privacy, and technical review before execution.
+[SPEC-0041](specs/spec-student-internship-requests.md). ADR-0041's first human
+decision was answered yes on 2026-08-09 — a student may approach a company that
+has published no position — so increment 1 is implemented: position-less
+requests to companies that opted in, and one recorded company decision. An
+approved request records a decision only; it neither starts nor completes an
+internship. The remaining requirements below still require Product Owner,
+university, company-partner, security/privacy, and technical review before
+execution.
 
 ### 1. Executive Summary
 

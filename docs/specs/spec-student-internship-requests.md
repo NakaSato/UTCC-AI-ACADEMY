@@ -2,7 +2,7 @@
 id: SPEC-0041
 type: spec
 title: Student-initiated internship requests, placements, and progress reporting
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-09
 updated: 2026-08-09
@@ -10,9 +10,18 @@ review_by: 2026-08-21
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0041, ADR-0024, ADR-0028, ADR-0040, SPEC-0024, SPEC-0028]
-implemented_by: []
+implemented_by:
+  - app/models/internship_request.rb
+  - app/controllers/internship_requests_controller.rb
+  - app/controllers/internship_request_decisions_controller.rb
+  - app/controllers/organization_internship_settings_controller.rb
+  - db/migrate/20260809160000_create_internship_requests.rb
 enforced_by:
-  - test/operations/internship_request_gate_test.rb
+  - test/models/internship_request_test.rb
+  - test/controllers/internship_requests_controller_test.rb
+  - test/controllers/internship_request_decisions_controller_test.rb
+  - test/operations/internship_request_boundary_test.rb
+  - test/system/internship_request_walk_test.rb
 touches:
   - app/models
   - app/services
@@ -31,12 +40,13 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003]
 
 # Student-Initiated Internship Requests, Placements, and Progress Reporting
 
-> **Review state:** Draft for Product Owner, Tech Lead, Security Owner, Privacy
-> Owner, Academic Owner, Recruitment Domain Owner, and QA Owner review. This
-> specification authorizes no internship-request route, placement record,
-> progress report, document upload, faculty workflow, notification, or academic
-> decision. Human decision 1 in ADR-0041 decides whether the request layer is
-> built at all.
+> **Review state:** Accepted by the user on 2026-08-09. ADR-0041 decision 1 was
+> answered yes, so increment 1 is authorized and implemented: student-initiated,
+> strictly position-less internship requests to companies that have opted in,
+> and a recorded company decision. Placements, progress reports, faculty
+> oversight, document uploads, interviews, rubric evaluation, email, REST APIs,
+> and any academic-credit field remain unauthorized and are enforced absent by
+> `test/operations/internship_request_boundary_test.rb`.
 
 > [Executable Specifications](README.md) ·
 > [Student internship request ADR](../decisions/adr-0041-student-internship-request-boundary.md) ·
@@ -61,23 +71,33 @@ internship request models.
 
 ## Scope
 
-### Included
+### Included in increment 1 (implemented)
 
 - A student-initiated internship request addressed to an organization, carrying
   a motivation statement and learning goals as structured text.
-- Company-directed requests, where the target organization has published no
-  position — subject to ADR-0041 human decision 1.
-- A request lifecycle with an explicit draft state, submission, withdrawal,
-  and a recorded company decision with an optional reason.
-- A placement record created by approval, with a planned, active, and completed
-  lifecycle that only authorized action advances.
-- Periodic progress reports authored by the placed student, recording activity,
-  outcomes, and blockers, with supervisor acknowledgement.
-- A faculty assignment scoped to a request or placement, and an academic review
-  record that is advisory evidence rather than a grade.
-- Privacy-safe audit events for requests, decisions, placements, transitions,
-  reports, acknowledgements, and faculty actions.
+- Strictly position-less requests: a request holds no reference to a
+  `Recruitment::InternshipProgram`, which is what keeps it from becoming a
+  second application model.
+- An organization opt-in switch; a company is targetable only after an
+  accountable member turns acceptance on.
+- A request lifecycle of draft, submitted, under review, approved, rejected, and
+  withdrawn, with guarded transitions and a rejection reason.
+- One open request per student per organization, with re-approach allowed after
+  a decision or withdrawal.
+- In-app notification to the company's deciders on submission and to the student
+  on a decision.
+- Privacy-safe audit events for submission, review, decisions, withdrawal, and
+  the opt-in switch.
 - Bilingual English/Thai copy.
+
+### Deferred to later increments (unauthorized, enforced absent)
+
+- A placement record and its planned/active/completed lifecycle. Approval in
+  increment 1 records a decision and nothing more; an approved request is
+  explicitly not an internship, and not a finished one.
+- Periodic progress reports, hours, and supervisor acknowledgement.
+- A faculty assignment and academic review record; the `instructor` role
+  continues to grant nothing in this context.
 
 ### Excluded
 
@@ -85,7 +105,8 @@ internship request models.
   and the per-application evaluation — SPEC-0028 owns all of these and this
   specification adds no second model for any of them.
 - Résumé, portfolio, deliverable, and any other file or document upload, until
-  ADR-0041 decision 5 records the document contract.
+  ADR-0041 decision 5 records the document contract. Requests carry structured
+  text only, and the interface states this.
 - Academic credit, hours-to-credit conversion, grades, transcript entries, and
   any field that implies them.
 - Interview scheduling and external calendar or meeting integration.
@@ -194,45 +215,50 @@ Design-gate criteria for the current slice. Implementation must add real
 enforcing tests and human-approved policy references before this specification
 moves beyond draft.
 
-- [ ] ADR-0041 records the boundary against SPEC-0028, the trust boundaries,
+- [x] ADR-0041 records the boundary against SPEC-0028, the trust boundaries,
       alternatives, consequences, fitness functions, and human decisions.
-- [ ] The specification states which capabilities remain owned by SPEC-0028 and
-      adds no second position, application, or capacity model.
-- [ ] ADR-0041 decision 1 is answered, and if a request must target a published
-      position, the request layer is withdrawn and this specification is
-      reduced to placements, progress reporting, and faculty oversight.
-- [ ] The request lifecycle defines draft, submitted, decided, and withdrawn
-      behavior, including duplicate, expiry, and re-approach rules.
+- [x] The specification states which capabilities remain owned by SPEC-0028 and
+      adds no second position, application, or capacity model
+      (`test/operations/internship_request_boundary_test.rb`).
+- [x] ADR-0041 decision 1 is answered — yes — so the request layer is built and
+      is strictly position-less (`test/models/internship_request_test.rb`).
+- [x] The request lifecycle defines draft, submitted, under-review, decided, and
+      withdrawn behavior, including the duplicate and re-approach rules
+      (`test/models/internship_request_test.rb`).
+- [x] A company is targetable only after opting in
+      (`test/controllers/internship_requests_controller_test.rb`).
+- [x] Approval records a decision only; no placement exists and no record
+      implies a started or finished internship
+      (`test/operations/internship_request_boundary_test.rb`).
 - [ ] The placement lifecycle defines planned, active, and completed behavior
-      and proves an approved request is not a completed internship.
+      and proves an approved request is not a completed internship — increment 2.
 - [ ] Progress reporting defines cadence, required fields, append-only
-      behavior, acknowledgement authority, and missed-report handling.
+      behavior, acknowledgement authority, and missed-report handling —
+      increment 2.
 - [ ] Faculty assignment, academic review authority, and visibility per role are
-      recorded by the academic and privacy owners.
+      recorded by the academic and privacy owners — deferred.
 - [ ] The document contract for résumés, portfolios, and deliverables is
-      recorded before any upload route is designed.
-- [ ] The audit and privacy contract covers redaction, retention, export,
-      deletion, and cross-domain non-mutation.
-- [ ] `bin/docs` validates this specification's metadata, links, and skill
+      recorded before any upload route is designed — deferred.
+- [x] The audit and privacy contract covers redaction and cross-domain
+      non-mutation for increment 1; retention is append-only with export and
+      deletion routed to the policy owner
+      (`test/controllers/internship_request_decisions_controller_test.rb`).
+- [x] `bin/docs` validates this specification's metadata, links, and skill
       references.
 
-### Required future implementation evidence
+### Implementation evidence
 
-Before implementation is accepted, the spec owner must add real test paths for
-each contract:
-
-| Contract | Required evidence |
+| Contract | Evidence |
 | --- | --- |
-| Domain separation | Tests proving no second position, application, or capacity model, and that a request cannot mutate a `Recruitment::InternshipApplication` |
-| Request scope and isolation | Model and request tests for cross-student, cross-organization reads and identifier disclosure |
-| Request lifecycle | Tests for draft, submission, withdrawal, single recorded decision, duplicate and expiry rules |
-| Placement lifecycle | Tests proving approval yields exactly one `planned` placement and that completion requires an explicit authorized transition |
-| Progress reporting | Tests for author scope on an active placement, append-only history, and acknowledgement authority |
-| Faculty authority | Tests proving `instructor` alone grants nothing and that revoking an assignment removes access without deleting evidence |
-| Academic non-mutation | Tests proving no course progress, grade, certificate, award, or recruitment stage changes |
-| Document absence | A boundary test proving no upload route, no Active Storage attachment, and no mailer in this context |
-| Audit and privacy | Tests for redaction, retention, export, deletion, and absence of document content in audit rows |
-| Browser workflow | QA-owned system walkthrough for request submission, decision, placement activation, and a progress report |
+| Domain separation | `test/operations/internship_request_boundary_test.rb` — no second position or application model, no program association on a request, and the shipped internship domain intact |
+| Request scope and isolation | `test/controllers/internship_requests_controller_test.rb`, `test/controllers/internship_request_decisions_controller_test.rb` |
+| Request lifecycle | `test/models/internship_request_test.rb` |
+| Opt-in targeting | `test/controllers/internship_requests_controller_test.rb` |
+| Academic and cross-domain non-mutation | `test/controllers/internship_request_decisions_controller_test.rb` |
+| Deferred-increment absence | `test/operations/internship_request_boundary_test.rb` — no placement, progress-report, faculty, upload, mailer, API, or credit surface |
+| Audit and privacy | Audit assertions across the model and controller tests |
+| Browser workflow | `test/system/internship_request_walk_test.rb` |
+| Placement lifecycle · progress reporting · faculty authority · document contract | Increment 2 and beyond; not yet authorized |
 
 ## Error and boundary cases
 
@@ -263,19 +289,24 @@ each contract:
 
 ## Human review handoff
 
-The Product Owner, Tech Lead, Security Owner, Privacy Owner, Academic Owner,
-Recruitment Domain Owner, and QA Owner must record the eleven decisions in
-ADR-0041. Decision 1 is blocking: until it is answered, the central request
-capability cannot be designed, because a request that must target a published
-position is the shipped application.
+ADR-0041 carries the recorded decisions. Decision 1 was answered yes on
+2026-08-09, authorizing increment 1; decisions 2 through 11 remain open and each
+gates its own increment. The decisions that shape what shipped are: requests are
+strictly position-less, a company must opt in before it can be targeted, a
+student may hold one open request per organization and may re-approach after a
+decision, faculty oversight is deferred, and placements and progress reports are
+deferred so approval records a decision and nothing more.
 
 ## Rollback and observability
 
-This design slice adds no runtime behavior to roll back. Before implementation,
-the release plan must define how to stop new requests, freeze placements
-without losing evidence, revoke faculty access, reconcile partial reports, and
-return the platform to a no-internship-request state without deleting required
-audit records.
+Increment 1 adds the `internship_requests` table and one organization column
+through a reversible migration, with no external dependency. To stop the
+capability without losing evidence, switch off acceptance on each organization —
+no company becomes targetable and existing requests stay readable and auditable.
+Removing the routes makes every path unreachable while records remain. Dropping
+the table destroys evidence and needs the release owner's explicit approval.
+Later increments must extend this plan to cover freezing placements and
+reconciling partial reports.
 
 Future operations must measure privacy-safe counts and latency for request
 submissions, decisions, placement transitions, report submissions and misses,
@@ -286,7 +317,11 @@ company-confidential data, and any personal identifier beyond an internal id.
 ## Verification
 
 ```bash
-bin/rails test test/operations/internship_request_gate_test.rb
+bin/rails test test/models/internship_request_test.rb \
+  test/controllers/internship_requests_controller_test.rb \
+  test/controllers/internship_request_decisions_controller_test.rb \
+  test/operations/internship_request_boundary_test.rb
+bin/rails test:system TEST=test/system/internship_request_walk_test.rb
 bin/docs
 git diff --check
 ```

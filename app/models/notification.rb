@@ -12,7 +12,8 @@ class Notification < ApplicationRecord
 
   KINDS = %w[ enrolled role_changed integrity_notice integrity_escalated academic_post_invitation
               recruitment_organization_invitation recruitment_job_alert
-              business_case_invitation business_case_submission_received ].freeze
+              business_case_invitation business_case_submission_received
+              internship_request_received internship_request_decided ].freeze
 
   validates :kind, inclusion: { in: KINDS }
 
@@ -48,12 +49,17 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.business_case_invitation_path(params.fetch("token"))
     when "business_case_submission_received"
       Rails.application.routes.url_helpers.business_case_path(params.fetch("id"))
+    when "internship_request_received"
+      Rails.application.routes.url_helpers.organization_internship_requests_path(params.fetch("organization_id"))
+    when "internship_request_decided"
+      Rails.application.routes.url_helpers.internship_request_path(params.fetch("id"))
     end
   end
 
   def action_label
     return unless %w[ academic_post_invitation recruitment_organization_invitation recruitment_job_alert
-                      business_case_invitation business_case_submission_received ].include?(kind)
+                      business_case_invitation business_case_submission_received
+                      internship_request_received internship_request_decided ].include?(kind)
 
     I18n.t("notifications.#{kind}_action")
   end

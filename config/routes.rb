@@ -203,6 +203,26 @@ Rails.application.routes.draw do
        as: :decline_business_case_invitation
   # End business-case collaboration
 
+  # Internship requests (SPEC-0041, increment 1). Student-initiated and strictly
+  # position-less; published positions are reached through the recruitment
+  # internship routes above. The boundary test reads this delimited block to
+  # prove no placement, progress-report, faculty, document, mailer, or API
+  # surface ships before each has its own recorded decision.
+  resources :internship_requests, path: "internship-requests", only: %i[index new create edit update show] do
+    post :submit, on: :member
+    post :withdraw, on: :member
+  end
+  resources :organizations, only: [], path: "companies" do
+    resources :internship_requests, path: "internship-requests", only: :index,
+              controller: "internship_request_decisions", as: :internship_requests
+    patch "internship-requests/settings", to: "organization_internship_settings#update",
+          as: :internship_request_settings
+  end
+  post "internship-requests/:id/review", to: "internship_request_decisions#review", as: :review_internship_request
+  post "internship-requests/:id/approve", to: "internship_request_decisions#approve", as: :approve_internship_request
+  post "internship-requests/:id/reject", to: "internship_request_decisions#reject", as: :reject_internship_request
+  # End internship requests
+
   # /instructor needs the instructor or admin role, /admin the admin role — see
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin

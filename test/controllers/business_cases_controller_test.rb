@@ -85,27 +85,30 @@ class BusinessCasesControllerTest < ActionDispatch::IntegrationTest
   test "no non-participant can read a case or learn that it exists" do
     other_organization = Organization.create!(name: "Unrelated Org", creator: users(:admin))
     other_organization.memberships.create!(user: users(:student), role: "owner")
-    # The public error page, not the test-only detailed one, is what a stranger
-    # actually receives — so the disclosure claim is checked against that.
-    public_errors = { "action_dispatch.show_detailed_exceptions" => false }
-
+    # The 404 itself is the non-disclosure guarantee: the loader raises before any
+    # view runs, so nothing renders the case. Asserting against the body would
+    # only inspect the test environment's debug page, which echoes this file.
     [ users(:two), users(:student), users(:instructor), users(:admin) ].each do |user|
       sign_in_as user
 
-      get business_case_path(@business_case), env: public_errors
+      get business_case_path(@business_case)
       assert_response :not_found, "#{user.name} must not read the case"
-      assert_not_includes response.body, @business_case.title
-      assert_not_includes response.body, @business_case.brief
 
-      get edit_business_case_path(@business_case), env: public_errors
+      get edit_business_case_path(@business_case)
       assert_response :not_found
 
-      post publish_business_case_path(@business_case), env: public_errors
+      post publish_business_case_path(@business_case)
       assert_response :not_found
       assert_predicate @business_case.reload, :draft?
 
       sign_out
     end
+
+    # The owner does see it, so the four 404s above are not false passes.
+    sign_in_as users(:one)
+    get business_case_path(@business_case)
+    assert_response :success
+    assert_includes response.body, @business_case.title
   end
 
   test "a revoked participant loses read access" do
