@@ -8,7 +8,7 @@
     <div class="mb-6 flex flex-col gap-4">
       <label class="flex flex-col gap-1.75">
         <span class="text-13-5 font-medium text-ink-4"><%= t("academic.fields.title") %></span>
-        <%= form.text_field :title, required: false, maxlength: 200,
+        <%= form.text_field :title, size: nil, required: false, maxlength: 200,
               placeholder: t("academic.fields.title_placeholder"),
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none focus:border-brand" %>
       </label>

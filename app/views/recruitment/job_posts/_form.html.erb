@@ -6,7 +6,7 @@
     <div class="grid gap-5 md:grid-cols-2">
       <div class="md:col-span-2">
         <%= form.label :title, t("recruitment.jobs.fields.title"), class: "mb-2 block text-13 font-semibold text-ink" %>
-        <%= form.text_field :title, maxlength: 200, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        <%= form.text_field :title, size: nil, maxlength: 200, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
       </div>
       <div class="md:col-span-2">
         <%= form.label :summary, t("recruitment.jobs.fields.summary"), class: "mb-2 block text-13 font-semibold text-ink" %>
@@ -27,7 +27,7 @@
       <% %i[ category department team seniority location ].each do |field| %>
         <div>
           <%= form.label field, t("recruitment.jobs.fields.#{field}"), class: "mb-2 block text-13 font-semibold text-ink" %>
-          <%= form.text_field field, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+          <%= form.text_field field, size: nil, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
         </div>
       <% end %>
       <div>
@@ -48,7 +48,7 @@
       </div>
       <div>
         <%= form.label :currency, t("recruitment.jobs.fields.currency"), class: "mb-2 block text-13 font-semibold text-ink" %>
-        <%= form.text_field :currency, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+        <%= form.text_field :currency, size: nil, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
         <p class="mt-1 text-12 text-muted"><%= t("recruitment.jobs.field_help.salary") %></p>
       </div>
       <div>

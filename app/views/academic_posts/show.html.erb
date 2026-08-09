@@ -55,7 +55,7 @@
           <%= form_with scope: :invitation, url: invitations_academic_post_path(@post), class: "mt-3 flex flex-wrap items-end gap-2" do |form| %>
             <label class="flex flex-col gap-1">
               <span class="text-12.5 text-muted"><%= t("academic.collaboration.student_id") %></span>
-              <%= form.text_field :student_id, required: true, maxlength: 13, class: "rounded border border-hairline-2 bg-surface px-2.5 py-2 text-13 text-ink" %>
+              <%= form.text_field :student_id, size: nil, required: true, maxlength: 13, class: "rounded border border-hairline-2 bg-surface px-2.5 py-2 text-13 text-ink" %>
             </label>
             <label class="flex flex-col gap-1">
               <span class="text-12.5 text-muted"><%= t("academic.collaboration.permission") %></span>

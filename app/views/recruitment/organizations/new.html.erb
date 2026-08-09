@@ -17,12 +17,12 @@
 
     <div>
       <%= form.label :name, t("recruitment.organizations.fields.name"), class: "mb-2 block text-13 font-semibold text-ink" %>
-      <%= form.text_field :name, required: true, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <%= form.text_field :name, size: nil, required: true, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
     </div>
 
     <div>
       <%= form.label :slug, t("recruitment.organizations.fields.slug"), class: "mb-2 block text-13 font-semibold text-ink" %>
-      <%= form.text_field :slug, maxlength: 80, placeholder: "example-company", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <%= form.text_field :slug, size: nil, maxlength: 80, placeholder: "example-company", class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
       <p class="mt-1.5 text-12 text-muted"><%= t("recruitment.organizations.fields.slug_hint") %></p>
     </div>
 

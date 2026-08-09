@@ -8,11 +8,11 @@
   <div class="grid gap-5 sm:grid-cols-2">
     <div class="sm:col-span-2">
       <%= form.label :name, t("recruitment.internships.fields.name"), class: "text-13 font-semibold text-ink" %>
-      <%= form.text_field :name, maxlength: 200, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+      <%= form.text_field :name, size: nil, maxlength: 200, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
     </div>
     <div>
       <%= form.label :department, t("recruitment.internships.fields.department"), class: "text-13 font-semibold text-ink" %>
-      <%= form.text_field :department, maxlength: 160, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
+      <%= form.text_field :department, size: nil, maxlength: 160, required: true, class: "mt-2 w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2.5 text-14 text-ink" %>
     </div>
     <div>
       <%= form.label :mentor_id, t("recruitment.internships.fields.mentor"), class: "text-13 font-semibold text-ink" %>

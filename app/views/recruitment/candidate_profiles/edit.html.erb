@@ -22,7 +22,7 @@
 
     <div>
       <%= form.label :headline, t("recruitment.candidate_profile.fields.headline"), class: "mb-2 block text-13 font-semibold text-ink" %>
-      <%= form.text_field :headline, maxlength: 140, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <%= form.text_field :headline, size: nil, maxlength: 140, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
     </div>
 
     <div class="grid gap-5 sm:grid-cols-2">
@@ -40,7 +40,7 @@
       </div>
       <div>
         <%= form.label :salary_currency, t("recruitment.candidate_profile.fields.salary_currency"), class: "mb-2 block text-13 font-semibold text-ink" %>
-        <%= form.text_field :salary_currency, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 uppercase text-ink" %>
+        <%= form.text_field :salary_currency, size: nil, maxlength: 3, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 uppercase text-ink" %>
       </div>
       <div>
         <%= form.label :salary_expectation_min, t("recruitment.candidate_profile.fields.salary_min"), class: "mb-2 block text-13 font-semibold text-ink" %>
@@ -151,7 +151,7 @@
 
     <div>
       <%= form.label :preferred_location, t("recruitment.candidate_profile.fields.preferred_location"), class: "mb-2 block text-13 font-semibold text-ink" %>
-      <%= form.text_field :preferred_location, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
+      <%= form.text_field :preferred_location, size: nil, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-1 px-4 py-3 text-14 text-ink" %>
     </div>
 
     <div>

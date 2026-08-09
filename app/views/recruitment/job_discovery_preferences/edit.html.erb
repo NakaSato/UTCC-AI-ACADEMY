@@ -37,11 +37,11 @@
       <div class="mt-4 space-y-4">
         <div>
           <%= form.label :search_query, t("recruitment.jobs.search_phrase"), class: "mb-2 block text-13 font-semibold text-ink" %>
-          <%= form.text_field :search_query, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+          <%= form.text_field :search_query, size: nil, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
         </div>
         <div>
           <%= form.label :location, t("recruitment.jobs.location_preference"), class: "mb-2 block text-13 font-semibold text-ink" %>
-          <%= form.text_field :location, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
+          <%= form.text_field :location, size: nil, maxlength: 160, class: "w-full rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-13 text-ink" %>
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
           <div>

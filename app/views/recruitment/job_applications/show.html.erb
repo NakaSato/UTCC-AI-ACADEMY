@@ -92,7 +92,7 @@
       <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.applications.transition_title") %></h2>
       <%= form_with url: transition_recruitment_organization_job_post_application_path(@organization, @job_post, @application), scope: :recruitment_job_application, method: :post, class: "mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto]" do |form| %>
         <%= form.select :status, Recruitment::JobApplication::TRANSITIONS.fetch(@application.status).map { |status| [ t("recruitment.applications.statuses.#{status}"), status ] }, {}, class: "rounded-xl border border-hairline bg-surface-2 px-3 py-2.5 text-13 text-ink" %>
-        <%= form.text_field :note, maxlength: 2_000, placeholder: t("recruitment.applications.note_placeholder"), class: "rounded-xl border border-hairline bg-surface-2 px-3 py-2.5 text-13 text-ink" %>
+        <%= form.text_field :note, size: nil, maxlength: 2_000, placeholder: t("recruitment.applications.note_placeholder"), class: "rounded-xl border border-hairline bg-surface-2 px-3 py-2.5 text-13 text-ink" %>
         <%= form.hidden_field :lock_version, value: @application.lock_version %>
         <%= form.submit t("recruitment.applications.transition"), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
       <% end %>

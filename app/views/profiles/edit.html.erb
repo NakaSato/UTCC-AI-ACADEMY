@@ -30,7 +30,7 @@
               profile.*: the same field asked for on the same terms. %>
           <label class="flex flex-col gap-1.75">
             <span class="text-13-5 font-medium text-ink-4"><%= t("auth.fields.name") %></span>
-            <%= form.text_field :name, required: true, autocomplete: "name", maxlength: 60,
+            <%= form.text_field :name, size: nil, required: true, autocomplete: "name", maxlength: 60,
                   placeholder: t("auth.fields.name_placeholder"),
                   "aria-invalid": @user.errors[:name].any?.to_s,
                   class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15
