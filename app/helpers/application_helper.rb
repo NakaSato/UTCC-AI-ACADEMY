@@ -58,10 +58,14 @@ module ApplicationHelper
 
   # Admin first — it is the admin's index. Organizations because creating one
   # and granting its first membership are admin-only actions.
+  #
+  # No Teaching entry: /instructor is a report on a section an admin does not
+  # teach, so for them it is somebody else's screen. An admin who genuinely
+  # teaches holds the instructor role and gets that workspace; the route still
+  # admits any staff member who types it.
   def admin_nav_items
     [
       [ t("chrome.nav.admin"),         admin_path ],
-      [ t("chrome.nav.instructor"),    instructor_path ],
       [ t("chrome.nav.organizations"), companies_path ]
     ]
   end

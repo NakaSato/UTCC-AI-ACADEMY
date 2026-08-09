@@ -84,7 +84,8 @@ never a role — so asking the role handed them a learner's app.
 - A student's nav includes Catalog and Map and excludes Instructor and
   Organizations.
 - An instructor's nav is exactly Instructor and Academic writing.
-- An admin's nav is exactly Admin, Instructor, and Organizations.
+- An admin's nav is exactly Admin and Organizations — `/instructor` reports on
+  a section an admin does not teach, though the route still admits them.
 - A company member's nav is exactly Organizations, Business cases, and
   Internships, and includes no coursework entry.
 - The burger drawer renders the same labels as the rail.

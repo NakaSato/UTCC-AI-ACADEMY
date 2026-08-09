@@ -58,12 +58,16 @@ class WorkspaceNavigationTest < ActionDispatch::IntegrationTest
     assert_equal [ I18n.t("chrome.nav.instructor"), I18n.t("chrome.nav.writing") ], nav_labels
   end
 
-  test "an admin gets the admin nav, including organizations" do
+  # No Teaching entry: /instructor reports on a section an admin does not teach.
+  # The route still admits them — this is about what the nav claims is theirs.
+  test "an admin gets the admin nav and is not offered the teaching screen" do
     sign_in_as users(:admin)
     get admin_url
 
-    assert_equal [ I18n.t("chrome.nav.admin"), I18n.t("chrome.nav.instructor"),
-                   I18n.t("chrome.nav.organizations") ], nav_labels
+    assert_equal [ I18n.t("chrome.nav.admin"), I18n.t("chrome.nav.organizations") ], nav_labels
+
+    get instructor_url
+    assert_response :success
   end
 
   # The one this whole change is about: a company member holds the student role,

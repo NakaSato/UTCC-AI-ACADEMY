@@ -305,12 +305,16 @@ class AppScreensTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     # Once in the nav rail, once in the burger drawer.
-    assert_select "header a[href=?]", instructor_path, count: 2
     assert_select "header a[href=?]", admin_path, count: 2
+    assert_select "header a[href=?]", companies_path, count: 2
+    # /instructor is a report on a section an admin does not teach, so the nav
+    # does not offer it — the route still admits them if they type it.
+    assert_select "header a[href=?]", instructor_path, count: 0
   end
 
-  # An admin's nav is the two staff screens and nothing else: `/` only bounces
-  # them back to /admin, so the catalog and the learner screens are not theirs.
+  # An admin's nav is the admin screen and the company list, and nothing else:
+  # `/` only bounces them back to /admin, so the catalog and the learner screens
+  # are not theirs.
   test "the admin nav drops the learner screens" do
     sign_in_as users(:admin)
     get admin_url
