@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T12:28:00+07:00",
+  "updated_at": "2026-08-09T12:35:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1844,7 +1844,7 @@
     {
       "id": "REC-016",
       "title": "Define governed enterprise recruitment integrations and adoption controls",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, Platform, and QA owners",
       "milestone": "AI-M15",
@@ -1854,7 +1854,7 @@
         "REC-014",
         "REC-015"
       ],
-      "blocker": "Design is prepared; implementation remains blocked pending Product Owner, legal, security, privacy, data, platform, recruitment-domain, and QA review of provider, tenant, consent, data-sharing, and operating decisions",
+      "blocker": null,
       "evidence": [
         {
           "label": "AI Recruitment Platform roadmap — Milestone 15",
@@ -1869,7 +1869,7 @@
           "url": "specs/spec-recruitment-enterprise-integrations.html"
         }
       ],
-      "updated_at": "2026-08-07T22:45:00+07:00"
+      "updated_at": "2026-08-09T12:35:00+07:00"
     },
     {
       "id": "BIZ-001",
@@ -3519,6 +3519,14 @@
       "to": "complete",
       "summary": "The user approved REC-015 as defined. Participant-scoped in-app application conversations are accepted: plain-text messages readable and writable only by the candidate and active owner, recruiter, or hiring-manager members of the application's organization, immutable after creation with sender, timestamp, and audit event, never mutating application status, and with no external delivery of any kind. Consent, retention, moderation, and notification policy still require the named owner reviews before production use.",
       "evidence_url": "specs/spec-recruitment-application-conversations.html"
+    },
+    {
+      "at": "2026-08-09T12:35:00+07:00",
+      "item_id": "REC-016",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-016 as the governing design boundary for enterprise recruitment integrations: tenant-scoped fail-closed registration lifecycle, secret and payload hygiene with reference-only custody, domain sovereignty over recruitment tables and local roles, contract- and purpose-scoped field allowlists, validated idempotent callbacks, and revocation without silent replay. No provider is selected and no external request, callback, or data exchange is authorized; connector implementation remains gated on the recorded human review handoff and the required future enforcement tests.",
+      "evidence_url": "specs/spec-recruitment-enterprise-integrations.html"
     }
   ]
 }

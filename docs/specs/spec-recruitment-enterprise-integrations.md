@@ -2,10 +2,10 @@
 id: SPEC-0039
 type: spec
 title: Governed enterprise recruitment integrations and adoption controls
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@recruitment-domain-owner", "@data-owner", "@platform-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -28,10 +28,11 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-004]
 
 # Governed Enterprise Recruitment Integrations and Adoption Controls
 
-> **Review state:** Draft design only. This specification authorizes no
-> external request, callback, account linking, synchronization, calendar event,
-> partner access, or production data exchange. It becomes implementation-ready
-> only after the human decisions in the review handoff are recorded.
+> **Review state:** Accepted by the user on 2026-08-09 as the governing design
+> gate. This specification authorizes no external request, callback, account
+> linking, synchronization, calendar event, partner access, or production data
+> exchange. It becomes implementation-ready only after the human decisions in
+> the review handoff are recorded.
 
 > [Executable Specifications](README.md) ·
 > [Enterprise integration ADR](../decisions/adr-0039-governed-enterprise-integrations.md) ·

@@ -2,10 +2,10 @@
 id: ADR-0039
 type: adr
 title: Define a governed control boundary for enterprise recruitment integrations
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@recruitment-domain-owner", "@data-owner", "@platform-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -29,11 +29,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-002]
 
 # Define a Governed Control Boundary for Enterprise Recruitment Integrations
 
-> **Decision state:** Agent-prepared draft. No SSO, HRIS, calendar, partner API,
-> webhook, or external data exchange is authorized by this record. The Product
-> Owner, Tech Lead, Security Owner, Privacy Owner, Recruitment Domain Owner,
-> Data Owner, Platform Owner, and QA Owner must approve the provider, tenant,
-> consent, data, operating, and compliance choices before implementation.
+> **Decision state:** Accepted by the user on 2026-08-09 as the governing
+> control contract for enterprise integrations. No SSO, HRIS, calendar, partner
+> API, webhook, or external data exchange is authorized by this record. The
+> Product Owner, Tech Lead, Security Owner, Privacy Owner, Recruitment Domain
+> Owner, Data Owner, Platform Owner, and QA Owner must still approve the
+> provider, tenant, consent, data, operating, and compliance choices before any
+> connector implementation.
 
 > [Decision Records](README.md) ·
 > [Enterprise integration specification](../specs/spec-recruitment-enterprise-integrations.md) ·
