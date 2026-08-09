@@ -43,6 +43,30 @@ class Recruitment::JobApplicationMessageTest < ActiveSupport::TestCase
     assert_not @application.messages.build(sender: users(:student), body: "x" * 4_001).valid?
   end
 
+  test "messages use current candidate ownership and remain append-only" do
+    stale_application = Recruitment::JobApplication.find(@application.id)
+    Recruitment::JobApplication.where(id: @application.id).update_all(candidate_id: @outsider.id)
+    unauthorized = stale_application.messages.build(sender: users(:student), body: "No longer authorized")
+
+    assert_not unauthorized.valid?
+
+    Recruitment::JobApplication.where(id: @application.id).update_all(candidate_id: users(:student).id)
+    message = @application.messages.create!(sender: users(:student), body: "Immutable history")
+    audit = AuditEvent.order(:id).last
+
+    assert_equal users(:student), audit.user
+    assert_equal "recruitment_job_application_message_created", audit.action
+    assert_not message.update(body: "Rewritten history")
+    assert_not message.destroy
+    assert_equal "Immutable history", message.reload.body
+  end
+
+  test "model-created messages always record an audit event" do
+    assert_difference "AuditEvent.count", 1 do
+      @application.messages.create!(sender: users(:two), body: "Recorded by the model")
+    end
+  end
+
   test "creating a message does not change the application stage" do
     assert_no_changes -> { @application.reload.status } do
       @application.messages.create!(sender: users(:student), body: "Still waiting for review.")

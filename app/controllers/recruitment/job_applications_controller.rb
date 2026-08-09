@@ -81,8 +81,6 @@ module Recruitment
       end
 
       @application.messages.create!(sender: Current.user, body: message_params[:body])
-      AuditEvent.record("recruitment_job_application_message_created", organization: @application.job_post.organization.name,
-                        job: @application.job_post.title, application: @application.id)
       redirect_to redirect_path, notice: t("flash.recruitment_job_application_message_created")
     rescue ActiveRecord::RecordInvalid
       redirect_to redirect_path || recruitment_job_application_path(@application || params[:id]),

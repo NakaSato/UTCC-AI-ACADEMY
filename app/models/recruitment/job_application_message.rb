@@ -12,6 +12,9 @@ module Recruitment
     validate :sender_can_participate
 
     before_validation :set_sent_time, on: :create
+    before_update { throw :abort }
+    before_destroy { throw :abort }
+    after_create :record_audit_event
 
     private
       def set_sent_time
@@ -20,9 +23,16 @@ module Recruitment
 
       def sender_can_participate
         return if sender.blank? || job_application.blank?
-        return if sender.id == job_application.candidate_id || job_application.reviewer?(sender)
+        return if Recruitment::JobApplication.where(id: job_application.id, candidate_id: sender.id).exists? ||
+                  job_application.reviewer?(sender)
 
         errors.add(:sender, :invalid)
+      end
+
+      def record_audit_event
+        AuditEvent.create!(user: sender, action: "recruitment_job_application_message_created",
+                           params: { organization: job_application.job_post.organization.name,
+                                     job: job_application.job_post.title, application: job_application.id })
       end
   end
 end
