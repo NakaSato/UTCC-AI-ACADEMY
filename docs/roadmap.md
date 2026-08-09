@@ -1142,7 +1142,7 @@ later milestones remain proposals
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
 | M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
-| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increment 1 implemented | M10 company boundary, shared identity, and institutional internship policy |
+| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–2 implemented | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
 | M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | Proposed | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
 | M14 | Core Team Internal Work Dashboard | Core team members can manage private Markdown work records and connect them to governed Slack collaboration | Proposed | Core-team identity, repository lifecycle records, Slack policy, and M13 proposal decisions |
@@ -1575,10 +1575,11 @@ boundaries established by M10; it does not replace UTCC Academy M10 Academic
 Writing, AI Recruitment Platform M4 Internship Management, or AI Recruitment
 Platform M11 AI Candidate Agent.
 
-**Status:** Increment 1 implemented (2026-08-09) — student-initiated,
-position-less internship requests to companies that opt in, with a recorded
-company decision. Placements, progress reports, faculty oversight, documents,
-and academic credit remain proposals.
+**Status:** Increments 1 and 2 implemented (2026-08-09) — student-initiated,
+position-less internship requests to companies that opt in, a recorded company
+decision, and placements with weekly progress reports. A placement originates
+from either an approved request or an accepted recruitment application. Faculty
+oversight, documents, rubric evaluation, and academic credit remain proposals.
 
 Corrected 2026-08-09: company internship **positions and evaluations already
 exist** and ship under

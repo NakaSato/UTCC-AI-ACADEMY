@@ -31,6 +31,8 @@ class InternshipRequest < ApplicationRecord
   belongs_to :organization, inverse_of: :internship_requests
   belongs_to :student, class_name: "User", inverse_of: :internship_requests
   belongs_to :decided_by, class_name: "User", optional: true, inverse_of: :decided_internship_requests
+  has_one :placement, class_name: "InternshipPlacement", dependent: :restrict_with_exception,
+                      inverse_of: :internship_request
 
   attr_accessor :status_transition_context
 

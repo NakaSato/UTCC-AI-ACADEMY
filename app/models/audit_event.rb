@@ -59,6 +59,9 @@ class AuditEvent < ApplicationRecord
     internship_requests_opened internship_requests_closed
     internship_request_submitted internship_request_withdrawn
     internship_request_review_started internship_request_approved internship_request_rejected
+    internship_placement_created internship_placement_activated internship_placement_completed
+    internship_placement_cancelled
+    internship_progress_report_submitted internship_progress_report_acknowledged
   ].freeze
 
   # The ones worth noticing: a privilege change, or something that cannot be
@@ -66,7 +69,8 @@ class AuditEvent < ApplicationRecord
   WARN = %w[ role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
               unenrolled integrity_escalated card_removed recruitment_membership_revoked
               business_case_closed business_case_participant_revoked
-              internship_requests_opened internship_request_rejected ].freeze
+              internship_requests_opened internship_request_rejected
+              internship_placement_cancelled ].freeze
 
   # The tab is a sidebar, not an archive — the rows are all still there.
   RECENT = 50

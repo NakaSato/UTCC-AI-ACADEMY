@@ -12,16 +12,25 @@ superseded_by: []
 depends_on: [ADR-0041, ADR-0024, ADR-0028, ADR-0040, SPEC-0024, SPEC-0028]
 implemented_by:
   - app/models/internship_request.rb
+  - app/models/internship_placement.rb
+  - app/models/internship_progress_report.rb
   - app/controllers/internship_requests_controller.rb
   - app/controllers/internship_request_decisions_controller.rb
   - app/controllers/organization_internship_settings_controller.rb
+  - app/controllers/internship_placements_controller.rb
+  - app/controllers/internship_progress_reports_controller.rb
   - db/migrate/20260809160000_create_internship_requests.rb
+  - db/migrate/20260809180000_create_internship_placements.rb
 enforced_by:
   - test/models/internship_request_test.rb
+  - test/models/internship_placement_test.rb
+  - test/models/internship_progress_report_test.rb
+  - test/controllers/internship_placements_controller_test.rb
   - test/controllers/internship_requests_controller_test.rb
   - test/controllers/internship_request_decisions_controller_test.rb
   - test/operations/internship_request_boundary_test.rb
   - test/system/internship_request_walk_test.rb
+  - test/system/internship_placement_walk_test.rb
 touches:
   - app/models
   - app/services
@@ -46,7 +55,11 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003]
 > and a recorded company decision. Placements, progress reports, faculty
 > oversight, document uploads, interviews, rubric evaluation, email, REST APIs,
 > and any academic-credit field remain unauthorized and are enforced absent by
-> `test/operations/internship_request_boundary_test.rb`.
+> `test/operations/internship_request_boundary_test.rb`. Increment 2 was
+> recorded and implemented the same day: placements with a planned, active,
+> completed, and cancelled lifecycle, originating from either an approved
+> request or an accepted `Recruitment::InternshipApplication`, plus weekly
+> progress reports with supervisor acknowledgement.
 
 > [Executable Specifications](README.md) ·
 > [Student internship request ADR](../decisions/adr-0041-student-internship-request-boundary.md) ·
@@ -90,14 +103,30 @@ internship request models.
   the opt-in switch.
 - Bilingual English/Thai copy.
 
+### Included in increment 2 (implemented)
+
+- A placement record with a planned, active, completed, and cancelled lifecycle
+  that only an authorized company decider advances. Creating one never happens
+  by implication.
+- Exactly one origin per placement, either an approved `InternshipRequest` or an
+  accepted `Recruitment::InternshipApplication`, enforced by a database check
+  constraint. The origin is read-only: a placement never mutates an
+  application, its status, or its evaluation.
+- Weekly progress reports authored by the placed student while the placement is
+  active, recording activities, hours, outcomes, and blockers. One report per
+  placement per week, append-only once submitted.
+- Acknowledgement by an active company decider, recording who and when without
+  rewriting the student's text.
+- Privacy-safe audit events for placement creation, each transition, report
+  submission, and acknowledgement.
+
 ### Deferred to later increments (unauthorized, enforced absent)
 
-- A placement record and its planned/active/completed lifecycle. Approval in
-  increment 1 records a decision and nothing more; an approved request is
-  explicitly not an internship, and not a finished one.
-- Periodic progress reports, hours, and supervisor acknowledgement.
 - A faculty assignment and academic review record; the `instructor` role
   continues to grant nothing in this context.
+- Résumé, portfolio, and deliverable uploads.
+- Rubric evaluation dimensions, interviews, email, REST APIs, and any field
+  holding academic credit or converting hours to credit.
 
 ### Excluded
 
@@ -185,12 +214,15 @@ ADR-0041 decision 4, and the faculty role is decision 2.
    request accepts no further student edits.
 4. A company decision is recorded once, by an authorized member, with the
    reason policy requires, and is never silently overwritten.
-5. Approval creates at most one placement per request, in the `planned` state.
-6. A placement reaches `active` and `completed` only through explicit
-   authorized transitions. Neither approval nor any report marks a placement
-   complete.
-7. A progress report belongs to exactly one placement, is authored only by that
-   placement's student while it is `active`, and is append-only once submitted.
+5. A placement has exactly one origin — an approved request or an accepted
+   `Recruitment::InternshipApplication` — with at most one placement per origin,
+   and it is created in the `planned` state.
+6. A placement reaches `active`, `completed`, or `cancelled` only through
+   explicit authorized transitions. Neither approval nor any report advances a
+   placement, and a placement never mutates the record it originated from.
+7. A progress report belongs to exactly one placement and one week, is authored
+   only by that placement's student while the placement is `active`, and is
+   append-only once submitted.
 8. A supervisor acknowledgement records who acknowledged and when, and never
    rewrites the student's report.
 9. Faculty access requires an explicit active assignment; the `instructor`
@@ -230,11 +262,16 @@ moves beyond draft.
 - [x] Approval records a decision only; no placement exists and no record
       implies a started or finished internship
       (`test/operations/internship_request_boundary_test.rb`).
-- [ ] The placement lifecycle defines planned, active, and completed behavior
-      and proves an approved request is not a completed internship — increment 2.
-- [ ] Progress reporting defines cadence, required fields, append-only
-      behavior, acknowledgement authority, and missed-report handling —
-      increment 2.
+- [x] The placement lifecycle defines planned, active, completed, and cancelled
+      behavior and proves an approved request is not a completed internship
+      (`test/models/internship_placement_test.rb`).
+- [x] A placement carries exactly one origin and never mutates the shipped
+      application it may point at
+      (`test/models/internship_placement_test.rb`,
+      `test/operations/internship_request_boundary_test.rb`).
+- [x] Progress reporting defines weekly cadence, required fields, append-only
+      behavior, and acknowledgement authority
+      (`test/models/internship_progress_report_test.rb`).
 - [ ] Faculty assignment, academic review authority, and visibility per role are
       recorded by the academic and privacy owners — deferred.
 - [ ] The document contract for résumés, portfolios, and deliverables is
@@ -257,8 +294,11 @@ moves beyond draft.
 | Academic and cross-domain non-mutation | `test/controllers/internship_request_decisions_controller_test.rb` |
 | Deferred-increment absence | `test/operations/internship_request_boundary_test.rb` — no placement, progress-report, faculty, upload, mailer, API, or credit surface |
 | Audit and privacy | Audit assertions across the model and controller tests |
-| Browser workflow | `test/system/internship_request_walk_test.rb` |
-| Placement lifecycle · progress reporting · faculty authority · document contract | Increment 2 and beyond; not yet authorized |
+| Browser workflow | `test/system/internship_request_walk_test.rb`, `test/system/internship_placement_walk_test.rb` |
+| Placement lifecycle | `test/models/internship_placement_test.rb`, `test/controllers/internship_placements_controller_test.rb` |
+| Placement origin and non-mutation | `test/models/internship_placement_test.rb` — both origins accepted, exactly one required, and the shipped application untouched |
+| Progress reporting | `test/models/internship_progress_report_test.rb` |
+| Faculty authority · document contract · rubric evaluation | Later increments; not yet authorized, absence enforced by `test/operations/internship_request_boundary_test.rb` |
 
 ## Error and boundary cases
 
@@ -321,7 +361,10 @@ bin/rails test test/models/internship_request_test.rb \
   test/controllers/internship_requests_controller_test.rb \
   test/controllers/internship_request_decisions_controller_test.rb \
   test/operations/internship_request_boundary_test.rb
-bin/rails test:system TEST=test/system/internship_request_walk_test.rb
+bin/rails test test/models/internship_placement_test.rb \
+  test/models/internship_progress_report_test.rb \
+  test/controllers/internship_placements_controller_test.rb
+bin/rails test test/system/internship_request_walk_test.rb test/system/internship_placement_walk_test.rb
 bin/docs
 git diff --check
 ```

@@ -33,19 +33,27 @@ class InternshipRequestBoundaryTest < ActiveSupport::TestCase
   end
 
   test "no deferred increment ships before its own decision is recorded" do
-    %w[
-      app/models/internship_placement.rb
-      app/models/internship_progress_report.rb
-      app/models/internship_faculty_assignment.rb
-    ].each do |path|
-      refute ROOT.join(path).exist?,
-        "#{path} belongs to a later increment; ADR-0041 defers it pending a recorded decision"
-    end
+    refute ROOT.join("app/models/internship_faculty_assignment.rb").exist?,
+      "faculty oversight needs ADR-0041 decision 2 from the Academic Owner first"
 
     routes = internship_request_routes
-    %w[placement progress_report faculty].each do |word|
+    %w[faculty academic_review].each do |word|
       refute_includes routes, word, "a #{word} route implies a deferred increment shipped early"
     end
+  end
+
+  test "a placement never writes to the recruitment application it may originate from" do
+    placement = code_of("app/models/internship_placement.rb")
+
+    assert_includes placement, "belongs_to :application",
+      "increment 2 accepts an accepted recruitment application as an origin"
+    refute_match(/application\.update|application\.transition_to|application\.accept!|application\.reject!/,
+                 placement,
+                 "SPEC-0028 owns the application; a placement references it read-only")
+
+    report = code_of("app/models/internship_progress_report.rb")
+    refute_match(/\bcredit\b|\bgrade\b|\bgpa\b/i, report,
+      "hours are evidence for a supervisor, never converted to credit or a grade")
   end
 
   test "no document, mailer, api, or academic-credit surface exists" do

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T17:10:00+07:00",
+  "updated_at": "2026-08-09T18:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2040,6 +2040,33 @@
         }
       ],
       "updated_at": "2026-08-09T17:10:00+07:00"
+    },
+    {
+      "id": "INT-003",
+      "title": "Implement increment 2: internship placements and weekly progress reports",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Tech Lead, Security Owner, Privacy Owner, Recruitment Domain Owner, and QA Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Student internship request specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Student internship request boundary ADR",
+          "url": "decisions/adr-0041-student-internship-request-boundary.html"
+        },
+        {
+          "label": "Shipped internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        }
+      ],
+      "updated_at": "2026-08-09T18:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3686,6 +3713,14 @@
       "from": "in_progress",
       "to": "complete",
       "summary": "Implemented increment 1: an organization opt-in switch held by the owner and company-reviewer roles, a position-less InternshipRequest with draft, submitted, under_review, approved, rejected, and withdrawn states behind guarded transitions, one open request per student per organization enforced by a partial unique index that permits re-approach after a decision, a rejection reason required by both model and database check constraint, immutability once decided, in-app notification to deciders on submission and to the student on a decision, privacy-safe audit events, and bilingual copy. Mentors cannot decide; drafts are invisible to the company. Enforced by model, student-controller, decision-controller, boundary, and system tests, including proof that no placement, progress-report, faculty, upload, mailer, API, or academic-credit surface exists.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-09T18:30:00+07:00",
+      "item_id": "INT-003",
+      "from": "in_progress",
+      "to": "complete",
+      "summary": "The user recorded the increment 2 decisions and the slice was implemented. A placement carries exactly one origin and may come from either an approved InternshipRequest or an accepted Recruitment::InternshipApplication, so the shipped application path is tracked too rather than left half-finished; the origin is read-only and a placement never mutates an application, its status, or its evaluation, which SPEC-0028 still owns. Lifecycle is planned, active, completed, and cancelled behind guarded transitions with a required cancellation reason, so a placement never claims more than happened. Weekly progress reports record activities, hours, outcomes, and blockers, one per placement per week enforced by a unique index, append-only once submitted, authored only by the placed student while the placement is active, and acknowledged by an active company decider without rewriting the student text. Hours are evidence only and no field holds academic credit. Visibility is the placed student plus the organization active deciders; faculty and administrators remain outside pending decisions 2 and 7.",
       "evidence_url": "specs/spec-student-internship-requests.html"
     }
   ]

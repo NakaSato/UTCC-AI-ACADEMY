@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -320,6 +320,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_160000) do
     t.string "scope", default: "global", null: false
     t.datetime "updated_at", null: false
     t.index ["key", "scope"], name: "index_feature_settings_on_key_and_scope", unique: true
+  end
+
+  create_table "internship_placements", force: :cascade do |t|
+    t.datetime "activated_at"
+    t.bigint "application_id"
+    t.text "cancellation_reason"
+    t.datetime "cancelled_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.date "ends_on"
+    t.bigint "internship_request_id"
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "organization_id", null: false
+    t.date "starts_on"
+    t.string "status", default: "planned", null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_internship_placements_on_application_id", unique: true, where: "(application_id IS NOT NULL)"
+    t.index ["internship_request_id"], name: "index_internship_placements_on_internship_request_id", unique: true, where: "(internship_request_id IS NOT NULL)"
+    t.index ["organization_id", "status"], name: "index_internship_placements_on_organization_id_and_status"
+    t.index ["student_id", "status"], name: "index_internship_placements_on_student_id_and_status"
+    t.check_constraint "(internship_request_id IS NULL) <> (application_id IS NULL)", name: "internship_placements_one_origin"
+    t.check_constraint "ends_on IS NULL OR starts_on IS NULL OR ends_on >= starts_on", name: "internship_placements_dates"
+    t.check_constraint "status::text <> 'cancelled'::text OR cancellation_reason IS NOT NULL AND cancellation_reason <> ''::text", name: "internship_placements_cancellation_reason"
+    t.check_constraint "status::text = ANY (ARRAY['planned'::character varying, 'active'::character varying, 'completed'::character varying, 'cancelled'::character varying]::text[])", name: "internship_placements_status"
+  end
+
+  create_table "internship_progress_reports", force: :cascade do |t|
+    t.datetime "acknowledged_at"
+    t.bigint "acknowledged_by_id"
+    t.text "activities", null: false
+    t.text "blockers"
+    t.datetime "created_at", null: false
+    t.decimal "hours", precision: 5, scale: 1
+    t.bigint "internship_placement_id", null: false
+    t.text "outcomes"
+    t.datetime "submitted_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "week_starting_on", null: false
+    t.index ["acknowledged_by_id"], name: "index_internship_progress_reports_on_acknowledged_by_id"
+    t.index ["internship_placement_id", "week_starting_on"], name: "internship_progress_reports_one_per_week", unique: true
+    t.check_constraint "hours IS NULL OR hours >= 0::numeric AND hours <= 168::numeric", name: "internship_progress_reports_hours"
   end
 
   create_table "internship_requests", force: :cascade do |t|
@@ -1015,6 +1057,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_160000) do
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "internship_placements", "internship_requests"
+  add_foreign_key "internship_placements", "organizations"
+  add_foreign_key "internship_placements", "recruitment_internship_applications", column: "application_id"
+  add_foreign_key "internship_placements", "users", column: "student_id"
+  add_foreign_key "internship_progress_reports", "internship_placements"
+  add_foreign_key "internship_progress_reports", "users", column: "acknowledged_by_id"
   add_foreign_key "internship_requests", "organizations"
   add_foreign_key "internship_requests", "users", column: "decided_by_id"
   add_foreign_key "internship_requests", "users", column: "student_id"

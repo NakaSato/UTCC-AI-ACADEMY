@@ -221,6 +221,18 @@ Rails.application.routes.draw do
   post "internship-requests/:id/review", to: "internship_request_decisions#review", as: :review_internship_request
   post "internship-requests/:id/approve", to: "internship_request_decisions#approve", as: :approve_internship_request
   post "internship-requests/:id/reject", to: "internship_request_decisions#reject", as: :reject_internship_request
+
+  # Placements and weekly progress reports (SPEC-0041, increment 2). A placement
+  # originates from an approved request or an accepted recruitment application,
+  # and is the only record that says an internship is happening.
+  resources :internship_placements, path: "internships/placements", only: %i[index show create] do
+    post :activate, on: :member
+    post :complete, on: :member
+    post :cancel, on: :member
+    post :reports, on: :member, to: "internship_progress_reports#create"
+    post "reports/:report_id/acknowledge", on: :member,
+         to: "internship_progress_reports#acknowledge", as: :acknowledge_report
+  end
   # End internship requests
 
   # /instructor needs the instructor or admin role, /admin the admin role — see

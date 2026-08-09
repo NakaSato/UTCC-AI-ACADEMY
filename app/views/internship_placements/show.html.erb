@@ -1,0 +1,117 @@
+<% content_for :title, "#{@placement.organization.name} — #{t("internship_placements.title")}" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <%= link_to t("internship_placements.back"), internship_placements_path,
+          class: "text-13 font-semibold text-brand hover:underline" %>
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= @placement.organization.name %></p>
+        <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= @placement.student.name %></h1>
+        <p class="mt-2 text-13 text-muted">
+          <%= t("internship_placements.origin.#{@placement.internship_request_id.present? ? "request" : "application"}") %>
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("internship_placements.status.#{@placement.status}") %></span>
+        <% if @manageable && @placement.planned? %>
+          <%= button_to t("internship_placements.activate"), activate_internship_placement_path(@placement),
+                class: "rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+        <% if @manageable && @placement.active? %>
+          <%= button_to t("internship_placements.complete"), complete_internship_placement_path(@placement),
+                class: "rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-8 rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
+    <%= t("internship_placements.evidence_notice") %>
+  </div>
+
+  <% if @manageable && !@placement.settled? %>
+    <section class="mb-8 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.cancel_heading") %></h2>
+      <%= form_with url: cancel_internship_placement_path(@placement), class: "mt-3 flex flex-wrap items-start gap-2" do %>
+        <%= text_field_tag :cancellation_reason, nil, size: nil, required: true, maxlength: 5_000,
+              placeholder: t("internship_placements.cancel_reason_placeholder"),
+              class: "w-[320px] rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+        <%= submit_tag t("internship_placements.cancel"),
+              class: "rounded-full border border-red-200 px-4 py-2 text-13 font-semibold text-red-700 transition hover:bg-red-50" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if @placement.cancelled? %>
+    <section class="mb-8 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.cancelled_heading") %></h2>
+      <p class="mt-2 text-14 leading-[1.7] whitespace-pre-line text-muted"><%= @placement.cancellation_reason %></p>
+    </section>
+  <% end %>
+
+  <section class="rounded-card border border-hairline bg-surface-1 p-6">
+    <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.reports_heading") %></h2>
+
+    <% if @is_student && @placement.accepts_reports? %>
+      <%= form_with url: reports_internship_placement_path(@placement), scope: :progress_report,
+            class: "mt-4 space-y-3 border-b border-hairline pb-6" do |form| %>
+        <div>
+          <%= form.label :activities, t("internship_placements.fields.activities"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+          <%= form.text_area :activities, rows: 3, required: true,
+                class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+        </div>
+        <div>
+          <%= form.label :outcomes, t("internship_placements.fields.outcomes"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+          <%= form.text_area :outcomes, rows: 2,
+                class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+        </div>
+        <div>
+          <%= form.label :blockers, t("internship_placements.fields.blockers"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+          <%= form.text_area :blockers, rows: 2,
+                class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+        </div>
+        <div>
+          <%= form.label :hours, t("internship_placements.fields.hours"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+          <%= form.number_field :hours, step: 0.5, min: 0, max: 168,
+                class: "w-[140px] rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+          <p class="mt-1 text-12 text-muted"><%= t("internship_placements.fields.hours_hint") %></p>
+        </div>
+        <%= form.submit t("internship_placements.submit_report"),
+              class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+      <% end %>
+    <% end %>
+
+    <% if @reports.empty? %>
+      <p class="mt-4 text-13 text-muted"><%= t("internship_placements.reports_empty") %></p>
+    <% end %>
+
+    <ul class="mt-5 space-y-4">
+      <% @reports.each do |report| %>
+        <li class="rounded-xl border border-hairline p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-13 font-semibold text-ink">
+              <%= t("internship_placements.week_of", date: l(report.week_starting_on, format: :long)) %>
+            </p>
+            <p class="font-mono text-11 text-muted">
+              <% if report.hours.present? %><%= t("internship_placements.hours_value", hours: report.hours.to_f) %> · <% end %>
+              <%= report.acknowledged? ? t("internship_placements.acknowledged_by", name: report.acknowledged_by.name) : t("internship_placements.not_acknowledged") %>
+            </p>
+          </div>
+          <p class="mt-2 text-13 leading-[1.65] whitespace-pre-line text-muted"><%= report.activities %></p>
+          <% if report.outcomes.present? %>
+            <p class="mt-2 text-13 leading-[1.65] whitespace-pre-line text-muted"><strong class="text-ink"><%= t("internship_placements.fields.outcomes") %>:</strong> <%= report.outcomes %></p>
+          <% end %>
+          <% if report.blockers.present? %>
+            <p class="mt-2 text-13 leading-[1.65] whitespace-pre-line text-muted"><strong class="text-ink"><%= t("internship_placements.fields.blockers") %>:</strong> <%= report.blockers %></p>
+          <% end %>
+          <% if @manageable && !report.acknowledged? %>
+            <%= button_to t("internship_placements.acknowledge"),
+                  acknowledge_report_internship_placement_path(@placement, report_id: report.id),
+                  class: "mt-3 rounded-full border border-hairline px-3 py-1 text-11 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</main>

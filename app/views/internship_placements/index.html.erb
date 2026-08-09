@@ -1,0 +1,75 @@
+<% content_for :title, "#{t("internship_placements.title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= t("internship_placements.eyebrow") %></p>
+    <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_placements.title") %></h1>
+    <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("internship_placements.subtitle") %></p>
+  </div>
+
+  <% if @student_placements.empty? && @company_placements.empty? %>
+    <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
+      <h2 class="text-18 font-semibold text-ink"><%= t("internship_placements.empty_title") %></h2>
+      <p class="mt-2 text-14 text-muted"><%= t("internship_placements.empty_body") %></p>
+    </div>
+  <% end %>
+
+  <% if @placeable_requests.any? || @placeable_applications.any? %>
+    <section class="mb-10 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.placeable_heading") %></h2>
+      <p class="mt-2 text-13 leading-[1.65] text-muted"><%= t("internship_placements.placeable_body") %></p>
+      <ul class="mt-4 space-y-3">
+        <% @placeable_requests.each do |internship_request| %>
+          <li class="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3">
+            <div>
+              <p class="text-13 font-semibold text-ink"><%= internship_request.student.name %></p>
+              <p class="text-11 text-muted"><%= internship_request.organization.name %> · <%= t("internship_placements.origin.request") %></p>
+            </div>
+            <%= button_to t("internship_placements.create"), internship_placements_path,
+                  params: { internship_request_id: internship_request.id },
+                  class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+          </li>
+        <% end %>
+        <% @placeable_applications.each do |application| %>
+          <li class="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3">
+            <div>
+              <p class="text-13 font-semibold text-ink"><%= application.student.name %></p>
+              <p class="text-11 text-muted"><%= application.program.organization.name %> · <%= t("internship_placements.origin.application") %></p>
+            </div>
+            <%= button_to t("internship_placements.create"), internship_placements_path,
+                  params: { application_id: application.id },
+                  class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <% { mine: @student_placements, hosting: @company_placements }.each do |key, placements| %>
+    <% next if placements.empty? %>
+    <section class="mb-10">
+      <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("internship_placements.#{key}_heading") %></h2>
+      <ul class="space-y-4">
+        <% placements.each do |placement| %>
+          <li>
+            <%= link_to internship_placement_path(placement),
+                  class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand hover:shadow-sm" do %>
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h3 class="text-18 font-semibold text-ink"><%= placement.organization.name %></h3>
+                  <p class="mt-1 text-13 text-muted">
+                    <%= key == :mine ? t("internship_placements.origin.#{placement.internship_request_id.present? ? "request" : "application"}") : placement.student.name %>
+                  </p>
+                </div>
+                <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("internship_placements.status.#{placement.status}") %></span>
+              </div>
+              <% if placement.missing_current_week_report? %>
+                <p class="mt-4 text-13 font-semibold text-brand"><%= t("internship_placements.week_missing") %></p>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+</main>

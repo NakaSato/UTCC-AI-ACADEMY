@@ -91,6 +91,11 @@ class User < ApplicationRecord
                                  inverse_of: :student
   has_many :decided_internship_requests, class_name: "InternshipRequest", foreign_key: :decided_by_id,
                                          dependent: :nullify, inverse_of: :decided_by
+  has_many :internship_placements, foreign_key: :student_id, dependent: :restrict_with_exception,
+                                   inverse_of: :student
+  has_many :acknowledged_internship_progress_reports, class_name: "InternshipProgressReport",
+                                                     foreign_key: :acknowledged_by_id, dependent: :nullify,
+                                                     inverse_of: :acknowledged_by
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

@@ -40,6 +40,12 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
 > progress reports, faculty oversight, document uploads, interviews, rubric
 > evaluation, email, REST APIs, and any academic-credit field remain
 > unauthorized and each needs its own recorded decision.
+>
+> **Increment 2 recorded 2026-08-09:** placements and weekly progress reports
+> are authorized, with a placement originating from either an approved request
+> or an accepted `Recruitment::InternshipApplication` as a read-only reference.
+> Faculty oversight, documents, interviews, rubric evaluation, email, REST APIs,
+> and academic credit remain unauthorized.
 
 > [Decision Records](README.md) ·
 > [Student internship request specification](../specs/spec-student-internship-requests.md) ·
@@ -290,10 +296,32 @@ the four that shape increment 1. Everything else in the list below stays open.
 5. **Faculty oversight is deferred (decision 2 deferred).** Increment 1 has no
    faculty actor, because academic-eligibility and visibility policy does not
    exist in writing. The `instructor` role continues to grant nothing here.
-6. **Placements and progress reports are deferred (increment 2).** Approval
-   records a decision and nothing more. An approved request is explicitly not an
-   internship and not a completed one; no record in increment 1 may imply
-   either.
+6. **Placements and progress reports were deferred to increment 2 and are now
+   recorded (2026-08-09).** In increment 1, approval recorded a decision and
+   nothing more. Increment 2 adds the placement and the weekly progress report,
+   with these decisions:
+   - **A placement has exactly one origin, and it may be either an approved
+     `InternshipRequest` or an accepted `Recruitment::InternshipApplication`.**
+     Both are real internships, so both are tracked by one concept rather than
+     leaving the shipped application path untracked. The origin is a read-only
+     reference: a placement never mutates an application, its status, or its
+     evaluation, and SPEC-0028 keeps ownership of that record. A database check
+     constraint enforces exactly one origin.
+   - **Lifecycle is planned, active, completed, and cancelled.** Creating a
+     placement from an approved origin yields `planned`; only an authorized
+     company decider advances it. `cancelled` exists because an internship that
+     ends early otherwise has to sit in `active` forever or be falsely marked
+     `completed`, and this record's whole point is that a state must not claim
+     more than happened.
+   - **Reports are weekly and record activities, hours, outcomes, and
+     blockers.** One report per placement per week, append-only once submitted,
+     authored only by the placed student while the placement is active. Hours
+     are evidence for a supervisor, never converted to credit or a grade.
+   - **A report is acknowledged by an active company decider**, which records
+     who acknowledged and when and never rewrites the student's text.
+   - **Visibility is the placed student plus the organization's active deciders**
+     — the same roles that decide requests. Faculty and administrators remain
+     outside until decisions 2 and 7 are recorded.
 7. **Documents stay excluded (decision 5 unchanged).** No résumé, portfolio, or
    deliverable upload surface exists. Requests carry structured text, and the
    interface says so.
