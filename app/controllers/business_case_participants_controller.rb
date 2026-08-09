@@ -25,6 +25,8 @@ class BusinessCaseParticipantsController < ApplicationController
 
     redirect_to business_case_path(@business_case),
                 notice: t("flash.business_case_participant_revoked", name: participant.user.name)
+  rescue ActiveRecord::RecordInvalid => error
+    redirect_to business_case_path(@business_case), alert: error.record.errors.full_messages.to_sentence
   rescue ActiveRecord::RecordNotFound
     redirect_to business_case_path(@business_case), alert: t("flash.business_case_member_missing")
   end

@@ -3,7 +3,10 @@ module Recruitment
     self.table_name = "recruitment_internship_evaluations"
 
     STATUSES = %w[ draft submitted ].freeze
-    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor company_reviewer ].freeze
+    # Deliberately excludes company_reviewer: an application has exactly one
+    # evaluation, so letting another role file it would lock out the assigned
+    # mentor SPEC-0028 names as its owner.
+    REVIEWER_ROLES = %w[ owner recruiter hiring_manager mentor ].freeze
 
     belongs_to :application, class_name: "Recruitment::InternshipApplication", inverse_of: :evaluation
     belongs_to :evaluator, class_name: "User", inverse_of: :internship_evaluations

@@ -5,6 +5,7 @@ class InternshipRequestsController < ApplicationController
 
   def index
     @requests = Current.user.internship_requests.includes(:organization).newest_first
+    @can_request = Organization.accepting_internship_requests.exists?
   end
 
   def new

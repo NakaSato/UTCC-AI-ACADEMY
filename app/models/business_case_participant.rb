@@ -16,6 +16,7 @@ class BusinessCaseParticipant < ApplicationRecord
   validate :user_matches_role
   validate :mentor_is_assigned_by_an_owner
   validate :single_active_assignment
+  validate :business_case_is_not_closed, on: :create
 
   scope :active, -> { where(revoked_at: nil) }
 
@@ -29,8 +30,10 @@ class BusinessCaseParticipant < ApplicationRecord
   end
 
   private
+    # Revocation is deliberately exempt: an account role that changed after the
+    # grant must never be able to keep someone inside a confidential case.
     def user_matches_role
-      return if user.blank?
+      return if user.blank? || revoked_at.present?
       return if student? && user.student?
       return if mentor? && user.instructor?
 
@@ -44,6 +47,10 @@ class BusinessCaseParticipant < ApplicationRecord
       if assigned_by.blank? || (business_case.present? && !business_case.manageable_by?(assigned_by))
         errors.add(:assigned_by, :invalid)
       end
+    end
+
+    def business_case_is_not_closed
+      errors.add(:business_case, :invalid) if business_case&.closed?
     end
 
     def single_active_assignment

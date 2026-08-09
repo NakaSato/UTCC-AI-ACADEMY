@@ -67,6 +67,6 @@ class InternshipRequestDecisionsController < ApplicationController
       Notification.notify(internship_request.student, "internship_request_decided",
                           id: internship_request.id,
                           organization: internship_request.organization.name,
-                          outcome: t("internship_requests.status.#{internship_request.status}"))
+                          outcome: internship_request.status)
     end
 end

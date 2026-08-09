@@ -3,6 +3,7 @@
 class InternshipPlacementsController < ApplicationController
   def index
     @student_placements = Current.user.internship_placements.includes(:organization).newest_first
+    @weeks_reported = reported_weeks_by_placement
     @company_placements = InternshipPlacement.joins(organization: :memberships)
                                              .merge(Organization.active)
                                              .where(organization_memberships: {
@@ -60,6 +61,14 @@ class InternshipPlacementsController < ApplicationController
   end
 
   private
+    # One query for the whole index instead of one per placement, so the view can
+    # answer "did this week get reported?" without touching the database again.
+    def reported_weeks_by_placement
+      InternshipProgressReport.where(week_starting_on: Date.current.beginning_of_week)
+                             .pluck(:internship_placement_id)
+                             .to_set
+    end
+
     def decidable_organization_ids
       OrganizationMembership.active
                            .where(user_id: Current.user.id, role: InternshipPlacement::DECIDER_ROLES)
@@ -82,7 +91,8 @@ class InternshipPlacementsController < ApplicationController
                                        .where(recruitment_internship_programs: {
                                                 organization_id: decidable_organization_ids
                                               })
-                                       .where.not(id: InternshipPlacement.select(:application_id))
+                                       .where.not(id: InternshipPlacement.where.not(application_id: nil)
+                                                                        .select(:application_id))
                                        .includes(:student, program: :organization)
     end
 
@@ -107,7 +117,7 @@ class InternshipPlacementsController < ApplicationController
                         student: placement.student.name)
       Notification.notify(placement.student, "internship_placement_updated",
                           id: placement.id, organization: placement.organization.name,
-                          outcome: t("internship_placements.status.#{placement.status}"))
+                          outcome: placement.status)
 
       redirect_to internship_placement_path(placement), notice:
     rescue ActiveRecord::RecordInvalid

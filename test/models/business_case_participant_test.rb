@@ -63,6 +63,25 @@ class BusinessCaseParticipantTest < ActiveSupport::TestCase
     assert_equal "A question", comment.reload.body
   end
 
+  test "revocation still works after the participant's account role changes" do
+    participant = @business_case.participants.create!(user: users(:student), role: "student")
+    users(:student).update!(role: "instructor")
+
+    participant.revoke!
+
+    assert_not_predicate participant.reload, :active?
+    assert_not @business_case.reload.accessible_to?(users(:student))
+  end
+
+  test "a closed case grants nobody new access" do
+    @business_case.transition_to!("closed", actor: users(:one))
+
+    mentor = @business_case.participants.build(user: users(:instructor), role: "mentor",
+                                              assigned_by: users(:one))
+    assert_not mentor.valid?
+    assert_predicate mentor.errors[:business_case], :any?
+  end
+
   test "a revoked participant cannot submit or comment again" do
     participant = @business_case.participants.create!(user: users(:student), role: "student")
     milestone = @business_case.milestones.create!(title: "Discovery")

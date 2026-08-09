@@ -119,6 +119,17 @@ class BusinessCaseInvitationTest < ActiveSupport::TestCase
     assert_equal 1, @business_case.participants.active.count
   end
 
+  test "acceptance survives the inviter losing their membership" do
+    @organization.memberships.create!(user: users(:two), role: "company_reviewer")
+    invitation = @business_case.invitations.create!(inviter: users(:two), invitee: users(:student))
+    @organization.memberships.find_by(user: users(:two)).revoke!
+
+    invitation.accept!
+
+    assert_predicate invitation.reload.accepted_at, :present?
+    assert @business_case.reload.accessible_to?(users(:student))
+  end
+
   test "an active participant cannot be invited again" do
     invitation = @business_case.invitations.create!(inviter: users(:one), invitee: users(:student))
     invitation.accept!

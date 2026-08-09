@@ -24,6 +24,12 @@ class Notification < ApplicationRecord
   # The dropdown is a sidebar, not an archive.
   RECENT = 8
 
+  # Which locale scope a stored `outcome` key belongs to, per kind.
+  OUTCOME_SCOPES = {
+    "internship_request_decided" => "internship_requests.status",
+    "internship_placement_updated" => "internship_placements.status"
+  }.freeze
+
   # The one place a notification is written, and therefore the one place the
   # bell has to be told. Every caller acts *on* somebody else, so the recipient
   # is by definition looking at a different page than the one that caused this
@@ -79,6 +85,12 @@ class Notification < ApplicationRecord
         key = values[:role]
         scope = I18n.exists?("admin.roles.#{key}") ? "admin.roles" : "recruitment.memberships.roles"
         values[:role] = I18n.t("#{scope}.#{key}")
+      end
+      # A status is stored as its key, not its sentence: the writer's locale must
+      # not leak into the reader's bell, and rewording the key has to reword the
+      # history with it.
+      if values.key?(:outcome) && OUTCOME_SCOPES.key?(kind)
+        values[:outcome] = I18n.t("#{OUTCOME_SCOPES.fetch(kind)}.#{values[:outcome]}")
       end
       values
     end

@@ -146,6 +146,15 @@ class InternshipRequestTest < ActiveSupport::TestCase
     assert_equal 2, InternshipRequest.where(student: users(:student)).count
   end
 
+  test "a company decision survives the student's account role changing" do
+    @request.submit!(actor: users(:student))
+    users(:student).update!(role: "instructor")
+
+    @request.approve!(actor: users(:one))
+
+    assert_predicate @request.reload, :approved?
+  end
+
   test "visibility is limited to the student and the company deciders" do
     assert @request.visible_to?(users(:student))
     assert @request.visible_to?(users(:one))

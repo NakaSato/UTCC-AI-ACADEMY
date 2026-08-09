@@ -63,7 +63,7 @@
                 </div>
                 <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("internship_placements.status.#{placement.status}") %></span>
               </div>
-              <% if placement.missing_current_week_report? %>
+              <% if placement.active? && @weeks_reported.exclude?(placement.id) %>
                 <p class="mt-4 text-13 font-semibold text-brand"><%= t("internship_placements.week_missing") %></p>
               <% end %>
             <% end %>

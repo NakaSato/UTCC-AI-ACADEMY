@@ -45,7 +45,7 @@ class InternshipRequest < ApplicationRecord
   validates :learning_goals, presence: true, length: { maximum: 5_000 }
   validates :decision_reason, length: { maximum: 5_000 }
   validates :status, inclusion: { in: STATUSES }
-  validate :student_account
+  validate :student_account, on: :create
   validate :organization_accepts_requests, on: :create
   validate :initial_status_is_draft, on: :create
   validate :one_open_request_per_organization

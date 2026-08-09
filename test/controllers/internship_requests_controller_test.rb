@@ -110,5 +110,11 @@ class InternshipRequestsControllerTest < ActionDispatch::IntegrationTest
 
     get new_internship_request_path
     assert_response :not_found
+
+    # And the index must not offer a button that leads straight to that 404.
+    get internship_requests_path
+    assert_response :success
+    assert_select "a[href=?]", new_internship_request_path, count: 0
+    assert_includes response.body, I18n.t("internship_requests.none_accepting")
   end
 end

@@ -7,8 +7,10 @@
       <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_requests.title") %></h1>
       <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("internship_requests.subtitle") %></p>
     </div>
-    <%= link_to t("internship_requests.new"), new_internship_request_path,
-          class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <% if @can_request %>
+      <%= link_to t("internship_requests.new"), new_internship_request_path,
+            class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
+    <% end %>
   </div>
 
   <div class="mb-8 rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
@@ -18,7 +20,9 @@
   <% if @requests.empty? %>
     <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
       <h2 class="text-18 font-semibold text-ink"><%= t("internship_requests.empty_title") %></h2>
-      <p class="mt-2 text-14 text-muted"><%= t("internship_requests.empty_body") %></p>
+      <p class="mt-2 text-14 text-muted">
+        <%= @can_request ? t("internship_requests.empty_body") : t("internship_requests.none_accepting") %>
+      </p>
     </div>
   <% else %>
     <ul class="space-y-4">

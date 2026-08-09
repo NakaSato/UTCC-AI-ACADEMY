@@ -21,7 +21,7 @@ class BusinessCaseSubmission < ApplicationRecord
   before_destroy { throw :abort }
   after_create :record_audit_event
 
-  scope :newest_first, -> { order(version: :desc, id: :desc) }
+  scope :newest_first, -> { order(submitted_at: :desc, id: :desc) }
 
   private
     def set_submission_time_and_version

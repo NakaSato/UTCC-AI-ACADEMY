@@ -14,7 +14,7 @@ class BusinessCaseInvitation < ApplicationRecord
   validates :token_digest, presence: true, uniqueness: true
   validates :expires_at, presence: true
   validate :business_case_is_open, on: :create
-  validate :inviter_can_invite
+  validate :inviter_can_invite, on: :create
   validate :invitee_is_eligible
   validate :pending_invitation_is_unique
 

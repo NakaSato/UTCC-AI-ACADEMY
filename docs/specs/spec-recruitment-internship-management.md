@@ -5,7 +5,7 @@ title: Organization-scoped internship programs, student applications, and evalua
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@academic-owner"]
 created: 2026-08-07
-updated: 2026-08-08
+updated: 2026-08-09
 review_by: 2026-08-22
 supersedes: []
 superseded_by: []
@@ -101,8 +101,8 @@ students or let a race exceed program capacity.
 | Record | Statuses | Allowed actor |
 | --- | --- | --- |
 | Program | draft, review, published, paused, closed, archived | organization author; publication by owner/hiring manager |
-| Application | pending, accepted, rejected, withdrawn | student owns withdrawal; program reviewer decides |
-| Evaluation | draft, submitted | assigned mentor or program reviewer |
+| Application | pending, accepted, rejected, withdrawn | student owns withdrawal; program reviewer decides — owner, recruiter, hiring-manager, mentor, or company-reviewer |
+| Evaluation | draft, submitted | assigned mentor or program reviewer — owner, recruiter, hiring-manager, or mentor; company-reviewer is excluded so the assigned mentor is never locked out of the single evaluation |
 
 ## Invariants
 
@@ -117,15 +117,18 @@ students or let a race exceed program capacity.
 5. Accepting applications is serialized on the program row and never makes
    accepted applications exceed `max_students`.
 6. Students can withdraw only their own pending or accepted application.
-7. Only an active organization reviewer may accept/reject an application; a
+7. Program authoring is open to owner, recruiter, hiring-manager, and
+   company-reviewer memberships (the last added 2026-08-09, see ADR-0024);
+   publication approval stays with owner and hiring-manager.
+8. Only an active organization reviewer may accept/reject an application; a
    mentor may evaluate only an accepted application in their organization.
-8. Each accepted application has at most one evaluation; evaluation submission
+9. Each accepted application has at most one evaluation; evaluation submission
    requires a rating, outcome result, feedback, and next steps.
-9. Program publication, application decisions, withdrawals, and evaluations do
+10. Program publication, application decisions, withdrawals, and evaluations do
    not automatically issue certificates or alter academic records.
-10. Raw student profile data, protected characteristics, and hidden ranking
+11. Raw student profile data, protected characteristics, and hidden ranking
     signals are not copied into program or application records.
-11. Every program suggestion stores provider, source, uncertainty, and review
+12. Every program suggestion stores provider, source, uncertainty, and review
     status; accepting a description changes only an editable program.
 
 ## Acceptance Criteria

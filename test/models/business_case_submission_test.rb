@@ -49,6 +49,23 @@ class BusinessCaseSubmissionTest < ActiveSupport::TestCase
     assert_equal [ second, first ], @business_case.submissions.newest_first.to_a
   end
 
+  test "the feed reads chronologically, not by per-author version number" do
+    other_milestone = @business_case.milestones.create!(title: "Prototype")
+    @business_case.invitations.create!(inviter: users(:one), invitee: users(:two)).accept!
+
+    older = @business_case.submissions.create!(milestone: @milestone, author: users(:student),
+                                              body: "First pass")
+    older.update_columns(submitted_at: 2.weeks.ago)
+    revision = @business_case.submissions.create!(milestone: @milestone, author: users(:student),
+                                                 body: "Second pass")
+    revision.update_columns(submitted_at: 10.days.ago)
+    newest = @business_case.submissions.create!(milestone: other_milestone, author: users(:two),
+                                                body: "Brand new work")
+
+    assert_equal [ newest, revision, older ], @business_case.submissions.newest_first.to_a
+    assert_equal 1, newest.version, "a first submission is version 1 yet must still sort first"
+  end
+
   test "a duplicate version conflicts in the database and preserves the original" do
     first = @business_case.submissions.create!(milestone: @milestone, author: users(:student), body: "First pass")
     conflicting = @business_case.submissions.build(milestone: @milestone, author: users(:student), body: "Racing pass",

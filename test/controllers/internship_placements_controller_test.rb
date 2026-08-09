@@ -129,7 +129,56 @@ class InternshipPlacementsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "an accepted application stays placeable after a request-origin placement exists" do
+    application = accepted_application_for(users(:two))
+    InternshipPlacement.from_request!(@approved_request, actor: users(:one))
+
+    sign_in_as users(:one)
+    get internship_placements_path
+
+    assert_response :success
+    assert_includes response.body, I18n.t("internship_placements.origin.application"),
+      "a NULL application_id on the request-origin placement must not empty the placeable list"
+
+    assert_difference "InternshipPlacement.count", 1 do
+      post internship_placements_path, params: { application_id: application.id }
+    end
+
+    placement = InternshipPlacement.order(:id).last
+    assert_equal application, placement.origin
+    assert_equal users(:two), placement.student
+  end
+
+  test "the student's decision notification reads in the student's own language" do
+    placement = InternshipPlacement.from_request!(@approved_request, actor: users(:one))
+
+    sign_in_as users(:one)
+    post activate_internship_placement_path(placement)
+
+    notification = users(:student).notifications.order(:id).last
+    assert_equal "active", notification.params["outcome"], "the row stores the key, not a sentence"
+    I18n.with_locale(:th) do
+      assert_includes notification.text, I18n.t("internship_placements.status.active", locale: :th)
+    end
+    I18n.with_locale(:en) do
+      assert_includes notification.text, I18n.t("internship_placements.status.active", locale: :en)
+    end
+  end
+
   private
+    def accepted_application_for(student)
+      program = @organization.internship_programs.create!(
+        creator: users(:one), mentor: users(:one), name: "Logistics Internship", department: "Ops",
+        description: "Work with the routing team.", required_skills: "Spreadsheets",
+        learning_outcomes: "Cost analysis", working_days: "Mon-Fri", certificate_policy: "On completion"
+      )
+      program.transition_to!("review")
+      program.transition_to!("published")
+      application = program.apply!(student:, statement: "Ready to learn")
+      application.accept!(reviewer: users(:one))
+      application
+    end
+
     def approved_request_for(student)
       request = @organization.internship_requests.create!(student:, motivation: "Your routing work",
                                                         learning_goals: "Optimisation")

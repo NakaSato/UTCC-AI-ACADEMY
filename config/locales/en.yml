@@ -2450,6 +2450,7 @@ en:
     withdraw: "Withdraw"
     empty_title: "No internship requests yet"
     empty_body: "Draft a request to a company that accepts them, then submit it when you are ready."
+    none_accepting: "No partner company is accepting internship requests right now. Check back later."
     positionless_notice: "This is a direct request, not an application to an advertised position — browse open internships separately. Text only: no résumé, portfolio, or file uploads yet, and no confidential or real personal data. An approved request records the company's decision; it does not start or complete an internship, and it carries no academic credit."
     decision_heading: "Company decision"
     decision_recorded: "%{outcome} on %{date}"
