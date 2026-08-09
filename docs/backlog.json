@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T00:11:59+07:00",
+  "updated_at": "2026-08-09T12:07:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1399,7 +1399,9 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, and Security/Privacy owner",
       "milestone": "AI-M1",
-      "depends_on": ["REC-001"],
+      "depends_on": [
+        "REC-001"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1428,7 +1430,10 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
       "milestone": "AI-M2",
-      "depends_on": ["REC-001", "REC-002"],
+      "depends_on": [
+        "REC-001",
+        "REC-002"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1457,7 +1462,9 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, and Recruitment Domain owner",
       "milestone": "AI-M3",
-      "depends_on": ["REC-003"],
+      "depends_on": [
+        "REC-003"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1486,7 +1493,11 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Academic owners",
       "milestone": "AI-M4",
-      "depends_on": ["REC-001", "REC-003", "REC-004"],
+      "depends_on": [
+        "REC-001",
+        "REC-003",
+        "REC-004"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1515,7 +1526,11 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M5",
-      "depends_on": ["REC-001", "REC-004", "REC-005"],
+      "depends_on": [
+        "REC-001",
+        "REC-004",
+        "REC-005"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1544,7 +1559,9 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M6",
-      "depends_on": ["REC-006"],
+      "depends_on": [
+        "REC-006"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1573,7 +1590,11 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, and Privacy owners",
       "milestone": "AI-M7",
-      "depends_on": ["REC-003", "REC-006", "REC-007"],
+      "depends_on": [
+        "REC-003",
+        "REC-006",
+        "REC-007"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1602,7 +1623,10 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, Data, and QA owners",
       "milestone": "AI-M8",
-      "depends_on": ["REC-007", "REC-008"],
+      "depends_on": [
+        "REC-007",
+        "REC-008"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1631,7 +1655,11 @@
       "priority": 1,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, and QA owners",
       "milestone": "AI-M9",
-      "depends_on": ["REC-003", "REC-006", "REC-009"],
+      "depends_on": [
+        "REC-003",
+        "REC-006",
+        "REC-009"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1660,7 +1688,10 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, and QA owners",
       "milestone": "AI-M10",
-      "depends_on": ["REC-009", "REC-010"],
+      "depends_on": [
+        "REC-009",
+        "REC-010"
+      ],
       "blocker": null,
       "evidence": [
         {
@@ -1685,12 +1716,15 @@
     {
       "id": "REC-012",
       "title": "Define the permissioned AI candidate agent boundary for search, applications, and career guidance",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, Data, and QA owners",
       "milestone": "AI-M11",
-      "depends_on": ["REC-007", "REC-008"],
-      "blocker": "Final production use still requires legal, security, recruitment-domain, privacy, data, and QA review",
+      "depends_on": [
+        "REC-007",
+        "REC-008"
+      ],
+      "blocker": null,
       "evidence": [
         {
           "label": "AI Recruitment Platform roadmap — Milestone 11",
@@ -1709,7 +1743,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/candidate_application_assistant_test.rb"
         }
       ],
-      "updated_at": "2026-08-07T22:08:36+07:00"
+      "updated_at": "2026-08-09T12:07:00+07:00"
     },
     {
       "id": "REC-013",
@@ -1718,7 +1752,11 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Academic, Data, and QA owners",
       "milestone": "AI-M12",
-      "depends_on": ["REC-005", "REC-007", "REC-009"],
+      "depends_on": [
+        "REC-005",
+        "REC-007",
+        "REC-009"
+      ],
       "blocker": "Final production use still requires legal, academic, security, recruitment-domain, privacy, data, and QA review",
       "evidence": [
         {
@@ -1747,7 +1785,10 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Recruitment Domain, Data, Privacy, Security, and QA owners",
       "milestone": "AI-M13",
-      "depends_on": ["REC-009", "REC-010"],
+      "depends_on": [
+        "REC-009",
+        "REC-010"
+      ],
       "blocker": "Final production use still requires privacy, security, recruitment-domain, data, and QA review of metric definitions",
       "evidence": [
         {
@@ -1776,7 +1817,9 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Privacy, and QA owners",
       "milestone": "AI-M14",
-      "depends_on": ["REC-010"],
+      "depends_on": [
+        "REC-010"
+      ],
       "blocker": "Final production use still requires consent, retention, moderation, notification, privacy, security, recruitment-domain, and QA review",
       "evidence": [
         {
@@ -1805,7 +1848,12 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Data, Platform, and QA owners",
       "milestone": "AI-M15",
-      "depends_on": ["REC-001", "REC-010", "REC-014", "REC-015"],
+      "depends_on": [
+        "REC-001",
+        "REC-010",
+        "REC-014",
+        "REC-015"
+      ],
       "blocker": "Design is prepared; implementation remains blocked pending Product Owner, legal, security, privacy, data, platform, recruitment-domain, and QA review of provider, tenant, consent, data-sharing, and operating decisions",
       "evidence": [
         {
@@ -1830,7 +1878,11 @@
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Academic, Recruitment Domain, and QA owners",
       "milestone": "M10-CBP",
-      "depends_on": ["REC-001", "REC-003", "REC-005"],
+      "depends_on": [
+        "REC-001",
+        "REC-003",
+        "REC-005"
+      ],
       "blocker": "Design is prepared; implementation remains blocked pending Product, academic, legal/privacy, security, recruitment-domain, industry-partner, and QA review of confidentiality, consent, IP, participant, storage, retention, and notification decisions",
       "evidence": [
         {
@@ -3435,6 +3487,14 @@
       "to": "complete",
       "summary": "The user approved REC-011 as a governed advisory boundary. Provider-neutral next-action assistance, source/uncertainty disclosure, deterministic attention flags, access control, bilingual human-responsibility copy, and the prohibition on consequential hiring decisions are accepted; production use remains subject to the documented legal, security, privacy, data, QA, and recruitment review.",
       "evidence_url": "specs/spec-recruiter-advisory-assistance.html"
+    },
+    {
+      "at": "2026-08-09T12:07:00+07:00",
+      "item_id": "REC-012",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-012 as defined. The advisory, candidate-owned application-preparation checklist is accepted: deterministic rules_preview with no external provider, read-only narrow data scope, source and uncertainty disclosure, terminal-state closure guidance, and the prohibition on acting for the candidate. Production or external candidate use still requires legal, security, recruitment-domain, privacy, data, and QA review.",
+      "evidence_url": "specs/spec-candidate-application-assistance.html"
     }
   ]
 }

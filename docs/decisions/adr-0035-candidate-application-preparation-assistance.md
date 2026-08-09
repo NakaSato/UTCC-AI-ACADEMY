@@ -2,10 +2,10 @@
 id: ADR-0035
 type: adr
 title: Start the AI candidate agent with candidate-controlled application preparation guidance
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -36,9 +36,12 @@ enforced_by:
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This slice is implementation-approved by the user
-> for local verification; Product, legal, Security, Recruitment, Privacy, Data,
-> and QA owners must review it before production or external candidate use.
+> **Decision state:** Accepted by the user on 2026-08-09 for the advisory
+> candidate application-preparation slice: a candidate-owned checklist with
+> deterministic rules_preview behavior, source and uncertainty disclosure, and
+> the prohibition on acting for the candidate. Legal, security, recruitment,
+> privacy, data, and QA owners must still review it before production or
+> external candidate use.
 
 ## Context
 
