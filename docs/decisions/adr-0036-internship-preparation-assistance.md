@@ -2,10 +2,10 @@
 id: ADR-0036
 type: adr
 title: Start the AI internship agent with student-controlled preparation guidance
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@academic-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -36,9 +36,12 @@ enforced_by:
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This slice is implementation-approved by the user
-> for local verification; Product, Academic, legal, Security, Recruitment,
-> Privacy, Data, and QA owners must review it before production use.
+> **Decision state:** Accepted by the user on 2026-08-09 for the advisory
+> student internship-preparation slice: a student-owned checklist with
+> deterministic rules_preview behavior, published-program data scope, source
+> and uncertainty disclosure, and no matching, evaluation, or academic
+> decisions. Product, Academic, legal, Security, Recruitment, Privacy, Data,
+> and QA owners must still review it before production use.
 
 ## Context
 

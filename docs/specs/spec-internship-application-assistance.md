@@ -2,10 +2,10 @@
 id: SPEC-0036
 type: spec
 title: Provider-neutral student internship preparation assistance
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@academic-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []

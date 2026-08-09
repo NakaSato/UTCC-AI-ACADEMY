@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T12:07:00+07:00",
+  "updated_at": "2026-08-09T12:15:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1748,7 +1748,7 @@
     {
       "id": "REC-013",
       "title": "Define the AI internship agent boundary for matching, mentorship, progress, and evaluation",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Recruitment Domain, Academic, Data, and QA owners",
       "milestone": "AI-M12",
@@ -1757,7 +1757,7 @@
         "REC-007",
         "REC-009"
       ],
-      "blocker": "Final production use still requires legal, academic, security, recruitment-domain, privacy, data, and QA review",
+      "blocker": null,
       "evidence": [
         {
           "label": "AI Recruitment Platform roadmap — Milestone 12",
@@ -1776,7 +1776,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/services/recruitment/internship_application_assistant_test.rb"
         }
       ],
-      "updated_at": "2026-08-07T22:18:46+07:00"
+      "updated_at": "2026-08-09T12:15:00+07:00"
     },
     {
       "id": "REC-014",
@@ -3495,6 +3495,14 @@
       "to": "complete",
       "summary": "The user approved REC-012 as defined. The advisory, candidate-owned application-preparation checklist is accepted: deterministic rules_preview with no external provider, read-only narrow data scope, source and uncertainty disclosure, terminal-state closure guidance, and the prohibition on acting for the candidate. Production or external candidate use still requires legal, security, recruitment-domain, privacy, data, and QA review.",
       "evidence_url": "specs/spec-candidate-application-assistance.html"
+    },
+    {
+      "at": "2026-08-09T12:15:00+07:00",
+      "item_id": "REC-013",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-013 as defined. The advisory, student-owned internship preparation checklist is accepted: deterministic rules_preview with no external provider, published-program and own-application data scope only, source and uncertainty disclosure, reflection guidance for rejected or withdrawn states, and the prohibition on matching, ranking, evaluation, or any academic decision. Production use still requires legal, academic, security, recruitment-domain, privacy, data, and QA review.",
+      "evidence_url": "specs/spec-internship-application-assistance.html"
     }
   ]
 }
