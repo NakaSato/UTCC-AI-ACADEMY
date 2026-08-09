@@ -4,6 +4,26 @@
 th:
   language_name: "ไทย"
 
+  # Without these, `l(date)` on a Thai page falls back to English and prints
+  # "August 16, 2026" beside Thai copy. Years stay Common Era; switching to
+  # Buddhist Era cannot be expressed in YAML because strftime has no +543.
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y"
+    day_names: [อาทิตย์, จันทร์, อังคาร, พุธ, พฤหัสบดี, ศุกร์, เสาร์]
+    abbr_day_names: [อา., จ., อ., พ., พฤ., ศ., ส.]
+    month_names: [~, มกราคม, กุมภาพันธ์, มีนาคม, เมษายน, พฤษภาคม, มิถุนายน, กรกฎาคม, สิงหาคม, กันยายน, ตุลาคม, พฤศจิกายน, ธันวาคม]
+    abbr_month_names: [~, ม.ค., ก.พ., มี.ค., เม.ย., พ.ค., มิ.ย., ก.ค., ส.ค., ก.ย., ต.ค., พ.ย., ธ.ค.]
+  time:
+    formats:
+      default: "%-d %B %Y %H:%M:%S"
+      short: "%-d %b %H:%M"
+      long: "%-d %B %Y %H:%M"
+    am: "ก่อนเที่ยง"
+    pm: "หลังเที่ยง"
+
   flash:
     integrity_closed: "ปิดเคสของ %{name} แล้ว"
     case_notified: "แจ้ง %{name} แล้ว"
