@@ -67,6 +67,7 @@ en:
     academic_post_invitation_accepted: "Invitation accepted"
     academic_post_invitation_unavailable: "That invitation is no longer available"
     academic_post_membership_revoked: "Collaborator access revoked"
+    proposal_request_created: "Your proposal idea has been sent to the contributor team"
     recruitment_organization_created: "Created organization %{name}"
     recruitment_membership_granted: "Added %{name} to the organization"
     recruitment_membership_revoked: "Revoked %{name}'s organization access"
@@ -197,6 +198,19 @@ en:
             showcase: "Student showcase"
             share: "Share a project"
             events: "Events and workshops"
+            contributors: "Meet the contributors"
+            proposal: "Send a proposal idea"
+        profile:
+          title: "Contributors"
+          links:
+            story: "Why we contribute"
+            people: "Contributor profiles"
+            practice: "How we work"
+        join:
+          title: "Keep learning"
+          links:
+            academy: "Back to the academy"
+            sign_up: "Create an account"
         learn:
           title: "Learn"
           links:
@@ -1801,6 +1815,7 @@ en:
       title: "Student community"
       subtitle: "What everyone is trying out. You do not have to wait until a project is finished to share it."
       cta: "Share your work"
+      contributors_cta: "Meet the contributors"
     shares:
       chatbot:
         title: "What I took away from building my first chatbot"
@@ -1846,6 +1861,92 @@ en:
       other_faculties:
         q: "Is this open to students from other faculties?"
         a: "It is open to UTCC students from every faculty. The material is designed so you can start without an engineering background."
+
+  contributors:
+    meta_title: "Contributors — UTCC AI Academy"
+    meta_description: "Meet the people and roles that shape UTCC AI Academy: a student-built space for learning, making, and sharing AI together."
+    back_to_academy: "Back to the academy"
+    eyebrow: "The people behind the learning"
+    hero_title: "Built by people who share the work."
+    hero_body: "UTCC AI Academy is shaped by contributors who turn difficult ideas into clear starting points, useful tools, and a community that keeps moving. This is the profile of how we show up."
+    hero_cta: "Explore the profiles"
+    join_cta: "Join the learning community"
+    proposal_cta: "Send a proposal idea"
+    profile_badge: "A living profile"
+    profile_status: "active this semester"
+    profile_name: "The contributor collective"
+    profile_role: "Student-built · UTCC AI Academy"
+    profile_quote: "A good contribution leaves the next person with more room to try, ask, and make something of their own."
+    profile_tags: ["peer-led", "open notes", "real projects"]
+    profile_fields:
+      focus: "Focus"
+      focus_value: "learning in public"
+      mode: "Mode"
+      mode_value: "small steps, shared"
+    stats:
+      contributors:
+        value: "04"
+        label: "ways to contribute"
+      disciplines:
+        value: "03"
+        label: "disciplines in the room"
+      mission:
+        value: "01"
+        label: "shared mission"
+    nav:
+      story: "Our story"
+      contributors: "Profiles"
+      practice: "Our practice"
+    story:
+      eyebrow: "A profile is more than a name"
+      title: "The work is the introduction."
+      body: "Every contributor brings a different way of noticing a problem. One person makes the explanation click. Another turns a rough idea into a welcoming workshop. Together, those perspectives become the learning experience students actually remember."
+      note_one: "We document the decisions, not only the finished screens."
+      note_two: "We make the next step visible for whoever follows."
+    directory:
+      eyebrow: "The contributor map"
+      title: "Four ways to move the work forward."
+      body: "These profiles describe the jobs that make the academy feel alive. One person can hold more than one profile — the shape changes with the project."
+    profiles:
+      curriculum:
+        role: "01 · curriculum"
+        title: "Make the first step feel possible."
+        body: "Translate AI fundamentals into examples, exercises, and explanations that respect where a learner is starting from."
+        tags: ["explain", "sequence", "edit"]
+      community:
+        role: "02 · community"
+        title: "Make room for questions."
+        body: "Turn a collection of learners into a generous peer space through study jams, shared notes, and honest conversations about getting stuck."
+        tags: ["listen", "welcome", "connect"]
+      design:
+        role: "03 · experience"
+        title: "Make the useful thing easy to find."
+        body: "Shape the words, interfaces, and small details that help people understand what to do next without needing a map."
+        tags: ["frame", "prototype", "clarify"]
+      platform:
+        role: "04 · platform"
+        title: "Make the foundation trustworthy."
+        body: "Keep the product fast, legible, and safe to build on — from the first route to the quiet work that keeps a learning space running."
+        tags: ["build", "verify", "care"]
+    practice:
+      eyebrow: "Our working agreement"
+      title: "Small signals. Shared ownership."
+      items:
+        open:
+          title: "Open the work early"
+          body: "Rough notes and honest questions are useful before a project has a polished answer."
+        teach:
+          title: "Leave a trail for the next person"
+          body: "A contribution is stronger when someone else can understand it, adapt it, and carry it further."
+        ship:
+          title: "Make it real enough to use"
+          body: "We learn from contact with real learners, so we turn good intentions into small, testable releases."
+    final:
+      eyebrow: "Your next contribution"
+      title: "There is always a useful place to begin."
+      body: "Start with a topic, a question, or a small thing you can explain better than yesterday."
+      academy: "Explore the academy"
+      join: "Create your profile"
 
   # Kept 1:1 with th.yml, where these do the real work — Rails ships the English
   # wording already, so the values here just restate it.
@@ -2067,6 +2168,45 @@ en:
       invitation_title: "Academic-post invitation"
       invitation_help: "%{title} was shared with you with %{permission} permission."
       accept: "Accept invitation"
+
+  proposal_request:
+    eyebrow: "Shape what comes next"
+    new_title: "Send a proposal idea"
+    new_subtitle: "Tell the contributor team what would make learning, sharing, or building with the academy better."
+    private_note: "Account only"
+    prompt_title: "A useful proposal has a shape"
+    prompt_body: "Start with a real problem, describe the smallest useful change, and tell us what would be different if it worked."
+    form_eyebrow: "Feature proposal"
+    form_title: "What should we build next?"
+    form_subtitle: "Your request is saved to your account and can be reviewed by the contributor team."
+    submit: "Send proposal idea"
+    cancel: "Cancel"
+    confirmation_eyebrow: "Proposal received"
+    confirmation_title: "Thanks for shaping the next step."
+    confirmation_body: "Your proposal is saved. The contributor team can review the idea and decide what belongs in a future release."
+    reference: "Reference"
+    back_to_contributors: "Back to contributors"
+    send_another: "Send another idea"
+    fields:
+      title: "Proposal title"
+      title_placeholder: "e.g. Add a weekly project clinic"
+      category: "Where does it belong?"
+      problem: "What problem should we solve?"
+      problem_placeholder: "Who is affected, and what is difficult today?"
+      idea: "What is your idea?"
+      idea_placeholder: "Describe the smallest useful version of the feature or change."
+      impact: "What would improve if we built it?"
+      impact_placeholder: "Tell us how learners or contributors would benefit."
+    categories:
+      feature: "Product feature"
+      curriculum: "Learning content"
+      community: "Community and events"
+      platform: "Platform and tooling"
+    status:
+      submitted: "Submitted"
+      in_review: "In review"
+      planned: "Planned"
+      declined: "Not planned"
     reader:
       controls: "Reader controls"
       contents: "Contents"

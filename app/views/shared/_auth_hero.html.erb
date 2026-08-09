@@ -34,7 +34,7 @@
     </ul>
   </div>
 
-  <div class="flex flex-col gap-4">
+  <footer class="flex flex-col gap-4">
     <%# The site is a student project, so it says so before anyone signs in. %>
     <p class="max-w-[46ch] border-l-2 border-brand pl-3 text-12-5 leading-[1.65] text-balance text-on-chrome-dim">
       <%= t("auth.disclaimer") %>
@@ -44,5 +44,12 @@
       <%= render "shared/language_toggle", dark: true %>
       <span class="text-12-5 text-on-chrome-dim"><%= t("auth.footer") %></span>
     </div>
-  </div>
+
+    <nav class="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label="<%= t("chrome.footer.columns.community.title") %>">
+      <%= link_to t("chrome.footer.columns.community.links.contributors"), contributors_path,
+            class: "text-12-5 text-on-chrome-muted transition-colors hover:text-surface" %>
+      <%= link_to t("chrome.footer.columns.community.links.proposal"), new_proposal_request_path,
+            class: "text-12-5 text-on-chrome-muted transition-colors hover:text-surface" %>
+    </nav>
+  </footer>
 </div>

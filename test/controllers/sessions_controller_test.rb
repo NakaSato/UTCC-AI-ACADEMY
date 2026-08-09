@@ -27,6 +27,19 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the auth footer links to contributors and proposal ideas in both locales" do
+    %w[th en].each do |locale|
+      post language_path(locale)
+      get login_path
+
+      assert_response :success
+      assert_select "footer a[href=?]", contributors_path, 1
+      assert_select "footer a[href=?]", new_proposal_request_path, 1
+      assert_select "footer a", { text: I18n.t("chrome.footer.columns.community.links.contributors", locale:), count: 1 }
+      assert_select "footer a", { text: I18n.t("chrome.footer.columns.community.links.proposal", locale:), count: 1 }
+    end
+  end
+
   test "create with valid credentials" do
     post login_path, params: { student_id: @user.student_id, password: "password" }
 

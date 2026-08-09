@@ -87,10 +87,16 @@ module ApplicationHelper
   # key doubles as the section id the header's scroll spy watches, so the nav
   # and the page stay in step from one list.
   def nav_links
-    %i[learn tracks community events faq].to_h { [ t("landing.nav.#{it}"), "##{it}" ] }
+    %i[learn tracks community events faq].to_h do |section|
+      [ t("landing.nav.#{section}"), contributors_page? ? root_path(anchor: section) : "##{section}" ]
+    end
   end
 
-  # The footer's three link columns. Ruby holds only the shape — which columns
+  def contributors_page?
+    request.path == contributors_path
+  end
+
+  # The footer's link columns. Ruby holds only the shape — which columns
   # exist, in what order, and where each link goes; every label is looked up as
   # `chrome.footer.columns.<column>.title` / `.links.<link>`. Keyed rather than
   # positional, so adding a link here without its copy raises a missing
@@ -102,7 +108,21 @@ module ApplicationHelper
   # points at the app's own screens instead. The university column — three
   # external sites — is the same either way.
   def footer_columns
-    (authenticated? ? app_footer_columns : landing_footer_columns).merge(university_footer_column)
+    (authenticated? ? app_footer_columns : (contributors_page? ? contributors_footer_columns : landing_footer_columns)).merge(university_footer_column)
+  end
+
+  def contributors_footer_columns
+    {
+      profile: {
+        story: "#story",
+        people: "#contributors",
+        practice: "#practice"
+      },
+      join: {
+        academy: root_path,
+        sign_up: register_path
+      }
+    }
   end
 
   def landing_footer_columns
@@ -115,7 +135,9 @@ module ApplicationHelper
       community: {
         showcase: "#community",
         share: "#community",
-        events: "#events"
+        events: "#events",
+        contributors: contributors_path,
+        proposal: new_proposal_request_path
       }
     }
   end

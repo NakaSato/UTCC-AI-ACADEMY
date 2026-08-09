@@ -41,7 +41,7 @@ class IndexingTest < ActionDispatch::IntegrationTest
   test "every public page names its translations and a default" do
     sign_out
 
-    [ root_path, privacy_path, terms_path ].each do |path|
+    [ root_path, contributors_path, privacy_path, terms_path ].each do |path|
       get path
 
       published = css_select("link[rel=alternate]").to_h { [ it["hreflang"], it["href"] ] }
@@ -85,7 +85,7 @@ class IndexingTest < ActionDispatch::IntegrationTest
   test "the pages that are meant to be found do not" do
     sign_out
 
-    [ root_path, privacy_path, terms_path ].each do |path|
+    [ root_path, contributors_path, privacy_path, terms_path ].each do |path|
       get path
 
       assert_select "meta[name=robots]", false, "#{path} should not be asking to be left out"

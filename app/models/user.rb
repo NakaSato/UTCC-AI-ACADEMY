@@ -68,6 +68,7 @@ class User < ApplicationRecord
                                                 inverse_of: :invitee
   has_many :academic_post_revisions, foreign_key: :author_id, dependent: :restrict_with_exception,
                                      inverse_of: :author
+  has_many :proposal_requests, dependent: :destroy, inverse_of: :user
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

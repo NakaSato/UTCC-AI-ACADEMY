@@ -56,7 +56,7 @@ class CrawlersTest < ActionDispatch::IntegrationTest
     # Scanned rather than selected: the entries carry namespaced xhtml:link
     # children, and what they are is more legible as text than as a DOM query.
     locations = response.body.scan(%r{<loc>(.+?)</loc>}).flatten
-    expected = [ root_url, privacy_url, terms_url ].flat_map { [ it, "#{it}?lang=en" ] }
+    expected = [ root_url, contributors_url, privacy_url, terms_url ].flat_map { [ it, "#{it}?lang=en" ] }
 
     assert_equal expected.sort, locations.sort
     CrawlersController::DISALLOWED.each do |path|
@@ -71,7 +71,7 @@ class CrawlersTest < ActionDispatch::IntegrationTest
 
     entries = response.body.scan(%r{<url>.*?</url>}m)
 
-    assert_equal 6, entries.size
+    assert_equal 8, entries.size
     entries.each do |entry|
       I18n.available_locales.each do |locale|
         assert_match(/hreflang="#{locale}"/, entry, entry)
@@ -108,7 +108,7 @@ class CrawlersTest < ActionDispatch::IntegrationTest
     end
 
     # The pages are linked in the language the file is written in.
-    [ root_url, privacy_url, terms_url ].each do |url|
+    [ root_url, contributors_url, privacy_url, terms_url ].each do |url|
       assert_includes response.body, "#{url}?lang=en"
     end
     assert_includes response.body, sitemap_url

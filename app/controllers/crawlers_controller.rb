@@ -9,7 +9,7 @@
 class CrawlersController < ApplicationController
   allow_unauthenticated_access
 
-  # Three pages are readable without an account; everything else is behind
+  # Public pages are readable without an account; everything else is behind
   # `require_authentication` and answers a redirect to `/`. Saying so costs one
   # line and saves a crawler from discovering it one 302 at a time.
   DISALLOWED = %w[
@@ -37,7 +37,7 @@ class CrawlersController < ApplicationController
   # Paths rather than URLs: each one is listed once per language, and the view is
   # what knows how a language becomes a URL.
   def sitemap
-    @paths = [ root_path, privacy_path, terms_path ]
+    @paths = [ root_path, contributors_path, privacy_path, terms_path ]
   end
 
   # One file for a site with two languages. It is written in English — the

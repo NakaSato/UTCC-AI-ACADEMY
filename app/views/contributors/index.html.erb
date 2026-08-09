@@ -1,0 +1,174 @@
+<% content_for :title, t("contributors.meta_title") %>
+<% content_for :description, t("contributors.meta_description") %>
+
+<main id="main">
+  <section class="brand-field relative isolate overflow-hidden text-surface">
+    <div class="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full border border-surface/10 lg:size-96" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-40 -left-28 size-96 rounded-full border border-brand-soft/20" aria-hidden="true"></div>
+
+    <div class="relative mx-auto grid w-full max-w-page gap-12 px-4 py-16 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.8fr)] lg:items-center lg:gap-20 lg:py-24 xl:px-8">
+      <div class="max-w-[42rem]">
+        <a href="<%= root_path %>" class="mb-10 inline-flex items-center gap-2 text-13-5 text-on-chrome-2 transition-colors hover:text-surface">
+          <span aria-hidden="true">←</span>
+          <%= t("contributors.back_to_academy") %>
+        </a>
+
+        <p class="mb-5 text-12-5 font-semibold tracking-[0.18em] text-brand-soft uppercase"><%= t("contributors.eyebrow") %></p>
+        <h1 class="max-w-[10ch] text-54 leading-[1.04] font-bold tracking-[-0.045em] sm:text-64 lg:text-80"><%= t("contributors.hero_title") %></h1>
+        <p class="mt-7 max-w-[58ch] text-18 leading-[1.7] text-on-chrome-2 sm:text-20"><%= t("contributors.hero_body") %></p>
+
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a href="#contributors" class="inline-flex items-center gap-2 rounded-full bg-surface px-5 py-3 text-14-5 font-semibold text-brand-deep shadow-md transition duration-300 hover:bg-brand-tint hover:shadow-lg active:scale-97">
+            <%= t("contributors.hero_cta") %>
+            <span aria-hidden="true">↓</span>
+          </a>
+          <a href="<%= register_path %>" class="inline-flex items-center gap-2 rounded-full border border-surface/60 px-5 py-3 text-14-5 font-semibold text-surface transition duration-300 hover:bg-surface hover:text-brand-deep active:scale-97">
+            <%= t("contributors.join_cta") %>
+          </a>
+          <a href="<%= new_proposal_request_path %>" class="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-3 text-14-5 font-semibold text-gold-deep shadow-md transition duration-300 hover:bg-gold-tint hover:shadow-lg active:scale-97">
+            <%= t("contributors.proposal_cta") %>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="mt-12 grid max-w-[34rem] grid-cols-3 border-t border-surface/15 pt-5">
+          <% %i[contributors disciplines mission].each do |stat| %>
+            <div class="pr-4">
+              <p class="text-26 font-semibold tracking-[-0.03em] text-surface"><%= t("contributors.stats.#{stat}.value") %></p>
+              <p class="mt-1 text-11-5 leading-[1.35] text-on-chrome-muted"><%= t("contributors.stats.#{stat}.label") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-[31rem] lg:mx-0 lg:justify-self-end">
+        <div class="absolute -top-5 -left-5 z-10 rounded-full bg-gold px-3 py-1.5 text-11 font-semibold tracking-[0.12em] text-gold-deep uppercase shadow-md"><%= t("contributors.profile_badge") %></div>
+        <div class="rounded-box border border-surface/15 bg-chrome-deep/75 p-4 shadow-2xl backdrop-blur-sm sm:p-5">
+          <div class="flex items-center justify-between border-b border-surface/10 pb-4 text-11-5 text-on-chrome-muted">
+            <span class="font-mono">contributor_profile / 01</span>
+            <span class="flex items-center gap-1.5"><span class="size-1.5 rounded-full bg-success-bright"></span><%= t("contributors.profile_status") %></span>
+          </div>
+
+          <div class="py-7 sm:py-9">
+            <div class="flex items-center gap-4">
+              <div class="grid size-16 place-items-center rounded-full bg-brand text-24 font-semibold text-surface ring-8 ring-brand/10">UT</div>
+              <div>
+                <p class="text-20 font-semibold text-surface"><%= t("contributors.profile_name") %></p>
+                <p class="mt-1 text-13-5 text-on-chrome-muted"><%= t("contributors.profile_role") %></p>
+              </div>
+            </div>
+
+            <p class="mt-7 max-w-[34ch] text-18 leading-[1.65] text-on-chrome"><%= t("contributors.profile_quote") %></p>
+
+            <div class="mt-7 flex flex-wrap gap-2">
+              <% t("contributors.profile_tags").each do |tag| %>
+                <span class="rounded-full border border-surface/15 px-3 py-1 text-11-5 text-on-chrome-2"><%= tag %></span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 border-t border-surface/10 pt-4 text-11-5 text-on-chrome-muted">
+            <span><%= t("contributors.profile_fields.focus") %></span>
+            <span class="text-right text-on-chrome"><%= t("contributors.profile_fields.focus_value") %></span>
+            <span><%= t("contributors.profile_fields.mode") %></span>
+            <span class="text-right text-on-chrome"><%= t("contributors.profile_fields.mode_value") %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="story" class="scroll-mt-24 py-16 lg:py-24">
+    <div class="mx-auto grid w-full max-w-page gap-10 px-4 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 xl:px-8">
+      <div>
+        <p class="mb-3 text-12-5 font-semibold tracking-[0.16em] text-brand uppercase"><%= t("contributors.story.eyebrow") %></p>
+        <h2 class="max-w-[12ch] text-38 leading-tight font-bold tracking-[-0.04em] text-brand-deep sm:text-46"><%= t("contributors.story.title") %></h2>
+      </div>
+
+      <div class="max-w-[60ch]">
+        <p class="text-20 leading-[1.7] text-ink-2"><%= t("contributors.story.body") %></p>
+        <div class="mt-8 grid gap-4 border-l-2 border-brand pl-5 sm:grid-cols-2 sm:gap-8">
+          <div>
+            <p class="text-30 font-semibold tracking-[-0.03em] text-brand-deep">01</p>
+            <p class="mt-1 text-14 leading-[1.6] text-muted"><%= t("contributors.story.note_one") %></p>
+          </div>
+          <div>
+            <p class="text-30 font-semibold tracking-[-0.03em] text-brand-deep">02</p>
+            <p class="mt-1 text-14 leading-[1.6] text-muted"><%= t("contributors.story.note_two") %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contributors" class="scroll-mt-24 bg-surface-2 py-16 lg:py-24">
+    <div class="mx-auto w-full max-w-page px-4 sm:px-8 xl:px-8">
+      <div class="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="mb-3 text-12-5 font-semibold tracking-[0.16em] text-brand uppercase"><%= t("contributors.directory.eyebrow") %></p>
+          <h2 class="max-w-[15ch] text-38 leading-tight font-bold tracking-[-0.04em] text-brand-deep sm:text-46"><%= t("contributors.directory.title") %></h2>
+        </div>
+        <p class="max-w-[34ch] text-15 leading-[1.65] text-muted"><%= t("contributors.directory.body") %></p>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <% @contributors.each do |contributor| %>
+          <article class="group relative overflow-hidden rounded-box border border-hairline bg-surface p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-brand-line hover:shadow-card-hover sm:p-7">
+            <div class="absolute top-0 right-0 size-28 rounded-bl-full bg-brand-tint transition-transform duration-500 group-hover:scale-125" aria-hidden="true"></div>
+            <div class="relative flex items-start justify-between gap-4">
+              <div class="grid size-14 place-items-center rounded-2xl bg-brand-deep text-18 font-semibold text-surface"><%= contributor[:index] %></div>
+              <span class="font-mono text-11-5 tracking-[0.12em] text-muted-2">PROFILE.<%= contributor[:index] %></span>
+            </div>
+            <div class="relative mt-8">
+              <p class="text-13-5 font-semibold tracking-[0.08em] text-brand uppercase"><%= t("contributors.profiles.#{contributor[:key]}.role") %></p>
+              <h3 class="mt-2 text-26 leading-tight font-bold tracking-[-0.03em] text-brand-deep"><%= t("contributors.profiles.#{contributor[:key]}.title") %></h3>
+              <p class="mt-3 max-w-[42ch] text-15 leading-[1.7] text-muted"><%= t("contributors.profiles.#{contributor[:key]}.body") %></p>
+              <div class="mt-6 flex flex-wrap gap-2">
+                <% t("contributors.profiles.#{contributor[:key]}.tags").each do |tag| %>
+                  <span class="rounded-full bg-surface-2 px-3 py-1 text-11-5 font-medium text-brand-deep"><%= tag %></span>
+                <% end %>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="practice" class="scroll-mt-24 py-16 lg:py-24">
+    <div class="mx-auto w-full max-w-page px-4 sm:px-8 xl:px-8">
+      <div class="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+        <div>
+          <p class="mb-3 text-12-5 font-semibold tracking-[0.16em] text-brand uppercase"><%= t("contributors.practice.eyebrow") %></p>
+          <h2 class="max-w-[13ch] text-38 leading-tight font-bold tracking-[-0.04em] text-brand-deep sm:text-46"><%= t("contributors.practice.title") %></h2>
+        </div>
+
+        <div class="divide-y divide-hairline border-y border-hairline">
+          <% %i[open teach ship].each_with_index do |principle, index| %>
+            <div class="grid gap-3 py-5 sm:grid-cols-[3rem_1fr] sm:gap-6">
+              <span class="font-mono text-12-5 text-brand">0<%= index + 1 %></span>
+              <div>
+                <h3 class="text-20 font-semibold text-ink"><%= t("contributors.practice.items.#{principle}.title") %></h3>
+                <p class="mt-1 max-w-[54ch] text-15 leading-[1.65] text-muted"><%= t("contributors.practice.items.#{principle}.body") %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-4 pb-16 sm:px-8 lg:pb-24 xl:px-8">
+    <div class="brand-field mx-auto grid w-full max-w-page gap-8 rounded-box px-6 py-10 text-surface sm:px-10 lg:grid-cols-[1fr_auto] lg:items-center lg:px-14 lg:py-12">
+      <div>
+        <p class="mb-3 text-12-5 font-semibold tracking-[0.16em] text-brand-soft uppercase"><%= t("contributors.final.eyebrow") %></p>
+        <h2 class="max-w-[18ch] text-32 leading-tight font-bold tracking-[-0.04em] sm:text-40"><%= t("contributors.final.title") %></h2>
+        <p class="mt-3 max-w-[54ch] text-15 leading-[1.65] text-on-chrome-2"><%= t("contributors.final.body") %></p>
+      </div>
+      <div class="flex flex-wrap gap-3 lg:justify-end">
+        <a href="<%= root_path %>" class="inline-flex items-center justify-center rounded-full bg-surface px-5 py-3 text-14-5 font-semibold text-brand-deep transition hover:bg-brand-tint active:scale-97"><%= t("contributors.final.academy") %></a>
+        <a href="<%= register_path %>" class="inline-flex items-center justify-center rounded-full border border-surface/60 px-5 py-3 text-14-5 font-semibold text-surface transition hover:bg-surface hover:text-brand-deep active:scale-97"><%= t("contributors.final.join") %></a>
+      </div>
+    </div>
+  </section>
+</main>

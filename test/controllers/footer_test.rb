@@ -13,8 +13,9 @@ class FooterTest < ActionDispatch::IntegrationTest
   # it redirects an admin to /admin, so the catalog is checked as a student.
   APP_SCREENS = %w[/my-learning /courses/AI1101 /lesson /map /progress /leaderboard /instructor /admin]
 
-  # Nine column links plus the two policy links in the bottom bar.
+  # Nine app column links plus the two policy links in the bottom bar.
   FOOTER_LINKS = 11
+  LANDING_FOOTER_LINKS = 13
 
   test "signed out the footer links into the landing page" do
     each_locale do |locale|
@@ -22,8 +23,10 @@ class FooterTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "footer", 1
-      assert_select "footer a", FOOTER_LINKS
+      assert_select "footer a", LANDING_FOOTER_LINKS
       assert_select "footer a[href='#learn']", 1
+      assert_select "footer a[href=?]", contributors_path, 1
+      assert_select "footer a[href=?]", new_proposal_request_path, 1
       assert_select "footer a[href='https://utcc.ac.th']", 1
 
       assert_footer_copy locale, "chrome.footer.columns.start.title"

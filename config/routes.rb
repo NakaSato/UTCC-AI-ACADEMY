@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   # under a /policies prefix nobody would type.
   get "privacy", to: "policies#privacy", as: :privacy
   get "terms", to: "policies#terms", as: :terms
+  get "contributors", to: "contributors#index", as: :contributors
 
   # What a crawler reads before it reads a page. Rendered rather than checked into
   # public/ because each one has to name absolute URLs and only the request knows
@@ -175,6 +176,7 @@ Rails.application.routes.draw do
     post :invitations, on: :member, to: "academic_post_invitations#create"
     delete "memberships/:user_id", to: "academic_post_invitations#revoke", as: :membership
   end
+  resources :proposal_requests, path: "proposal-requests", only: %i[new create show]
   get "academic-post-invitations/:token", to: "academic_post_invitations#show", as: :academic_post_invitation
   post "academic-post-invitations/:token/accept", to: "academic_post_invitations#accept", as: :accept_academic_post_invitation
 

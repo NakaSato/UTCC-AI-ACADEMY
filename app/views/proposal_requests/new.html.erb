@@ -1,0 +1,79 @@
+<% content_for :title, "#{t("proposal_request.new_title")} — UTCC AI Academy" %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-9 pb-20 sm:px-8">
+  <div class="mx-auto grid max-w-[1120px] gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-8">
+    <aside class="brand-field rounded-panel p-6 text-surface sm:p-8 lg:p-9">
+      <div class="flex items-center justify-between gap-4 border-b border-surface/15 pb-4 text-11-5 text-on-chrome-muted">
+        <span class="font-mono">proposal_request / 01</span>
+        <span class="rounded-full border border-surface/15 px-2.5 py-1 text-10-5 uppercase"><%= t("proposal_request.private_note") %></span>
+      </div>
+
+      <div class="py-10 lg:py-16">
+        <p class="mb-3 text-12-5 font-semibold tracking-[0.16em] text-brand-soft uppercase"><%= t("proposal_request.eyebrow") %></p>
+        <h1 class="max-w-[10ch] text-40 leading-tight font-bold tracking-[-0.045em] sm:text-54"><%= t("proposal_request.new_title") %></h1>
+        <p class="mt-5 text-15 leading-[1.7] text-on-chrome-2"><%= t("proposal_request.new_subtitle") %></p>
+      </div>
+
+      <div class="border-t border-surface/15 pt-5">
+        <p class="text-11-5 font-semibold tracking-[0.12em] text-brand-soft uppercase"><%= t("proposal_request.prompt_title") %></p>
+        <p class="mt-2 text-14 leading-[1.65] text-on-chrome-2"><%= t("proposal_request.prompt_body") %></p>
+      </div>
+    </aside>
+
+    <section class="rounded-panel border border-hairline bg-surface px-6 py-7 shadow-card sm:px-8 sm:py-9">
+      <div class="mb-7">
+        <p class="mb-2 text-12-5 font-semibold tracking-[0.14em] text-brand uppercase"><%= t("proposal_request.form_eyebrow") %></p>
+        <h2 class="text-28 leading-tight font-bold tracking-[-0.035em] text-brand-deep"><%= t("proposal_request.form_title") %></h2>
+        <p class="mt-2 max-w-[58ch] text-14-5 leading-[1.65] text-muted"><%= t("proposal_request.form_subtitle") %></p>
+      </div>
+
+      <%= form_with model: @proposal, url: proposal_requests_path do |form| %>
+        <%= render "shared/form_errors", record: @proposal %>
+
+        <div class="flex flex-col gap-5">
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("proposal_request.fields.title") %></span>
+            <%= form.text_field :title, required: true, maxlength: 160,
+                  placeholder: t("proposal_request.fields.title_placeholder"),
+                  class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none placeholder:text-muted-3 focus:border-brand" %>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("proposal_request.fields.category") %></span>
+            <%= form.select :category,
+                  ProposalRequest::CATEGORIES.map { |category| [ t("proposal_request.categories.#{category}"), category ] },
+                  {}, class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none focus:border-brand" %>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("proposal_request.fields.problem") %></span>
+            <%= form.text_area :problem, required: true, maxlength: 2_000, rows: 4,
+                  placeholder: t("proposal_request.fields.problem_placeholder"),
+                  class: "resize-y rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 leading-[1.65] text-ink outline-none placeholder:text-muted-3 focus:border-brand" %>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("proposal_request.fields.idea") %></span>
+            <%= form.text_area :idea, required: true, maxlength: 4_000, rows: 6,
+                  placeholder: t("proposal_request.fields.idea_placeholder"),
+                  class: "resize-y rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 leading-[1.65] text-ink outline-none placeholder:text-muted-3 focus:border-brand" %>
+          </label>
+
+          <label class="flex flex-col gap-1.75">
+            <span class="text-13-5 font-medium text-ink-4"><%= t("proposal_request.fields.impact") %></span>
+            <%= form.text_area :impact, required: true, maxlength: 1_000, rows: 3,
+                  placeholder: t("proposal_request.fields.impact_placeholder"),
+                  class: "resize-y rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 leading-[1.65] text-ink outline-none placeholder:text-muted-3 focus:border-brand" %>
+          </label>
+        </div>
+
+        <div class="mt-7 flex flex-wrap items-center gap-3 border-t border-hairline pt-6">
+          <%= form.submit t("proposal_request.submit"),
+                class: "cursor-pointer rounded-[12px] bg-brand px-6 py-3.25 text-15-5 font-semibold text-white transition-colors hover:bg-brand-deep" %>
+          <%= link_to t("proposal_request.cancel"), contributors_path,
+                class: "px-2 text-14-5 font-medium text-muted hover:text-ink" %>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</main>
