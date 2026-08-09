@@ -248,6 +248,10 @@ Rails.application.routes.draw do
   # Where a console account comes from. Sign-up produces learners only, so an
   # instructor, an administrator, or a company member is made here or nowhere.
   post "admin/console-accounts", to: "admin#create_console_account", as: :admin_console_accounts
+  # A console account's only way back in when the one-time password is gone: it
+  # has no student ID and its owner may not reach the email reset. See
+  # AdminController#reissue_password.
+  post "admin/users/:id/password", to: "admin#reissue_password", as: :admin_user_password
   patch "admin/courses/:id/state", to: "admin#update_course_state", as: :admin_course_state
   post "admin/approvals/:id/decision", to: "admin#decide_approval", as: :admin_approval_decision
   patch "admin/features/:key", to: "admin#update_feature_setting", as: :admin_feature_setting

@@ -28,6 +28,7 @@ touches:
 enforced_by:
   - test/models/user_test.rb
   - test/controllers/admin_console_accounts_test.rb
+  - test/controllers/admin_password_reissue_test.rb
   - test/controllers/console_sessions_controller_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-002, SKILL-ARCH-004, SKILL-SPEC-001]
@@ -103,7 +104,19 @@ The accepted policy is:
 8. Creating a console account writes an audit event at the `warn` level, naming
    the identifier, the person, and the access level — never the password.
 9. Out of scope: SSO, self-service console sign-up, editing or deleting console
-   accounts from this form, bulk import, and admin-issued password resets.
+   accounts from this form, and bulk import.
+
+**Amended 2026-08-09, same day:** points 10 and 11 were added once it was clear
+the boundary above could strand a real person out of an account — a console
+account with no email and a one-time password had no way back in at all.
+
+10. A console account created here **requires** an email address. It is the only
+    self-service route back into an account that has no student ID.
+11. An administrator may reissue a console account's password from the roster.
+    It generates a fresh temporary password under the same one-flash, digest-only
+    rule, ends every session of that account, and is audited at `warn`. A learner
+    is not eligible — `/forgot-password` reaches them without an administrator
+    reading their new password — and an admin cannot reissue their own.
 
 ## Alternatives
 
@@ -138,8 +151,11 @@ far out of proportion to making one column nullable.
 - An account can now exist that `/login` cannot admit — deliberately. Console
   accounts sign in at `/console`.
 - The generated first password is shown in a flash. It reaches the admin's
-  screen and no log, but it does mean an admin who loses it must have the
-  account recreated or reset out of band, since nothing here reissues one.
+  screen and no log; an admin who loses it before relaying it reissues one from
+  the roster rather than recreating the account.
+- Reissuing is a privileged read of someone else's credential. Confining it to
+  console accounts keeps an administrator out of the recovery path for the
+  hundreds of learners who have an email route of their own.
 - A company account created here holds an active membership immediately, so the
   organization's screens open on the first sign-in.
 
@@ -164,3 +180,6 @@ far out of proportion to making one column nullable.
 - A posted `role` on the creation form cannot change the access level granted.
 - A company account and its membership are created together or not at all.
 - The generated password appears in exactly one flash and in no audit row.
+- A console account cannot be created without an email address.
+- Reissuing a password ends every session of the account it belongs to, and is
+  refused for a learner and for the acting administrator's own account.

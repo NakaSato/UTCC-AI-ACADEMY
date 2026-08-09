@@ -53,7 +53,9 @@
 
       <label class="flex flex-col gap-1.5">
         <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.email") %></span>
-        <%= email_field_tag "console_account[email_address]", nil, maxlength: 255,
+        <%# Required, unlike on sign-up: an address is a console account's only
+            self-service way back in. See AdminController. %>
+        <%= email_field_tag "console_account[email_address]", nil, required: true, maxlength: 255,
               spellcheck: false, autocapitalize: "off", placeholder: "you@utcc.ac.th",
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
                       transition-colors outline-none focus:border-brand" %>
@@ -137,17 +139,27 @@
       <% if user == Current.user %>
         <span class="text-right text-13-5 text-muted-2"><%= t("admin.role_self") %></span>
       <% else %>
-        <%= form_with url: admin_user_path(user), method: :patch,
-              class: "flex justify-end gap-2" do %>
-          <%= select_tag :role,
-                options_for_select(User::ROLES.map { [ t("admin.roles.#{it}"), it ] }, user.role),
-                "aria-label": t("admin.role_for", name: user.name),
-                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                        transition-colors outline-none focus:border-brand" %>
-          <%= submit_tag t("admin.save"),
-                class: "rounded-field bg-brand px-4 py-2 text-14 font-semibold whitespace-nowrap text-white
-                        transition-colors hover:bg-brand-deep" %>
-        <% end %>
+        <div class="flex flex-wrap justify-end gap-2">
+          <%# Console accounts only: a learner resets their own password by email,
+              which reaches them without an admin reading the new one. %>
+          <% if user.console_access? %>
+            <%= button_to t("admin.console_account.reissue"), admin_user_password_path(user),
+                  form: { data: { turbo_confirm: t("admin.console_account.reissue_confirm", name: user.name) } },
+                  class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14
+                          font-medium whitespace-nowrap text-ink-2 transition-colors hover:border-muted-3" %>
+          <% end %>
+
+          <%= form_with url: admin_user_path(user), method: :patch, class: "flex gap-2" do %>
+            <%= select_tag :role,
+                  options_for_select(User::ROLES.map { [ t("admin.roles.#{it}"), it ] }, user.role),
+                  "aria-label": t("admin.role_for", name: user.name),
+                  class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                          transition-colors outline-none focus:border-brand" %>
+            <%= submit_tag t("admin.save"),
+                  class: "rounded-field bg-brand px-4 py-2 text-14 font-semibold whitespace-nowrap text-white
+                          transition-colors hover:bg-brand-deep" %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   <% end %>

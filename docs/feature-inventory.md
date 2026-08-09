@@ -39,7 +39,9 @@ This inventory reflects the routes, controllers, models, views, and documented b
 - Admin-created console accounts:
   - Instructor, administrator, or company member, chosen from a whitelist
   - No student ID; a company account is created with its active organization membership in one transaction
+  - An email address required, since it is the account's only self-service way back in
   - A generated first password, shown to the admin once and stored only as a digest
+  - Admin-reissued passwords for console accounts, which sign that account out everywhere
   - Audited as a privilege change
 - "Remember me" sessions
 - Logout

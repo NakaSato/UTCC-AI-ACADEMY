@@ -140,6 +140,17 @@ class AdminConsoleAccountsTest < ActionDispatch::IntegrationTest
     assert_not_includes AuditEvent.order(:id).last.params.to_s, password
   end
 
+  # An address is the only self-service way back into a console account: it has
+  # no student ID, and its first password is shown once.
+  test "a console account without an email address is refused" do
+    assert_no_difference "User.count" do
+      create_console_account(access: "instructor",
+                             console_account: { name: "ไร้อีเมล", username: "no-email", email_address: "" })
+    end
+
+    assert_equal I18n.t("flash.console_account_no_email"), flash[:alert]
+  end
+
   test "a non-admin cannot create a console account" do
     sign_out
     sign_in_as users(:instructor)

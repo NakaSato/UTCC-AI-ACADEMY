@@ -30,6 +30,7 @@ touches:
 enforced_by:
   - test/models/user_test.rb
   - test/controllers/admin_console_accounts_test.rb
+  - test/controllers/admin_password_reissue_test.rb
   - test/controllers/console_sessions_controller_test.rb
   - test/controllers/registrations_controller_test.rb
 agent_writable: true
@@ -85,6 +86,14 @@ A console account needs a name of its own and a screen that makes one.
    at `warn` level carrying the identifier, the name, and the access key.
 10. Screens that used to print `user.student_id` print `User#identifier`; the
     admin roster search covers name, student ID, username, and email.
+11. A console account cannot be created without an email address — the account
+    has no student ID and its first password is shown once, so an address is its
+    only self-service way back in.
+12. `POST /admin/users/:id/password` is admin-only and reissues a console
+    account's password under the same rules as the first one: generated, shown
+    once, digest-only. It destroys every session of that account and writes a
+    `console_password_reissued` audit event at `warn`. It refuses an account
+    without console access, and refuses the acting administrator's own.
 
 ## Acceptance Criteria
 
@@ -106,6 +115,13 @@ A console account needs a name of its own and a screen that makes one.
 - The flash carries a generated password that authenticates the new account.
 - The audit row is `warn`, names the identifier, and does not carry the password.
 - A non-admin posting to the endpoint creates nothing and lands on `/`.
+- A console account posted with a blank email address creates nothing.
+- A reissued password authenticates the account, the previous password stops
+  working, and every session of that account is gone.
+- The roster offers the reissue control for console accounts and not for
+  learners; posting it for a learner, or for the acting admin, changes no digest.
+- The reissue audit row is `warn`, names the identifier, and omits the password.
+- A non-admin cannot reissue a password.
 
 ## Verification
 
@@ -115,6 +131,8 @@ A console account needs a name of its own and a screen that makes one.
 - `test/controllers/admin_console_accounts_test.rb` covers every acceptance
   criterion for the creation screen, including the rollback, the whitelist, the
   ignored role, the one-time password, and the audit row.
+- `test/controllers/admin_password_reissue_test.rb` covers the reissue: who is
+  eligible, the session sweep, the one-time password, and the audit row.
 - `test/controllers/console_sessions_controller_test.rb` covers sign-in by
   username for accounts that have no student ID at all.
 - `test/controllers/registrations_controller_test.rb` continues to prove sign-up

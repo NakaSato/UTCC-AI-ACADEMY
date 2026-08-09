@@ -313,6 +313,15 @@ class AdminController < ApplicationController
       return
     end
 
+    # An address is the only self-service way back into an account, and a console
+    # account has no other: it never had a student ID, and its first password is
+    # shown once. Without this a username-only account whose owner forgets the
+    # password can only be rescued by an admin reissuing one.
+    if console_account_params[:email_address].blank?
+      redirect_to admin_path(tab: :users), alert: t("flash.console_account_no_email")
+      return
+    end
+
     # Generated, never chosen: the admin relays it once and the account owner
     # changes it on /profile. Only the digest is stored.
     password = User.generate_temporary_password
@@ -330,6 +339,36 @@ class AdminController < ApplicationController
                 notice: t("flash.console_account_created", identifier: user.identifier, password:)
   rescue ActiveRecord::RecordInvalid => invalid
     redirect_to admin_path(tab: :users), alert: invalid.record.errors.full_messages.to_sentence
+  end
+
+  # The other half of the one-time password: the admin who loses the flash before
+  # relaying it, and the console account whose owner forgets it, both end up
+  # here. A learner is deliberately not eligible — /forgot-password is theirs,
+  # and it reaches them without an administrator reading their new password.
+  #
+  # Every session of that account dies with the old password, the way the reset
+  # flow ends them. An admin cannot reissue their own, which would sign them out
+  # mid-request and hand them a password they did not need.
+  def reissue_password
+    user = User.find(params[:id])
+
+    if user == Current.user
+      redirect_to admin_path(tab: :users), alert: t("flash.password_reissue_self")
+      return
+    elsif !user.console_access?
+      redirect_to admin_path(tab: :users), alert: t("flash.password_reissue_not_console")
+      return
+    end
+
+    password = User.generate_temporary_password
+    User.transaction do
+      user.update!(password:)
+      user.sessions.destroy_all
+      AuditEvent.record("console_password_reissued", identifier: user.identifier, name: user.name)
+    end
+
+    redirect_to admin_path(tab: :users),
+                notice: t("flash.password_reissued", identifier: user.identifier, password:)
   end
 
   def update

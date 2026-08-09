@@ -17,7 +17,7 @@ class AuditEvent < ApplicationRecord
   # it is the noisiest control on the screen — a log full of reorders buries the
   # role grants.
   ACTIONS = %w[
-    console_account_created
+    console_account_created console_password_reissued
     role_changed
     course_state_changed
     approval_decided
@@ -67,7 +67,7 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ console_account_created role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
+  WARN = %w[ console_account_created console_password_reissued role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
               unenrolled integrity_escalated card_removed recruitment_membership_revoked
               business_case_closed business_case_participant_revoked
               internship_requests_opened internship_request_rejected

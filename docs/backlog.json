@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T21:00:00+07:00",
+  "updated_at": "2026-08-09T22:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2111,6 +2111,29 @@
         }
       ],
       "updated_at": "2026-08-09T21:00:00+07:00"
+    },
+    {
+      "id": "AUTH-012",
+      "title": "Give console accounts a way back in: required email and admin-reissued passwords",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner, Tech Lead, and Security Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "AUTH-011"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Console account identity specification",
+          "url": "specs/spec-console-account-identity.html"
+        },
+        {
+          "label": "Console account identity ADR, amended",
+          "url": "decisions/adr-0043-console-account-identity.html"
+        }
+      ],
+      "updated_at": "2026-08-09T22:00:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3781,6 +3804,14 @@
       "from": "queued",
       "to": "complete",
       "summary": "The user ruled that console accounts carry no student ID and are named by email or username, and chose an admin creation screen over shell-only onboarding. users.student_id is now nullable and required only under a :registration validation context, so every learner still has one while an instructor or recruiter has none. A unique users.username column joins student_id and email_address as the three columns that can identify an account, at least one of which every account must hold; User#identifier is what screens print where they printed the student ID, and the admin roster searches all three. Console sign-in tells the three apart by shape alone, which is why a username must contain a letter — an all-digit one would be read as a student ID and could never sign in. /admin gained a create-console-account form: name plus username and/or email, one whitelisted access level, never a role read from posted attributes, and for a company member an ordinary account plus an active organization membership written in the same transaction, leaving the role column student exactly as ADR-0024 requires. The first password is generated to satisfy the password policy, shown once in a flash, and stored only as a digest — not in the audit row, not in a log, not in an email. Creation is audited at warn level. Seeds now build the three console accounts by username and upgrade a database seeded before the change in place.",
+      "evidence_url": "specs/spec-console-account-identity.html"
+    },
+    {
+      "at": "2026-08-09T22:00:00+07:00",
+      "item_id": "AUTH-012",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Closed the recovery gap AUTH-011 opened. A console account has no student ID and its first password is shown once, so a username-only account whose owner lost that password had no route back at all — /forgot-password keys on an email address. Creating a console account now requires one. Alongside it, an administrator can reissue a console account's password from the roster: a fresh generated password under the same one-flash, digest-only rule, every session of that account destroyed so a forgotten password that was actually a stolen one does not survive the recovery, and a warn-level audit row that names the identifier and omits the password. A learner is deliberately not eligible, because /forgot-password reaches them without an administrator reading their new password, and an admin cannot reissue their own. ADR-0043 had listed admin-issued resets as out of scope and was amended the same day to add both points.",
       "evidence_url": "specs/spec-console-account-identity.html"
     }
   ]
