@@ -2,10 +2,10 @@
 id: ADR-0038
 type: adr
 title: Start recruitment communication with participant-scoped in-app application conversations
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -38,10 +38,11 @@ enforced_by:
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This slice is implementation-approved by the user
-> for local verification; Product, Privacy, Security, Recruitment, and QA
-> owners must approve retention, moderation, notification, and production
-> communication policy.
+> **Decision state:** Accepted by the user on 2026-08-09 for the in-app
+> conversation slice: participant-scoped access, immutable audited plain-text
+> messages, no stage effects, and no external delivery. Product, Privacy,
+> Security, Recruitment, and QA owners must still approve retention,
+> moderation, notification, and production communication policy.
 
 ## Context
 
