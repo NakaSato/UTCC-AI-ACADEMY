@@ -99,7 +99,7 @@ never a role — so asking the role handed them a learner's app.
 - `/admin`, `/map`, and `/login` still reach their own screens.
 - An organization named "Admin" is created and reachable at `/company/admin`.
 - Nested workspace paths carry the slug and the same prefix — including
-  `/company/:slug/internship-requests`.
+  `/company/:slug/internship`.
 
 ## Verification
 

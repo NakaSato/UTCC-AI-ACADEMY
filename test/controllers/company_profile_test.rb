@@ -64,7 +64,7 @@ class CompanyProfileTest < ActionDispatch::IntegrationTest
   # rather than a name for the profile and a namespace for everything behind it.
   test "the workspace behind the profile shares the prefix" do
     assert_equal "/company/north-star/job_posts", company_job_posts_path(@organization)
-    assert_equal "/company/north-star/internship-requests",
+    assert_equal "/company/north-star/internship",
                  company_internship_requests_path(@organization)
     assert_equal "/company", companies_path
   end

@@ -84,9 +84,9 @@ Rails.application.routes.draw do
       # Two screens that belong to a company but not to the recruitment module —
       # the leading slash is what keeps them out of it. They live here so a
       # company has one namespace rather than one per feature that touches it.
-      resources :internship_requests, path: "internship-requests", only: :index,
+      resources :internship_requests, path: "internship", only: :index,
                 controller: "/internship_request_decisions", as: :internship_requests
-      patch "internship-requests/settings", to: "/organization_internship_settings#update",
+      patch "internship/settings", to: "/organization_internship_settings#update",
             as: :internship_request_settings
       resources :job_posts, only: %i[index new create show edit update destroy] do
         post :submit, on: :member
