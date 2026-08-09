@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T12:15:00+07:00",
+  "updated_at": "2026-08-09T12:22:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1781,7 +1781,7 @@
     {
       "id": "REC-014",
       "title": "Define trustworthy recruitment analytics and AI-effectiveness reporting",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Recruitment Domain, Data, Privacy, Security, and QA owners",
       "milestone": "AI-M13",
@@ -1789,7 +1789,7 @@
         "REC-009",
         "REC-010"
       ],
-      "blocker": "Final production use still requires privacy, security, recruitment-domain, data, and QA review of metric definitions",
+      "blocker": null,
       "evidence": [
         {
           "label": "AI Recruitment Platform roadmap — Milestone 13",
@@ -1808,7 +1808,7 @@
           "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/recruitment/reporting_controller_test.rb"
         }
       ],
-      "updated_at": "2026-08-07T22:25:01+07:00"
+      "updated_at": "2026-08-09T12:22:00+07:00"
     },
     {
       "id": "REC-015",
@@ -3503,6 +3503,14 @@
       "to": "complete",
       "summary": "The user approved REC-013 as defined. The advisory, student-owned internship preparation checklist is accepted: deterministic rules_preview with no external provider, published-program and own-application data scope only, source and uncertainty disclosure, reflection guidance for rejected or withdrawn states, and the prohibition on matching, ranking, evaluation, or any academic decision. Production use still requires legal, academic, security, recruitment-domain, privacy, data, and QA review.",
       "evidence_url": "specs/spec-internship-application-assistance.html"
+    },
+    {
+      "at": "2026-08-09T12:22:00+07:00",
+      "item_id": "REC-014",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved REC-014 as defined. Privacy-safe organization-scoped recruitment reporting is accepted: descriptive job-post and application status counts only, suppression of totals and cells below a population of five, no candidate identity or free-text data, organization-scoped read-only queries, and source and uncertainty disclosure. The Measurement Contract stands: outcome, fairness, and AI-effectiveness reporting remain out of scope until Product and Data owners approve metric definitions.",
+      "evidence_url": "specs/spec-recruitment-reporting.html"
     }
   ]
 }

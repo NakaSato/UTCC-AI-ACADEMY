@@ -2,10 +2,10 @@
 id: ADR-0037
 type: adr
 title: Start recruitment analytics with organization-scoped aggregate reporting and small-cell suppression
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@recruitment-domain-owner", "@privacy-owner", "@data-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -37,9 +37,12 @@ enforced_by:
 > [AI Recruitment Platform Roadmap](../roadmap.md#ai-recruitment-platform-roadmap) ·
 > [Project Development Flow](../development-flow.md)
 
-> **Decision state:** Draft. This slice is implementation-approved by the user
-> for local verification; Product, Privacy, Security, Recruitment, Data, and QA
-> owners must approve the metric definitions and production reporting policy.
+> **Decision state:** Accepted by the user on 2026-08-09 for the descriptive
+> reporting slice: organization-scoped status counts with sub-five suppression,
+> no candidate identity or free-text data, and source and uncertainty
+> disclosure. Product, Privacy, Security, Recruitment, Data, and QA owners must
+> still approve metric definitions and reporting policy before production use
+> or any outcome, fairness, or AI-effectiveness claim.
 
 ## Context
 
