@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T12:35:00+07:00",
+  "updated_at": "2026-08-09T12:45:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1874,7 +1874,7 @@
     {
       "id": "BIZ-001",
       "title": "Define the Company Business Case Platform industry–university collaboration boundary",
-      "status": "verification",
+      "status": "complete",
       "priority": 2,
       "owner": "Product Owner, Tech Lead, Security/Privacy, Academic, Recruitment Domain, and QA owners",
       "milestone": "M10-CBP",
@@ -1883,7 +1883,7 @@
         "REC-003",
         "REC-005"
       ],
-      "blocker": "Design is prepared; implementation remains blocked pending Product, academic, legal/privacy, security, recruitment-domain, industry-partner, and QA review of confidentiality, consent, IP, participant, storage, retention, and notification decisions",
+      "blocker": null,
       "evidence": [
         {
           "label": "Company Business Case Platform roadmap",
@@ -1898,7 +1898,7 @@
           "url": "specs/spec-company-business-case-collaboration.html"
         }
       ],
-      "updated_at": "2026-08-07T22:45:25+07:00"
+      "updated_at": "2026-08-09T12:45:00+07:00"
     },
     {
       "id": "WEB-001",
@@ -3527,6 +3527,14 @@
       "to": "complete",
       "summary": "The user approved REC-016 as the governing design boundary for enterprise recruitment integrations: tenant-scoped fail-closed registration lifecycle, secret and payload hygiene with reference-only custody, domain sovereignty over recruitment tables and local roles, contract- and purpose-scoped field allowlists, validated idempotent callbacks, and revocation without silent replay. No provider is selected and no external request, callback, or data exchange is authorized; connector implementation remains gated on the recorded human review handoff and the required future enforcement tests.",
       "evidence_url": "specs/spec-recruitment-enterprise-integrations.html"
+    },
+    {
+      "at": "2026-08-09T12:45:00+07:00",
+      "item_id": "BIZ-001",
+      "from": "verification",
+      "to": "complete",
+      "summary": "The user approved BIZ-001 as the governing design boundary for the Company Business Case Platform: organization-owned invitation-only cases with no public discovery, single-use expiry-bound invitations, case-scoped participant and faculty authorization, immutable student submission evidence, gated private assets, cross-domain isolation from recruitment and academic records, and privacy-safe audit. No route, invitation, upload, or company data is authorized; implementation remains gated on the recorded human review handoff covering confidentiality, consent, IP, academic, role, notification, and data-governance decisions.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
     }
   ]
 }

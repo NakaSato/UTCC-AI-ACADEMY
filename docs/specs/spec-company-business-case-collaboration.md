@@ -2,16 +2,17 @@
 id: SPEC-0040
 type: spec
 title: Invitation-only company business-case collaboration and project workspace boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0040, ADR-0024, ADR-0025, ADR-0033, ADR-0038]
 implemented_by: []
-enforced_by: []
+enforced_by:
+  - test/operations/business_case_gate_test.rb
 touches:
   - app/models
   - app/services
@@ -30,7 +31,8 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH
 
 # Invitation-Only Company Business-Case Collaboration and Project Workspace
 
-> **Review state:** Draft design only. This specification authorizes no
+> **Review state:** Accepted by the user on 2026-08-09 as the governing design
+> gate. This specification authorizes no
 > business-case route, invitation, file upload, source-code exchange, milestone
 > transition, notification, or production company data. Implementation requires
 > the human decisions in the review handoff.

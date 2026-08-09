@@ -2,10 +2,10 @@
 id: ADR-0040
 type: adr
 title: Define an invitation-only company business-case collaboration boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-09
 review_by: 2026-08-21
 supersedes: []
 superseded_by: []
@@ -31,11 +31,12 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC
 
 # Define an Invitation-Only Company Business-Case Collaboration Boundary
 
-> **Decision state:** Agent-prepared draft. No company business-case, project,
-> invitation, attachment, source-code, milestone, or submission workflow is
-> authorized by this record. Product, Security, Privacy, Academic,
-> Recruitment Domain, and QA owners must approve the confidentiality, consent,
-> intellectual-property, retention, and participant rules before implementation.
+> **Decision state:** Accepted by the user on 2026-08-09 as the governing
+> collaboration boundary. No company business-case, project, invitation,
+> attachment, source-code, milestone, or submission workflow is authorized by
+> this record. Product, Security, Privacy, Academic, Recruitment Domain, and QA
+> owners must still approve the confidentiality, consent, intellectual-property,
+> retention, and participant rules before implementation.
 
 > [Decision Records](README.md) ·
 > [Company business-case specification](../specs/spec-company-business-case-collaboration.md) ·
