@@ -5,8 +5,8 @@ title: Defer production email delivery
 status: accepted
 owners: ["@product-owner"]
 created: 2026-08-01
-updated: 2026-08-01
-review_by: 2026-08-08
+updated: 2026-08-09
+review_by: 2026-08-23
 supersedes: [ADR-0002]
 superseded_by: []
 depends_on: []

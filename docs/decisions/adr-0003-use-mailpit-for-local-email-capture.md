@@ -5,8 +5,8 @@ title: Use Mailpit for local email capture
 status: accepted
 owners: ["@repository-owner"]
 created: 2026-07-31
-updated: 2026-08-01
-review_by: 2026-08-07
+updated: 2026-08-09
+review_by: 2026-08-23
 supersedes: []
 superseded_by: []
 depends_on: []
