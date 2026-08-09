@@ -14,7 +14,7 @@
     <section class="mb-8 rounded-card border border-hairline bg-surface-1 p-6">
       <h2 class="text-16 font-semibold text-ink"><%= t("internship_requests.settings_heading") %></h2>
       <p class="mt-2 text-13 leading-[1.65] text-muted"><%= t("internship_requests.settings_body") %></p>
-      <%= button_to organization_internship_request_settings_path(@organization),
+      <%= button_to company_internship_request_settings_path(@organization),
             method: :patch,
             params: { accepts_internship_requests: !@organization.accepts_internship_requests },
             class: "mt-4 rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" do %>

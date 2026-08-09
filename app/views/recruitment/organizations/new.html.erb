@@ -2,13 +2,13 @@
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to t("recruitment.back_to_organizations"), recruitment_organizations_path,
+    <%= link_to t("recruitment.back_to_organizations"), companies_path,
           class: "text-13 font-semibold text-brand hover:underline" %>
     <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.organizations.new") %></h1>
     <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("recruitment.organizations.new_subtitle") %></p>
   </div>
 
-  <%= form_with model: @organization, url: recruitment_organizations_path, class: "max-w-2xl space-y-6" do |form| %>
+  <%= form_with model: @organization, url: companies_path, class: "max-w-2xl space-y-6" do |form| %>
     <% if @organization.errors.any? %>
       <div class="rounded-card border border-red-200 bg-red-50 p-4 text-13 text-red-800" role="alert">
         <%= @organization.errors.full_messages.to_sentence %>
@@ -37,7 +37,7 @@
 
     <div class="flex gap-3">
       <%= form.submit t("recruitment.save"), class: "rounded-full bg-brand px-5 py-2.5 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
-      <%= link_to t("recruitment.cancel"), recruitment_organizations_path, class: "rounded-full border border-hairline px-5 py-2.5 text-13 font-semibold text-muted hover:text-ink" %>
+      <%= link_to t("recruitment.cancel"), companies_path, class: "rounded-full border border-hairline px-5 py-2.5 text-13 font-semibold text-muted hover:text-ink" %>
     </div>
   <% end %>
 </main>

@@ -2,8 +2,8 @@
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to t("recruitment.jobs.back_to_organization"), recruitment_organization_job_posts_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <%= link_to t("recruitment.jobs.back_to_organization"), company_job_posts_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
     <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.jobs.new") %></h1>
   </div>
-  <%= render "form", organization: @organization, job_post: @job_post, form_url: recruitment_organization_job_posts_path(@organization), form_method: :post %>
+  <%= render "form", organization: @organization, job_post: @job_post, form_url: company_job_posts_path(@organization), form_method: :post %>
 </main>

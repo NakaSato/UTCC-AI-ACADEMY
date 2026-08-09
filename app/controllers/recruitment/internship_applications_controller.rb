@@ -41,7 +41,7 @@ module Recruitment
       end
 
       def load_reviewable_program
-        @organization = Organization.active.from_param!(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:company_id])
         permitted = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                       role: InternshipProgram::REVIEWER_ROLES)
         raise ActiveRecord::RecordNotFound unless permitted
@@ -57,10 +57,10 @@ module Recruitment
         action = @application.accepted? ? "accepted" : "rejected"
         AuditEvent.record("recruitment_internship_application_#{action}", organization: @organization.name,
                           program: @program.name, student: @application.student.name)
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     notice: t("flash.recruitment_internship_application_#{action}")
       rescue ActiveRecord::RecordInvalid
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     alert: t("flash.recruitment_internship_application_unavailable")
       end
   end

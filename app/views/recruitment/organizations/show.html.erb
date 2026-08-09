@@ -2,7 +2,7 @@
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to t("recruitment.back_to_organizations"), recruitment_organizations_path,
+    <%= link_to t("recruitment.back_to_organizations"), companies_path,
           class: "text-13 font-semibold text-brand hover:underline" %>
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -11,11 +11,11 @@
       </div>
       <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("recruitment.organizations.status.#{@organization.status}") %></span>
     </div>
-    <%= link_to t("recruitment.jobs.management_title"), recruitment_organization_job_posts_path(@organization),
+    <%= link_to t("recruitment.jobs.management_title"), company_job_posts_path(@organization),
           class: "mt-5 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
-    <%= link_to t("recruitment.internships.management_title"), recruitment_organization_internship_programs_path(@organization),
+    <%= link_to t("recruitment.internships.management_title"), company_internship_programs_path(@organization),
           class: "mt-5 ml-2 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" %>
-    <%= link_to t("recruitment.reporting.title"), reporting_recruitment_organization_path(@organization),
+    <%= link_to t("recruitment.reporting.title"), reporting_company_path(@organization),
           class: "mt-5 ml-2 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand hover:border-brand" if @can_view_reporting %>
   </div>
 
@@ -47,7 +47,7 @@
               <td class="py-4">
                 <% unless membership.owner? %>
                   <%= button_to t("recruitment.memberships.revoke"),
-                        membership_recruitment_organization_path(@organization, membership.user_id),
+                        membership_company_path(@organization, membership.user_id),
                         method: :delete,
                         class: "text-12 font-semibold text-red-700 hover:underline" %>
                 <% else %>
@@ -66,7 +66,7 @@
       <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.memberships.add_title") %></h2>
       <p class="mt-1 text-13 text-muted"><%= t("recruitment.memberships.add_subtitle") %></p>
 
-      <%= form_with url: memberships_recruitment_organization_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
+      <%= form_with url: memberships_company_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
         <div class="min-w-[220px] flex-1">
           <%= label_tag "membership_user_id", t("recruitment.memberships.member"), class: "mb-2 block text-13 font-semibold text-ink" %>
           <%= select_tag "membership[user_id]", options_from_collection_for_select(@users, :id, :name),
@@ -90,7 +90,7 @@
       <p class="mt-1 text-13 text-muted"><%= t("recruitment.memberships.invite_subtitle") %></p>
 
       <% if @invitees.any? %>
-        <%= form_with url: invitations_recruitment_organization_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
+        <%= form_with url: invitations_company_path(@organization), class: "mt-5 flex flex-wrap items-end gap-3" do |form| %>
           <div class="min-w-[220px] flex-1">
             <%= label_tag "invitation_user_id", t("recruitment.memberships.member"), class: "mb-2 block text-13 font-semibold text-ink" %>
             <%= select_tag "invitation[user_id]", options_from_collection_for_select(@invitees, :id, :name),

@@ -5,10 +5,10 @@ module Recruitment
       @evaluation = @application.build_evaluation(evaluation_params.merge(evaluator: Current.user, status: "submitted"))
       @evaluation.submit!
       record_evaluation
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_evaluation_submitted")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   alert: t("flash.recruitment_internship_evaluation_unavailable")
     end
 
@@ -20,10 +20,10 @@ module Recruitment
       @evaluation.assign_attributes(evaluation_params)
       @evaluation.submit!
       record_evaluation
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_evaluation_submitted")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   alert: t("flash.recruitment_internship_evaluation_unavailable")
     end
 
@@ -33,7 +33,7 @@ module Recruitment
       end
 
       def load_evaluation_context
-        @organization = Organization.active.from_param!(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:company_id])
         @program = @organization.internship_programs.find(params[:internship_program_id])
         @application = @program.applications.find(params[:application_id])
         membership = @organization.memberships.active.find_by(user_id: Current.user.id)

@@ -70,7 +70,7 @@ class WorkspaceNavigationTest < ActionDispatch::IntegrationTest
   # so asking the role handed them a learner's app.
   test "a company member gets the company nav and no coursework" do
     sign_in_as @company
-    get recruitment_organizations_url
+    get companies_url
 
     assert_equal [ I18n.t("chrome.nav.organizations"), I18n.t("chrome.nav.business_cases"),
                    I18n.t("chrome.nav.placements") ], nav_labels
@@ -81,7 +81,7 @@ class WorkspaceNavigationTest < ActionDispatch::IntegrationTest
   # Both navs read the same list, so the drawer must not disagree with the rail.
   test "the burger drawer carries the same list as the rail" do
     sign_in_as @company
-    get recruitment_organizations_url
+    get companies_url
 
     drawer = css_select("[data-menu=nav] a").map { it.text.strip }
     assert_equal nav_labels, drawer
@@ -91,7 +91,7 @@ class WorkspaceNavigationTest < ActionDispatch::IntegrationTest
 
   test "a company member is left out of the hearts mechanic" do
     sign_in_as @company
-    get recruitment_organizations_url
+    get companies_url
 
     assert_not_includes response.body, I18n.t("chrome.hearts_left", count: 5, max: 5)
   end
@@ -100,7 +100,7 @@ class WorkspaceNavigationTest < ActionDispatch::IntegrationTest
   # bar announcing somebody else's semester is worse than no bar.
   test "a company member does not get the academic strip at all" do
     sign_in_as @company
-    get recruitment_organizations_url
+    get companies_url
 
     assert_select "header [data-strip=academy]", false
   end

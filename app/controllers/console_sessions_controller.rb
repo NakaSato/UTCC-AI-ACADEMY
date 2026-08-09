@@ -72,7 +72,7 @@ class ConsoleSessionsController < ApplicationController
       elsif user.instructor?
         instructor_url
       else
-        recruitment_organizations_url
+        companies_url
       end
     end
 end

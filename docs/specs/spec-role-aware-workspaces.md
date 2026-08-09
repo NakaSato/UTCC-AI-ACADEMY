@@ -65,15 +65,15 @@ never a role — so asking the role handed them a learner's app.
    `:instructor` to `/instructor`, and `:company` to their company's profile —
    or to the organizations list when they belong to more than one.
 5. The hearts counter and the refill timer render only for `:student`.
-6. `GET /:slug` serves a company profile. The route is the **last** in
-   `config/routes.rb`, and its `:slug` constraint is `Organization::SLUG_FORMAT`.
-7. `Organization::RESERVED_SLUGS` contains every top-level route segment a valid
-   slug could shadow, and a slug in that list fails validation — whether typed
-   or derived from the name.
+6. `GET /company/:slug` serves a company profile, and every screen scoped to a
+   company sits under the same prefix — including the internship-request queue
+   and settings, whose controllers live outside the recruitment module.
+7. Because company names sit under `/company`, no reserved-name list exists: a
+   company called "admin" is `/company/admin` and shadows nothing.
 8. `Organization#to_param` is the slug and `Organization.from_param!` is how a
    controller resolves one, so no organization row id appears in any URL.
-9. `GET /recruitment/organizations/:id` still resolves and redirects to the
-   canonical `/:slug`.
+9. `/recruitment` keeps the candidate's half only — jobs, applications, and the
+   candidate profile.
 10. Profile visibility is unchanged by the address: members and admins only.
 11. Anything that stores an organization reference in order to rebuild a URL
     later stores the slug; rows written before this resolve their stored id.
@@ -91,24 +91,24 @@ never a role — so asking the role handed them a learner's app.
 - A company member sees no hearts counter, despite `student?` being true.
 - Revoking the only membership returns that account to the learner navigation.
 - `/` lands a student on the catalog, an instructor on `/instructor`, an admin
-  on `/admin`, and a single-organization company member on `/:slug`.
-- A member opens their company at `/north-star`; `company_path` builds the name,
-  not the row id.
+  on `/admin`, and a single-organization company member on `/company/:slug`.
+- A member opens their company at `/company/north-star`; `company_path` builds
+  the name, not the row id.
 - A non-member and an unknown name both get 404; a signed-out visitor is sent to
   the front door.
 - `/admin`, `/map`, and `/login` still reach their own screens.
-- An organization cannot be created with a reserved name, including one derived
-  from an ordinary-looking name like "Admin".
-- Nested workspace paths carry the slug too.
+- An organization named "Admin" is created and reachable at `/company/admin`.
+- Nested workspace paths carry the slug and the same prefix — including
+  `/company/:slug/internship-requests`.
 
 ## Verification
 
 - `test/controllers/workspace_navigation_test.rb` covers all four navigations,
   the drawer, the four front doors, the hearts strip, and the revoked member.
-- `test/controllers/company_profile_test.rb` covers the vanity route, its
-  visibility, the reserved paths, and the nested URLs.
-- `test/models/organization_slug_test.rb` asserts the reserved list and the
-  routes agree — it fails when a top-level route is added without reserving it.
+- `test/controllers/company_profile_test.rb` covers the company address, its
+  visibility, that real paths are not shadowed, and the nested URLs.
+- `test/models/organization_slug_test.rb` covers slug derivation, `to_param`,
+  `from_param!`, and that a route-shaped name is fine under the prefix.
 - `test/models/user_test.rb` covers `workspace` precedence, including an
   instructor who is also a company member.
 - `test/controllers/app_header_test.rb` continues to cover the strip for staff.

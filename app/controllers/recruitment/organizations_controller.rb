@@ -40,11 +40,6 @@ module Recruitment
 
     def show
       @organization = find_visible_organization
-      # One canonical address for a profile. The old id-based URL still resolves
-      # — bookmarks, and every link that predates the vanity route — but it
-      # answers by sending the reader to the name.
-      return redirect_to company_path(@organization) if params[:id]
-
       @memberships = @organization.memberships.active.includes(:user).order(:role, :id)
       @users = eligible_users
       @can_manage_invitations = can_manage_invitations?
@@ -82,7 +77,7 @@ module Recruitment
       redirect_to company_path(organization),
                   alert: t("flash.recruitment_owner_revoke_forbidden")
     rescue ActiveRecord::RecordNotFound
-      redirect_to recruitment_organizations_path, alert: t("flash.recruitment_member_missing")
+      redirect_to companies_path, alert: t("flash.recruitment_member_missing")
     end
 
     private
@@ -109,14 +104,10 @@ module Recruitment
         Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id, role: "owner")
       end
 
-      # Two ways in, one record: /northstar carries the slug, and the nested
-      # workspace routes still carry the id.
+      # `:id` carries the slug: `to_param` writes it and `from_param!` reads it,
+      # so a company has one address and one lookup rather than two of each.
       def find_visible_organization
-        organization = if params[:slug]
-          Organization.find_by!(slug: params[:slug])
-        else
-          Organization.from_param!(params[:id])
-        end
+        organization = Organization.from_param!(params[:id])
         raise ActiveRecord::RecordNotFound unless organization.visible_to?(Current.user)
 
         organization

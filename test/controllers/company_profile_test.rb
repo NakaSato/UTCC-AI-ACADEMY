@@ -1,9 +1,8 @@
 require "test_helper"
 
-# A company's profile is /northstar — the address a company would print on a
-# page about itself. The route sits last in the file so every real path wins,
-# and Organization::RESERVED_SLUGS makes sure no company is ever named something
-# that route could not reach.
+# A company's profile is /company/north-star — the address a company would print
+# on a page about itself, under a prefix that says what it is. Everything scoped
+# to that company sits under the same prefix.
 class CompanyProfileTest < ActionDispatch::IntegrationTest
   setup do
     @organization = Organization.create!(name: "North Star", creator: users(:admin))
@@ -13,24 +12,24 @@ class CompanyProfileTest < ActionDispatch::IntegrationTest
 
   test "a member opens their company at its name" do
     sign_in_as @member
-    get "/north-star"
+    get "/company/north-star"
 
     assert_response :success
     assert_select "h1", "North Star"
   end
 
   test "the helper builds the name, not the row id" do
-    assert_equal "/north-star", company_path(@organization)
+    assert_equal "/company/north-star", company_path(@organization)
   end
 
-  # The vanity route is last, so a real path must still win however an
-  # organization is named — and it cannot be named these anyway.
-  test "a reserved path still reaches its own screen" do
+  # The prefix is what keeps company names out of the root namespace, so no
+  # reserved-name list is needed and a real path cannot be shadowed.
+  test "a real path is not shadowed by a company name" do
     sign_in_as users(:admin)
 
     { "/admin" => I18n.t("admin.title"), "/map" => nil }.each_key do |path|
       get path
-      assert_response :success, "#{path} must not be shadowed by the company route"
+      assert_response :success, "#{path} must not be shadowed by a company"
     end
 
     sign_out
@@ -40,7 +39,7 @@ class CompanyProfileTest < ActionDispatch::IntegrationTest
 
   test "an unknown name is not found" do
     sign_in_as @member
-    get "/no-such-company"
+    get "/company/no-such-company"
 
     assert_response :not_found
   end
@@ -49,22 +48,24 @@ class CompanyProfileTest < ActionDispatch::IntegrationTest
   # admins, and a stranger cannot read it by guessing the name.
   test "a non-member cannot read a company at its name" do
     sign_in_as users(:two)
-    get "/north-star"
+    get "/company/north-star"
 
     assert_response :not_found
   end
 
   test "a signed-out visitor is sent to the front door" do
     sign_out
-    get "/north-star"
+    get "/company/north-star"
 
     assert_redirected_to root_path
   end
 
-  # Nested workspace routes carry the same name, so a company's URLs read as one
-  # set rather than a name for the profile and a number for everything behind it.
-  test "the workspace behind the profile is addressed by name too" do
-    assert_equal "/recruitment/organizations/north-star/job_posts",
-                 recruitment_organization_job_posts_path(@organization)
+  # One prefix for everything about a company, so its URLs read as one set
+  # rather than a name for the profile and a namespace for everything behind it.
+  test "the workspace behind the profile shares the prefix" do
+    assert_equal "/company/north-star/job_posts", company_job_posts_path(@organization)
+    assert_equal "/company/north-star/internship-requests",
+                 company_internship_requests_path(@organization)
+    assert_equal "/company", companies_path
   end
 end

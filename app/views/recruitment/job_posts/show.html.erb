@@ -5,7 +5,7 @@
     <% if @public %>
       <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path, class: "text-13 font-semibold text-brand hover:underline" %>
     <% else %>
-      <%= link_to t("recruitment.jobs.back_to_organization"), recruitment_organization_job_posts_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+      <%= link_to t("recruitment.jobs.back_to_organization"), company_job_posts_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
     <% end %>
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -108,7 +108,7 @@
           <p class="mt-1 max-w-2xl text-13 leading-relaxed text-muted"><%= t("recruitment.jobs.suggestions_subtitle") %></p>
         </div>
         <% if @can_generate_suggestions %>
-          <%= button_to t("recruitment.jobs.generate_suggestions"), suggestions_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
+          <%= button_to t("recruitment.jobs.generate_suggestions"), suggestions_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" %>
         <% end %>
       </div>
 
@@ -132,19 +132,19 @@
               </dl>
 
               <% if suggestion.actionable? %>
-                <%= form_with url: recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), scope: :recruitment_job_post_suggestion, method: :patch, class: "mt-5" do |form| %>
+                <%= form_with url: company_job_post_suggestion_path(@organization, @job_post, suggestion), scope: :recruitment_job_post_suggestion, method: :patch, class: "mt-5" do |form| %>
                   <%= form.text_area :content, value: suggestion.content, rows: 4, maxlength: 20_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
                   <%= form.submit t("recruitment.jobs.edit_suggestion"), class: "mt-3 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand hover:border-brand" %>
                 <% end %>
                 <div class="mt-3 flex flex-wrap gap-2">
-                  <%= button_to t("recruitment.jobs.accept_suggestion"), accept_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white hover:bg-brand-dark" %>
-                  <%= button_to t("recruitment.jobs.reject_suggestion"), reject_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+                  <%= button_to t("recruitment.jobs.accept_suggestion"), accept_company_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white hover:bg-brand-dark" %>
+                  <%= button_to t("recruitment.jobs.reject_suggestion"), reject_company_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
                   <% if @can_generate_suggestions %>
-                    <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+                    <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_company_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
                   <% end %>
                 </div>
               <% elsif suggestion.status == "rejected" && @can_generate_suggestions %>
-                <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_recruitment_organization_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "mt-4 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
+                <%= button_to t("recruitment.jobs.regenerate_suggestion"), regenerate_company_job_post_suggestion_path(@organization, @job_post, suggestion), method: :post, class: "mt-4 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-muted hover:border-brand" %>
               <% end %>
             </article>
           <% end %>
@@ -160,7 +160,7 @@
           <h2 class="text-20 font-semibold text-ink"><%= t("recruitment.applications.pipeline_title") %></h2>
           <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.applications.pipeline_subtitle") %></p>
         </div>
-        <%= link_to t("recruitment.applications.open_pipeline"), recruitment_organization_job_post_applications_path(@organization, @job_post), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
+        <%= link_to t("recruitment.applications.open_pipeline"), company_job_post_applications_path(@organization, @job_post), class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" %>
       </div>
       <p class="mt-4 text-13 text-muted"><%= t("recruitment.applications.pipeline_count", count: @application_count) %></p>
     </section>
@@ -170,14 +170,14 @@
     <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
       <p class="text-13 text-muted"><%= t("recruitment.jobs.approval_note") %></p>
       <div class="mt-5 flex flex-wrap gap-3">
-        <%= link_to t("recruitment.jobs.save"), edit_recruitment_organization_job_post_path(@organization, @job_post), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" if @can_edit %>
-        <%= button_to t("recruitment.jobs.submit"), submit_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_submit %>
-        <%= button_to t("recruitment.jobs.request_changes"), request_changes_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_request_changes %>
-        <%= button_to t("recruitment.jobs.publish"), publish_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_publish %>
-        <%= button_to t("recruitment.jobs.pause"), pause_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_pause %>
-        <%= button_to t("recruitment.jobs.close"), close_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_close %>
-        <%= button_to t("recruitment.jobs.archive"), archive_recruitment_organization_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_archive %>
-        <%= button_to t("recruitment.jobs.delete"), recruitment_organization_job_post_path(@organization, @job_post), method: :delete, class: "rounded-full border border-red-200 px-4 py-2.5 text-13 font-semibold text-red-700 hover:border-red-400", form: { data: { turbo_confirm: t("recruitment.jobs.delete") } } if @can_delete %>
+        <%= link_to t("recruitment.jobs.save"), edit_company_job_post_path(@organization, @job_post), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" if @can_edit %>
+        <%= button_to t("recruitment.jobs.submit"), submit_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_submit %>
+        <%= button_to t("recruitment.jobs.request_changes"), request_changes_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_request_changes %>
+        <%= button_to t("recruitment.jobs.publish"), publish_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white hover:bg-brand-dark" if @can_publish %>
+        <%= button_to t("recruitment.jobs.pause"), pause_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_pause %>
+        <%= button_to t("recruitment.jobs.close"), close_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_close %>
+        <%= button_to t("recruitment.jobs.archive"), archive_company_job_post_path(@organization, @job_post), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted hover:border-brand" if @can_archive %>
+        <%= button_to t("recruitment.jobs.delete"), company_job_post_path(@organization, @job_post), method: :delete, class: "rounded-full border border-red-200 px-4 py-2.5 text-13 font-semibold text-red-700 hover:border-red-400", form: { data: { turbo_confirm: t("recruitment.jobs.delete") } } if @can_delete %>
       </div>
     </section>
   <% end %>

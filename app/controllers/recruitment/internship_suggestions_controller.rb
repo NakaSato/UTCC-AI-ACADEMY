@@ -4,10 +4,10 @@ module Recruitment
       load_author_program
       suggestions = InternshipSuggestionGenerator.call(program: @program, requested_by: Current.user)
       audit("recruitment_internship_suggestions_generated", count: suggestions.size)
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_suggestions_generated", count: suggestions.size)
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   alert: t("flash.recruitment_internship_suggestions_unavailable")
     end
 
@@ -16,10 +16,10 @@ module Recruitment
       suggestion = find_suggestion
       suggestion.edit!(suggestion_params[:content], reviewer: Current.user)
       audit("recruitment_internship_suggestion_edited", suggestion: suggestion.kind)
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_suggestion_edited")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   alert: t("flash.recruitment_internship_suggestion_unavailable")
     end
 
@@ -36,10 +36,10 @@ module Recruitment
       suggestion = find_suggestion
       InternshipSuggestionGenerator.regenerate!(suggestion:, requested_by: Current.user)
       audit("recruitment_internship_suggestion_regenerated", suggestion: suggestion.kind)
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_suggestion_regenerated")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   alert: t("flash.recruitment_internship_suggestion_unavailable")
     end
 
@@ -59,7 +59,7 @@ module Recruitment
       end
 
       def load_program
-        @organization = Organization.active.from_param!(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:company_id])
         allowed = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                     role: InternshipProgram::AUTHOR_ROLES)
         raise ActiveRecord::RecordNotFound unless allowed
@@ -76,10 +76,10 @@ module Recruitment
         suggestion = find_suggestion
         yield
         audit("recruitment_internship_suggestion_#{action}", suggestion: suggestion.kind)
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     notice: t("flash.recruitment_internship_suggestion_#{action}")
       rescue ActiveRecord::RecordInvalid
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     alert: t("flash.recruitment_internship_suggestion_unavailable")
       end
 

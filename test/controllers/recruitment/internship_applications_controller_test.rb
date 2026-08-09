@@ -37,7 +37,7 @@ class Recruitment::InternshipApplicationsControllerTest < ActionDispatch::Integr
 
     sign_out
     sign_in_as users(:one)
-    post accept_recruitment_organization_internship_program_application_path(@organization, @program, first)
+    post accept_company_internship_program_application_path(@organization, @program, first)
     assert_predicate first.reload, :accepted?
 
     second_student = User.create!(name: "Second applicant", student_id: "9999999999997", password: "Student99")
@@ -55,7 +55,7 @@ class Recruitment::InternshipApplicationsControllerTest < ActionDispatch::Integr
     sign_out
     sign_in_as users(:instructor)
 
-    get recruitment_organization_internship_program_applications_path(outsider, @program)
+    get company_internship_program_applications_path(outsider, @program)
 
     assert_response :not_found
   end

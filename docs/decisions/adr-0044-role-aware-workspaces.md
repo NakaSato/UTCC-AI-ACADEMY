@@ -37,9 +37,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 > **Decision state:** Accepted by the user on 2026-08-09. One shell, four
 > workspaces: `User#workspace` decides the navigation, the gamification strip,
-> and where `/` lands. A company's profile moves to `/:slug` — `/northstar` —
-> and organizations are addressed by name in every URL. Dashboard *content* per
+> and where `/` lands. A company's screens move under `/company/:slug` and
+> organizations are addressed by name in every URL. Dashboard *content* per
 > role is explicitly a later slice.
+>
+> **Amended 2026-08-09, same day:** the profile was briefly at the bare root
+> (`/northstar`) before the `/company` prefix replaced it — see the alternative
+> below. `Organization::RESERVED_SLUGS`, which that shape required, is gone.
 
 > [Decision Records](README.md) ·
 > [Role-aware workspaces specification](../specs/spec-role-aware-workspaces.md) ·
@@ -71,8 +75,8 @@ to want to link to the page from somewhere else.
 - **Current behavior:** One nav for four populations, a learner front door for
   three of them, and a row id where a company's name should be.
 - **Failure risk:** Role checks scattered through views drift apart; a "separate
-  UI" becomes four layouts to keep in step; a vanity URL at the root shadows
-  real paths.
+  UI" becomes four layouts to keep in step; a company address collides with a
+  real path.
 - **Success signal:** Each population sees a navigation of doors it can open,
   lands somewhere it can act, and a company can put its address on a poster.
 
@@ -93,12 +97,15 @@ The accepted policy is:
    profile, or the catalog. A company member in more than one organization lands
    on the list, since they have a choice to make.
 5. The gamification strip is keyed on the workspace, not on `student?`.
-6. A company's profile is `/:slug`. The route is declared **last**, so every
-   real path wins, and `Organization::RESERVED_SLUGS` forbids a name that a real
-   path would shadow — a test keeps the list and the routes in step.
-7. `Organization#to_param` is the slug, so the workspace routes behind the
-   profile carry the name too. `Organization.from_param!` is the one lookup.
-   The id-based profile URL still resolves and redirects to the name.
+6. A company lives under `/company/:slug` — the profile and everything scoped
+   to it, including the screens whose controllers sit outside the recruitment
+   module. The prefix is what keeps company names out of the root namespace, so
+   no reserved-name list is needed and a company called "admin" is simply
+   `/company/admin`.
+7. `Organization#to_param` is the slug and `Organization.from_param!` is the one
+   lookup, so no organization row id appears in any URL. `/recruitment` keeps
+   only the candidate's half — jobs, applications, candidate profile — which is
+   a section a student browses rather than an internal namespace leaking out.
 8. **Out of scope, deferred to its own slice:** dashboard *content*. No new
    summary screens, counts, or activity feeds. Each workspace lands on the best
    screen that already exists.
@@ -125,7 +132,17 @@ independently.
 ### Keep `/recruitment/organizations/:id`
 
 No routing risk at all, but it hands a company an internal URL with a row id in
-it, and a nav item pointing at a list rather than at them.
+it, spells out a code-level namespace, and points a nav item at a list rather
+than at them.
+
+### A company profile at the bare root, `/northstar`
+
+Shortest possible address, and the first shape this took. Abandoned within the
+day: it puts every company name in the same namespace as every route, so the
+route has to be declared last and a reserved-name list has to be kept in step
+with the router forever — a standing tax, and a silently unreachable profile
+whenever someone forgets. The `/company` prefix costs eight characters and
+removes the whole problem.
 
 ## Consequences
 
@@ -134,8 +151,8 @@ it, and a nav item pointing at a list rather than at them.
 - An instructor's nav is two items. That is honestly what an instructor has
   today; padding it would mean linking them to somebody else's coursework.
 - A slug is now a public URL. Renaming an organization does not move it — the
-  slug is set once at creation — but adding a top-level route means adding to
-  `RESERVED_SLUGS`, and the test says so out loud.
+  slug is set once at creation — and because the profile sits under `/company`,
+  adding a top-level route can never collide with a company name.
 - Organization ids are gone from URLs. Anything that stored one to rebuild a URL
   later had to store the slug instead; the internship-request notification did,
   and resolves old rows by id for as long as they exist.
@@ -150,7 +167,7 @@ it, and a nav item pointing at a list rather than at them.
   holding the student role; revoking the membership returns them to the learner
   app entirely.
 - `/` lands each workspace on its own home.
-- Every top-level route segment that a valid slug could shadow is reserved, and
-  an organization cannot be created with a reserved name.
-- A company profile is reachable at its name, and the id-based URL redirects
-  there rather than serving a second copy.
+- A company named after a route — "admin", "login" — is reachable at
+  `/company/admin` and shadows nothing.
+- A company profile and everything scoped to it share one prefix, and no
+  organization row id appears in any URL.

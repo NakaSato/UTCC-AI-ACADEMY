@@ -5,10 +5,10 @@ module Recruitment
       suggestions = JobSuggestionGenerator.call(job_post: @job_post, requested_by: Current.user)
       AuditEvent.record("recruitment_job_suggestions_generated", organization: @organization.name,
                         job: @job_post.title.presence || t("recruitment.jobs.untitled"), count: suggestions.size)
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   notice: t("flash.recruitment_job_suggestions_generated", count: suggestions.size)
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   alert: t("flash.recruitment_job_suggestions_unavailable")
     end
 
@@ -18,10 +18,10 @@ module Recruitment
       suggestion.edit!(suggestion_params[:content], reviewer: Current.user)
       AuditEvent.record("recruitment_job_suggestion_edited", organization: @organization.name,
                         job: @job_post.title.presence || t("recruitment.jobs.untitled"), suggestion: suggestion.kind)
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   notice: t("flash.recruitment_job_suggestion_edited")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   alert: t("flash.recruitment_job_suggestion_unavailable")
     end
 
@@ -39,10 +39,10 @@ module Recruitment
       JobSuggestionGenerator.regenerate!(suggestion:, requested_by: Current.user)
       AuditEvent.record("recruitment_job_suggestion_regenerated", organization: @organization.name,
                         job: @job_post.title.presence || t("recruitment.jobs.untitled"), suggestion: suggestion.kind)
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   notice: t("flash.recruitment_job_suggestion_regenerated")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   alert: t("flash.recruitment_job_suggestion_unavailable")
     end
 
@@ -62,7 +62,7 @@ module Recruitment
       end
 
       def load_job
-        @organization = Organization.active.from_param!(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:company_id])
         unless Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                  role: Recruitment::JobPost::AUTHOR_ROLES)
           raise ActiveRecord::RecordNotFound
@@ -80,10 +80,10 @@ module Recruitment
         yield
         AuditEvent.record("recruitment_job_suggestion_#{action}", organization: @organization.name,
                           job: @job_post.title.presence || t("recruitment.jobs.untitled"), suggestion: suggestion.kind)
-        redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+        redirect_to company_job_post_path(@organization, @job_post),
                     notice: t("flash.recruitment_job_suggestion_#{action}")
       rescue ActiveRecord::RecordInvalid
-        redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+        redirect_to company_job_post_path(@organization, @job_post),
                     alert: t("flash.recruitment_job_suggestion_unavailable")
       end
   end

@@ -20,17 +20,17 @@ class Recruitment::InternshipProgramsControllerTest < ActionDispatch::Integratio
 
   test "an authorized recruiter creates and submits an internship program" do
     assert_difference [ "Recruitment::InternshipProgram.count", "AuditEvent.count" ], 1 do
-      post recruitment_organization_internship_programs_path(@organization), params: {
+      post company_internship_programs_path(@organization), params: {
         recruitment_internship_program: program_attributes
       }
     end
 
     program = @organization.internship_programs.order(:id).last
-    assert_redirected_to recruitment_organization_internship_program_path(@organization, program)
+    assert_redirected_to company_internship_program_path(@organization, program)
     assert_equal "draft", program.status
 
     assert_difference "AuditEvent.count", 1 do
-      post submit_recruitment_organization_internship_program_path(@organization, program)
+      post submit_company_internship_program_path(@organization, program)
     end
     assert_equal "review", program.reload.status
   end
@@ -39,7 +39,7 @@ class Recruitment::InternshipProgramsControllerTest < ActionDispatch::Integratio
     sign_out
     sign_in_as users(:student)
 
-    get recruitment_organization_internship_programs_path(@organization)
+    get company_internship_programs_path(@organization)
 
     assert_response :not_found
   end

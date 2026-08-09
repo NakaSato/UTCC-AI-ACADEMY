@@ -7,7 +7,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     assert_difference "Organization.count", 1 do
       assert_difference "OrganizationMembership.count", 1 do
         assert_difference "AuditEvent.count", 2 do
-          post recruitment_organizations_path, params: {
+          post companies_path, params: {
             organization: { name: "North Star", slug: "", owner_id: users(:one).id }
           }
         end
@@ -26,7 +26,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     assert_no_difference "Organization.count" do
-      post recruitment_organizations_path, params: {
+      post companies_path, params: {
         organization: { name: "Forbidden", owner_id: users(:one).id }
       }
     end
@@ -34,7 +34,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
 
     organization = Organization.create!(name: "Existing", creator: users(:admin))
     assert_no_difference "OrganizationMembership.count" do
-      post memberships_recruitment_organization_path(organization), params: {
+      post memberships_company_path(organization), params: {
         membership: { user_id: users(:two).id, role: "recruiter" }
       }
     end
@@ -51,13 +51,10 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Member Org"
 
-    # The id-based URL still resolves and answers with the canonical one.
-    get recruitment_organization_path(organization)
-    assert_redirected_to company_path(organization)
 
     sign_out
     sign_in_as users(:two)
-    get recruitment_organization_path(organization)
+    get company_path(organization)
     assert_response :not_found
   end
 
@@ -66,7 +63,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     organization.memberships.create!(user: users(:one), role: "owner")
 
     assert_difference "OrganizationMembership.count", 1 do
-      post memberships_recruitment_organization_path(organization), params: {
+      post memberships_company_path(organization), params: {
         membership: { user_id: users(:two).id, role: "recruiter" }
       }
     end
@@ -75,7 +72,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "recruiter", membership.role
 
     assert_difference -> { organization.memberships.active.count }, -1 do
-      delete membership_recruitment_organization_path(organization, users(:two).id)
+      delete membership_company_path(organization, users(:two).id)
     end
     assert_redirected_to company_path(organization)
     assert_equal "revoked", membership.reload.status
@@ -85,7 +82,7 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     organization = Organization.create!(name: "Owner Org", creator: users(:admin))
     membership = organization.memberships.create!(user: users(:one), role: "owner")
 
-    delete membership_recruitment_organization_path(organization, users(:one).id)
+    delete membership_company_path(organization, users(:one).id)
 
     assert_redirected_to company_path(organization)
     assert_predicate membership.reload, :active?

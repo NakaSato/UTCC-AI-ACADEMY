@@ -1,7 +1,7 @@
 module Recruitment
   class InternshipProgramsController < ApplicationController
     def index
-      if params[:organization_id]
+      if params[:company_id]
         @organization = readable_organization
         @programs = @organization.internship_programs.order(updated_at: :desc, id: :desc)
         @public = false
@@ -25,7 +25,7 @@ module Recruitment
       @program.creator = Current.user
       @program.save!
       audit("recruitment_internship_program_created", program: program_name)
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_program_created")
     rescue ActiveRecord::RecordInvalid
       @mentors = available_mentors
@@ -33,7 +33,7 @@ module Recruitment
     end
 
     def show
-      if params[:organization_id]
+      if params[:company_id]
         @organization = readable_organization
         @program = @organization.internship_programs.find(params[:id])
         @public = false
@@ -61,7 +61,7 @@ module Recruitment
       @program.assign_attributes(program_params)
       @program.save!
       audit("recruitment_internship_program_updated", program: program_name)
-      redirect_to recruitment_organization_internship_program_path(@organization, @program),
+      redirect_to company_internship_program_path(@organization, @program),
                   notice: t("flash.recruitment_internship_program_saved")
     rescue ActiveRecord::StaleObjectError
       @program = @organization.internship_programs.find(@program.id)
@@ -107,7 +107,7 @@ module Recruitment
       end
 
       def readable_organization
-        organization = Organization.active.from_param!(params[:organization_id])
+        organization = Organization.active.from_param!(params[:company_id])
         return organization if Current.user.admin? || organization.member?(Current.user)
 
         raise ActiveRecord::RecordNotFound
@@ -118,7 +118,7 @@ module Recruitment
       end
 
       def authorizing_organization(roles)
-        organization = Organization.active.from_param!(params[:organization_id])
+        organization = Organization.active.from_param!(params[:company_id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id, role: roles)
 
@@ -139,7 +139,7 @@ module Recruitment
         @program = @organization.internship_programs.find(params[:id])
         return true if @program.editable?
 
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     alert: t("flash.recruitment_internship_program_not_editable")
         false
       end
@@ -169,10 +169,10 @@ module Recruitment
         @program.transition_to!(target)
         audit("recruitment_internship_program_#{audit_suffix}", program: program_name,
               from_status: previous_status, to_status: @program.status)
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     notice: t("flash.recruitment_internship_program_#{audit_suffix}")
       rescue ActiveRecord::RecordInvalid
-        redirect_to recruitment_organization_internship_program_path(@organization, @program),
+        redirect_to company_internship_program_path(@organization, @program),
                     alert: t("flash.recruitment_internship_program_transition_forbidden")
       end
 

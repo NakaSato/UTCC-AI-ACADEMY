@@ -56,19 +56,19 @@ class Recruitment::JobApplicationsControllerTest < ActionDispatch::IntegrationTe
 
     sign_out
     sign_in_as users(:two)
-    get recruitment_organization_job_post_applications_path(@organization, @job)
+    get company_job_post_applications_path(@organization, @job)
     assert_response :success
     assert_select "body", /นักศึกษา สาม/
 
     assert_difference [ "Recruitment::JobApplicationEvent.count", "AuditEvent.count" ], 1 do
-      post transition_recruitment_organization_job_post_application_path(@organization, @job, application), params: {
+      post transition_company_job_post_application_path(@organization, @job, application), params: {
         recruitment_job_application: { status: "screening", note: "Reviewing evidence", lock_version: application.lock_version }
       }
     end
-    assert_redirected_to recruitment_organization_job_post_application_path(@organization, @job, application)
+    assert_redirected_to company_job_post_application_path(@organization, @job, application)
     assert_predicate application.reload, :screening?
 
-    get recruitment_organization_job_post_application_path(@organization, @job, application)
+    get company_job_post_application_path(@organization, @job, application)
     assert_response :success
     assert_select "body", /#{I18n.t("recruitment.applications.assistant_title")}/
   end
@@ -80,7 +80,7 @@ class Recruitment::JobApplicationsControllerTest < ActionDispatch::IntegrationTe
 
     sign_out
     sign_in_as users(:instructor)
-    get recruitment_organization_job_post_applications_path(@organization, @job)
+    get company_job_post_applications_path(@organization, @job)
 
     assert_response :not_found
   end
@@ -125,12 +125,12 @@ class Recruitment::JobApplicationsControllerTest < ActionDispatch::IntegrationTe
     sign_out
     sign_in_as users(:two)
     assert_difference [ "Recruitment::JobApplicationMessage.count", "AuditEvent.count" ], 1 do
-      post message_recruitment_organization_job_post_application_path(@organization, @job, application), params: {
+      post message_company_job_post_application_path(@organization, @job, application), params: {
         recruitment_job_application_message: { body: "Please prepare a short portfolio example." }
       }
     end
 
-    assert_redirected_to recruitment_organization_job_post_application_path(@organization, @job, application)
+    assert_redirected_to company_job_post_application_path(@organization, @job, application)
     assert_predicate application.reload, :submitted?
     follow_redirect!
     assert_select "body", /Please prepare a short portfolio example\./

@@ -60,8 +60,8 @@
 
     <div class="mt-7 flex flex-wrap items-center gap-3">
       <%= form.submit t("recruitment.jobs.save"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white transition hover:bg-brand-dark" %>
-      <%= link_to t("recruitment.cancel"), recruitment_organization_job_post_path(organization, job_post), class: "px-2 text-13 font-semibold text-muted hover:text-ink" if job_post.persisted? %>
-      <%= link_to t("recruitment.cancel"), recruitment_organization_job_posts_path(organization), class: "px-2 text-13 font-semibold text-muted hover:text-ink" unless job_post.persisted? %>
+      <%= link_to t("recruitment.cancel"), company_job_post_path(organization, job_post), class: "px-2 text-13 font-semibold text-muted hover:text-ink" if job_post.persisted? %>
+      <%= link_to t("recruitment.cancel"), company_job_posts_path(organization), class: "px-2 text-13 font-semibold text-muted hover:text-ink" unless job_post.persisted? %>
     </div>
   <% end %>
 </section>

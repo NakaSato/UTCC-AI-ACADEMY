@@ -16,7 +16,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
   test "a decider reviews then approves, notifying the student with an audited decision" do
     sign_in_as users(:two)
 
-    get organization_internship_requests_path(@organization)
+    get company_internship_requests_path(@organization)
     assert_response :success
     assert_includes response.body, users(:student).name
     assert_includes response.body, "Your routing work"
@@ -30,7 +30,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
       post approve_internship_request_path(@internship_request)
     end
 
-    assert_redirected_to organization_internship_requests_path(@organization)
+    assert_redirected_to company_internship_requests_path(@organization)
     assert_predicate @internship_request.reload, :approved?
     assert_equal users(:two), @internship_request.decided_by
 
@@ -48,7 +48,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     post reject_internship_request_path(@internship_request), params: { decision_reason: "" }
-    assert_redirected_to organization_internship_requests_path(@organization)
+    assert_redirected_to company_internship_requests_path(@organization)
     assert_predicate @internship_request.reload, :submitted?
 
     post reject_internship_request_path(@internship_request), params: { decision_reason: "No capacity this term" }
@@ -56,7 +56,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "No capacity this term", @internship_request.decision_reason
 
     post approve_internship_request_path(@internship_request)
-    assert_redirected_to organization_internship_requests_path(@organization)
+    assert_redirected_to company_internship_requests_path(@organization)
     assert_predicate @internship_request.reload, :rejected?
   end
 
@@ -67,7 +67,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
     [ users(:instructor), users(:student), users(:admin) ].each do |user|
       sign_in_as user
 
-      get organization_internship_requests_path(@organization)
+      get company_internship_requests_path(@organization)
       assert_response :not_found, "#{user.name} must not read the request queue"
 
       post approve_internship_request_path(@internship_request)
@@ -83,7 +83,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
                                                      learning_goals: "Still private")
 
     sign_in_as users(:one)
-    get organization_internship_requests_path(@organization)
+    get company_internship_requests_path(@organization)
 
     assert_response :success
     assert_not_includes response.body, "Still private"
@@ -93,7 +93,7 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
 
   test "only the accountable roles may open or close the request channel" do
     sign_in_as users(:two)
-    patch organization_internship_request_settings_path(@organization),
+    patch company_internship_request_settings_path(@organization),
           params: { accepts_internship_requests: false }
     assert_response :not_found
     assert_predicate @organization.reload, :accepts_internship_requests?
@@ -102,10 +102,10 @@ class InternshipRequestDecisionsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     assert_difference "AuditEvent.count", 1 do
-      patch organization_internship_request_settings_path(@organization),
+      patch company_internship_request_settings_path(@organization),
             params: { accepts_internship_requests: false }
     end
-    assert_redirected_to organization_internship_requests_path(@organization)
+    assert_redirected_to company_internship_requests_path(@organization)
     assert_not @organization.reload.accepts_internship_requests?
 
     audit = AuditEvent.order(:id).last

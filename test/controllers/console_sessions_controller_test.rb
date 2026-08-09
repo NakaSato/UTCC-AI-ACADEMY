@@ -78,7 +78,7 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
   test "a company member lands on their organizations" do
     sign_in_to_console identifier: @recruiter.student_id
 
-    assert_redirected_to recruitment_organizations_url
+    assert_redirected_to companies_url
     assert cookies[:session_id].present?
   end
 
@@ -87,7 +87,7 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
   test "a company member signs in with their email address" do
     sign_in_to_console identifier: @recruiter.email_address.upcase
 
-    assert_redirected_to recruitment_organizations_url
+    assert_redirected_to companies_url
     assert cookies[:session_id].present?
   end
 
@@ -108,7 +108,7 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
 
     sign_in_to_console identifier: partner.username
 
-    assert_redirected_to recruitment_organizations_url
+    assert_redirected_to companies_url
     assert cookies[:session_id].present?
   end
 
@@ -163,12 +163,12 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
   # The stash `require_authentication` leaves behind still wins: a company member
   # sent to the front door comes back to the screen they asked for.
   test "a deep link survives the trip through the console" do
-    get recruitment_organization_path(@organization)
+    get company_path(@organization)
     assert_redirected_to root_path
 
     sign_in_to_console identifier: @recruiter.student_id
 
-    assert_redirected_to recruitment_organization_url(@organization)
+    assert_redirected_to company_url(@organization)
   end
 
   test "guessing at one console account is throttled across addresses" do

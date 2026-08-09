@@ -9,7 +9,7 @@ class Recruitment::ReportingControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "recruiter sees organization-scoped aggregate reporting" do
-    get reporting_recruitment_organization_path(@organization)
+    get reporting_company_path(@organization)
 
     assert_response :success
     assert_select "h1", text: I18n.t("recruitment.reporting.title")
@@ -25,7 +25,7 @@ class Recruitment::ReportingControllerTest < ActionDispatch::IntegrationTest
     CandidateProfile.create!(user: users(:student), application_data_reuse_consent: true)
     Recruitment::JobApplication.submit!(job_post: job, candidate: users(:student), statement: "Candidate secret statement")
 
-    get reporting_recruitment_organization_path(@organization)
+    get reporting_company_path(@organization)
 
     assert_response :success
     assert_no_match "Candidate secret statement", response.body
@@ -36,17 +36,17 @@ class Recruitment::ReportingControllerTest < ActionDispatch::IntegrationTest
   test "mentor and unrelated users cannot access reporting" do
     sign_out
     sign_in_as users(:student)
-    get reporting_recruitment_organization_path(@organization)
+    get reporting_company_path(@organization)
     assert_response :not_found
 
     sign_out
     sign_in_as users(:instructor)
-    get reporting_recruitment_organization_path(@organization)
+    get reporting_company_path(@organization)
     assert_response :not_found
   end
 
   test "reporting metadata follows the selected locale" do
-    get reporting_recruitment_organization_path(@organization, lang: "th")
+    get reporting_company_path(@organization, lang: "th")
 
     assert_response :success
     assert_select "main", /#{Regexp.escape(I18n.t("recruitment.reporting.source_label", locale: :th))}/

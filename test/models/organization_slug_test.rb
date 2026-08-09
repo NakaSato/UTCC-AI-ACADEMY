@@ -1,52 +1,41 @@
 require "test_helper"
 
-# A slug is a top-level URL: /northstar is that company's profile. The vanity
-# route is declared last so every real path wins, which makes a collision a
-# silently unreachable profile rather than a broken app — so the collision has
-# to be impossible instead.
+# The slug is the organization's name in every URL it appears in — the profile
+# at /company/north-star and the workspace routes behind it.
 class OrganizationSlugTest < ActiveSupport::TestCase
-  # Only the segments a valid slug could actually shadow. "robots.txt" and
-  # "sitemap.xml" carry characters the slug format already refuses.
-  def top_level_route_segments
-    Rails.application.routes.routes.filter_map do |route|
-      spec = route.path.spec.to_s
-      next if spec.start_with?("/rails")
-
-      segment = spec.split("/")[1].to_s.split("(").first.to_s
-      segment if segment.match?(Organization::SLUG_FORMAT)
-    end.uniq
-  end
-
-  # The list and the routes drift apart the moment someone adds a path, and the
-  # drift is invisible until a company cannot open its own page.
-  test "every top-level path a slug could shadow is reserved" do
-    unreserved = top_level_route_segments - Organization::RESERVED_SLUGS
-
-    assert_empty unreserved,
-                 "add these to Organization::RESERVED_SLUGS: #{unreserved.join(", ")}"
-  end
-
-  test "a reserved name is refused" do
-    Organization::RESERVED_SLUGS.first(5).each do |reserved|
-      organization = Organization.new(name: "Taken", slug: reserved, creator: users(:admin))
-
-      assert_not organization.valid?, "#{reserved.inspect} should be refused"
-      assert_predicate organization.errors[:slug], :any?
-    end
-  end
-
-  # A name that derives into a reserved slug has to be refused too, or the
-  # reservation only holds for whoever types the slug by hand.
-  test "a name that derives into a reserved slug is refused" do
-    organization = Organization.new(name: "Admin", creator: users(:admin))
-
-    assert_not organization.valid?
-    assert_predicate organization.errors[:slug], :any?
-  end
-
-  test "an ordinary name still derives an ordinary slug" do
+  test "an ordinary name derives an ordinary slug" do
     organization = Organization.create!(name: "North Star Technology", creator: users(:admin))
 
     assert_equal "north-star-technology", organization.slug
+  end
+
+  test "the slug is what a path helper writes, not the row id" do
+    organization = Organization.create!(name: "Path Co", creator: users(:admin))
+
+    assert_equal "path-co", organization.to_param
+    assert_equal organization, Organization.from_param!("path-co")
+  end
+
+  # The /company prefix is what makes this safe. A name that would have shadowed
+  # a real path at the root is just a company under it.
+  test "a name that matches a route is allowed under the prefix" do
+    %w[admin login map].each do |name|
+      organization = Organization.create!(name: name.capitalize, creator: users(:admin))
+
+      assert_equal name, organization.slug
+      assert_equal "/company/#{name}",
+                   Rails.application.routes.url_helpers.company_path(organization)
+    end
+  end
+
+  # A blank one is absent from the list on purpose: `derive_slug` fills it in
+  # from the name before validation, so blank is corrected rather than refused.
+  test "a slug still has to look like a slug" do
+    [ "Not A Slug", "trailing-", "under_score" ].each do |bad|
+      organization = Organization.new(name: "X", slug: bad, creator: users(:admin))
+
+      assert_not organization.valid?, "#{bad.inspect} should be rejected"
+      assert_predicate organization.errors[:slug], :any?
+    end
   end
 end

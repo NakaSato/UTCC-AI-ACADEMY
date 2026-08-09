@@ -44,7 +44,7 @@ class InternshipRequestWalkTest < ApplicationSystemTestCase
 
     sign_in_through_the_form(@decider)
 
-    visit organization_internship_requests_path(@organization)
+    visit company_internship_requests_path(@organization)
     assert_text @student.name
     assert_text "สนใจงานคลังสินค้าและการวางเส้นทางของบริษัท"
 

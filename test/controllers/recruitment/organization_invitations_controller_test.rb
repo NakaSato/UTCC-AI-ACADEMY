@@ -9,7 +9,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
 
   test "owner sends an in-app invitation and invitee accepts it" do
     assert_difference [ "OrganizationInvitation.count", "Notification.count", "AuditEvent.count" ], 1 do
-      post invitations_recruitment_organization_path(@organization), params: {
+      post invitations_company_path(@organization), params: {
         invitation: { user_id: users(:two).id, role: "recruiter" }
       }
     end
@@ -56,7 +56,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
     sign_out
     sign_in_as users(:two)
     assert_difference "OrganizationInvitation.count", 0 do
-      post invitations_recruitment_organization_path(@organization), params: {
+      post invitations_company_path(@organization), params: {
         invitation: { user_id: users(:student).id, role: "mentor" }
       }
     end
@@ -66,7 +66,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
     sign_in_as users(:two)
     post recruitment_decline_organization_invitation_path(invitation.token)
 
-    assert_redirected_to recruitment_organizations_path
+    assert_redirected_to companies_path
     assert invitation.reload.declined_at.present?
     assert_not @organization.member?(users(:two))
   end
@@ -76,7 +76,7 @@ class Recruitment::OrganizationInvitationsControllerTest < ActionDispatch::Integ
     sign_in_as users(:admin)
 
     assert_difference "OrganizationInvitation.count", 1 do
-      post invitations_recruitment_organization_path(@organization), params: {
+      post invitations_company_path(@organization), params: {
         invitation: { user_id: users(:student).id, role: "hiring_manager" }
       }
     end

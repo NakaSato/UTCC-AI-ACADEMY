@@ -30,7 +30,7 @@ class HomeController < ApplicationController
     def company_home
       organizations = Current.user.organizations.merge(Organization.active)
 
-      organizations.one? ? company_path(organizations.first) : recruitment_organizations_path
+      organizations.one? ? company_path(organizations.first) : companies_path
     end
     def render_catalog
       @filter = filter_param

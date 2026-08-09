@@ -65,13 +65,29 @@ Rails.application.routes.draw do
   get "notifications", to: "notifications#show", as: :notifications
   # The bell's "mark all read" — one write, back to where you were.
   post "notifications/read", to: "notifications#read_all", as: :read_notifications
-  namespace :recruitment do
-    resources :organizations, only: %i[index new create show] do
+  # A company's own screens live at /company/:slug — the profile and everything
+  # scoped to it. `path` and `as` are set because the code's name for the record
+  # is Organization and the URL's name for it is a company; the model keeps the
+  # general word, the address uses the one a visitor would.
+  #
+  # Declared outside `namespace :recruitment` and pointed back into it with
+  # `module:`, so the controllers stay where they are while the URL stops
+  # spelling out an internal namespace. `to_param` is the slug, so `:id` and
+  # `:organization_id` both carry the name — no controller reads an id here.
+  scope module: :recruitment do
+    resources :organizations, path: "company", as: :companies, only: %i[index new create show] do
       get :reporting, on: :member, to: "reporting#show"
       post :memberships, on: :member, to: "organizations#create_membership"
       delete "memberships/:user_id", on: :member, to: "organizations#revoke_membership",
              as: :membership
       post :invitations, on: :member, to: "organization_invitations#create"
+      # Two screens that belong to a company but not to the recruitment module —
+      # the leading slash is what keeps them out of it. They live here so a
+      # company has one namespace rather than one per feature that touches it.
+      resources :internship_requests, path: "internship-requests", only: :index,
+                controller: "/internship_request_decisions", as: :internship_requests
+      patch "internship-requests/settings", to: "/organization_internship_settings#update",
+            as: :internship_request_settings
       resources :job_posts, only: %i[index new create show edit update destroy] do
         post :submit, on: :member
         post :request_changes, on: :member
@@ -110,6 +126,12 @@ Rails.application.routes.draw do
         end
       end
     end
+  end
+
+  # The candidate's half of recruitment keeps its own prefix: these are screens
+  # about jobs and applications rather than about one company, and /recruitment
+  # is a section a student browses rather than an internal namespace leaking out.
+  namespace :recruitment do
     resources :jobs, only: %i[index show], controller: :job_posts
     resources :job_applications, only: %i[index show], path: "job-applications", controller: :job_applications
     post "jobs/:id/apply", to: "job_applications#create", as: :apply_job
@@ -218,12 +240,6 @@ Rails.application.routes.draw do
     post :submit, on: :member
     post :withdraw, on: :member
   end
-  resources :organizations, only: [], path: "companies" do
-    resources :internship_requests, path: "internship-requests", only: :index,
-              controller: "internship_request_decisions", as: :internship_requests
-    patch "internship-requests/settings", to: "organization_internship_settings#update",
-          as: :internship_request_settings
-  end
   post "internship-requests/:id/review", to: "internship_request_decisions#review", as: :review_internship_request
   post "internship-requests/:id/approve", to: "internship_request_decisions#approve", as: :approve_internship_request
   post "internship-requests/:id/reject", to: "internship_request_decisions#reject", as: :reject_internship_request
@@ -287,17 +303,4 @@ Rails.application.routes.draw do
   # The catalog for signed-in students, /admin for an admin, the public landing
   # page for everyone else.
   root "home#index"
-
-  # A company's profile is /northstar, not /recruitment/organizations/7 — the
-  # address a company would put on a page about itself. It is deliberately the
-  # LAST route in the file: every real path above wins, whatever an organization
-  # is called. Organization::RESERVED_SLUGS is the other half of that guarantee,
-  # so an organization can never be named something it could not be reached at,
-  # and `organization_slug_test.rb` proves the two lists agree.
-  #
-  # Only the profile moves. The workspace behind it — job posts, programs,
-  # applications, reporting — stays nested under /recruitment/organizations/:id,
-  # where being scoped to an organization is the point of the URL.
-  get "/:slug", to: "recruitment/organizations#show", as: :company,
-      constraints: { slug: /[a-z0-9]+(?:-[a-z0-9]+)*/ }
 end

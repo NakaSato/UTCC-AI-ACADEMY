@@ -1,7 +1,7 @@
 module Recruitment
   class JobApplicationsController < ApplicationController
     def index
-      if params[:organization_id]
+      if params[:company_id]
         load_reviewable_job
         @applications = @job_post.applications.includes(:candidate, :events).newest_first
         @organization_view = true
@@ -13,7 +13,7 @@ module Recruitment
     end
 
     def show
-      if params[:organization_id]
+      if params[:company_id]
         load_reviewable_job
         @application = @job_post.applications.includes(:candidate, :events, :messages).find(params[:id])
         @assistant = Recruitment::JobApplicationAssistant.call(application: @application, viewer: Current.user)
@@ -61,19 +61,19 @@ module Recruitment
                         job: @job_post.title, application: @application.id,
                         from_status: @application.events.order(:id).last.from_status,
                         to_status: @application.status)
-      redirect_to recruitment_organization_job_post_application_path(@organization, @job_post, @application),
+      redirect_to company_job_post_application_path(@organization, @job_post, @application),
                   notice: t("flash.recruitment_job_application_transitioned")
     rescue ActiveRecord::RecordInvalid, ActiveRecord::StaleObjectError
-      redirect_to recruitment_organization_job_post_application_path(@organization, @job_post, @application || params[:id]),
+      redirect_to company_job_post_application_path(@organization, @job_post, @application || params[:id]),
                   alert: t("flash.recruitment_job_application_transition_unavailable")
     end
 
     def message
       redirect_path = nil
-      if params[:organization_id]
+      if params[:company_id]
         load_reviewable_job
         @application = @job_post.applications.find(params[:id])
-        redirect_path = recruitment_organization_job_post_application_path(@organization, @job_post, @application)
+        redirect_path = company_job_post_application_path(@organization, @job_post, @application)
       else
         require_student
         @application = Current.user.job_applications.includes(:job_post).find(params[:id])
@@ -105,7 +105,7 @@ module Recruitment
       end
 
       def load_reviewable_job
-        @organization = Organization.active.from_param!(params[:organization_id])
+        @organization = Organization.active.from_param!(params[:company_id])
         permitted = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                     role: Recruitment::JobApplication::REVIEWER_ROLES)
         raise ActiveRecord::RecordNotFound unless permitted

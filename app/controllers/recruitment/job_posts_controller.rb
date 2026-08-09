@@ -1,7 +1,7 @@
 module Recruitment
   class JobPostsController < ApplicationController
     def index
-      if params[:organization_id]
+      if params[:company_id]
         @organization = readable_organization
         @job_posts = @organization.job_posts.order(updated_at: :desc, id: :desc)
         @public = false
@@ -35,14 +35,14 @@ module Recruitment
       @job_post.save!
       AuditEvent.record("recruitment_job_post_created", organization: @organization.name,
                         job: @job_post.title.presence || t("recruitment.jobs.untitled"))
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   notice: t("flash.recruitment_job_created")
     rescue ActiveRecord::RecordInvalid
       render :new, status: :unprocessable_entity
     end
 
     def show
-      if params[:organization_id]
+      if params[:company_id]
         @organization = readable_organization
         @job_post = @organization.job_posts.find(params[:id])
         @public = false
@@ -72,7 +72,7 @@ module Recruitment
       @job_post.save!
       AuditEvent.record("recruitment_job_post_updated", organization: @organization.name,
                         job: @job_post.title.presence || t("recruitment.jobs.untitled"))
-      redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      redirect_to company_job_post_path(@organization, @job_post),
                   notice: t("flash.recruitment_job_saved")
     rescue ActiveRecord::StaleObjectError
       @job_post = @organization.job_posts.find(@job_post.id)
@@ -85,13 +85,13 @@ module Recruitment
     def destroy
       @organization = authorizing_organization(Recruitment::JobPost::APPROVER_ROLES)
       @job_post = @organization.job_posts.find(params[:id])
-      return redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+      return redirect_to company_job_post_path(@organization, @job_post),
                          alert: t("flash.recruitment_job_delete_forbidden") unless @job_post.draft?
 
       title = @job_post.title.presence || t("recruitment.jobs.untitled")
       @job_post.destroy!
       AuditEvent.record("recruitment_job_post_deleted", organization: @organization.name, job: title)
-      redirect_to recruitment_organization_job_posts_path(@organization),
+      redirect_to company_job_posts_path(@organization),
                   notice: t("flash.recruitment_job_deleted")
     end
 
@@ -129,7 +129,7 @@ module Recruitment
       end
 
       def readable_organization
-        organization = Organization.active.from_param!(params[:organization_id])
+        organization = Organization.active.from_param!(params[:company_id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id)
 
@@ -141,7 +141,7 @@ module Recruitment
       end
 
       def authorizing_organization(roles)
-        organization = Organization.active.from_param!(params[:organization_id])
+        organization = Organization.active.from_param!(params[:company_id])
         return organization if Current.user.admin?
         return organization if organization.memberships.active.exists?(user_id: Current.user.id, role: roles)
 
@@ -153,7 +153,7 @@ module Recruitment
         @job_post = @organization.job_posts.find(params[:id])
         return true if @job_post.editable?
 
-        redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+        redirect_to company_job_post_path(@organization, @job_post),
                     alert: t("flash.recruitment_job_not_editable")
         false
       end
@@ -181,10 +181,10 @@ module Recruitment
         AuditEvent.record("recruitment_job_post_#{audit_suffix}", organization: @organization.name,
                           job: @job_post.title.presence || t("recruitment.jobs.untitled"),
                           from_status: previous_status, to_status: @job_post.status)
-        redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+        redirect_to company_job_post_path(@organization, @job_post),
                     notice: t("flash.recruitment_job_#{audit_suffix}")
       rescue ActiveRecord::RecordInvalid
-        redirect_to recruitment_organization_job_post_path(@organization, @job_post),
+        redirect_to company_job_post_path(@organization, @job_post),
                     alert: t("flash.recruitment_job_transition_forbidden")
       end
   end

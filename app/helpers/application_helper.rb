@@ -62,7 +62,7 @@ module ApplicationHelper
     [
       [ t("chrome.nav.admin"),         admin_path ],
       [ t("chrome.nav.instructor"),    instructor_path ],
-      [ t("chrome.nav.organizations"), recruitment_organizations_path ]
+      [ t("chrome.nav.organizations"), companies_path ]
     ]
   end
 
@@ -80,7 +80,7 @@ module ApplicationHelper
   # they run, and the students they have placed. None of it is coursework.
   def company_nav_items
     [
-      [ t("chrome.nav.organizations"),  recruitment_organizations_path ],
+      [ t("chrome.nav.organizations"),  companies_path ],
       [ t("chrome.nav.business_cases"), business_cases_path ],
       [ t("chrome.nav.placements"),     internship_placements_path ]
     ]

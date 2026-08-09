@@ -60,7 +60,7 @@ class Notification < ApplicationRecord
       # `organization_id` is what rows written before organizations were
       # addressed by name carry; resolving it keeps those links working.
       slug = params["organization_slug"] || Organization.find_by(id: params["organization_id"])&.slug
-      Rails.application.routes.url_helpers.organization_internship_requests_path(slug) if slug
+      Rails.application.routes.url_helpers.company_internship_requests_path(slug) if slug
     when "internship_request_decided"
       Rails.application.routes.url_helpers.internship_request_path(params.fetch("id"))
     when "internship_placement_updated", "internship_progress_report_acknowledged"

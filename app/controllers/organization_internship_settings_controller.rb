@@ -9,13 +9,13 @@ class OrganizationInternshipSettingsController < ApplicationController
     AuditEvent.record(accepting ? "internship_requests_opened" : "internship_requests_closed",
                       organization: organization.name)
 
-    redirect_to organization_internship_requests_path(organization),
+    redirect_to company_internship_requests_path(organization),
                 notice: t(accepting ? "flash.internship_requests_opened" : "flash.internship_requests_closed")
   end
 
   private
     def manageable_organization
-      organization = Organization.active.from_param!(params[:organization_id])
+      organization = Organization.active.from_param!(params[:company_id])
       raise ActiveRecord::RecordNotFound unless organization.memberships.active
                                                             .exists?(user_id: Current.user.id,
                                                                      role: InternshipRequest::SETTING_ROLES)

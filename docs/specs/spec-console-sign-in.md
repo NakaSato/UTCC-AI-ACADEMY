@@ -123,7 +123,7 @@ test only, all with the password `utcc2026`:
 | --- | --- | --- |
 | Instructor | `wichai` or `wichai@utcc.ac.th` | `/instructor` |
 | Administrator | `utcc-admin` or `admin@utcc.ac.th` | `/admin` |
-| Company owner | `northstar` or `recruiter@northstar.co.th` | `/recruitment/organizations` |
+| Company owner | `northstar` or `recruiter@northstar.co.th` | their company at `/company/:slug` |
 
 None of the three has a student ID — see SPEC-0043. The company account carries
 no role either: its reach is an active `owner` membership of the seeded

@@ -39,7 +39,7 @@ class InternshipRequestsControllerTest < ActionDispatch::IntegrationTest
 
     notification = users(:one).notifications.order(:id).last
     assert_equal "internship_request_received", notification.kind
-    assert_equal organization_internship_requests_path(@organization), notification.action_path
+    assert_equal company_internship_requests_path(@organization), notification.action_path
     assert_not notification.params.value?("Your routing work, specifically upcountry"),
       "a notification must not copy the request text"
 

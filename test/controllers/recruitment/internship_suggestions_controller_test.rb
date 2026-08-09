@@ -18,30 +18,30 @@ class Recruitment::InternshipSuggestionsControllerTest < ActionDispatch::Integra
   test "a recruiter generates, edits, and accepts a program suggestion" do
     assert_difference "Recruitment::InternshipProgramSuggestion.count", 5 do
       assert_difference "AuditEvent.count", 1 do
-        post suggestions_recruitment_organization_internship_program_path(@organization, @program)
+        post suggestions_company_internship_program_path(@organization, @program)
       end
     end
 
     suggestion = @program.suggestions.find_by!(kind: "description")
-    patch recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion), params: {
+    patch company_internship_program_suggestion_path(@organization, @program, suggestion), params: {
       recruitment_internship_program_suggestion: { content: "Human-reviewed description" }
     }
     assert_equal "edited", suggestion.reload.status
 
-    post accept_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion)
+    post accept_company_internship_program_suggestion_path(@organization, @program, suggestion)
     assert_equal "Human-reviewed description", @program.reload.description
     assert_predicate @program, :draft?
   end
 
   test "rejection and regeneration preserve the old decision" do
-    post suggestions_recruitment_organization_internship_program_path(@organization, @program)
+    post suggestions_company_internship_program_path(@organization, @program)
     suggestion = @program.suggestions.find_by!(kind: "learning_roadmap")
 
-    post reject_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion)
+    post reject_company_internship_program_suggestion_path(@organization, @program, suggestion)
     assert_equal "rejected", suggestion.reload.status
 
     assert_difference "Recruitment::InternshipProgramSuggestion.count", 1 do
-      post regenerate_recruitment_organization_internship_program_suggestion_path(@organization, @program, suggestion)
+      post regenerate_company_internship_program_suggestion_path(@organization, @program, suggestion)
     end
 
     assert_predicate @program.suggestions.find_by!(kind: "learning_roadmap", status: "pending"), :actionable?
@@ -52,7 +52,7 @@ class Recruitment::InternshipSuggestionsControllerTest < ActionDispatch::Integra
     sign_out
     sign_in_as users(:student)
 
-    post suggestions_recruitment_organization_internship_program_path(@organization, @program)
+    post suggestions_company_internship_program_path(@organization, @program)
 
     assert_response :not_found
   end

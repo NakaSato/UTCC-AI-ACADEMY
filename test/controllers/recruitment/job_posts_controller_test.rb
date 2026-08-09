@@ -31,21 +31,21 @@ class Recruitment::JobPostsControllerTest < ActionDispatch::IntegrationTest
 
   test "recruiter creates and updates an organization-scoped draft" do
     assert_difference [ "Recruitment::JobPost.count", "AuditEvent.count" ], 1 do
-      post recruitment_organization_job_posts_path(@organization), params: job_params
+      post company_job_posts_path(@organization), params: job_params
     end
 
     job = @organization.job_posts.order(:id).last
-    assert_redirected_to recruitment_organization_job_post_path(@organization, job)
+    assert_redirected_to company_job_post_path(@organization, job)
     assert_predicate job, :draft?
     assert_equal users(:two), job.creator
 
-    patch recruitment_organization_job_post_path(@organization, job), params: {
+    patch company_job_post_path(@organization, job), params: {
       recruitment_job_post: job_params[:recruitment_job_post].merge(
         title: "Senior AI Product Analyst", lock_version: job.lock_version
       )
     }
 
-    assert_redirected_to recruitment_organization_job_post_path(@organization, job)
+    assert_redirected_to company_job_post_path(@organization, job)
     assert_equal "Senior AI Product Analyst", job.reload.title
   end
 
@@ -53,45 +53,45 @@ class Recruitment::JobPostsControllerTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as users(:student)
     assert_no_difference "Recruitment::JobPost.count" do
-      post recruitment_organization_job_posts_path(@organization), params: job_params
+      post company_job_posts_path(@organization), params: job_params
     end
     assert_response :not_found
 
     sign_out
     sign_in_as users(:instructor)
-    get recruitment_organization_job_posts_path(@organization)
+    get company_job_posts_path(@organization)
     assert_response :not_found
   end
 
   test "recruiter submits for review and owner publishes" do
-    post recruitment_organization_job_posts_path(@organization), params: job_params
+    post company_job_posts_path(@organization), params: job_params
     job = @organization.job_posts.order(:id).last
 
     assert_difference "AuditEvent.count", 1 do
-      post submit_recruitment_organization_job_post_path(@organization, job)
+      post submit_company_job_post_path(@organization, job)
     end
     assert_predicate job.reload, :review?
 
-    post publish_recruitment_organization_job_post_path(@organization, job)
+    post publish_company_job_post_path(@organization, job)
     assert_response :not_found
     assert_predicate job.reload, :review?
 
     sign_out
     sign_in_as users(:one)
     assert_difference "AuditEvent.count", 1 do
-      post publish_recruitment_organization_job_post_path(@organization, job)
+      post publish_company_job_post_path(@organization, job)
     end
-    assert_redirected_to recruitment_organization_job_post_path(@organization, job)
+    assert_redirected_to company_job_post_path(@organization, job)
     assert_predicate job.reload, :published?
   end
 
   test "published jobs are visible to candidates but drafts and expired jobs are hidden" do
-    post recruitment_organization_job_posts_path(@organization), params: job_params
+    post company_job_posts_path(@organization), params: job_params
     draft = @organization.job_posts.order(:id).last
-    post submit_recruitment_organization_job_post_path(@organization, draft)
+    post submit_company_job_post_path(@organization, draft)
     sign_out
     sign_in_as users(:one)
-    post publish_recruitment_organization_job_post_path(@organization, draft)
+    post publish_company_job_post_path(@organization, draft)
 
     expired = @organization.job_posts.create!(
       creator: users(:two), title: "Expired", summary: "Old", description: "Old details",
@@ -113,22 +113,22 @@ class Recruitment::JobPostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "owner can pause, close, archive, and delete drafts" do
-    post recruitment_organization_job_posts_path(@organization), params: job_params
+    post company_job_posts_path(@organization), params: job_params
     job = @organization.job_posts.order(:id).last
-    post submit_recruitment_organization_job_post_path(@organization, job)
+    post submit_company_job_post_path(@organization, job)
 
     sign_out
     sign_in_as users(:one)
-    post publish_recruitment_organization_job_post_path(@organization, job)
-    post pause_recruitment_organization_job_post_path(@organization, job)
+    post publish_company_job_post_path(@organization, job)
+    post pause_company_job_post_path(@organization, job)
     assert_predicate job.reload, :paused?
-    post close_recruitment_organization_job_post_path(@organization, job)
-    post archive_recruitment_organization_job_post_path(@organization, job)
+    post close_company_job_post_path(@organization, job)
+    post archive_company_job_post_path(@organization, job)
     assert_predicate job.reload, :archived?
 
     draft = @organization.job_posts.create!(creator: users(:one))
     assert_difference "Recruitment::JobPost.count", -1 do
-      delete recruitment_organization_job_post_path(@organization, draft)
+      delete company_job_post_path(@organization, draft)
     end
   end
 end

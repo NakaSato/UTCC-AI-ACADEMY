@@ -27,23 +27,10 @@ class Organization < ApplicationRecord
                    format: { with: SLUG_FORMAT },
                    length: { maximum: 80 }
   validates :status, inclusion: { in: STATUSES }
-  # The slug is a top-level URL — /northstar is this organization's profile — so
-  # a slug that collides with a real path is a profile nobody can open. The
-  # route is declared last and every path above wins, which is what makes the
-  # collision silent rather than loud; this is what makes it impossible.
-  #
-  # Only names a *valid* slug could shadow: "robots.txt" and "sitemap.xml" carry
-  # characters the format above already refuses. Kept in step with the routes by
-  # test/models/organization_slug_test.rb.
-  RESERVED_SLUGS = %w[
-    academic academic-post-invitations admin business-case-invitations business-cases cable
-    companies console contributors courses forgot-password instructor internship-requests
-    internships language leaderboard lesson login logout map my-learning notifications
-    passwords privacy profile progress proposal-requests recruitment register registration
-    reset-password session terms up
-  ].freeze
-
-  validates :slug, exclusion: { in: RESERVED_SLUGS }
+  # No reserved-name list: the profile lives under /company/:slug, so a company
+  # called "admin" is reachable at /company/admin and shadows nothing. A list
+  # here would have to name every top-level route and be re-checked whenever one
+  # was added — a standing tax for a collision the prefix already prevents.
 
   scope :active, -> { where(status: "active") }
   scope :accepting_internship_requests, -> { active.where(accepts_internship_requests: true) }

@@ -31,7 +31,7 @@ class InternshipRequestDecisionsController < ApplicationController
 
   private
     def decidable_organization
-      organization = Organization.active.from_param!(params[:organization_id])
+      organization = Organization.active.from_param!(params[:company_id])
       raise ActiveRecord::RecordNotFound unless organization.memberships.active
                                                             .exists?(user_id: Current.user.id,
                                                                      role: InternshipRequest::DECIDER_ROLES)
@@ -57,9 +57,9 @@ class InternshipRequestDecisionsController < ApplicationController
                         student: internship_request.student.name)
       notify_student(internship_request) if internship_request.decided?
 
-      redirect_to organization_internship_requests_path(internship_request.organization), notice:
+      redirect_to company_internship_requests_path(internship_request.organization), notice:
     rescue ActiveRecord::RecordInvalid
-      redirect_to organization_internship_requests_path(internship_request.organization),
+      redirect_to company_internship_requests_path(internship_request.organization),
                   alert: t("flash.internship_request_decision_unavailable")
     end
 

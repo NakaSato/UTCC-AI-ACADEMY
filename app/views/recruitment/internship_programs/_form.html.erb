@@ -44,6 +44,6 @@
 
   <div class="flex flex-wrap gap-3">
     <%= form.submit t("recruitment.internships.save"), class: "rounded-full bg-brand px-5 py-3 text-13 font-semibold text-white hover:bg-brand-dark" %>
-    <%= link_to t("recruitment.internships.cancel"), @program.persisted? ? recruitment_organization_internship_program_path(@organization, @program) : recruitment_organization_internship_programs_path(@organization), class: "rounded-full border border-hairline px-5 py-3 text-13 font-semibold text-brand hover:border-brand" %>
+    <%= link_to t("recruitment.internships.cancel"), @program.persisted? ? company_internship_program_path(@organization, @program) : company_internship_programs_path(@organization), class: "rounded-full border border-hairline px-5 py-3 text-13 font-semibold text-brand hover:border-brand" %>
   </div>
 <% end %>

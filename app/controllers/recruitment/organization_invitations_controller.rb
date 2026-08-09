@@ -51,10 +51,10 @@ module Recruitment
       invitation.decline!
       AuditEvent.record("recruitment_invitation_declined", organization: invitation.organization.name,
                         member: Current.user.name, role: invitation.role)
-      redirect_to recruitment_organizations_path,
+      redirect_to companies_path,
                   notice: t("flash.recruitment_invitation_declined")
     rescue ActiveRecord::RecordInvalid
-      redirect_to recruitment_organizations_path,
+      redirect_to companies_path,
                   alert: t("flash.recruitment_invitation_unavailable")
     end
 

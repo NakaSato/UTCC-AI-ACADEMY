@@ -61,6 +61,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     def company_home_path(user)
       organizations = user.organizations.merge(Organization.active)
 
-      organizations.one? ? company_path(organizations.first) : recruitment_organizations_path
+      organizations.one? ? company_path(organizations.first) : companies_path
     end
 end

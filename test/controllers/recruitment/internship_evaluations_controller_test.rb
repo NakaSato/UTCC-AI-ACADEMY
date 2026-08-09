@@ -20,7 +20,7 @@ class Recruitment::InternshipEvaluationsControllerTest < ActionDispatch::Integra
 
   test "the assigned mentor submits a structured evaluation" do
     assert_difference [ "Recruitment::InternshipEvaluation.count", "AuditEvent.count" ], 1 do
-      post recruitment_organization_internship_program_application_evaluation_path(@organization, @program, @application), params: {
+      post company_internship_program_application_evaluation_path(@organization, @program, @application), params: {
         recruitment_internship_evaluation: {
           rating: 4, learning_outcomes_met: "true", feedback: "Good evidence.", next_steps: "Keep practicing."
         }
@@ -28,7 +28,7 @@ class Recruitment::InternshipEvaluationsControllerTest < ActionDispatch::Integra
     end
 
     evaluation = @application.reload.evaluation
-    assert_redirected_to recruitment_organization_internship_program_path(@organization, @program)
+    assert_redirected_to company_internship_program_path(@organization, @program)
     assert_predicate evaluation, :submitted?
   end
 
@@ -38,7 +38,7 @@ class Recruitment::InternshipEvaluationsControllerTest < ActionDispatch::Integra
     sign_out
     sign_in_as other_mentor
 
-    post recruitment_organization_internship_program_application_evaluation_path(@organization, @program, @application), params: {
+    post company_internship_program_application_evaluation_path(@organization, @program, @application), params: {
       recruitment_internship_evaluation: {
         rating: 4, learning_outcomes_met: "true", feedback: "No.", next_steps: "No."
       }
