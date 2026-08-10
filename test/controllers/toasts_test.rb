@@ -72,10 +72,42 @@ class ToastsTest < ActionDispatch::IntegrationTest
     assert_select "[data-code-task-target=console]"
   end
 
+  # Urgency is a screen-reader concern, not a styling one: an error interrupts
+  # and a confirmation waits its turn. Two regions is how that is said, and the
+  # controller files a row into one of them by kind, so both have to be here.
+  test "the host carries a polite and an assertive region" do
+    get root_path
+
+    assert_select "#toasts [data-toast-target=list][data-urgency=polite][aria-live=polite][role=status]", 1
+    assert_select "#toasts [data-toast-target=list][data-urgency=assertive][aria-live=assertive][role=alert]", 1
+  end
+
+  # Everything below is read out of the DOM by name at runtime, so a renamed
+  # slot breaks a toast silently with nothing failing server-side.
+  test "the row template carries every slot a caller can fill" do
+    get root_path
+
+    %w[title message action close].each do |slot|
+      assert_select "template[data-toast-target=row]", html: /data-slot="#{slot}"/,
+                    count: 1, message: "the row template has no #{slot} slot"
+    end
+  end
+
+  test "the row can be dismissed by the person reading it, in their language" do
+    get root_path
+
+    assert_select "template[data-toast-target=row]",
+                  html: /#{Regexp.escape(I18n.t("chrome.toast_dismiss", locale: :th))}/
+  end
+
   private
     def assert_toast_host
-      assert_select "[data-controller=toast][data-action='toast:show@window->toast#show']", 1
-      assert_select "[data-controller=toast] [data-toast-target=list]", 1
+      # The id is what `turbo_stream.toast` names as its target — see
+      # test/helpers/toast_stream_test.rb for the tag that names it. The anchor
+      # is what tells the controller whether there is a header to clear.
+      assert_select "#toasts[data-controller=toast][data-toast-anchor-value=top]" \
+                    "[data-action='toast:show@window->toast#show']", 1
+      assert_select "[data-controller=toast] [data-toast-target=list]", 2
       assert_select "[data-controller=toast] template[data-toast-target=row]", 1
     end
 end

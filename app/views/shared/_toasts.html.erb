@@ -1,44 +1,117 @@
 <%# Transient feedback for something that happened without a page load — a copy
-    that succeeded, a tab that opened. `shared/_flashes` covers the other half:
-    a message that has to survive a redirect.
+    that succeeded, a bell that was cleared. `shared/_flashes` covers the other
+    half: a message that has to survive a redirect. Neither is a fallback for
+    the other.
 
     Any Stimulus controller raises one with
 
       this.dispatch("show", { prefix: "toast", detail: { message:, kind: } })
 
-    and the one action below routes every `toast:show` here, so a new caller
-    needs no wiring in this file. `kind` is "info" (the default), "success" or
-    "error".
+    and a controller action answering a Turbo request raises one with
+
+      render turbo_stream: turbo_stream.toast(t("..."), kind: :success)
+
+    The one action below routes every `toast:show` here, and the stream action
+    in app/javascript/toast_stream.js raises exactly that event rather than
+    writing a row of its own, so both callers share this template, this timer
+    and this dismissal. A new caller needs no wiring in this file.
+
+    The detail a caller may send:
+
+      message   the sentence. Required; anything else raises nothing.
+      kind      "info" (default), "success", "warning" or "error".
+      title     an optional bold line above the message.
+      duration  milliseconds before it leaves. 0 keeps it until dismissed.
+      action    { label:, href:, method: } — one link out, e.g. an undo.
 
     The row is a <template> cloned per message rather than markup built in JS,
     the same shape as the proctor log's row. %>
+
+<%# Where the stack sits. One of six, passed by the layout; the classes are
+    written out per position rather than composed, because a class Tailwind
+    cannot see as a literal is a class it does not build.
+
+    `--toast-enter` is the offset a row animates in from, and it lives here
+    rather than on the row so that a bottom-anchored stack rises into place
+    instead of dropping into it. The row reads it as its own start state, which
+    keeps the whole animation to two rules and out of reach of variant
+    ordering. %>
+<% anchor, offset, place = {
+     top_right:     [ "top", "-0.375rem", "top-(--toast-top) right-4 left-4 sm:left-auto" ],
+     top_left:      [ "top", "-0.375rem", "top-(--toast-top) right-4 left-4 sm:right-auto" ],
+     top_center:    [ "top", "-0.375rem", "top-(--toast-top) right-4 left-4 sm:right-auto sm:left-1/2 sm:-translate-x-1/2" ],
+     bottom_right:  [ "bottom", "0.375rem", "right-4 bottom-4 left-4 sm:left-auto" ],
+     bottom_left:   [ "bottom", "0.375rem", "right-4 bottom-4 left-4 sm:right-auto" ],
+     bottom_center: [ "bottom", "0.375rem", "right-4 bottom-4 left-4 sm:right-auto sm:left-1/2 sm:-translate-x-1/2" ]
+   }.fetch(local_assigns.fetch(:position, :top_right)) %>
+
 <%# Below the sticky chrome, not over it: at top-4 a toast covered the header's
-    language toggle and account menu for as long as it was up. The value here
+    language toggle and account menu for as long as it was up. `--toast-top`
     clears the marketing header — the same "header plus a gap" the base layer
     uses for scroll-padding-top — and the controller raises it to the measured
     height on a layout whose header is taller, which the app one is because the
-    hearts strip sits inside it. %>
-<div data-controller="toast" data-action="toast:show@window->toast#show"
-     class="pointer-events-none fixed top-[calc(var(--spacing-header)+var(--spacing)*3)] right-4 left-4 z-50
-            sm:left-auto sm:w-[380px]">
-  <%# aria-live on the list rather than the row: the row does not exist yet when
-      the screen reader starts watching, and announcing needs a stable host. %>
-  <div data-toast-target="list" role="status" aria-live="polite"
+    hearts strip sits inside it. A bottom-anchored stack has nothing to clear. %>
+<div id="toasts"
+     style="--toast-top: calc(var(--spacing-header) + var(--spacing) * 3); --toast-enter: <%= offset %>"
+     data-controller="toast"
+     data-toast-anchor-value="<%= anchor %>"
+     data-action="toast:show@window->toast#show"
+     class="pointer-events-none fixed z-50 sm:w-[380px] <%= place %>">
+  <%# Two regions, because urgency is not a style. A screen reader interrupts
+      for `assertive` and waits for `polite`, and "saved" should never interrupt
+      anything. The controller files a row into the one its kind belongs to.
+
+      aria-live on the region rather than the row: the row does not exist yet
+      when the screen reader starts watching, and announcing needs a stable
+      host. %>
+  <div data-toast-target="list" data-urgency="polite" role="status" aria-live="polite"
        class="flex flex-col gap-2"></div>
+  <div data-toast-target="list" data-urgency="assertive" role="alert" aria-live="assertive"
+       class="flex flex-col gap-2 empty:hidden [&:not(:empty)]:mt-2"></div>
 
   <template data-toast-target="row">
+    <%# pointer-events back on for the row only: the host spans the viewport so
+        it can position the stack, and must not eat clicks meant for the page. %>
     <div data-kind="info" data-visible="false"
-         class="group flex items-start gap-2.5 -translate-y-1.5 rounded-field border border-chrome-line
-                bg-chrome px-3.5 py-2.75 text-13-5 leading-[1.5] text-on-chrome-bright opacity-0
-                shadow-menu-dark transition-[opacity,transform] duration-200
+         data-action="mouseenter->toast#hold mouseleave->toast#release
+                      focusin->toast#hold focusout->toast#release"
+         class="group pointer-events-auto flex items-start gap-2.5 translate-y-(--toast-enter)
+                rounded-field border border-l-2 border-chrome-line bg-chrome px-3.5 py-2.75
+                text-13-5 leading-[1.5] text-on-chrome-bright opacity-0 shadow-menu-dark
+                transition-[opacity,transform] duration-200
+                data-[kind=success]:border-l-success data-[kind=warning]:border-l-gold
+                data-[kind=error]:border-l-brand-alert
                 data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100">
-      <%# One glyph per kind, shown by the variant rather than swapped in JS. %>
+      <%# One glyph per kind, shown by the variant rather than swapped in JS.
+          Info has none: it is the default, and a mark for "nothing special
+          happened" is noise. %>
       <span aria-hidden="true"
             class="hidden font-semibold text-success group-data-[kind=success]:inline">✓</span>
       <span aria-hidden="true"
+            class="hidden font-semibold text-gold group-data-[kind=warning]:inline">!</span>
+      <span aria-hidden="true"
             class="hidden font-semibold text-danger-bright group-data-[kind=error]:inline">✕</span>
 
-      <span data-slot="message" class="text-balance"></span>
+      <div class="min-w-0 flex-1">
+        <p data-slot="title" hidden class="mb-0.5 font-semibold text-balance"></p>
+        <p data-slot="message" class="text-balance"></p>
+
+        <%# One way out of a toast and no more. The href and the method come from
+            the caller; Turbo turns a non-GET into a real request. %>
+        <a data-slot="action" hidden
+           class="mt-1.5 inline-block font-medium text-danger-soft underline underline-offset-2
+                  transition-colors hover:text-on-chrome-bright"></a>
+      </div>
+
+      <%# Always there, not only on a sticky toast: a message that is still being
+          read should be dismissable by the person reading it. %>
+      <button type="button" data-action="toast#close" data-slot="close"
+              class="-mr-1 flex-none rounded px-1 leading-none text-on-chrome-muted
+                     transition-colors hover:text-on-chrome-bright
+                     focus-visible:ring-1 focus-visible:ring-chrome-edge focus-visible:outline-none">
+        <span aria-hidden="true">✕</span>
+        <span class="sr-only"><%= t("chrome.toast_dismiss") %></span>
+      </button>
     </div>
   </template>
 </div>

@@ -74,6 +74,32 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_equal 1, Notification.count
   end
 
+  # Clearing a dropdown is not a navigation. A browser with Turbo gets the bell
+  # back and a toast; the redirect is what is left for one without it.
+  test "mark-all-read answers a Turbo request with a redrawn bell and a toast" do
+    sign_in_as users(:admin)
+    post admin_enrol_url(sections(:ba_2)), params: { student_id: users(:two).student_id }
+
+    sign_in_as users(:two)
+    post read_notifications_url, as: :turbo_stream
+
+    assert_response :success
+    assert_equal 0, users(:two).notifications.unread.count
+    assert_select "turbo-stream[action=replace][target=?]", NotificationBell::ID
+    assert_select "turbo-stream[action=toast][kind=success][target=toasts] template",
+                  text: I18n.t("flash.notifications_read", locale: :th)
+  end
+
+  test "mark-all-read still redirects a browser that cannot take a stream" do
+    sign_in_as users(:admin)
+    post admin_enrol_url(sections(:ba_2)), params: { student_id: users(:two).student_id }
+
+    sign_in_as users(:two)
+    post read_notifications_url, headers: { "Referer" => progress_url }
+
+    assert_redirected_to progress_url
+  end
+
   test "an empty bell says so instead of showing nothing" do
     sign_in_as users(:one)
     get root_url

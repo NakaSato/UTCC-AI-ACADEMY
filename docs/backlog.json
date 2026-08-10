@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T21:05:00+07:00",
+  "updated_at": "2026-08-09T22:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2180,6 +2180,52 @@
         }
       ],
       "updated_at": "2026-08-09T21:05:00+07:00"
+    },
+    {
+      "id": "UX-003",
+      "title": "Toast notifications: kinds, positions, actions, and a server-side raiser",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Product Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-002"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Toast notifications specification",
+          "url": "specs/spec-toast-notifications.html"
+        },
+        {
+          "label": "Server-raised toasts ADR",
+          "url": "decisions/adr-0046-server-raised-toasts.html"
+        }
+      ],
+      "updated_at": "2026-08-09T22:30:00+07:00"
+    },
+    {
+      "id": "UX-004",
+      "title": "Clear the notification bell without navigating the whole page",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Product Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-003"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Toast notifications specification",
+          "url": "specs/spec-toast-notifications.html"
+        },
+        {
+          "label": "Server-raised toasts ADR",
+          "url": "decisions/adr-0046-server-raised-toasts.html"
+        }
+      ],
+      "updated_at": "2026-08-09T22:30:00+07:00"
     }
   ],
   "recently_completed": [
