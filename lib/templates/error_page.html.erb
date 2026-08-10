@@ -1,9 +1,12 @@
+<%# Generated — do not edit public/*.html by hand. Run `bin/rails error_pages:build`.
+    Plain ERB, not a Rails view: this renders at build time and the result must
+    stand on its own with the app switched off. See lib/error_pages.rb. -%>
 <!DOCTYPE html>
 <html lang="th">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>เราอ่านคำขอนี้ไม่ได้ · We couldn&#39;t read that request (400)</title>
+    <title><%= copy[:th][:title] %> · <%= copy[:en][:title] %> (<%= code %>)</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#17120F">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -122,25 +125,25 @@
       <div class="panel">
         <div class="copy">
           <p class="status">
-            <span class="code">400</span>
-            <span class="name">คำขอไม่ถูกต้อง</span>
+            <span class="code"><%= code %></span>
+            <span class="name"><%= copy[:th][:name] %></span>
           </p>
 
-          <h1>เราอ่านคำขอนี้ไม่ได้</h1>
-          <p class="body">ที่อยู่เว็บหรือข้อมูลที่ส่งมาด้วยมีรูปแบบไม่ถูกต้อง จึงไม่มีสิ่งใดให้ตอบกลับ หากคุณกดมาจากลิงก์ ลิงก์นั้นน่าจะขาดหายระหว่างทาง</p>
+          <h1><%= copy[:th][:title] %></h1>
+          <p class="body"><%= copy[:th][:body] %></p>
 
           <div class="translation" lang="en">
-            <h2>We couldn&#39;t read that request</h2>
-            <p class="body">The address or the data sent with it was malformed, so there was nothing here to answer. If you followed a link, it was probably truncated somewhere along the way.</p>
+            <h2><%= copy[:en][:title] %></h2>
+            <p class="body"><%= copy[:en][:body] %></p>
           </div>
 
-          <a class="home" href="/">กลับไปหน้าแรก · <span lang="en">Back to the home page</span></a>
+          <a class="home" href="/"><%= copy[:th][:home] %> · <span lang="en"><%= copy[:en][:home] %></span></a>
         </div>
       </div>
     </main>
 
     <footer>
-      <p>UTCC AI Academy · คณะวิศวกรรมศาสตร์ มหาวิทยาลัยหอการค้าไทย</p>
+      <p><%= copy[:th][:footer] %></p>
     </footer>
   </body>
 </html>

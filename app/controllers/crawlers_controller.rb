@@ -15,6 +15,7 @@ class CrawlersController < ApplicationController
   DISALLOWED = %w[
     /login /register /console /forgot-password /reset-password
     /courses /lesson /my-learning /map /progress /leaderboard /instructor /admin
+    /errors
   ].freeze
 
   # The model crawlers, named. They are given exactly the rules everyone else

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T23:15:00+07:00",
+  "updated_at": "2026-08-09T21:05:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2157,6 +2157,29 @@
         }
       ],
       "updated_at": "2026-08-09T23:15:00+07:00"
+    },
+    {
+      "id": "UX-002",
+      "title": "Give every failed request a branded, bilingual error page",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead, Platform Owner, and Product Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-001"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Error pages specification",
+          "url": "specs/spec-error-pages.html"
+        },
+        {
+          "label": "Rendered error pages ADR",
+          "url": "decisions/adr-0045-rendered-error-pages.html"
+        }
+      ],
+      "updated_at": "2026-08-09T21:05:00+07:00"
     }
   ],
   "recently_completed": [

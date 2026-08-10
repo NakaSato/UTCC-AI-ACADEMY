@@ -1,0 +1,54 @@
+<%# The chrome an error page can afford. Deliberately not the application
+    layout: that one renders the header's gem and streak counters, the
+    notification bell and the footer's session-dependent columns, all of which
+    read the database — and the request that got here may be here *because* the
+    database is what failed. This layout reads nothing but the locale.
+
+    No canonical, no hreflang, no Open Graph: an error is not a page anyone
+    should arrive at from a search result, which is what the robots tag says. %>
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= yield :title %></title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#17120F">
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= render "shared/fonts" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  </head>
+
+  <body class="flex min-h-screen flex-col bg-canvas font-sans text-16 leading-body text-ink antialiased">
+    <%# The lockup only, without the nav — every link in the nav is a place this
+        visitor has just failed to reach, and the shield is what says they are
+        still on the right site. %>
+    <header class="w-full bg-chrome">
+      <div class="mx-auto flex min-h-header w-full max-w-page items-center px-4 xl:px-8">
+        <a href="/" class="flex flex-none items-center gap-3" title="<%= t("landing.home") %>">
+          <%= image_tag "utcc-eng-shield.svg", alt: "", aria: { hidden: true },
+                        width: 48, height: 48, loading: "eager",
+                        class: "block h-12 w-auto" %>
+          <span class="flex flex-col justify-center border-l border-chrome-line pl-3 leading-none">
+            <span class="text-20 font-bold tracking-[0.02em] text-surface"><%= t("landing.brand_name") %></span>
+            <span class="mt-1 text-11-5 font-light tracking-[0.14em] text-on-chrome uppercase">
+              <%= t("chrome.brand_line") %>
+            </span>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <%= yield %>
+
+    <footer class="bg-chrome py-6">
+      <p class="mx-auto max-w-page px-4 text-13-5 text-on-chrome-muted xl:px-8">
+        <%= t("error_pages.footer") %>
+      </p>
+    </footer>
+  </body>
+</html>

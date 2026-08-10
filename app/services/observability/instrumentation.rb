@@ -11,12 +11,18 @@ module Observability
       end
 
       private
+        # Telemetry is named in full in all three subscribers, and has to be. A
+        # subscriber block outlives the class that defined it: in development
+        # the next reload replaces this class, the block keeps the old one as
+        # its lexical scope, and a bare `Telemetry` then resolves against a
+        # namespace that no longer exists. Qualifying it starts the lookup at
+        # Object, which is always the current Observability.
         def subscribe_to_controller_failures
           ActiveSupport::Notifications.subscribe("process_action.action_controller") do |*args|
             payload = args.last
             next unless payload[:exception].present? || payload[:status].to_i >= 500
 
-            Telemetry.emit(
+            Observability::Telemetry.emit(
               "http.request.failure",
               controller: payload[:controller],
               action: payload[:action],
@@ -31,7 +37,7 @@ module Observability
             payload = args.last
             next unless payload[:exception]
 
-            Telemetry.emit(
+            Observability::Telemetry.emit(
               "database.query.failure",
               operation: payload[:name],
               error_class: payload[:exception].first
@@ -44,7 +50,7 @@ module Observability
             payload = args.last
             next unless payload[:exception]
 
-            Telemetry.emit(
+            Observability::Telemetry.emit(
               "mail.delivery.failure",
               mailer: payload[:mailer],
               action: payload[:action],

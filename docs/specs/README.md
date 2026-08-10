@@ -50,3 +50,4 @@ owner.
 - [SPEC-0042 — Console sign-in for teaching staff, administrators, and company members](spec-console-sign-in.md) — accepted; second sign-in door at /console over the one shared session mechanism
 - [SPEC-0043 — Console account identity, admin-created accounts, and the identifier model](spec-console-account-identity.md) — accepted; three identifier columns, at least one required, and an admin creation screen
 - [SPEC-0044 — Role-aware navigation, front doors, and company profile addresses](spec-role-aware-workspaces.md) — accepted; User#workspace drives the nav, the strip, and where / lands; organizations addressed by name
+- [SPEC-0045 — Error pages for every failed request, rendered and flat](spec-error-pages.md) — accepted; exceptions_app renders bilingual branded pages that read no database, and public/ is generated from the same copy

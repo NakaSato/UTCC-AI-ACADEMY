@@ -2995,6 +2995,66 @@ en:
         accepted: "Accepted"
         rejected: "Rejected"
 
+  # The error screens — see HttpError. `client` and `server` are the words every
+  # status falls back to, so a status nobody wrote copy for still renders a page.
+  # The numeric keys are quoted because YAML would otherwise read them as
+  # integers, and I18n cannot symbolise an Integer key.
+  error_pages:
+    home: "Back to the home page"
+    retry: "Nothing is wrong with what you asked for. Try again in a few minutes, and tell us if it is still failing."
+    request_id: "Reference for support:"
+    footer: "UTCC AI Academy · Faculty of Engineering, University of the Thai Chamber of Commerce"
+
+    client:
+      name: "Request error"
+      title: "We couldn't do that"
+      body: "Something about this request wasn't something we could act on. Check the address and try again."
+    server:
+      name: "Server error"
+      title: "Something went wrong on our side"
+      body: "This is a fault in the academy, not in anything you did. It has been recorded and we are looking at it."
+
+    "400":
+      name: "Bad request"
+      title: "We couldn't read that request"
+      body: "The address or the data sent with it was malformed, so there was nothing here to answer. If you followed a link, it was probably truncated somewhere along the way."
+    "403":
+      name: "Forbidden"
+      title: "This isn't yours to open"
+      body: "Your account doesn't have access to this screen. If you believe it should, ask the instructor or administrator who manages your section."
+    "404":
+      name: "Not found"
+      title: "There is nothing at this address"
+      body: "The page may have been renamed or removed, or the address may have a typo in it. Nothing is broken — this address simply doesn't lead anywhere."
+    "406":
+      name: "Not acceptable"
+      title: "We can't send this page in a form your browser accepts"
+      body: "Your browser asked for this page in a format the academy doesn't produce. An older browser is the usual reason; updating it normally fixes this."
+    "422":
+      name: "Unprocessable"
+      title: "That form couldn't be submitted"
+      body: "The submission was rejected before it was saved — usually because the page had been open long enough for its security token to expire. Reload the page and fill the form in again."
+    "429":
+      name: "Too many requests"
+      title: "That's more attempts than we allow"
+      body: "You've made too many requests in a short time, so the academy has paused you for a few minutes. This limit is there to keep accounts safe from guessing."
+    "500":
+      name: "Internal server error"
+      title: "Something went wrong on our side"
+      body: "The academy hit an error it didn't expect while building this page. Nothing you did caused it, and no work of yours has been lost."
+    "502":
+      name: "Bad gateway"
+      title: "The academy didn't answer"
+      body: "The server in front of the academy couldn't get a reply from it. This is usually brief — a deploy finishing, or a restart."
+    "503":
+      name: "Service unavailable"
+      title: "The academy is unavailable right now"
+      body: "The service is down for maintenance or is too busy to answer. It should be back shortly."
+    "504":
+      name: "Gateway timeout"
+      title: "That took too long"
+      body: "The academy took longer to answer than the server in front of it would wait. Trying again often works, because the slow part is rarely slow twice."
+
   errors:
     messages:
       blank: "can't be blank"

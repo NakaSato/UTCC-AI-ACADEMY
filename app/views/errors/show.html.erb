@@ -1,0 +1,54 @@
+<%# One template for every status. What differs between a 404 and a 503 is three
+    strings and whether there is anything the visitor can do about it, so the
+    difference lives in the locale files and in HttpError#server?, not in ten
+    near-identical templates. %>
+<% content_for :title, "#{@error.title} — #{t("meta.title")}" %>
+
+<%# The panel is left-aligned inside the page container rather than centred in
+    the viewport, so its first character sits on the same vertical as the shield
+    in the header above it. %>
+<main id="main" class="flex flex-1 items-center py-16">
+  <div class="mx-auto w-full max-w-page px-4 xl:px-8">
+    <div class="max-w-[62ch]">
+      <p class="flex items-baseline gap-3">
+        <span class="font-mono text-38 leading-none font-bold tracking-[-0.02em] text-brand">
+          <%= @error.code %>
+        </span>
+        <span class="text-13-5 font-medium tracking-[0.12em] text-muted-2 uppercase">
+          <%= @error.name %>
+        </span>
+      </p>
+
+      <h1 class="mt-6 text-30 leading-[1.25] font-bold tracking-[-0.025em] text-balance sm:text-38">
+        <%= @error.title %>
+      </h1>
+
+      <p class="mt-4 text-16-5 leading-[1.7] text-balance text-muted">
+        <%= @error.body %>
+      </p>
+
+      <%# One way out, and it is `/` rather than a named path: the front door
+          already sorts a visitor by who they are — the catalog for a student,
+          /admin for an admin, the landing page for someone signed out — so this
+          is the only link that is right for all of them. %>
+      <div class="mt-9">
+        <a href="/"
+           class="inline-block rounded-field bg-brand px-5 py-2.5 text-15 font-medium text-surface transition-colors hover:bg-brand-deep">
+          <%= t("error_pages.home") %>
+        </a>
+      </div>
+
+      <%# A 5xx is already in the logs; giving the visitor its request id is what
+          turns "it broke" in a support message into one grep — it is the same
+          value Observability stamps on the event. %>
+      <% if @error.server? %>
+        <p class="mt-10 border-t border-hairline pt-6 text-13-5 leading-[1.7] text-muted-2">
+          <%= t("error_pages.retry") %>
+          <br>
+          <%= t("error_pages.request_id") %>
+          <span class="font-mono text-ink-4"><%= request.request_id %></span>
+        </p>
+      <% end %>
+    </div>
+  </div>
+</main>

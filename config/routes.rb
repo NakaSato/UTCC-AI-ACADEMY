@@ -292,6 +292,26 @@ Rails.application.routes.draw do
   patch "admin/landing/cards/:id/move", to: "admin#move_card", as: :move_admin_landing_card
   delete "admin/landing/cards/:id", to: "admin#destroy_card", as: :admin_landing_card
 
+  # The error screens. `config.exceptions_app` rewrites a failed request's path
+  # to its status code and dispatches it back through the router, so this one
+  # route answers every status Rails can raise — and every verb, because a POST
+  # that raised arrives here as a POST rather than as a GET of /500.
+  #
+  # Constrained to 4xx and 5xx so it stays an error route and not a catch-all:
+  # /700 is a page that does not exist, and is answered as one.
+  #
+  match "/:code", to: "errors#show", via: :all, as: :error,
+        constraints: { code: /[45]\d\d/ }
+
+  # The flat files in public/ answer /404 and /500 first whenever the static
+  # file server is on — the router never sees those requests. Only a dispatch
+  # from `exceptions_app` reaches the route above, which is the traffic that
+  # matters, but it leaves the live pages with no address anyone can open. This
+  # is that address: /errors/404 is how the pages are reviewed, screenshotted
+  # and tested.
+  get "errors/:code", to: "errors#show", as: :error_preview,
+      constraints: { code: /[45]\d\d/ }
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
