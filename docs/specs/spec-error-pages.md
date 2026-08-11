@@ -152,11 +152,15 @@ Three things worth keeping straight:
   `false` in `render.yaml` and a test enforces that. Committing `true` couples
   an operational switch to a release and leaves the repository claiming
   maintenance long after it ended.
-- **It is inert today.** The documentation site has never published — every
-  GitHub Actions run is refused for a billing lock on the account — so the
-  `uri` 404s and Render would fall back to its own page. The wiring is correct
-  and the page is generated; it starts working the moment Pages builds. RB-0006
-  leads with this so nobody discovers it during an outage.
+- **It publishes on Vercel, not GitHub Pages.** An earlier draft of this
+  amendment said the documentation site had never published and the `uri` was
+  inert. That was wrong: the site is live at `utcc-ai-academy.vercel.app`,
+  built from this repository by `script/build-dashboard` on push to `main`, and
+  has been throughout. The mistake was reading a failing
+  `.github/workflows/pages.yml` — refused for an account billing lock — as the
+  only publisher, when `vercel.json` sits in the repository root. The `uri`
+  pointed at the `github.io` address, which does not resolve, and now points at
+  the Vercel one.
 
 ## Out of scope
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-11T21:10:00+07:00",
+  "updated_at": "2026-08-12T10:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -1912,19 +1912,19 @@
       "evidence": [
         {
           "label": "Contributor presentation route",
-          "url": "/contributors"
+          "url": "https://academy.boring9.dev/contributors"
         },
         {
           "label": "Contributor page coverage",
-          "url": "test/controllers/contributors_test.rb"
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/test/controllers/contributors_test.rb"
         },
         {
           "label": "Full verification gate",
-          "url": "bin/verify"
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/bin/verify"
         },
         {
           "label": "Human content and visual approval",
-          "url": "/contributors"
+          "url": "https://academy.boring9.dev/contributors"
         }
       ],
       "updated_at": "2026-08-08T13:44:13+07:00"
@@ -2265,9 +2265,9 @@
         "UX-002"
       ],
       "blocker": {
-        "summary": "The maintenance page is published by the documentation site, which has never built: every GitHub Actions run is refused because the account is locked for a billing issue. Render's maintenanceMode uri therefore 404s and falls back to Render's default page. 502 and 504 are not customisable on Render at all.",
-        "decision_owner": "Repository owner",
-        "next_action": "Clear the GitHub billing lock so Actions run again; the Pages build then publishes docs/maintenance.html and the wiring becomes live with no further change."
+        "summary": "Resolved. The maintenance page publishes on Vercel, not GitHub Pages: an earlier reading treated the failing pages.yml workflow as the only publisher and pointed maintenanceMode.uri at a github.io address that does not resolve. It now points at utcc-ai-academy.vercel.app. Separately, the dashboard deploy had been failing since 2026-08-09 because backlog evidence URLs were bare repository paths, which abort script/validate-rendered-doc-links.",
+        "decision_owner": "Platform Owner",
+        "next_action": "Confirm the next Vercel deploy publishes /maintenance.html, then mark OPS-001 complete. 502 and 504 stay uncustomisable on Render."
       },
       "evidence": [
         {
@@ -2279,7 +2279,7 @@
           "url": "specs/spec-error-pages.html"
         }
       ],
-      "updated_at": "2026-08-11T21:10:00+07:00"
+      "updated_at": "2026-08-12T10:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3686,7 +3686,7 @@
       "from": "new",
       "to": "verification",
       "summary": "Implemented the public bilingual contributor presentation page, role-based profile cards, page-specific navigation, crawler metadata, focused controller coverage, and the full repository verification gate; human content and visual review remain.",
-      "evidence_url": "/contributors"
+      "evidence_url": "https://academy.boring9.dev/contributors"
     },
     {
       "at": "2026-08-08T13:44:13+07:00",
@@ -3694,7 +3694,7 @@
       "from": "verification",
       "to": "complete",
       "summary": "The user approved the contributor page content and final visual presentation after automated verification passed.",
-      "evidence_url": "/contributors"
+      "evidence_url": "https://academy.boring9.dev/contributors"
     },
     {
       "at": "2026-08-08T16:14:27+07:00",
@@ -3967,6 +3967,14 @@
       "to": "complete",
       "summary": "The user asked for the navigation and dashboards to stop being the same thing for every role, and chose one shell with role-aware chrome over a second layout, and the navigation split before any new dashboard content. User#workspace now answers admin, instructor, company, or student — membership before role, which is the whole point, because a company member holds the student role and asking the role had been handing recruiters a learner's navigation and a heart counter for coursework they are not doing. The header rail, the burger drawer, the gamification strip, and the / destination all read that one predicate, and every navigation entry is a door its workspace can actually open. Separately the user asked for a company's profile to live at its name: /northstar rather than /recruitment/organizations/7. The vanity route is declared last so every real path wins, Organization::RESERVED_SLUGS forbids a name a real path would shadow with a test that keeps the list and the routes in step, to_param is the slug so the workspace routes behind the profile carry the name too, and the id-based URL redirects to the canonical one. Dashboard content per role — summary cards, counts, pipelines — is deliberately deferred to its own slice; each workspace lands on the best screen that exists today.",
       "evidence_url": "specs/spec-role-aware-workspaces.html"
+    },
+    {
+      "at": "2026-08-12T10:30:00+07:00",
+      "item_id": "OPS-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Repointed the Render maintenance page at the Vercel-published documentation site and repaired the dashboard build, which had aborted on bare repository paths in backlog evidence since 2026-08-09.",
+      "evidence_url": "runbooks/rb-maintenance-mode.html"
     }
   ]
 }

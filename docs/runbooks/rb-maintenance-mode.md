@@ -46,13 +46,14 @@ otherwise, and are not reachable through Render today. Do not promise a branded
 ## Preconditions
 
 - [ ] The maintenance page is live. Open
-      <https://nakasato.github.io/UTCC-AI-ACADEMY/maintenance.html> and confirm
-      it returns 200 and renders in Thai and English.
-      **As of 2026-08-11 it does not**: the documentation site has never
-      published, because every GitHub Actions run is refused with *"the job was
-      not started because your account is locked due to a billing issue"*.
-      Until that is cleared, turning maintenance on shows **Render's default
-      page**, not the academy's — the wiring is correct and inert.
+      <https://utcc-ai-academy.vercel.app/maintenance.html> and confirm it
+      returns 200 and renders in Thai and English. It appears one deploy after
+      the page is generated and merged — the documentation site builds on push
+      to `main`, from this repository, on Vercel.
+      The GitHub Pages workflow in `.github/workflows/pages.yml` is a second,
+      currently failing publisher: its runs are refused for an account billing
+      lock. It is **not** what serves this page, and the `github.io` address
+      does not resolve. Do not point the `uri` at it.
 - [ ] `bin/rails error_pages:check` passes, so the published page matches the
       copy in `config/locales`.
 - [ ] The downtime is announced to whoever is teaching that day.
@@ -64,7 +65,7 @@ otherwise, and are not reachable through Render today. Do not promise a branded
    Render's default, because nobody will look again until the next outage:
 
    ```
-   curl -sI https://nakasato.github.io/UTCC-AI-ACADEMY/maintenance.html | head -1
+   curl -sI https://utcc-ai-academy.vercel.app/maintenance.html | head -1
    ```
 
 2. Turn maintenance **on** in the Render dashboard: *utcc-ai-academy →
@@ -114,8 +115,12 @@ without touching the service.
 
 ## Escalation
 
-- Page renders but is not the academy's → the `uri` is unreachable; check the
-  documentation site deployed, then Platform Owner.
+- Page renders but is not the academy's → the `uri` is unreachable; check that
+  the last Vercel deploy of the documentation site succeeded. Its build runs
+  `bin/docs` and `script/validate-rendered-doc-links`, so a bad link anywhere
+  in the documentation aborts it — and the previous deploy stays online looking
+  current, which is how it went unnoticed for two days in August 2026. Then
+  Platform Owner.
 - Maintenance mode absent from the dashboard → it is a paid-plan feature; the
   service is on `starter`, so escalate to whoever owns the Render account.
 - 502 or 504 instead of 503 → not maintenance mode; the service is genuinely

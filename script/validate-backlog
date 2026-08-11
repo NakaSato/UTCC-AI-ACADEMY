@@ -2,6 +2,17 @@
 
 require "json"
 
+# A link the dashboard can actually resolve: somewhere else entirely, an
+# anchor on the page itself, or a file the site renders. Anything else — most
+# often a bare repository path like `bin/verify` — is resolved against the
+# rendered site, found missing, and aborts the deploy.
+def renderable_link?(url)
+  return true if url.match?(%r{\A[a-z][a-z0-9+.-]*:}i)
+  return true if url.start_with?("#")
+
+  url.split("#").first.to_s.end_with?(".html", ".json")
+end
+
 path = ARGV.fetch(0, "docs/backlog.json")
 backlog = JSON.parse(File.read(path, encoding: Encoding::UTF_8))
 errors = []
@@ -32,6 +43,21 @@ if allowed_statuses.is_a?(Array) && items.is_a?(Array)
     if item["status"] == "blocked" && item["blocker"].nil?
       errors << "#{id}: blocked items require a blocker"
     end
+
+    # Evidence is either a page of the rendered documentation site or a URL
+    # somewhere else. A bare repository path is neither, and the failure is
+    # remote and silent: the dashboard build resolves it against the rendered
+    # site, finds nothing, and aborts — so the deployment stops updating while
+    # the last good copy stays online looking current. That is exactly what
+    # happened on 2026-08-09, and it went unnoticed for two days because the
+    # only symptom was a status page quietly showing older news.
+    (item["evidence"] || []).each do |evidence|
+      url = evidence["url"].to_s
+      next if renderable_link?(url)
+
+      errors << "#{id}: evidence #{url.inspect} is neither an absolute URL nor a " \
+                "rendered site file — a repository path must be a full github.com link"
+    end
   end
 end
 
@@ -40,6 +66,12 @@ if updates.is_a?(Array)
     %w[at item_id summary].each do |field|
       errors << "update #{index}: missing #{field}" unless update.key?(field)
     end
+
+    url = update["evidence_url"].to_s
+    next if url.empty?
+
+    errors << "update #{index} (#{update['item_id']}): evidence_url #{url.inspect} " \
+              "is neither an absolute URL nor a rendered site file" unless renderable_link?(url)
   end
 end
 

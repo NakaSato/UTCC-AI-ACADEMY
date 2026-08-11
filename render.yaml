@@ -53,7 +53,9 @@ services:
     # requires a `uri` that is not the service in maintenance, because the
     # service is what is unavailable. It is `docs/maintenance.html`, generated
     # from the same locale copy as public/503.html by
-    # `bin/rails error_pages:build` and published by the documentation site.
+    # `bin/rails error_pages:build` and published by the documentation site,
+    # which deploys to Vercel from this repository — a different origin from
+    # the academy, which is what Render requires.
     #
     # 502 and 504 have no equivalent. They are what Render's own proxy emits
     # when this service is unreachable or too slow to answer, and its blueprint
@@ -61,7 +63,7 @@ services:
     # for a proxy that can, not for this one. See SPEC-0045.
     maintenanceMode:
       enabled: false
-      uri: https://nakasato.github.io/UTCC-AI-ACADEMY/maintenance.html
+      uri: https://utcc-ai-academy.vercel.app/maintenance.html
 
     envVars:
       - key: RAILS_MASTER_KEY
