@@ -11,16 +11,18 @@ deprecate it.
 ## Records
 
 - [ADR-0001 — Adopt a repository-native Markdown development flow](adr-0001-adopt-markdown-development-flow.md) — accepted
-- [ADR-0002 — Select the production transactional-email provider](adr-0002-select-production-email-provider.md) — rejected; no provider selected
+- [ADR-0002 — Select the production transactional-email provider](adr-0002-select-production-email-provider.md) — superseded by ADR-0004; the choice was deferred rather than rejected, and no provider is selected
 - [ADR-0003 — Use Mailpit for local email capture](adr-0003-use-mailpit-for-local-email-capture.md) — accepted and implemented; Tier C verification and human review complete
+- [ADR-0004 — Defer production email delivery](adr-0004-defer-production-email.md) — accepted; supersedes ADR-0002 and is why MAIL-002 and MAIL-003 are blocked, with Mailpit the approved verification boundary
+- [ADR-0005 — Model course-specific curricula](adr-0005-course-specific-curricula.md) — accepted
 - [ADR-0006 — Define academic-post permissions and draft lifecycle](adr-0006-academic-post-permissions-and-lifecycle.md) — accepted
 - [ADR-0007 — Integrate Tiptap with a native Stimulus and Importmap bridge](adr-0007-integrate-tiptap-with-stimulus-importmap.md) — accepted
 - [ADR-0008 — Derive the knowledge map from course curricula](adr-0008-real-knowledge-map.md) — accepted
 - [ADR-0009 — Define the course syllabus PDF document boundary](adr-0009-course-syllabus-pdf.md) — accepted and implemented
 - [ADR-0010 — Define the UTCC SSO and account-linking boundary](adr-0010-utcc-sso-account-linking.md) — draft; institutional identity decisions pending
 - [ADR-0011 — Define course-completion certificate policy](adr-0011-course-completion-certificates.md) — accepted; academic credential policy pending
-- [ADR-0012 — Replace fabricated admin Overview metrics with defined live metrics](adr-0012-live-admin-overview-metrics.md) — baseline approved; future metric definitions and privacy review pending
-- [ADR-0013 — Define the admin course lifecycle and catalog boundary](adr-0013-admin-course-lifecycle.md) — baseline approved and implemented; future academic workflow pending
+- [ADR-0012 — Replace fabricated admin Overview metrics with defined live metrics](adr-0012-live-admin-overview-metrics.md) — draft; baseline approved, future metric definitions and privacy review pending
+- [ADR-0013 — Define the admin course lifecycle and catalog boundary](adr-0013-admin-course-lifecycle.md) — draft; baseline approved and implemented, future academic workflow pending
 - [ADR-0014 — Define approval queue records and decision history](adr-0014-approval-queue-records.md) — accepted; request and authority policy pending
 - [ADR-0015 — Define which admin feature flags are real and how settings persist](adr-0015-feature-flag-boundary.md) — accepted; supported-flag and runtime policy pending
 - [ADR-0016 — Define the learner hearts attempt and refill policy](adr-0016-hearts-attempt-policy.md) — accepted; academic and product policy pending

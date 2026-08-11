@@ -185,6 +185,43 @@ duplicate_ids = ids.group_by(&:itself).select { |_id, occurrences| occurrences.l
 errors << "duplicate document IDs: #{duplicate_ids.join(', ')}" unless duplicate_ids.empty?
 known_ids = ids.to_set
 
+# Every document is listed in its directory's README, and the line says the
+# status the document claims.
+#
+# Both halves were wrong before this check existed. ADR-0004 — the accepted
+# decision to defer production email, and the reason two backlog items are
+# blocked — was absent from the index entirely for a fortnight; four drafts
+# were described as "baseline approved", which reads as settled; and ADR-0002
+# was listed as "rejected" when it is superseded. The index is what a person
+# reads to find out what has been decided, so a document missing from it has,
+# for practical purposes, not been written.
+documents.group_by { |document| File.dirname(document[:path]) }.each do |directory, entries|
+  index_path = ROOT.join(directory, "README.md")
+  next unless index_path.exist?
+
+  index = index_path.read
+
+  entries.each do |document|
+    basename = File.basename(document[:path])
+    id = document[:metadata]["id"]
+    line = index.lines.find { |candidate| candidate.include?("(#{basename})") }
+
+    next errors << "#{directory}/README.md: no entry for #{id} (#{basename})" if line.nil?
+
+    # Each type has its own vocabulary — a release is planned or released, not
+    # accepted — so the words come from TYPE_CONFIG rather than one flat list.
+    vocabulary = TYPE_CONFIG.dig(document[:metadata]["type"], :statuses).to_a
+    described = line.split(") —", 2)[1].to_s.strip.downcase
+    stated = vocabulary.find { |word| described.include?(word) }
+
+    if stated.nil?
+      errors << "#{directory}/README.md: the #{id} entry does not say its status"
+    elsif stated != document[:metadata]["status"]
+      errors << "#{directory}/README.md: #{id} is listed as #{stated} but is #{document[:metadata]['status']}"
+    end
+  end
+end
+
 documents.each do |document|
   metadata = document[:metadata]
   relative_path = document[:path]

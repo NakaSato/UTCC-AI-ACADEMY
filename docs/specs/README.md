@@ -9,6 +9,9 @@ owner.
 
 ## Specifications
 
+- [SPEC-0001 — Deliver the first real bilingual AI1101 topic](spec-m2-first-real-topic.md) — accepted
+- [SPEC-0002 — Complete the AI1101 foundation course content](spec-m3-foundation-course.md) — accepted
+- [SPEC-0003 — Course-specific curricula](spec-m4-course-specific-curricula.md) — accepted
 - [SPEC-0004 — Academic-post permissions and draft lifecycle](spec-academic-post-permissions-and-lifecycle.md) — accepted
 - [SPEC-0005 — Academic-post Tiptap editor integration](spec-academic-post-tiptap-editor.md) — accepted
 - [SPEC-0006 — Academic-post preview-page editing](spec-academic-post-preview-editing.md) — accepted
@@ -17,8 +20,8 @@ owner.
 - [SPEC-0009 — Downloadable localized course syllabus PDF](spec-m6-course-syllabus-pdf.md) — accepted and implemented
 - [SPEC-0010 — UTCC SSO and safe account linking](spec-m6-utcc-sso-account-linking.md) — draft; institutional identity decisions pending
 - [SPEC-0011 — Course-completion certificate policy and artifact](spec-m6-course-completion-certificates.md) — accepted; academic credential policy pending
-- [SPEC-0012 — Live admin Overview metrics](spec-m7-live-admin-overview-metrics.md) — baseline approved; future metric definitions and privacy review pending
-- [SPEC-0013 — Real admin course catalog and lifecycle states](spec-m7-admin-course-lifecycle.md) — baseline approved and implemented; future academic workflow pending
+- [SPEC-0012 — Live admin Overview metrics](spec-m7-live-admin-overview-metrics.md) — draft; baseline approved, future metric definitions and privacy review pending
+- [SPEC-0013 — Real admin course catalog and lifecycle states](spec-m7-admin-course-lifecycle.md) — draft; baseline approved and implemented, future academic workflow pending
 - [SPEC-0014 — Persisted admin approval queue and decisions](spec-m7-approval-queue.md) — accepted; request and authority policy pending
 - [SPEC-0015 — Persisted admin feature-flag settings](spec-m7-feature-flag-settings.md) — draft; supported-flag and runtime policy pending
 - [SPEC-0016 — Learner hearts attempt, refill, and support policy](spec-m8-hearts-attempt-policy.md) — accepted; academic and product policy pending
