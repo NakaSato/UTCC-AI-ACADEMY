@@ -38,12 +38,12 @@
 <% when :link %>
   <%= link_to block.extra, target: "_blank", rel: "noopener",
         class: "flex items-center justify-between gap-4 rounded-xl border border-hairline bg-surface
-                px-5 py-3.75 transition-colors hover:border-brand" do %>
+                px-5 py-3.75 transition-colors hover:border-brand-ink" do %>
     <span class="min-w-0">
       <span class="block text-15 font-semibold text-ink"><%= block.value %></span>
       <span class="mt-0.75 block truncate font-mono text-11-5 text-muted-2"><%= block.extra %></span>
     </span>
-    <span class="flex-none text-13 font-semibold text-brand"><%= t("lesson.theory.open_link") %></span>
+    <span class="flex-none text-13 font-semibold text-brand-ink"><%= t("lesson.theory.open_link") %></span>
   <% end %>
 
 <% when :image %>

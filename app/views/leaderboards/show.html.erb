@@ -21,8 +21,8 @@
       <%= link_to course.title, leaderboard_path(course: course.code, tab: @tab),
             aria: { current: @course.code == course.code ? "page" : nil },
             class: "rounded-full border-[1.5px] border-hairline bg-surface px-4.5 py-2.25 text-14 font-medium
-                    text-ink-2 transition-colors hover:border-muted-3 aria-[current=page]:border-brand
-                    aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand-deep" %>
+                    text-ink-2 transition-colors hover:border-muted-3 aria-[current=page]:border-brand-ink
+                    aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand-ink-deep" %>
     <% end %>
   </nav>
 
@@ -31,8 +31,8 @@
       <%= link_to label, leaderboard_path(course: @course.code, tab: tab),
             role: "tab", aria: { selected: @tab == tab, controls: "leaderboard-board" },
             class: "rounded-full border-[1.5px] border-hairline bg-surface px-4.5 py-2.25 text-14 font-medium
-                    text-ink-2 transition-colors hover:border-muted-3 aria-selected:border-brand
-                    aria-selected:bg-brand-tint aria-selected:text-brand-deep" %>
+                    text-ink-2 transition-colors hover:border-muted-3 aria-selected:border-brand-ink
+                    aria-selected:bg-brand-tint aria-selected:text-brand-ink-deep" %>
     <% end %>
   </nav>
 

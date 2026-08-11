@@ -26,13 +26,13 @@
       <div class="flex flex-wrap items-center gap-3 text-14-5 text-ink-4">
         <span>
           <%= t("map.topics_for_course") %>
-          <%= link_to @course.title, course_path(@course.code), class: "text-brand hover:text-brand-deep" %>
+          <%= link_to @course.title, course_path(@course.code), class: "text-brand-ink hover:text-brand-ink-deep" %>
         </span>
         <span data-map-total="<%= @roots.first.total %>"
               class="rounded-[9px] border border-hairline-2 bg-surface px-3.5 py-1.25 text-14 font-semibold"><%= @roots.first.total %></span>
         <span class="text-muted"><%= t("map.need_to_learn") %></span>
         <span data-map-learned="<%= @roots.first.learned %>"
-              class="rounded-[9px] border-[1.5px] border-brand bg-brand-tint px-3.5 py-1.25 text-14 font-semibold text-brand-deep"><%= @roots.first.learned %></span>
+              class="rounded-[9px] border-[1.5px] border-brand-ink bg-brand-tint px-3.5 py-1.25 text-14 font-semibold text-brand-ink-deep"><%= @roots.first.learned %></span>
         <span class="text-muted"><%= t("map.learned_label") %></span>
       </div>
 
@@ -52,8 +52,8 @@
       <% if @legend_open %>
         <div class="flex w-full max-w-[320px] flex-col gap-2.5 rounded-[14px] border border-hairline bg-surface px-4.5 py-4">
           <% [ [ :not_started, "bg-surface border-muted-4", false ],
-               [ :partial,     "marker-partial border-brand", false ],
-               [ :complete,    "bg-brand border-brand", false ],
+               [ :partial,     "marker-partial border-brand-ink", false ],
+               [ :complete,    "bg-brand border-brand-ink", false ],
                [ :leaf,        "bg-muted-2 border-muted-2", true ] ].each do |key, marker, leaf| %>
             <div class="flex items-center gap-2.75 text-13-5 text-ink-4">
               <span aria-hidden="true"
@@ -77,7 +77,7 @@
               style: "padding-left: #{14 + row.depth * 22}px; animation-delay: #{index * 22}ms",
               class: class_names(
                 "flex w-full animate-row-in items-center gap-2.25 rounded-[10px] py-2.25 pr-3 text-14-5 leading-[1.4]",
-                "bg-brand-tint font-semibold text-brand-deep" => current,
+                "bg-brand-tint font-semibold text-brand-ink-deep" => current,
                 "text-ink-2 hover:bg-canvas" => !current
               ) do %>
           <% if row.depth.positive? %>
@@ -95,9 +95,9 @@
                        <%= if node.leaf?
                              "mx-[2.5px] size-[7px] rounded-full bg-muted-2 border-muted-2"
                            elsif node.fully_learned?
-                             "size-3 rounded-[3px] bg-brand border-brand"
+                             "size-3 rounded-[3px] bg-brand border-brand-ink"
                            elsif node.partly_learned?
-                             "size-3 rounded-[3px] marker-partial border-brand"
+                             "size-3 rounded-[3px] marker-partial border-brand-ink"
                            else
                              "size-3 rounded-[3px] bg-surface border-muted-4"
                            end %>"></span>
@@ -110,21 +110,21 @@
 
     <div>
       <nav class="mb-6 flex flex-wrap items-center gap-2.5 text-15" aria-label="<%= t("map.home_crumb") %>">
-        <%= link_to "⌂", root_path, "aria-label": t("map.home_crumb"), class: "text-14 text-brand" %>
+        <%= link_to "⌂", root_path, "aria-label": t("map.home_crumb"), class: "text-14 text-brand-ink" %>
         <% @trail.each_with_index do |node, index| %>
           <span aria-hidden="true" class="text-13 text-muted-3">→</span>
           <%= link_to node.name, knowledge_map_path(course: @course.code, mode: @mode, topic: node.id, legend: ("1" if @legend_open)),
                 class: class_names(
                   "text-15",
                   "font-semibold text-ink" => index == @trail.size - 1,
-                  "font-medium text-brand hover:text-brand-deep" => index < @trail.size - 1
+                  "font-medium text-brand-ink hover:text-brand-ink-deep" => index < @trail.size - 1
                 ) %>
         <% end %>
       </nav>
 
       <% if @selected.leaf? %>
         <div class="mb-6 max-w-[520px] rounded-card border border-hairline bg-surface px-7 py-7.5 sm:px-8">
-          <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+          <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand-ink uppercase">
             <%= t("map.single_topic") %>
           </div>
           <h2 class="mb-3 text-24 font-bold tracking-[-0.02em]"><%= @selected.name %></h2>
@@ -189,7 +189,7 @@
                   <%= child.remaining %>
                 </span>
                 <span class="min-w-8.5 rounded-lg border px-2.25 py-0.75 text-center text-13 font-semibold
-                             <%= child.learned.positive? ? "border-brand-soft bg-brand-tint text-brand-deep" : "border-hairline bg-surface text-muted-3" %>">
+                             <%= child.learned.positive? ? "border-brand-soft bg-brand-tint text-brand-ink-deep" : "border-hairline bg-surface text-muted-3" %>">
                   <%= child.learned %>
                 </span>
               </div>

@@ -9,7 +9,7 @@
   <%= json_ld event_list_schema(Landing.events, url: "#{root_url}#events") %>
 <% end %>
 
-<section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-surface">
+<section class="brand-field grid min-h-[60vh] w-full place-items-center py-16 text-center text-white">
   <div class="flex max-w-7xl flex-col items-center gap-4 p-4">
     <%# The UTCC ENG lockup is a white logo on transparency — it sits directly on
         the maroon field, so it needs no plate or scrim of its own.
@@ -36,13 +36,13 @@
     <div class="mt-4 flex flex-wrap justify-center gap-4">
       <a href="#learn"
          class="inline-flex items-center gap-2 rounded-full bg-surface px-6 py-2.5 text-18 leading-tight font-normal
-                whitespace-nowrap uppercase text-brand-deep shadow-md transition duration-300
+                whitespace-nowrap uppercase text-brand-ink-deep shadow-md transition duration-300
                 hover:bg-brand-tint hover:shadow-lg active:scale-97"><%= Landing.copy("hero.cta_learn") %></a>
       <%# On the maroon field an outline button takes the light-on-dark variant. %>
       <a href="#community"
          class="inline-flex items-center gap-2 rounded-full border border-surface px-6 py-2.5 text-18 leading-tight
-                font-normal whitespace-nowrap uppercase text-surface transition duration-300
-                hover:bg-surface hover:text-brand-deep active:scale-97"><%= Landing.copy("hero.cta_community") %></a>
+                font-normal whitespace-nowrap uppercase text-white transition duration-300
+                hover:bg-surface hover:text-brand-ink-deep active:scale-97"><%= Landing.copy("hero.cta_community") %></a>
     </div>
 
     <%# Student-run project — say so on the hero so no one mistakes it for a
@@ -58,8 +58,8 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand"><%= Landing.copy("learn.eyebrow") %></p>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+          <p class="mb-2 text-16 font-medium tracking-wide uppercase text-brand-ink"><%= Landing.copy("learn.eyebrow") %></p>
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-ink-deep lg:text-44">
             <%= Landing.copy("learn.title") %>
           </h2>
           <p class="max-w-[65ch] text-20 leading-body text-muted"><%= Landing.copy("learn.subtitle") %></p>
@@ -75,12 +75,12 @@
                     p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-brand-line
                     hover:shadow-card-hover"
              style="animation-delay: <%= i * 60 %>ms">
-            <h3 class="text-24 leading-tight font-bold text-balance text-brand-deep transition-colors duration-300
-                       group-hover:text-brand"><%= topic.title %></h3>
+            <h3 class="text-24 leading-tight font-bold text-balance text-brand-ink-deep transition-colors duration-300
+                       group-hover:text-brand-ink"><%= topic.title %></h3>
 
             <p class="text-17 leading-body text-muted"><%= topic.blurb %></p>
 
-            <span class="mt-auto inline-flex items-center gap-2 pt-3 text-16 font-medium text-brand"
+            <span class="mt-auto inline-flex items-center gap-2 pt-3 text-16 font-medium text-brand-ink"
                   aria-hidden="true">
               <%= Landing.copy("learn.card_cta") %>
               <span class="size-[0.5em] -rotate-45 border-t-2 border-r-2 border-current transition-transform
@@ -96,7 +96,7 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-ink-deep lg:text-44">
             <%= Landing.copy("tracks.title") %>
           </h2>
           <p class="max-w-[65ch] text-20 text-muted"><%= Landing.copy("tracks.subtitle") %></p>
@@ -105,8 +105,8 @@
           <% Landing.track_filters.each_with_index do |filter, i| %>
             <button type="button" role="tab"
                     class="rounded-full border border-hairline px-4 py-1.5 text-18 text-muted transition duration-300
-                           hover:border-brand hover:text-brand
-                           aria-selected:border-brand aria-selected:bg-brand aria-selected:text-surface"
+                           hover:border-brand-ink hover:text-brand-ink
+                           aria-selected:border-brand-ink aria-selected:bg-brand aria-selected:text-white"
                     data-tabs-target="tab" data-level="<%= filter.key %>"
                     data-action="tabs#select"
                     aria-selected="<%= i.zero? %>"><%= filter.label %></button>
@@ -120,16 +120,16 @@
                           hover:-translate-y-0.5 hover:shadow-lg"
                    data-tabs-target="item" data-level="<%= track.level %>">
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center rounded-full border border-brand px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track.level_label %></span>
-              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= track.duration %></span>
+              <span class="inline-flex items-center rounded-full border border-brand-ink px-3 py-0.5 text-18 font-medium text-brand-ink-deep"><%= track.level_label %></span>
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-ink-deep"><%= track.duration %></span>
             </div>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= track.title %></h3>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-ink-deep"><%= track.title %></h3>
             <p class="text-18 text-muted"><%= track.blurb %></p>
             <div class="mt-auto pt-2">
               <a href="#tracks"
-                 class="inline-flex items-center gap-2 rounded-full border border-brand px-6 py-2.5 text-18
-                        leading-tight font-normal whitespace-nowrap uppercase text-brand transition duration-300
-                        hover:bg-brand hover:text-surface active:scale-97"><%= Landing.copy("tracks.card_cta") %></a>
+                 class="inline-flex items-center gap-2 rounded-full border border-brand-ink px-6 py-2.5 text-18
+                        leading-tight font-normal whitespace-nowrap uppercase text-brand-ink transition duration-300
+                        hover:bg-brand hover:text-white active:scale-97"><%= Landing.copy("tracks.card_cta") %></a>
             </div>
           </article>
         <% end %>
@@ -141,18 +141,18 @@
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+          <h2 class="text-36 leading-tight font-bold text-balance text-brand-ink-deep lg:text-44">
             <%= Landing.copy("community.title") %>
           </h2>
           <p class="max-w-[65ch] text-20 text-muted"><%= Landing.copy("community.subtitle") %></p>
         </div>
         <a href="#community"
            class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight font-normal
-                  whitespace-nowrap uppercase text-surface transition duration-300
+                  whitespace-nowrap uppercase text-white transition duration-300
                   hover:bg-brand-deep active:scale-97"><%= Landing.copy("community.cta") %></a>
         <a href="<%= contributors_path %>"
-           class="inline-flex items-center gap-2 rounded-full border border-brand px-6 py-2.5 text-18 leading-tight font-normal
-                  whitespace-nowrap text-brand transition duration-300 hover:bg-brand hover:text-surface active:scale-97"><%= Landing.copy("community.contributors_cta") %></a>
+           class="inline-flex items-center gap-2 rounded-full border border-brand-ink px-6 py-2.5 text-18 leading-tight font-normal
+                  whitespace-nowrap text-brand-ink transition duration-300 hover:bg-brand hover:text-white active:scale-97"><%= Landing.copy("community.contributors_cta") %></a>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -162,9 +162,9 @@
                     hover:-translate-y-0.5 hover:shadow-lg">
             <div class="aspect-video w-full rounded-md bg-linear-to-br from-surface-3 to-surface-2"></div>
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-deep"><%= share.tag %></span>
+              <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-ink-deep"><%= share.tag %></span>
             </div>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= share.title %></h3>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-ink-deep"><%= share.title %></h3>
             <p class="text-18 text-muted-2"><%= share.author %> · <%= share.date %></p>
           </a>
         <% end %>
@@ -175,7 +175,7 @@
   <section class="bg-surface-2 py-16 lg:py-24" id="events">
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-ink-deep lg:text-44">
           <%= Landing.copy("events.title") %>
         </h2>
       </div>
@@ -183,8 +183,8 @@
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <% Landing.events.each do |event| %>
           <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md">
-            <span class="inline-flex w-fit items-center rounded-full bg-brand px-3 py-0.5 text-18 font-medium text-surface"><%= event.when_label %></span>
-            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-deep"><%= event.title %></h3>
+            <span class="inline-flex w-fit items-center rounded-full bg-brand px-3 py-0.5 text-18 font-medium text-white"><%= event.when_label %></span>
+            <h3 class="line-clamp-2 text-24 leading-tight font-bold text-balance text-brand-ink-deep"><%= event.title %></h3>
             <p class="text-18 text-muted-2"><%= event.where_label %></p>
           </article>
         <% end %>
@@ -195,14 +195,14 @@
   <section class="py-16 lg:py-24" id="faq">
     <div class="mx-auto w-full max-w-page px-4 xl:px-8">
       <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 class="text-36 leading-tight font-bold text-balance text-brand-deep lg:text-44">
+        <h2 class="text-36 leading-tight font-bold text-balance text-brand-ink-deep lg:text-44">
           <%= Landing.copy("faq_title") %>
         </h2>
       </div>
       <% Landing.faqs.each do |faq| %>
         <details class="group border-b border-hairline">
           <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 py-4 text-24 font-medium
-                          text-brand-deep after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
+                          text-brand-ink-deep after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
                           after:border-b-2 after:border-current after:transition-transform after:duration-300
                           after:content-[''] group-open:after:rotate-[-135deg]"><%= faq.question %></summary>
           <div class="pb-4 text-18 text-muted"><%= faq.answer %></div>

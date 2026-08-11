@@ -36,7 +36,7 @@
       <span class="text-14 font-bold text-ink"><%= t("chrome.notif_title") %></span>
       <% if unread %>
         <%= button_to t("chrome.notif_read_all"), read_notifications_path,
-              class: "cursor-pointer text-12-5 text-brand hover:text-brand-deep" %>
+              class: "cursor-pointer text-12-5 text-brand-ink hover:text-brand-ink-deep" %>
       <% end %>
     </div>
 
@@ -55,7 +55,7 @@
                 frame-scoped visit would look like a link that does nothing. %>
             <%= link_to notification.action_label, notification.action_path,
                   data: { turbo_frame: "_top" },
-                  class: "mt-1 inline-block text-12-5 font-semibold text-brand hover:text-brand-deep" %>
+                  class: "mt-1 inline-block text-12-5 font-semibold text-brand-ink hover:text-brand-ink-deep" %>
           <% end %>
           <div class="mt-0.5 font-mono text-11 text-muted-2">
             <%= notification.created_at.in_time_zone.strftime("%d/%m %H:%M") %>

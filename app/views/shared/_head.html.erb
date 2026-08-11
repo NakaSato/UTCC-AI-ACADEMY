@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="application-name" content="UTCC AI Academy">
 <meta name="mobile-web-app-capable" content="yes">
+<%# The one hex outside the @theme block, because a meta tag cannot read a CSS
+    variable — see docs/design-system.md. It mirrors --color-chrome, and chrome
+    is the same value in both palettes, so one tag still answers for both. %>
 <meta name="theme-color" content="#17120F">
 <%= csrf_meta_tags %>
 <%= csp_meta_tag %>

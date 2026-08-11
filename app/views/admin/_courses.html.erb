@@ -4,7 +4,7 @@
     <%= search_field_tag :q, @query, placeholder: t("admin.courses_search_ph"),
           "aria-label": t("admin.courses_search_ph"),
           class: "w-full max-w-[340px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25
-                  text-14 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+                  text-14 text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
   <% end %>
 <% end %>
 
@@ -33,7 +33,7 @@
           </span>
           <% course.available_transitions.each do |state| %>
             <%= button_to t("admin.courses.transition.#{state}"), admin_course_state_path(course.record),
-                  method: :patch, params: { state:, from: course.state }, class: "rounded-full border border-hairline-2 px-2.5 py-1 text-11-5 font-semibold text-ink-2 hover:border-brand hover:text-brand-deep" %>
+                  method: :patch, params: { state:, from: course.state }, class: "rounded-full border border-hairline-2 px-2.5 py-1 text-11-5 font-semibold text-ink-2 hover:border-brand-ink hover:text-brand-ink-deep" %>
           <% end %>
         </div>
       </div>

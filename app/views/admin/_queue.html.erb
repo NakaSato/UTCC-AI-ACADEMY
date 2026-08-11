@@ -34,7 +34,7 @@
                     class: "rounded-full bg-brand px-3.5 py-2 text-12 font-semibold text-white hover:bg-brand-deep" %>
               <%= button_to t("admin.queue.reject"), admin_approval_decision_path(request),
                     method: :post, params: { outcome: "rejected" },
-                    class: "rounded-full border border-hairline-2 px-3.5 py-2 text-12 font-semibold text-ink-2 hover:border-brand hover:text-brand-deep" %>
+                    class: "rounded-full border border-hairline-2 px-3.5 py-2 text-12 font-semibold text-ink-2 hover:border-brand-ink hover:text-brand-ink-deep" %>
             </div>
           <% elsif request.pending? %>
             <span class="flex-none rounded-[10px] border border-hairline bg-surface-4 px-4.5 py-2.5 text-13-5 font-medium text-muted-2">

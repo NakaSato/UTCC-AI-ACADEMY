@@ -29,8 +29,8 @@
           </select>
         </label>
         <%= button_to t("academic.reader.export"), export_academic_post_path(@post), method: :get,
-              class: "rounded px-3 py-1 text-12.5 font-semibold text-brand hover:bg-brand-tint" %>
-        <button type="button" data-action="reader#toggleTheme" class="rounded px-3 py-1 text-12.5 font-semibold text-brand hover:bg-brand-tint"><%= t("academic.reader.theme") %></button>
+              class: "rounded px-3 py-1 text-12.5 font-semibold text-brand-ink hover:bg-brand-tint" %>
+        <button type="button" data-action="reader#toggleTheme" class="rounded px-3 py-1 text-12.5 font-semibold text-brand-ink hover:bg-brand-tint"><%= t("academic.reader.theme") %></button>
       </section>
 
       <nav class="mb-6 rounded-field border border-hairline-2 bg-surface-2 p-3 text-13" aria-label="<%= t("academic.reader.contents") %>">
@@ -61,7 +61,7 @@
               <span class="text-12.5 text-muted"><%= t("academic.collaboration.permission") %></span>
               <%= form.select :permission, [[t("academic.collaboration.viewer"), "viewer"], [t("academic.collaboration.editor"), "editor"]], {}, class: "rounded border border-hairline-2 bg-surface px-2.5 py-2 text-13 text-ink" %>
             </label>
-            <%= form.submit t("academic.collaboration.invite"), class: "cursor-pointer rounded px-3 py-2 text-13 font-semibold text-brand hover:bg-brand-tint" %>
+            <%= form.submit t("academic.collaboration.invite"), class: "cursor-pointer rounded px-3 py-2 text-13 font-semibold text-brand-ink hover:bg-brand-tint" %>
           <% end %>
 
           <% if @post.memberships.active.any? || @post.invitations.pending.any? %>
@@ -75,7 +75,7 @@
               <% @post.invitations.pending.includes(:invitee).each do |invitation| %>
                 <div class="text-13 text-muted">
                   <%= t("academic.collaboration.pending", name: invitation.invitee.name) %> ·
-                  <%= link_to t("academic.collaboration.acceptance_link"), academic_post_invitation_path(invitation.token), class: "text-brand hover:text-brand-deep" %>
+                  <%= link_to t("academic.collaboration.acceptance_link"), academic_post_invitation_path(invitation.token), class: "text-brand-ink hover:text-brand-ink-deep" %>
                 </div>
               <% end %>
             </div>

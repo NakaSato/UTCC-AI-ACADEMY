@@ -15,7 +15,7 @@
             style: "animation-delay: #{index * 40}ms",
             class: class_names(
               "flex animate-pop items-center gap-2.25 rounded-full border-[1.5px] px-4 py-2.5 text-14 font-medium transition-colors",
-              "border-brand bg-brand-tint text-brand-deep" => current,
+              "border-brand-ink bg-brand-tint text-brand-ink-deep" => current,
               "border-hairline bg-surface text-ink-2 hover:border-muted-3" => !current
             ) do %>
         <span><%= t("catalog.filters.#{filter}") %></span>
@@ -71,7 +71,7 @@
           <div class="mb-4.5">
             <div class="mb-1.75 flex items-baseline justify-between gap-2.5">
               <span class="text-12-5 text-muted"><%= course.progress_text %></span>
-              <span class="text-13 font-bold text-brand"><%= course.percent %>%</span>
+              <span class="text-13 font-bold text-brand-ink"><%= course.percent %>%</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-surface-3">
               <div class="h-full origin-left animate-bar rounded-full bg-brand"
@@ -90,7 +90,7 @@
       <% end %>
     <% end %>
 
-    <div class="flex flex-col justify-center rounded-card border-[1.5px] border-brand bg-brand-tint p-6.5">
+    <div class="flex flex-col justify-center rounded-card border-[1.5px] border-brand-ink bg-brand-tint p-6.5">
       <h2 class="mb-2.5 text-20 font-bold tracking-[-0.02em]"><%= t("catalog.not_sure_title") %></h2>
       <p class="mb-5 text-14-5 leading-[1.6] text-ink-4"><%= t("catalog.not_sure_desc") %></p>
       <%= link_to t("catalog.not_sure_btn"), course_path("AI1101"),

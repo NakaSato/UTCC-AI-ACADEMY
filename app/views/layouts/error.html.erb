@@ -7,7 +7,7 @@
     No canonical, no hreflang, no Open Graph: an error is not a page anyone
     should arrive at from a search result, which is what the robots tag says. %>
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" class="<%= theme_class %>">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -34,7 +34,7 @@
                         width: 48, height: 48, loading: "eager",
                         class: "block h-12 w-auto" %>
           <span class="flex flex-col justify-center border-l border-chrome-line pl-3 leading-none">
-            <span class="text-20 font-bold tracking-[0.02em] text-surface"><%= t("landing.brand_name") %></span>
+            <span class="text-20 font-bold tracking-[0.02em] text-white"><%= t("landing.brand_name") %></span>
             <span class="mt-1 text-11-5 font-light tracking-[0.14em] text-on-chrome uppercase">
               <%= t("chrome.brand_line") %>
             </span>

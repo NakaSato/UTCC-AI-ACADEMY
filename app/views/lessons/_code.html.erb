@@ -8,7 +8,7 @@
      data-code-task-topic-value="<%= @topic_key %>"
      data-code-task-starter-value="<%= @lesson_content.starter_code %>">
   <div class="rounded-card border border-hairline bg-surface p-7 sm:px-8">
-    <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+    <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand-ink uppercase">
       <%= @lesson_content.translate("code.eyebrow") %>
     </div>
     <h1 class="mb-4 text-23 leading-[1.3] font-bold tracking-[-0.02em]"><%= @lesson_content.translate("code.title") %></h1>
@@ -61,7 +61,7 @@
 
         <%= link_to @lesson_content.translate("code.finish"), lesson_step_path(:summary),
               data: { code_task_target: "finish", panel: :summary, action: "panels#select" },
-              class: "ml-auto hidden rounded-[9px] border-[1.5px] border-brand px-4.5 py-2 text-14 font-semibold
+              class: "ml-auto hidden rounded-[9px] border-[1.5px] border-brand-ink px-4.5 py-2 text-14 font-semibold
                       text-danger-soft" %>
       </div>
 

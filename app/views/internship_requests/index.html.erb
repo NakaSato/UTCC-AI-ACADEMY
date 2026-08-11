@@ -29,7 +29,7 @@
       <% @requests.each do |internship_request| %>
         <li>
           <%= link_to internship_request_path(internship_request),
-                class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand hover:shadow-sm" do %>
+                class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand-ink hover:shadow-sm" do %>
             <div class="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 class="text-18 font-semibold text-ink"><%= internship_request.organization.name %></h2>

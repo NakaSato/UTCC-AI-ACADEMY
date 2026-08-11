@@ -21,7 +21,7 @@
                     width: 48, height: 48, loading: "eager",
                     class: "block h-12 w-auto" %>
       <span class="flex flex-col justify-center border-l border-chrome-line pl-3 leading-none">
-        <span class="text-20 font-bold tracking-[0.02em] text-surface"><%= t("landing.brand_name") %></span>
+        <span class="text-20 font-bold tracking-[0.02em] text-white"><%= t("landing.brand_name") %></span>
         <span class="mt-1 text-11-5 font-light tracking-[0.14em] text-on-chrome uppercase">
           <%= t("chrome.brand_line") %>
         </span>
@@ -41,11 +41,11 @@
           <a href="<%= href %>"
              data-header-target="navLink"
              data-active="false"
-             class="relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-surface
+             class="relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-white
                     after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
                     after:bg-on-chrome after:transition-[width] after:duration-300 after:content-['']
                     hover:after:right-auto hover:after:left-0 hover:after:w-full
-                    data-[active=true]:text-surface data-[active=true]:after:right-auto
+                    data-[active=true]:text-white data-[active=true]:after:right-auto
                     data-[active=true]:after:left-0 data-[active=true]:after:w-full
                     data-[active=true]:after:bg-brand"><%= label %></a>
         <% end %>
@@ -56,10 +56,11 @@
       <%# The landing page reads from `landing.*` in both locales now, so the
           toggle belongs here as much as it does on the app header. %>
       <%= render "shared/language_toggle", dark: true %>
+      <%= render "shared/theme_toggle", dark: true %>
 
       <div class="hidden items-center gap-2 lg:flex">
         <%= link_to t("landing.sign_in"), login_path,
-              class: "relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-surface
+              class: "relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-white
                       after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
                       after:bg-on-chrome after:transition-[width] after:duration-300 after:content-['']
                       hover:after:right-auto hover:after:left-0 hover:after:w-full" %>
@@ -67,12 +68,12 @@
             primary button everywhere else. %>
         <%= link_to t("landing.sign_up"), register_path,
               class: "inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-18 leading-tight
-                      font-normal whitespace-nowrap text-surface shadow-md transition duration-300
+                      font-normal whitespace-nowrap text-white shadow-md transition duration-300
                       hover:bg-brand-deep hover:shadow-lg active:scale-97" %>
       </div>
 
       <button type="button"
-              class="inline-flex rounded-full p-2 text-surface transition duration-300 hover:bg-surface/12 lg:hidden"
+              class="inline-flex rounded-full p-2 text-white transition duration-300 hover:bg-surface/12 lg:hidden"
               data-action="header#toggle" aria-label="<%= t("landing.menu_open") %>"
               aria-controls="landing-menu" aria-expanded="false"
               data-header-target="toggle">
@@ -93,7 +94,7 @@
          class="absolute top-0 right-0 h-full w-[min(20rem,85vw)] translate-x-full overflow-y-auto bg-chrome p-4
                 shadow-2xl transition-transform duration-300 group-data-[open=true]:translate-x-0"
          role="dialog" aria-modal="true" aria-label="<%= t("landing.menu_label") %>">
-      <div class="mb-4 flex items-center justify-between gap-4 text-surface">
+      <div class="mb-4 flex items-center justify-between gap-4 text-white">
         <span class="flex items-center gap-2">
           <%= image_tag "utcc-eng-shield.svg", alt: "", aria: { hidden: true },
                         width: 28, height: 28, class: "block h-7 w-auto" %>
@@ -113,22 +114,22 @@
           <a href="<%= href %>"
              data-header-target="navLink"
              data-active="false"
-             class="border-b border-chrome-line py-2 text-on-chrome transition-colors duration-300 hover:text-surface
-                    data-[active=true]:border-brand data-[active=true]:text-surface"
+             class="border-b border-chrome-line py-2 text-on-chrome transition-colors duration-300 hover:text-white
+                    data-[active=true]:border-brand-ink data-[active=true]:text-white"
              data-action="header#close"><%= label %></a>
         <% end %>
       </div>
 
-      <div class="mt-4 flex flex-col gap-2 text-surface">
+      <div class="mt-4 flex flex-col gap-2 text-white">
         <%# The drawer sits on the ink field, so an outline button takes the
             light-on-dark variant to stay visible. %>
         <%= link_to t("landing.sign_in"), login_path,
               class: "inline-flex w-full items-center justify-center gap-2 rounded-full border border-surface
-                      px-6 py-2.5 text-18 leading-tight font-normal whitespace-nowrap text-surface
+                      px-6 py-2.5 text-18 leading-tight font-normal whitespace-nowrap text-white
                       transition duration-300 hover:bg-surface hover:text-chrome active:scale-97" %>
         <%= link_to t("landing.sign_up"), register_path,
               class: "inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5
-                      text-18 leading-tight font-normal whitespace-nowrap text-surface shadow-md
+                      text-18 leading-tight font-normal whitespace-nowrap text-white shadow-md
                       transition duration-300 hover:bg-brand-deep hover:shadow-lg active:scale-97" %>
       </div>
     </div>

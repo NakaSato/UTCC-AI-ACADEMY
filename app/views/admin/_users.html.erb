@@ -8,7 +8,7 @@
           admin_path(tab: :users, role: (chip unless chip == :all), q: @query.presence),
           class: class_names(
             "rounded-full border-[1.5px] px-3.75 py-1.75 text-13-5 font-medium transition-colors",
-            "border-brand bg-brand-tint text-brand-deep" => current,
+            "border-brand-ink bg-brand-tint text-brand-ink-deep" => current,
             "border-hairline bg-surface text-ink-2 hover:border-muted-3" => !current
           ) %>
   <% end %>
@@ -20,7 +20,7 @@
       <%= search_field_tag :q, @query, placeholder: t("admin.users_search_ph"),
             "aria-label": t("admin.users_search_ph"),
             class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25 text-14
-                    text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+                    text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
     <% end %>
   <% end %>
 </div>
@@ -40,7 +40,7 @@
         <span class="text-13 font-medium text-ink-4"><%= t("admin.console_account.name") %></span>
         <%= text_field_tag "console_account[name]", nil, required: true, maxlength: 60,
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
 
       <label class="flex flex-col gap-1.5">
@@ -48,7 +48,7 @@
         <%= text_field_tag "console_account[username]", nil, maxlength: 30,
               spellcheck: false, autocapitalize: "off", placeholder: "wichai",
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
 
       <label class="flex flex-col gap-1.5">
@@ -58,7 +58,7 @@
         <%= email_field_tag "console_account[email_address]", nil, required: true, maxlength: 255,
               spellcheck: false, autocapitalize: "off", placeholder: "you@utcc.ac.th",
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
     </div>
 
@@ -68,7 +68,7 @@
         <%= select_tag :access,
               options_for_select(AdminConsole::CONSOLE_ACCESS.map { [ t("admin.console_account.access.#{it}"), it ] }),
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
 
       <%# Both are read only when access is "company" — see the controller. %>
@@ -78,7 +78,7 @@
               options_from_collection_for_select(@organizations, :id, :name),
               include_blank: t("admin.console_account.no_organization"),
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
 
       <label class="flex flex-col gap-1.5">
@@ -86,7 +86,7 @@
         <%= select_tag :membership_role,
               options_for_select(OrganizationMembership::ROLES.map { [ t("recruitment.memberships.roles.#{it}"), it ] }),
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                      transition-colors outline-none focus:border-brand" %>
+                      transition-colors outline-none focus:border-brand-ink" %>
       </label>
     </div>
 
@@ -126,7 +126,7 @@
       <span class="hidden sm:block">
         <span class="rounded-full px-2.75 py-1 text-12-5 font-semibold
                      <%= class_names(
-                           "bg-brand-tint text-brand-deep" => user.admin?,
+                           "bg-brand-tint text-brand-ink-deep" => user.admin?,
                            "bg-gold-tint text-gold-ink" => user.instructor?,
                            "bg-surface-2 text-ink-4" => user.student?
                          ) %>">
@@ -154,7 +154,7 @@
                   options_for_select(User::ROLES.map { [ t("admin.roles.#{it}"), it ] }, user.role),
                   "aria-label": t("admin.role_for", name: user.name),
                   class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                          transition-colors outline-none focus:border-brand" %>
+                          transition-colors outline-none focus:border-brand-ink" %>
             <%= submit_tag t("admin.save"),
                   class: "rounded-field bg-brand px-4 py-2 text-14 font-semibold whitespace-nowrap text-white
                           transition-colors hover:bg-brand-deep" %>

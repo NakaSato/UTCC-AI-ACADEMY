@@ -224,6 +224,11 @@ en:
     notif_empty: "Nothing yet — activity about your account will appear here"
     notif_toggle: "Open notifications"
     toast_dismiss: "Dismiss this message"
+    theme_label: "Colour theme"
+    theme:
+      light: "Light"
+      system: "Match my device"
+      dark: "Dark"
     user_toggle: "Open account menu"
     nav_label: "Main"
     nav_toggle: "Open main menu"

@@ -17,7 +17,7 @@
           <%= t("catalog.courses.AI1101.title") %>
         </h1>
         <%= link_to t("my_learning.course_link"), course_path("AI1101"),
-              class: "mb-6.5 inline-block border-b border-brand-line text-14-5 text-brand hover:text-brand-deep" %>
+              class: "mb-6.5 inline-block border-b border-brand-line text-14-5 text-brand-ink hover:text-brand-ink-deep" %>
 
         <div class="mb-7 flex flex-col gap-4">
           <%# Counted across the courses actually started, so the denominator is
@@ -28,7 +28,7 @@
                  progress.applied_percent, "bg-gold" ] ].each do |label, done, total, percent, fill| %>
             <div class="flex flex-wrap items-center gap-4">
               <span class="w-[150px] flex-none text-14-5 text-ink-4"><%= label %></span>
-              <span class="flex-none rounded-lg bg-brand-tint px-3 py-1 text-13-5 font-semibold text-brand-deep">
+              <span class="flex-none rounded-lg bg-brand-tint px-3 py-1 text-13-5 font-semibold text-brand-ink-deep">
                 <%= done %> / <%= total %>
               </span>
               <span class="w-11 flex-none text-14 text-muted-2"><%= percent %>%</span>
@@ -43,7 +43,7 @@
           <span class="text-14-5 text-muted">
             <%= t("my_learning.pick_project_before") %>
             <%= link_to t("my_learning.pick_project_link"), knowledge_map_path(mode: :project),
-                  class: "text-brand hover:text-brand-deep" %>
+                  class: "text-brand-ink hover:text-brand-ink-deep" %>
             <%= t("my_learning.pick_project_after") %>
           </span>
           <%= link_to t("my_learning.continue"), lesson_path(course: "AI1101"),
@@ -64,8 +64,8 @@
                   data: { panel: tab, path: my_learning_path(tab: tab),
                           panels_target: "tab", action: "panels#select" },
                   class: "-mb-px border-b-[2.5px] border-transparent px-0.5 pt-5 pb-4 text-15-5 font-medium
-                          text-muted transition-colors hover:text-ink aria-selected:border-brand
-                          aria-selected:font-semibold aria-selected:text-brand" %>
+                          text-muted transition-colors hover:text-ink aria-selected:border-brand-ink
+                          aria-selected:font-semibold aria-selected:text-brand-ink" %>
           <% end %>
         </nav>
 
@@ -88,7 +88,7 @@
                   </span>
                   <span class="text-17 font-semibold tracking-[-0.02em]"><%= enrollment.title %></span>
                   <span class="rounded-full px-2.75 py-1 text-12 font-semibold whitespace-nowrap
-                               <%= enrollment.in_progress? ? "bg-brand-tint text-brand-deep" : "bg-success-tint text-success-deep" %>">
+                               <%= enrollment.in_progress? ? "bg-brand-tint text-brand-ink-deep" : "bg-success-tint text-success-deep" %>">
                     <%= enrollment.badge %>
                   </span>
                   <span class="ml-auto font-mono text-12 text-muted-3"><%= enrollment.code %></span>
@@ -116,10 +116,10 @@
 
                   <div class="flex flex-wrap items-center justify-between gap-4.5">
                     <%= link_to t("my_learning.view_syllabus"), course_path(enrollment.code),
-                          class: "text-14 font-medium text-brand hover:text-brand-deep" %>
+                          class: "text-14 font-medium text-brand-ink hover:text-brand-ink-deep" %>
                     <%= link_to t("my_learning.continue"), lesson_path(course: enrollment.code),
-                          class: "rounded-[10px] border-[1.5px] border-brand px-5 py-2.25 text-14 font-semibold
-                                  whitespace-nowrap text-brand-deep transition-colors hover:bg-brand-tint" %>
+                          class: "rounded-[10px] border-[1.5px] border-brand-ink px-5 py-2.25 text-14 font-semibold
+                                  whitespace-nowrap text-brand-ink-deep transition-colors hover:bg-brand-tint" %>
                   </div>
                 </div>
               </details>
@@ -129,7 +129,7 @@
 
         <div class="flex justify-end pt-5">
           <%= link_to t("my_learning.explore_catalog"), root_path,
-                class: "text-14-5 font-medium text-brand hover:text-brand-deep" %>
+                class: "text-14-5 font-medium text-brand-ink hover:text-brand-ink-deep" %>
         </div>
       </section>
     </div>

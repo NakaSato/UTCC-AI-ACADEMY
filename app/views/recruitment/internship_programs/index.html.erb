@@ -4,7 +4,7 @@
   <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
     <div>
       <% unless @public %>
-        <%= link_to t("recruitment.internships.back_to_organization"), company_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+        <%= link_to t("recruitment.internships.back_to_organization"), company_path(@organization), class: "text-13 font-semibold text-brand-ink hover:underline" %>
       <% end %>
       <h1 class="mt-3 text-32 font-bold tracking-[-0.035em] text-ink"><%= @public ? t("recruitment.internships.public_title") : t("recruitment.internships.management_title") %></h1>
       <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= @public ? t("recruitment.internships.public_subtitle") : t("recruitment.internships.management_subtitle") %></p>
@@ -25,7 +25,7 @@
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-12 text-muted"><%= @public ? program.organization.name : program.department %></p>
-              <h2 class="mt-1 text-20 font-semibold text-ink"><%= link_to program.name.presence || t("recruitment.internships.untitled"), @public ? recruitment_internship_path(program) : company_internship_program_path(@organization, program), class: "hover:text-brand" %></h2>
+              <h2 class="mt-1 text-20 font-semibold text-ink"><%= link_to program.name.presence || t("recruitment.internships.untitled"), @public ? recruitment_internship_path(program) : company_internship_program_path(@organization, program), class: "hover:text-brand-ink" %></h2>
             </div>
             <% unless @public %>
               <span class="rounded-full bg-surface-2 px-3 py-1 text-12 font-semibold text-muted"><%= t("recruitment.internships.status.#{program.status}") %></span>

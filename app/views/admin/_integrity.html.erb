@@ -7,7 +7,7 @@
 </div>
 
 <%# Spelled out rather than interpolated so Tailwind's scanner sees them. %>
-<% severity_pill = { high: "bg-brand-tint text-brand-deep", medium: "bg-gold-tint text-gold-ink",
+<% severity_pill = { high: "bg-brand-tint text-brand-ink-deep", medium: "bg-gold-tint text-gold-ink",
                      low: "bg-surface-2 text-muted" } %>
 <% severity_edge = { high: "border-danger-line", medium: "border-gold-tint", low: "border-hairline" } %>
 
@@ -59,7 +59,7 @@
                       text-13-5 text-muted transition-colors hover:border-success hover:text-success" %>
         <%= button_to t("admin.integrity.actions.notify"), notify_integrity_case_path(kase.user),
               class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
-                      text-13-5 text-muted transition-colors hover:border-brand hover:text-brand" %>
+                      text-13-5 text-muted transition-colors hover:border-brand-ink hover:text-brand-ink" %>
         <%= button_to t("admin.integrity.actions.escalate"), escalate_integrity_case_path(kase.user),
               class: "cursor-pointer rounded-[10px] bg-brand px-4.5 py-2.5 text-13-5 font-semibold text-white
                       transition-colors hover:bg-brand-deep" %>

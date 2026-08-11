@@ -17,11 +17,26 @@ Everything lives in one file, `app/assets/tailwind/application.css`. There is no
 
 | Block | Holds |
 |---|---|
-| `@theme` | every token — `--color-*`, `--text-*`, `--radius-*`, `--shadow-*`, `--breakpoint-*`, `--container-*`, `--animate-*` and their keyframes. **The only place a raw hex belongs.** |
+| `@custom-variant dark` | one line, so a `dark:` utility is available if a screen ever needs one. Almost nothing does — see below |
+| `@theme` | every token — `--color-*`, `--text-*`, `--radius-*`, `--shadow-*`, `--breakpoint-*`, `--container-*`, `--animate-*` and their keyframes. **The light palette, and the only place a raw hex belongs apart from the dark block below.** |
+| `@layer theme` | the dark palette: the same `--color-*` names with dark values, twice — once under `.dark`, once under `@media (prefers-color-scheme: dark)` |
 | `@layer base` | page defaults: smooth scrolling with header-clearing `scroll-padding-top`, the button-cursor preflight restore, the `:focus-visible` ring, the reduced-motion block |
 | `@utility` × 8 | escape hatches for multi-stop gradients and clip-paths — see below |
 
-The one hex outside the file is the `theme-color` meta tag in `shared/_head`, which mirrors `--color-chrome` (`#17120F`) because a meta tag cannot read a CSS variable.
+The one hex outside the file is the `theme-color` meta tag in `shared/_head`, which mirrors `--color-chrome` (`#17120F`) because a meta tag cannot read a CSS variable. Chrome is the same value in both palettes, so one tag still answers for both.
+
+### Dark mode
+
+**No template carries a `dark:` utility, and none should.** Every colour in the app is a token, so dark mode redefines the tokens and the whole product repaints. `bg-canvas` compiles to `background-color: var(--color-canvas)`, and `.dark` gives that variable a different value.
+
+The design is *the rest of the app joins the chrome*. The chrome family and the `on-chrome-*` ramp are the one part that does not change — they were drawn for a near-black field already — so the header and footer look identical in both palettes. The canvas goes **below** chrome (`#0F0C0B` against `#17120F`) so the header still lifts off the page, and cards lift above both.
+
+Which palette a visitor gets is `session[:theme]`, rendered as a class on `<html>` and toggled by `shared/_theme_toggle` — the language toggle's twin, POST for the same reason. No preference at all means no class, and the media query answers, exactly as an unset locale falls through to `Accept-Language`. There is **no pre-paint script**: the server knows the answer when it renders, so there is no flash to prevent. See SPEC-0047.
+
+Two things to know before touching it:
+
+- **The dark block is written twice** — once for `.dark`, once for the media query — because CSS cannot share a declaration block across the two. `test/assets/dark_palette_test.rb` fails if they drift, and also checks every text pair against WCAG AA in both palettes.
+- **The theme toggle submits with `data-turbo: false`.** Turbo replaces `<body>` and merges `<head>` but never touches attributes on `<html>`, so a Turbo visit would leave the class stale and the palette unchanged until a reload.
 
 ## Color
 
@@ -31,8 +46,10 @@ Tokens are grouped by **role**, and the names say where a colour goes — not wh
 
 | Token | Hex | Used for |
 |---|---|---|
-| `brand` | `#A81E32` | primary fills, active state, progress |
-| `brand-deep` | `#7F1526` | hover on brand fills, text on tint |
+| `brand` | `#A81E32` | primary **fills**, active state, progress — the same in both palettes |
+| `brand-deep` | `#7F1526` | hover on brand fills |
+| `brand-ink` | `#A81E32` → `#E4798D` | crimson as **text and borders**; lifts in dark mode |
+| `brand-ink-deep` | `#7F1526` → `#F0A3AE` | its hover |
 | `brand-tint` | `#FDF6F6` | selected row, soft panel |
 | `brand-line` | `#F0DCDD` | hairline on a tint panel |
 | `brand-soft` | `#E79AA4` | the "learned" pill border |
@@ -158,7 +175,9 @@ Eight exist, and each is there for the same reason: **a multi-stop gradient or c
 ## Conventions
 
 - **There are no component classes** — no `.btn`, no `.card`. If a recipe repeats across views, repeat the utilities; that is the trade Tailwind asks for, and it keeps the cascade flat.
-- **Never hardcode a hex outside the `@theme` block** (the `theme-color` meta tag is the lone exception, above).
+- **Never hardcode a hex outside the `@theme` block and its dark counterpart** (the `theme-color` meta tag is the lone exception, above).
+- **Crimson as a fill and crimson as ink are different tokens.** `bg-brand` is the fill; `text-brand-ink` and `border-brand-ink` are the ink, with `-deep` for the hover on each. They are the same colour in light mode and deliberately different in dark, because no single crimson can carry white text *and* be readable on a near-black canvas — white on a fill needs a luminance at or below 0.183, ink on the canvas needs 0.210 or above, and that range is empty. `gold-ink` and `success-ink` already named the same distinction. There is no `text-brand`.
+- **`text-white` means white.** Use it for text on a brand fill or on the chrome field; do not reach for `text-surface`, which is a *surface* colour and goes dark with the palette.
 - **State travels on `data-*` attributes and is read by Tailwind variants** (`data-[state=correct]:`, `data-[open=true]:`, `group-open:`, `aria-selected:`). Stimulus controllers set an attribute; they do not juggle class lists. Accordions are native `<details class="group">` with `group-open:` styling — no controller.
 - The one controller that does touch classes, `header_controller`, receives its pinned state as **several** utilities via `data-header-pinned-class` and so calls `classList.add/remove(...this.pinnedClasses)` — `classList.toggle` accepts only one class and will silently drop the rest.
 - **A skeleton repeats the grid of what it stands in for, and lives beside it.** `skeleton`/`skeleton-on-chrome` and `animate-shimmer` are the tokens; the markup is per-screen, because a placeholder whose rows do not line up with the real ones shifts the layout the moment they land. `leaderboards/_skeleton` is the working example — it sits inside that screen's lazy Turbo frame, repeats the board row's `grid-cols` so both fall under one column header, staggers its shimmer by 90ms a row, and is `aria-hidden` inside a `role="status"` wrapper whose only readable text is `chrome.loading`. Decoration announces itself once, not eight times.

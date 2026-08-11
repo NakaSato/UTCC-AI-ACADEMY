@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" class="<%= theme_class %>">
   <head>
     <%= render "shared/head" %>
   </head>
 
   <body class="bg-canvas font-sans text-16 leading-body text-ink antialiased">
     <a href="#main"
-       class="absolute -top-full left-4 z-50 rounded-field bg-surface px-4 py-2 text-brand-deep shadow-lg transition-[top] duration-300 focus:top-2">
+       class="absolute -top-full left-4 z-50 rounded-field bg-surface px-4 py-2 text-brand-ink-deep shadow-lg transition-[top] duration-300 focus:top-2">
       <%= t("chrome.skip_to_content") %>
     </a>
 

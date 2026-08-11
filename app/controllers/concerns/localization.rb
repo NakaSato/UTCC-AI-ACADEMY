@@ -7,9 +7,21 @@ module Localization
 
   included do
     around_action :switch_locale
+    helper_method :theme_class
   end
 
   private
+    # What goes on <html>. Nothing when the visitor has never chosen, which is
+    # what hands the decision to `prefers-color-scheme` in the stylesheet — the
+    # same fall-through `switch_locale` gives Accept-Language. An explicit
+    # "light" is a class rather than an absence because it has to beat a dark
+    # system setting.
+    # Not an endless def with a modifier `if`: that would make the *definition*
+    # conditional and evaluate `session` while the class is loading.
+    def theme_class
+      session[:theme] if %w[ light dark ].include?(session[:theme])
+    end
+
     # Three sources, most specific first: the URL, the toggle, then the browser.
     #
     # The header's toggle writes session[:locale] and every request reads it back.

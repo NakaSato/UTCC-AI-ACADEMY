@@ -57,7 +57,7 @@
                 <span class="mt-0.5 block text-12-5 text-muted-2"><%= mod.meta_text %></span>
               </span>
 
-              <span class="hidden text-12-5 font-medium sm:inline <%= mod.current? ? "text-brand" : "text-muted-2" %>">
+              <span class="hidden text-12-5 font-medium sm:inline <%= mod.current? ? "text-brand-ink" : "text-muted-2" %>">
                 <%= mod.status_name %>
               </span>
               <span aria-hidden="true" class="text-11 text-muted-3 group-open:hidden">▼</span>
@@ -73,7 +73,7 @@
                 <% row = capture do %>
                   <span aria-hidden="true"
                         class="text-12 <%= class_names(
-                                             "text-brand" => topic.done?,
+                                             "text-brand-ink" => topic.done?,
                                              "text-muted-4" => mod.done? && !topic.done?,
                                              "text-brand-line" => mod.current? && !topic.done?,
                                              "text-hairline-2" => mod.locked?
@@ -103,7 +103,7 @@
       <div class="rounded-card border border-hairline bg-surface p-6">
         <div class="mb-2 flex items-baseline justify-between">
           <span class="text-14 font-semibold"><%= t("course.your_progress") %></span>
-          <span class="text-14 font-bold text-brand"><%= @course.percent %>%</span>
+          <span class="text-14 font-bold text-brand-ink"><%= @course.percent %>%</span>
         </div>
         <div class="mb-4.5 h-2 overflow-hidden rounded-full bg-surface-3">
           <div class="h-full rounded-full bg-brand" style="width: <%= @course.percent %>%"></div>

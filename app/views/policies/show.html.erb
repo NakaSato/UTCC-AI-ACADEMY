@@ -23,7 +23,7 @@
       <% @sections.each do |section| %>
         <li class="[counter-increment:section]">
           <h2 class="mb-3 text-20 leading-[1.3] font-bold tracking-[-0.02em]
-                     before:mr-2 before:text-brand before:content-[counter(section)_'.']">
+                     before:mr-2 before:text-brand-ink before:content-[counter(section)_'.']">
             <%= section.title %>
           </h2>
 
@@ -35,7 +35,7 @@
             <% if section.items? %>
               <ul class="flex list-disc flex-col gap-2 pl-5.5">
                 <% section.items.each do |item| %>
-                  <li class="text-15-5 leading-[1.7] text-ink-4 marker:text-brand"><%= item %></li>
+                  <li class="text-15-5 leading-[1.7] text-ink-4 marker:text-brand-ink"><%= item %></li>
                 <% end %>
               </ul>
             <% end %>
@@ -50,7 +50,7 @@
       <% other = @document == :privacy ? :terms : :privacy %>
       <%= link_to t("policy.read_other", document: Policy.title_for(other)),
             other == :privacy ? privacy_path : terms_path,
-            class: "text-15 font-medium text-brand transition-colors hover:text-brand-deep" %>
+            class: "text-15 font-medium text-brand-ink transition-colors hover:text-brand-ink-deep" %>
     </footer>
   </article>
 </main>

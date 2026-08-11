@@ -10,7 +10,7 @@
         <span class="text-13-5 font-medium text-ink-4"><%= t("academic.fields.title") %></span>
         <%= form.text_field :title, size: nil, required: false, maxlength: 200,
               placeholder: t("academic.fields.title_placeholder"),
-              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none focus:border-brand" %>
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink outline-none focus:border-brand-ink" %>
       </label>
 
       <div class="flex flex-col gap-1.75">
@@ -31,18 +31,18 @@
             <button type="button" data-action="tiptap#toggleBlockquote" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.blockquote") %>">❝</button>
             <button type="button" data-action="tiptap#insertMath" class="rounded px-2 py-1 text-13 hover:bg-surface" aria-label="<%= t("academic.editor.math") %>">∑</button>
             <% if post.persisted? %>
-              <label class="ml-auto cursor-pointer rounded px-2 py-1 text-13 font-medium text-brand-deep hover:bg-brand-tint">
+              <label class="ml-auto cursor-pointer rounded px-2 py-1 text-13 font-medium text-brand-ink-deep hover:bg-brand-tint">
                 <span><%= t("academic.editor.picture") %></span>
                 <input type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"
                        data-tiptap-target="pictureInput" data-action="change->tiptap#importPicture">
               </label>
               <input type="text" maxlength="160" placeholder="<%= t("academic.editor.picture_alt") %>"
-                     class="w-40 rounded border border-hairline-2 bg-surface px-2 py-1 text-12.5 text-ink outline-none focus:border-brand"
+                     class="w-40 rounded border border-hairline-2 bg-surface px-2 py-1 text-12.5 text-ink outline-none focus:border-brand-ink"
                      data-tiptap-target="pictureAlt" aria-label="<%= t("academic.editor.picture_alt") %>">
             <% end %>
           </div>
 
-          <div data-tiptap-target="editor" class="min-h-[260px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-4 py-3 text-15 leading-[1.65] text-ink outline-none focus-within:border-brand"
+          <div data-tiptap-target="editor" class="min-h-[260px] rounded-field border-[1.5px] border-hairline-2 bg-surface px-4 py-3 text-15 leading-[1.65] text-ink outline-none focus-within:border-brand-ink"
                data-placeholder="<%= t("academic.fields.body_placeholder") %>"></div>
 
           <div data-tiptap-target="bubbleMenu" class="tiptap-menu rounded-field border border-hairline bg-surface px-2 py-1 shadow-menu" aria-label="<%= t("academic.editor.selection_menu") %>">

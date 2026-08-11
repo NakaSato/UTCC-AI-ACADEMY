@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-09T22:30:00+07:00",
+  "updated_at": "2026-08-11T09:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2226,6 +2226,33 @@
         }
       ],
       "updated_at": "2026-08-09T22:30:00+07:00"
+    },
+    {
+      "id": "UX-005",
+      "title": "Give the app a dark palette a reader can choose",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead, Product Owner, and Design Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-003"
+      ],
+      "blocker": null,
+      "evidence": [
+        {
+          "label": "Dark mode specification",
+          "url": "specs/spec-dark-mode.html"
+        },
+        {
+          "label": "Dark mode ADR",
+          "url": "decisions/adr-0047-dark-mode-by-token-override.html"
+        },
+        {
+          "label": "Design system palette reference",
+          "url": "design-system.html"
+        }
+      ],
+      "updated_at": "2026-08-11T09:30:00+07:00"
     }
   ],
   "recently_completed": [

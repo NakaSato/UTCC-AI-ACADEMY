@@ -55,7 +55,7 @@
               <%= hidden_field_tag :lock_version, setting.lock_version %>
               <%= submit_tag t("instructor.integrity_actions.#{setting.enabled ? :disable : :enable}"),
                     class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
-                            text-13-5 text-ink-4 transition-colors hover:border-brand hover:text-brand" %>
+                            text-13-5 text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
             <% end %>
           </div>
         <% end %>
@@ -109,7 +109,7 @@
             <span class="text-right text-14 font-semibold
                          <%= class_names(
                                "text-success" => student.on_track?,
-                               "text-brand" => student.behind?,
+                               "text-brand-ink" => student.behind?,
                                "text-ink-2" => !student.on_track? && !student.behind?
                              ) %>">
               <%= student.percent %>%

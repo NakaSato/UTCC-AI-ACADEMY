@@ -51,4 +51,5 @@ owner.
 - [SPEC-0043 — Console account identity, admin-created accounts, and the identifier model](spec-console-account-identity.md) — accepted; three identifier columns, at least one required, and an admin creation screen
 - [SPEC-0044 — Role-aware navigation, front doors, and company profile addresses](spec-role-aware-workspaces.md) — accepted; User#workspace drives the nav, the strip, and where / lands; organizations addressed by name
 - [SPEC-0045 — Error pages for every failed request, rendered and flat](spec-error-pages.md) — accepted; exceptions_app renders bilingual branded pages that read no database, and public/ is generated from the same copy
+- [SPEC-0047 — Dark mode, the palette toggle, and the fill/ink split](spec-dark-mode.md) — accepted; the tokens flip, no template carries a `dark:` utility, and crimson splits into a fill and an ink
 - [SPEC-0046 — Toast notifications and the two ways to raise one](spec-toast-notifications.md) — accepted; one host, one row template, one clock, four kinds, six positions, reached by a Stimulus dispatch or by turbo_stream.toast

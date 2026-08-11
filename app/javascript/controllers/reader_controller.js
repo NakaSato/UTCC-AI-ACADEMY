@@ -64,7 +64,7 @@ export default class extends Controller {
       const link = document.createElement("a")
       link.href = `#${heading.id}`
       link.textContent = heading.textContent.trim()
-      link.className = "text-brand hover:text-brand-deep"
+      link.className = "text-brand-ink hover:text-brand-ink-deep"
       item.append(link)
       this.tocTarget.append(item)
     })

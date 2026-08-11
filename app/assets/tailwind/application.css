@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Dark mode is a class on <html>, written by the server from session[:theme] —
+   the same shape as the language toggle, and the reason there is no pre-paint
+   script anywhere in this app: the server already knows the answer when it
+   renders, so there is no flash of the wrong theme to prevent. A visitor who
+   has never touched the toggle gets no class at all and the media query below
+   decides, which is the same rule switch_locale uses for Accept-Language. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Design tokens — ported from the "UTCC AI Fundamental App UI" design
  * (claude.ai/design project 7a17af7d). See docs/design-system.md for the
@@ -17,6 +25,15 @@
   --color-brand-soft:  #E79AA4;  /* the "learned" pill border               */
   --color-brand-accent:#8F2130;  /* error text                              */
   --color-brand-alert: #C4566A;  /* error border, wrong-answer state        */
+
+  /* Crimson as *ink* — text and borders — rather than as a fill. Identical to
+     `brand` in light mode, and deliberately a separate token because dark mode
+     cannot use one value for both: white on a brand fill needs a luminance at
+     or below 0.183, brand text on the dark canvas needs 0.210 or above, and
+     that range is empty. `gold-ink` and `success-ink` already name the same
+     distinction. Fills stay `bg-brand`; text and borders take these. */
+  --color-brand-ink:      #A81E32;
+  --color-brand-ink-deep: #7F1526;  /* its hover                            */
 
   /* ---- Chrome: the near-black field the header and dark panels sit on -- */
   --color-chrome:        #17120F;
@@ -207,6 +224,138 @@
   @keyframes top-bar {
     from { transform: translateX(-100%); }
     to   { transform: translateX(320%); }
+  }
+}
+
+/* ---- The dark palette ------------------------------------------------------
+ *
+ * Dark mode is "the rest of the app joins the chrome". The chrome family and
+ * the `on-chrome-*` text ramp are absent from both blocks below on purpose:
+ * they were designed for a near-black field already, so the header and footer
+ * are the one part of the app that does not change. The canvas goes *below*
+ * chrome so the header still lifts off the page, and cards lift above both.
+ *
+ * Only the variables are redefined; no template carries a `dark:` utility.
+ * Every colour in this app is a token (see docs/design-system.md), so
+ * overriding the tokens repaints the whole product.
+ *
+ * The block appears twice because CSS has no way to share one declaration
+ * block between a class selector and a media query without a preprocessor.
+ * They must stay identical, and test/assets/dark_palette_test.rb fails if they
+ * drift or if a token is dark in one and not the other.
+ */
+@layer theme {
+  /* An explicit choice from the toggle. */
+  .dark {
+    color-scheme: dark;
+
+    --color-canvas:    #0F0C0B;
+    --color-surface:   #1A1512;
+    --color-surface-2: #211A16;
+    --color-surface-3: #272019;
+    --color-surface-4: #151110;
+    --color-surface-5: #1E1815;
+
+    --color-hairline:   #332B26;
+    --color-hairline-2: #3E352E;
+    --color-hairline-3: #4A4038;
+
+    --color-ink:     #F4EFEA;
+    --color-ink-2:   #E6DFD8;
+    --color-ink-3:   #E2DBD4;
+    --color-ink-4:   #CFC7BF;
+    --color-muted:   #ABA199;
+    --color-muted-2: #93897F;
+    --color-muted-3: #6E645D;
+    --color-muted-4: #5A514B;
+
+    /* `brand` itself does not move: it is a fill, and white on it is the same
+       combination the header already ships. Only the ink lifts. */
+    --color-brand-ink:      #E4798D;
+    --color-brand-ink-deep: #F0A3AE;
+    --color-brand-tint:  #241416;
+    --color-brand-line:  #3A2226;
+    --color-brand-accent:#F0A3AE;
+
+    --color-gold-tint: #3A2C10;
+    --color-gold-ink:  #F6E4B8;
+
+    --color-success-deep: #8FD6A4;
+    --color-success-tint: #132018;
+    --color-success-line: #27402F;
+    --color-success-ink:  #C6E6D0;
+
+    --color-danger-tint: #241416;
+    --color-danger-line: #3A2226;
+
+    --color-heat-0: #211A16;
+    --color-heat-1: #4A2028;
+    --color-heat-2: #8F2130;
+    --color-heat-3: #C4566A;
+    --color-heat-4: #E79AA4;
+
+    /* A shadow is a darker shade of the surface below it; on a dark surface
+       that reads as nothing, so the resting card leans on its border and the
+       raised states go deeper rather than softer. */
+    --shadow-card:       0 2px 8px rgba(0, 0, 0, 0.40);
+    --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.55);
+    --shadow-menu:       0 18px 44px rgba(0, 0, 0, 0.62);
+  }
+
+  /* No choice made: follow the browser, exactly as an unset language follows
+     Accept-Language. `:not(.light)` is what lets an explicit light choice win
+     against a dark system setting. */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      color-scheme: dark;
+
+      --color-canvas:    #0F0C0B;
+      --color-surface:   #1A1512;
+      --color-surface-2: #211A16;
+      --color-surface-3: #272019;
+      --color-surface-4: #151110;
+      --color-surface-5: #1E1815;
+
+      --color-hairline:   #332B26;
+      --color-hairline-2: #3E352E;
+      --color-hairline-3: #4A4038;
+
+      --color-ink:     #F4EFEA;
+      --color-ink-2:   #E6DFD8;
+      --color-ink-3:   #E2DBD4;
+      --color-ink-4:   #CFC7BF;
+      --color-muted:   #ABA199;
+      --color-muted-2: #93897F;
+      --color-muted-3: #6E645D;
+      --color-muted-4: #5A514B;
+
+      --color-brand-ink:      #E4798D;
+      --color-brand-ink-deep: #F0A3AE;
+      --color-brand-tint:  #241416;
+      --color-brand-line:  #3A2226;
+      --color-brand-accent:#F0A3AE;
+
+      --color-gold-tint: #3A2C10;
+      --color-gold-ink:  #F6E4B8;
+
+      --color-success-deep: #8FD6A4;
+      --color-success-tint: #132018;
+      --color-success-line: #27402F;
+      --color-success-ink:  #C6E6D0;
+
+      --color-danger-tint: #241416;
+      --color-danger-line: #3A2226;
+
+      --color-heat-0: #211A16;
+      --color-heat-1: #4A2028;
+      --color-heat-2: #8F2130;
+      --color-heat-3: #C4566A;
+      --color-heat-4: #E79AA4;
+
+      --shadow-card:       0 2px 8px rgba(0, 0, 0, 0.40);
+      --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.55);
+      --shadow-menu:       0 18px 44px rgba(0, 0, 0, 0.62);
+    }
   }
 }
 

@@ -5,7 +5,7 @@
      data-quiz-url-value="<%= submit_lesson_path %>"
      data-quiz-course-value="<%= @course.code %>"
      data-quiz-topic-value="<%= @topic_key %>">
-  <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand uppercase">
+  <div class="mb-2.5 text-12-5 font-semibold tracking-[0.06em] text-brand-ink uppercase">
     <%= @lesson_content.translate("quiz.eyebrow") %>
   </div>
   <h1 class="mb-6.5 max-w-[60ch] text-22 leading-[1.35] font-bold tracking-[-0.02em] text-balance sm:text-27">
@@ -18,7 +18,7 @@
               data-quiz-target="option" data-action="quiz#pick" data-index="<%= index %>" data-state=""
               class="group flex items-center gap-3.5 rounded-[13px] border-[1.5px] border-hairline bg-surface
                      px-5 py-4.25 text-left text-15-5 text-ink-2 transition-colors
-                     data-[state=picked]:border-brand data-[state=picked]:bg-brand-tint data-[state=picked]:text-ink
+                     data-[state=picked]:border-brand-ink data-[state=picked]:bg-brand-tint data-[state=picked]:text-ink
                      data-[state=correct]:border-success data-[state=correct]:bg-success-tint data-[state=correct]:text-success-ink
                      data-[state=wrong]:border-brand-alert data-[state=wrong]:bg-danger-tint">
         <span class="grid size-6.5 flex-none place-items-center rounded-lg bg-surface-2 text-12-5 font-semibold
@@ -51,7 +51,7 @@
 
     <%= link_to @lesson_content.translate("quiz.to_code"), lesson_step_path(:code),
           data: { quiz_target: "next", panel: :code, action: "panels#select" },
-          class: "hidden rounded-field border-[1.5px] border-brand px-6.5 py-2.75 text-15 font-semibold text-brand
+          class: "hidden rounded-field border-[1.5px] border-brand-ink px-6.5 py-2.75 text-15 font-semibold text-brand-ink
                   transition-colors hover:bg-brand-tint" %>
   </div>
 

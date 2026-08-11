@@ -3,14 +3,14 @@
 <main id="main" class="mx-auto max-w-page px-4 pt-12 pb-20 sm:px-8">
   <section class="mx-auto max-w-[720px] rounded-panel border border-hairline bg-surface px-6 py-9 text-center shadow-card sm:px-10 sm:py-12">
     <div class="mx-auto grid size-14 place-items-center rounded-full bg-success-tint text-24 text-success-deep ring-8 ring-success-tint/70" aria-hidden="true">✓</div>
-    <p class="mt-7 text-12-5 font-semibold tracking-[0.16em] text-brand uppercase"><%= t("proposal_request.confirmation_eyebrow") %></p>
-    <h1 class="mt-3 text-32 leading-tight font-bold tracking-[-0.04em] text-brand-deep sm:text-40"><%= t("proposal_request.confirmation_title") %></h1>
+    <p class="mt-7 text-12-5 font-semibold tracking-[0.16em] text-brand-ink uppercase"><%= t("proposal_request.confirmation_eyebrow") %></p>
+    <h1 class="mt-3 text-32 leading-tight font-bold tracking-[-0.04em] text-brand-ink-deep sm:text-40"><%= t("proposal_request.confirmation_title") %></h1>
     <p class="mx-auto mt-4 max-w-[52ch] text-15 leading-[1.7] text-muted"><%= t("proposal_request.confirmation_body") %></p>
 
     <div class="mx-auto mt-8 max-w-[520px] rounded-box bg-surface-2 px-5 py-4 text-left">
       <div class="flex flex-wrap items-baseline justify-between gap-2">
         <span class="text-12-5 text-muted-2"><%= t("proposal_request.reference") %></span>
-        <span class="font-mono text-15 font-semibold text-brand-deep"><%= @proposal.reference %></span>
+        <span class="font-mono text-15 font-semibold text-brand-ink-deep"><%= @proposal.reference %></span>
       </div>
       <p class="mt-3 text-18 font-semibold text-ink"><%= @proposal.title %></p>
       <p class="mt-1 text-13-5 text-muted"><%= t("proposal_request.categories.#{@proposal.category}") %> · <%= t("proposal_request.status.#{@proposal.status}") %></p>
@@ -20,7 +20,7 @@
       <%= link_to t("proposal_request.back_to_contributors"), contributors_path,
             class: "inline-flex items-center rounded-full bg-brand px-5 py-3 text-14-5 font-semibold text-white transition hover:bg-brand-deep" %>
       <%= link_to t("proposal_request.send_another"), new_proposal_request_path,
-            class: "inline-flex items-center rounded-full border border-hairline-2 px-5 py-3 text-14-5 font-semibold text-ink-4 transition hover:border-brand hover:text-brand" %>
+            class: "inline-flex items-center rounded-full border border-hairline-2 px-5 py-3 text-14-5 font-semibold text-ink-4 transition hover:border-brand-ink hover:text-brand-ink" %>
     </div>
   </section>
 </main>

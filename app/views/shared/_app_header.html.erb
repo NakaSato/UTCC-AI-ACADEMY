@@ -40,6 +40,9 @@
         and the rail still belongs against the right edge. %>
     <div class="ml-auto flex flex-none items-center gap-2">
       <%= render "shared/language_toggle" %>
+      <%# Beside the language toggle because they are the same kind of thing: a
+          presentation preference the visitor owns, kept in the session. %>
+      <%= render "shared/theme_toggle" %>
 
       <%# Subscribed here rather than inside the bell, so a replacement cannot
           tear down the subscription that delivered it. The channel name still
@@ -76,7 +79,7 @@
           </span>
           <div class="flex gap-1" aria-hidden="true">
             <% progress.hearts_max.times do |index| %>
-              <span class="text-12 <%= index < progress.hearts ? "text-brand" : "text-chrome-edge-2" %>">♥</span>
+              <span class="text-12 <%= index < progress.hearts ? "text-brand-ink" : "text-chrome-edge-2" %>">♥</span>
             <% end %>
           </div>
           <%# Derived, and only when a heart is actually missing — the old copy

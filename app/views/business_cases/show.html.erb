@@ -3,7 +3,7 @@
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
     <%= link_to t("business_cases.back"), business_cases_path,
-          class: "text-13 font-semibold text-brand hover:underline" %>
+          class: "text-13 font-semibold text-brand-ink hover:underline" %>
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
       <div>
         <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= @business_case.organization.name %></p>
@@ -13,7 +13,7 @@
         <span class="rounded-full bg-surface-2 px-3 py-1.5 text-12 font-semibold text-muted"><%= t("business_cases.status.#{@business_case.status}") %></span>
         <% if @manageable && @business_case.editable? %>
           <%= link_to t("business_cases.edit"), edit_business_case_path(@business_case),
-                class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+                class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand-ink hover:text-brand-ink" %>
         <% end %>
         <% if @manageable && @business_case.draft? %>
           <%= button_to t("business_cases.show.publish"), publish_business_case_path(@business_case),
@@ -69,7 +69,7 @@
                   <% if @manageable && milestone.open? && !@business_case.closed? %>
                     <%= button_to t("business_cases.show.complete_milestone"),
                           complete_milestone_business_case_path(@business_case, milestone_id: milestone.id),
-                          class: "rounded-full border border-hairline px-3 py-1 text-11 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+                          class: "rounded-full border border-hairline px-3 py-1 text-11 font-semibold text-muted transition hover:border-brand-ink hover:text-brand-ink" %>
                   <% end %>
                 </div>
               </div>

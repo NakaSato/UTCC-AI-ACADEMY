@@ -32,6 +32,12 @@ Rails.application.routes.draw do
   post "language/:locale", to: "languages#update", as: :language,
        constraints: { locale: /th|en/ }
 
+  # The palette toggle, same shape and for the same reason: a GET would repaint
+  # the app on hover. "system" clears the preference rather than storing a third
+  # value — see ThemesController.
+  post "theme/:theme", to: "themes#update", as: :theme,
+       constraints: { theme: /light|dark|system/ }
+
   # The policy documents. Public, and named for what they are rather than nested
   # under a /policies prefix nobody would type.
   get "privacy", to: "policies#privacy", as: :privacy

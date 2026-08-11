@@ -29,7 +29,7 @@
                      "aria-label": "#{t("admin.landing.fields.#{Landing.field_name(field)}")} · #{locale}",
                      class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25
                              text-14 text-ink transition-colors outline-none placeholder:text-muted-3
-                             focus:border-brand" } %>
+                             focus:border-brand-ink" } %>
         <% if Landing.long?(field) %>
           <%= text_area_tag name, written, rows: 3, **attrs %>
         <% else %>

@@ -3,7 +3,7 @@
     <% flash.each do |type, message| %>
       <div role="status"
            class="mx-auto w-full max-w-page rounded-field border-l-4 bg-surface px-4 py-3 text-14-5 shadow-card
-                  <%= type == "alert" ? "border-brand-alert text-brand-accent" : "border-brand text-brand-deep" %>">
+                  <%= type == "alert" ? "border-brand-alert text-brand-accent" : "border-brand-ink text-brand-ink-deep" %>">
         <%= message %>
       </div>
     <% end %>

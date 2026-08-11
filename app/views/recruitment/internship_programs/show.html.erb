@@ -1,7 +1,7 @@
 <% content_for :title, "#{@program.name.presence || t("recruitment.internships.untitled")} — UTCC AI Academy" %>
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to @public ? t("recruitment.internships.public_title") : t("recruitment.internships.back_to_programs"), @public ? recruitment_internships_path : company_internship_programs_path(@organization), class: "text-13 font-semibold text-brand hover:underline" %>
+    <%= link_to @public ? t("recruitment.internships.public_title") : t("recruitment.internships.back_to_programs"), @public ? recruitment_internships_path : company_internship_programs_path(@organization), class: "text-13 font-semibold text-brand-ink hover:underline" %>
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
       <div>
         <p class="text-13 text-muted"><%= @organization.name %></p>
@@ -23,10 +23,10 @@
           <% if @application %>
             <p class="mt-2 text-13 text-muted"><%= t("recruitment.internships.application_status", status: t("recruitment.internships.application_statuses.#{@application.status}")) %></p>
             <% if @application.pending? || @application.accepted? %>
-              <%= button_to t("recruitment.internships.withdraw"), recruitment_withdraw_internship_application_path(@application), method: :post, class: "mt-4 rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" %>
+              <%= button_to t("recruitment.internships.withdraw"), recruitment_withdraw_internship_application_path(@application), method: :post, class: "mt-4 rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand-ink hover:border-brand-ink" %>
             <% end %>
             <% if @internship_assistant %>
-              <section class="mt-6 rounded-xl border border-brand/20 bg-brand/5 p-5">
+              <section class="mt-6 rounded-xl border border-brand-ink/20 bg-brand/5 p-5">
                 <h3 class="text-17 font-semibold text-ink"><%= t("recruitment.internships.assistant_title") %></h3>
                 <p class="mt-1 text-13 leading-relaxed text-muted"><%= t("recruitment.internships.assistant_subtitle") %></p>
                 <ul class="mt-4 space-y-3">
@@ -67,7 +67,7 @@
     <section class="mt-6 rounded-card border border-hairline bg-surface-1 p-6">
       <p class="text-13 text-muted"><%= t("recruitment.internships.approval_note") %></p>
       <div class="mt-5 flex flex-wrap gap-3">
-        <%= link_to t("recruitment.internships.edit"), edit_company_internship_program_path(@organization, @program), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand hover:border-brand" if @can_edit %>
+        <%= link_to t("recruitment.internships.edit"), edit_company_internship_program_path(@organization, @program), class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-brand-ink hover:border-brand-ink" if @can_edit %>
         <%= button_to t("recruitment.internships.submit"), submit_company_internship_program_path(@organization, @program), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" if @can_submit %>
         <%= button_to t("recruitment.internships.request_changes"), request_changes_company_internship_program_path(@organization, @program), method: :post, class: "rounded-full border border-hairline px-4 py-2.5 text-13 font-semibold text-muted" if @can_request_changes %>
         <%= button_to t("recruitment.internships.publish"), publish_company_internship_program_path(@organization, @program), method: :post, class: "rounded-full bg-brand px-4 py-2.5 text-13 font-semibold text-white" if @can_publish %>
@@ -109,7 +109,7 @@
                 <% if suggestion.actionable? %>
                   <%= form_with url: company_internship_program_suggestion_path(@organization, @program, suggestion), scope: :recruitment_internship_program_suggestion, method: :patch, class: "mt-5" do |form| %>
                     <%= form.text_area :content, value: suggestion.content, rows: 4, maxlength: 20_000, class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
-                    <%= form.submit t("recruitment.internships.edit_suggestion"), class: "mt-3 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand" %>
+                    <%= form.submit t("recruitment.internships.edit_suggestion"), class: "mt-3 rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand-ink" %>
                   <% end %>
                   <div class="mt-3 flex flex-wrap gap-2">
                     <%= button_to t("recruitment.internships.accept_suggestion"), accept_company_internship_program_suggestion_path(@organization, @program, suggestion), method: :post, class: "rounded-full bg-brand px-3 py-2 text-12 font-semibold text-white" %>
@@ -156,7 +156,7 @@
                     <%= form.select :learning_outcomes_met, [[t("recruitment.internships.yes"), true], [t("recruitment.internships.no"), false]], { selected: evaluation&.learning_outcomes_met }, class: "ml-2 rounded-lg border border-hairline bg-surface-1 px-2 py-1 text-12 text-ink" %>
                     <%= form.text_area :feedback, value: evaluation&.feedback, rows: 3, required: true, placeholder: t("recruitment.internships.evaluation.feedback"), class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
                     <%= form.text_area :next_steps, value: evaluation&.next_steps, rows: 3, required: true, placeholder: t("recruitment.internships.evaluation.next_steps"), class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
-                    <%= form.submit t("recruitment.internships.evaluation.submit"), class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand hover:border-brand" %>
+                    <%= form.submit t("recruitment.internships.evaluation.submit"), class: "rounded-full border border-hairline px-3 py-2 text-12 font-semibold text-brand-ink hover:border-brand-ink" %>
                   <% end %>
                 <% end %>
               </article>

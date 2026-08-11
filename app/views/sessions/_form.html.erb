@@ -19,7 +19,7 @@
             title: t("auth.fields.student_id_hint"),
             value: params[:student_id],
             class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
-                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
     </label>
 
     <label class="flex flex-col gap-1.75">
@@ -27,7 +27,7 @@
       <%= form.password_field :password, required: true, maxlength: 72,
             autocomplete: "current-password", placeholder: "••••••••",
             class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.75 py-3.25 text-15 text-ink
-                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+                    transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
     </label>
   </div>
 
@@ -40,7 +40,7 @@
       <span><%= t("auth.remember") %></span>
     </label>
     <%= link_to t("auth.forgot_link"), forgot_password_path,
-          class: "text-14 font-medium text-brand hover:text-brand-deep" %>
+          class: "text-14 font-medium text-brand-ink hover:text-brand-ink-deep" %>
   </div>
 
   <%= form.submit t("auth.login.submit"),
@@ -56,5 +56,5 @@
     about, and the people it is for are the ones least likely to be told. %>
 <p class="mt-4 text-14">
   <%= link_to t("auth.login.console_link"), console_path,
-        class: "font-medium text-brand hover:text-brand-deep" %>
+        class: "font-medium text-brand-ink hover:text-brand-ink-deep" %>
 </p>

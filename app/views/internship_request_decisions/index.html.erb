@@ -3,7 +3,7 @@
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
     <%= link_to t("internship_requests.back_to_organization"), company_path(@organization),
-          class: "text-13 font-semibold text-brand hover:underline" %>
+          class: "text-13 font-semibold text-brand-ink hover:underline" %>
     <h1 class="mt-5 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_requests.queue_title") %></h1>
     <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted">
       <%= t("internship_requests.queue_subtitle", name: @organization.name, count: @awaiting) %>
@@ -62,7 +62,7 @@
             <div class="mt-5 flex flex-wrap items-start gap-3 border-t border-hairline pt-5">
               <% if internship_request.submitted? %>
                 <%= button_to t("internship_requests.start_review"), review_internship_request_path(internship_request),
-                      class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand hover:text-brand" %>
+                      class: "rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-muted transition hover:border-brand-ink hover:text-brand-ink" %>
               <% end %>
               <%= button_to t("internship_requests.approve"), approve_internship_request_path(internship_request),
                     class: "rounded-full bg-brand px-4 py-2 text-13 font-semibold text-white transition hover:bg-brand-dark" %>

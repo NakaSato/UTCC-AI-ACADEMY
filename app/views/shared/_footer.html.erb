@@ -19,7 +19,7 @@
                       width: 40, height: 40, loading: "lazy",
                       class: "block h-10 w-auto" %>
         <span class="flex flex-col justify-center border-l border-chrome-line pl-3.5 leading-[1.15]">
-          <span class="text-15 font-semibold tracking-[-0.01em] text-surface">UTCC</span>
+          <span class="text-15 font-semibold tracking-[-0.01em] text-white">UTCC</span>
           <span class="text-10 font-medium tracking-[0.11em] text-on-chrome-muted uppercase">
             <%= t("chrome.brand_line") %>
           </span>
@@ -34,7 +34,7 @@
       </p>
       <%# The disclaimer is the one place the crimson shows on this field — a
           rule rather than a fill, so it reads as an aside and not an action. %>
-      <p class="max-w-[42ch] border-l-2 border-brand pl-3 text-12-5 leading-[1.65] text-pretty text-on-chrome-dim">
+      <p class="max-w-[42ch] border-l-2 border-brand-ink pl-3 text-12-5 leading-[1.65] text-pretty text-on-chrome-dim">
         <%= t("chrome.footer.by") %>
       </p>
     </div>
@@ -47,7 +47,7 @@
         <div class="flex flex-col items-start gap-[11px]">
           <% links.each do |link, href| %>
             <a href="<%= href %>"
-               class="text-left text-13-5 leading-[1.5] text-on-chrome transition-colors duration-150 hover:text-surface">
+               class="text-left text-13-5 leading-[1.5] text-on-chrome transition-colors duration-150 hover:text-white">
               <%= t("chrome.footer.columns.#{column}.links.#{link}") %>
             </a>
           <% end %>
@@ -62,16 +62,16 @@
     <span class="text-12-5 text-on-chrome-dim"><%= t("chrome.footer.rights") %></span>
     <div class="flex flex-wrap items-center gap-[22px]">
       <%= link_to t("chrome.footer.pdpa"), privacy_path,
-            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface" %>
+            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-white" %>
       <%= link_to t("chrome.footer.terms"), terms_path,
-            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-surface" %>
+            class: "text-12-5 text-on-chrome-muted transition-colors duration-150 hover:text-white" %>
     </div>
   </div>
 </footer>
 
 <button type="button"
         class="invisible fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-brand
-               text-surface opacity-0 shadow-lg transition duration-300
+               text-white opacity-0 shadow-lg transition duration-300
                data-[visible=true]:visible data-[visible=true]:opacity-100"
         data-controller="to-top" data-action="to-top#scrollUp" aria-label="<%= t("chrome.to_top") %>">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"

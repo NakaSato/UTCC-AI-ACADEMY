@@ -62,13 +62,13 @@
               <%= button_to t("admin.landing.move_up"), move_admin_landing_card_path(card.id, dir: :up),
                     method: :patch, form_class: "contents",
                     class: "cursor-pointer rounded-[8px] border border-hairline-2 bg-surface px-2 py-1 text-12-5
-                            text-muted-2 transition-colors hover:border-brand hover:text-brand" %>
+                            text-muted-2 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
             <% end %>
             <% if index < group.cards.size - 1 %>
               <%= button_to t("admin.landing.move_down"), move_admin_landing_card_path(card.id, dir: :down),
                     method: :patch, form_class: "contents",
                     class: "cursor-pointer rounded-[8px] border border-hairline-2 bg-surface px-2 py-1 text-12-5
-                            text-muted-2 transition-colors hover:border-brand hover:text-brand" %>
+                            text-muted-2 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
             <% end %>
 
             <%# The one irreversible control on this screen: it takes the
@@ -91,14 +91,14 @@
                       options_for_select(LandingCard::LEVELS.map { [ t("levels.#{it}"), it ] }, card.record.level),
                       form: form_id,
                       class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                              transition-colors outline-none focus:border-brand" %>
+                              transition-colors outline-none focus:border-brand-ink" %>
               </label>
               <label class="flex flex-col gap-1.5">
                 <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.fields.weeks") %></span>
                 <%= number_field_tag "card[#{card.id}][weeks]", card.record.weeks, min: 1, form: form_id,
                       placeholder: t("admin.landing.ongoing_ph"),
                       class: "w-40 rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14
-                              text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand" %>
+                              text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
               </label>
             </div>
           <% elsif group.collection == "events" %>
@@ -106,7 +106,7 @@
               <span class="text-12-5 font-semibold text-ink-4"><%= t("admin.landing.fields.starts_on") %></span>
               <%= date_field_tag "card[#{card.id}][starts_on]", card.record.starts_on, form: form_id,
                     class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
-                            transition-colors outline-none focus:border-brand" %>
+                            transition-colors outline-none focus:border-brand-ink" %>
             </label>
           <% end %>
 
@@ -138,13 +138,13 @@
                 <%= text_field_tag "title[#{locale}]", nil,
                       "aria-label": "#{t("admin.landing.add_title")} · #{locale}",
                       class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2.25 text-14
-                              text-ink transition-colors outline-none focus:border-brand" %>
+                              text-ink transition-colors outline-none focus:border-brand-ink" %>
               </label>
             <% end %>
 
             <%= submit_tag t("admin.landing.add"),
                   class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-4 py-2.25
-                          text-14 font-semibold text-ink-4 transition-colors hover:border-brand hover:text-brand" %>
+                          text-14 font-semibold text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
           </div>
         <% end %>
       <% end %>

@@ -16,12 +16,38 @@
       *, *::before, *::after { box-sizing: border-box; }
       * { margin: 0; }
 
+      /* The palette, as variables, because this page gets a dark one too. It
+         cannot read session[:theme] — it is a flat file served when there is no
+         app to ask — so `prefers-color-scheme` is the only signal available,
+         and it is the same signal the app falls back to for a visitor who has
+         never touched the toggle. The values match the .dark block in
+         app/assets/tailwind/application.css. */
+      :root {
+        color-scheme: light;
+        --canvas: #F7F4F1;
+        --ink: #191512;
+        --muted: #6F6660;
+        --hairline: #E7E1DB;
+        --brand-ink: #A81E32;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --canvas: #0F0C0B;
+          --ink: #F4EFEA;
+          --muted: #ABA199;
+          --hairline: #332B26;
+          --brand-ink: #E4798D;
+        }
+      }
+
       body {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background: #F7F4F1;
-        color: #191512;
+        background: var(--canvas);
+        color: var(--ink);
         font-family: "IBM Plex Sans Thai", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
         font-size: 1rem;
         line-height: 1.6;
@@ -71,21 +97,21 @@
         font-weight: 700;
         line-height: 1;
         letter-spacing: -0.02em;
-        color: #A81E32;
+        color: var(--brand-ink);
       }
       .name {
         font-size: 0.84375rem;
         font-weight: 500;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: #8B8179;
+        color: var(--muted);
       }
 
       h1 { margin-top: 1.5rem; font-size: 1.875rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.025em; }
-      p.body { margin-top: 1rem; font-size: 1.03125rem; line-height: 1.7; color: #6F6660; }
+      p.body { margin-top: 1rem; font-size: 1.03125rem; line-height: 1.7; color: var(--muted); }
 
       /* The English half, under a hairline: the same page, said again. */
-      .translation { margin-top: 2rem; border-top: 1px solid #E7E1DB; padding-top: 2rem; }
+      .translation { margin-top: 2rem; border-top: 1px solid var(--hairline); padding-top: 2rem; }
       .translation h2 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; }
 
       .home {

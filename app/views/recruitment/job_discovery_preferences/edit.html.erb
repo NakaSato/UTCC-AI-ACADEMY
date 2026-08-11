@@ -2,7 +2,7 @@
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">
-    <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path, class: "text-13 font-semibold text-brand hover:underline" %>
+    <%= link_to t("recruitment.jobs.public_title"), recruitment_jobs_path, class: "text-13 font-semibold text-brand-ink hover:underline" %>
     <h1 class="mt-4 text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.jobs.alert_preferences") %></h1>
     <p class="mt-2 max-w-2xl text-14 leading-relaxed text-muted"><%= t("recruitment.jobs.alert_preferences_subtitle") %></p>
   </div>
@@ -17,11 +17,11 @@
       <h2 class="text-18 font-semibold text-ink"><%= t("recruitment.jobs.alert_settings_title") %></h2>
       <div class="mt-4 space-y-4">
         <label class="flex items-start gap-3 text-13 text-ink">
-          <%= form.check_box :alert_consent, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand" %>
+          <%= form.check_box :alert_consent, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand-ink" %>
           <span><%= t("recruitment.jobs.alert_consent") %><span class="mt-1 block text-12 text-muted"><%= t("recruitment.jobs.alert_consent_hint") %></span></span>
         </label>
         <label class="flex items-start gap-3 text-13 text-ink">
-          <%= form.check_box :alerts_enabled, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand" %>
+          <%= form.check_box :alerts_enabled, class: "mt-0.5 h-4 w-4 rounded border-hairline text-brand-ink" %>
           <span><%= t("recruitment.jobs.alerts_enabled") %><span class="mt-1 block text-12 text-muted"><%= t("recruitment.jobs.alerts_enabled_hint") %></span></span>
         </label>
         <div>

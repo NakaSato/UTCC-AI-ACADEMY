@@ -20,13 +20,13 @@
       <% @posts.each do |post| %>
         <article class="rounded-panel border border-hairline bg-surface p-5 shadow-card">
           <div class="mb-3 flex items-start justify-between gap-3">
-            <h2 class="text-19 font-bold"><%= link_to post.title.presence || t("academic.untitled"), post, class: "hover:text-brand" %></h2>
+            <h2 class="text-19 font-bold"><%= link_to post.title.presence || t("academic.untitled"), post, class: "hover:text-brand-ink" %></h2>
             <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted-2"><%= t("academic.status.#{post.status}") %></span>
           </div>
           <p class="line-clamp-3 whitespace-pre-line text-14 leading-[1.6] text-muted"><%= post.body.presence || t("academic.no_body") %></p>
           <div class="mt-5 flex items-center justify-between gap-3 text-12-5 text-muted-2">
             <span><%= l(post.updated_at, format: :short) %></span>
-            <%= link_to t("academic.open"), post, class: "font-semibold text-brand hover:text-brand-deep" %>
+            <%= link_to t("academic.open"), post, class: "font-semibold text-brand-ink hover:text-brand-ink-deep" %>
           </div>
         </article>
       <% end %>
