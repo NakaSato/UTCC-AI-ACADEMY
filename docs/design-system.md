@@ -36,7 +36,7 @@ Which palette a visitor gets is `session[:theme]`, rendered as a class on `<html
 Two things to know before touching it:
 
 - **The dark block is written twice** — once for `.dark`, once for the media query — because CSS cannot share a declaration block across the two. `test/assets/dark_palette_test.rb` fails if they drift, and also checks every text pair against WCAG AA in both palettes.
-- **The theme toggle submits with `data-turbo: false`.** Turbo replaces `<body>` and merges `<head>` but never touches attributes on `<html>`, so a Turbo visit would leave the class stale and the palette unchanged until a reload.
+- **The theme toggle submits with `data-turbo: false`.** Turbo replaces `<body>`, merges `<head>`, and copies exactly two attributes off the incoming `<html>` — `lang` and `dir`. `class` is not one of them, so a Turbo visit would leave the palette class stale and the palette unchanged until a reload. (This is also why the *language* toggle needs no such treatment: `lang` is copied.)
 
 ## Color
 

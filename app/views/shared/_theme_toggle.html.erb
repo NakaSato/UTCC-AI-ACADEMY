@@ -14,12 +14,14 @@
             <%= dark ? "border-chrome-line bg-chrome-2" : "border-hairline-2 bg-surface-2" %>">
   <% { "light" => "☀", "system" => "◐", "dark" => "☾" }.each do |theme, glyph| %>
     <% current = chosen == theme %>
-    <%# A real navigation, not a Turbo visit. Turbo replaces <body> and merges
-        <head>, but never touches attributes on <html> — measured, not assumed:
-        after a Turbo submit the class stayed empty and only appeared on a full
-        reload, so the palette would not change until the visitor happened to
-        reload. One full load on an action taken once in a while is the cheaper
-        side of that trade. %>
+    <%# A real navigation, not a Turbo visit. Turbo copies exactly two
+        attributes off the incoming page's <html> — `lang` and `dir` — and
+        `class` is not one of them. Measured, not assumed: after a Turbo submit
+        the class stayed empty and only appeared on a full reload, so the
+        palette would not change until the visitor happened to reload. One full
+        load on an action taken once in a while is the cheaper side of that
+        trade, and it is why the language toggle beside this one needs no such
+        treatment. %>
     <%= button_to theme_path(theme),
           form: { data: { turbo: false } },
           form_class: "contents",

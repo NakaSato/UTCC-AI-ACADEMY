@@ -81,7 +81,11 @@ class plus `dark:` variants in the markup and a pre-paint `<script>` reading
 5. **`brand` splits into a fill and an ink.** `bg-brand` stays crimson in both
    palettes; `text-brand-ink` and `border-brand-ink` lift to `#E4798D` in dark.
    289 utility occurrences were renamed. `text-brand` no longer exists.
-6. **The theme toggle submits with `data-turbo: false`.** Measured, not assumed.
+6. **The theme toggle submits with `data-turbo: false`.** Measured, not assumed:
+   Turbo copies `lang` and `dir` off the incoming page's `<html>` and nothing
+   else, so a Turbo visit leaves `class` stale and the palette unchanged until a
+   reload. The language toggle beside it needs no such treatment, because `lang`
+   *is* copied.
 7. **The flat error pages get a dark palette too**, via `prefers-color-scheme`
    only — they are served when there is no app to read a session.
 

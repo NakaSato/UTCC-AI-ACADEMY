@@ -95,8 +95,9 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
     hero, beside the language toggle, and marks the current choice with
     `aria-current`.
 16. Its labels are bilingual and its buttons carry an accessible name.
-17. The toggle's form submits with `data-turbo: false`. Turbo never updates
-    attributes on `<html>`, so a Turbo visit would leave the palette stale.
+17. The toggle's form submits with `data-turbo: false`. Turbo copies only `lang`
+    and `dir` from the incoming page's `<html>`, so a Turbo visit would leave
+    the palette class stale and the palette unchanged until a reload.
 18. There is no pre-paint script, and no client-side storage of the preference.
 
 ### The flat error pages
@@ -143,11 +144,12 @@ cells. It predates this work and fixing it moves a shipped colour, which is a
 design decision rather than a dark-mode one. It is recorded as
 `DarkPaletteTest::LIGHT_BELOW_AA` and the dark palette's equivalents pass.
 
-**The stale `lang` attribute.** The language toggle has the same Turbo
-limitation this spec fixes for the theme — `<html lang>` is not updated on a
-Turbo visit, so after switching language the document's declared language is
-stale until a reload. It is a pre-existing accessibility bug with the same
-one-line fix, and it belongs to whoever owns the language toggle.
+**The language toggle.** An earlier draft of this spec claimed it had the same
+staleness — it does not. Turbo copies exactly two attributes from the incoming
+page's `<html>`, `lang` and `dir`, and nothing else; verified in
+`turbo.min.js` and in a browser, where switching language over a Turbo visit
+updates `lang` correctly. That is precisely why the theme needs invariant 17:
+`class` is not in the copied set. The language toggle needs no change.
 
 **Per-user persistence.** The preference is a session, so it does not follow an
 account to another browser. Matching the language toggle was the point; a column
