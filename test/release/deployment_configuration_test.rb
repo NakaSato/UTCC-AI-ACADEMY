@@ -43,6 +43,26 @@ class DeploymentConfigurationTest < ActiveSupport::TestCase
     refute variables.key?("MAILPIT_HOST")
   end
 
+  # Maintenance mode is wired but off. The two halves — the URL Render fetches
+  # and the file the repository publishes — are written in different places and
+  # nothing at runtime notices when they stop agreeing: a `uri` pointing at
+  # nothing makes Render fall back to its own default page, silently, on the
+  # one screen a visitor sees during planned downtime.
+  test "maintenance mode is wired, off, and points at a page this repository publishes" do
+    maintenance = @service.fetch("maintenanceMode")
+
+    assert_equal false, maintenance.fetch("enabled"),
+                 "maintenance mode must ship off; turning it on is a deliberate act (RB-0006)"
+
+    uri = URI.parse(maintenance.fetch("uri"))
+    assert_equal "https", uri.scheme
+    assert_equal File.basename(ErrorPages::HOSTED[:path]), File.basename(uri.path),
+                 "the uri and the generated page have drifted apart"
+
+    # Render refuses a maintenance page hosted on the service being maintained.
+    refute_includes @service.fetch("domains"), uri.host
+  end
+
   test "the manual deploy workflow requires an immutable image digest" do
     workflow = ROOT.join(".github/workflows/render-deploy.yml").read
 

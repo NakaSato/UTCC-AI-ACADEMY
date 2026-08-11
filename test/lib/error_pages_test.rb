@@ -14,12 +14,34 @@ class ErrorPagesTest < ActiveSupport::TestCase
     HttpError::STATIC_PAGES.each_key do |filename|
       assert_predicate ErrorPages.path_for(filename), :exist?
     end
+
+    assert_predicate ErrorPages::HOSTED[:path], :exist?
   end
 
   test "the browser gate points at a page that is there" do
     # ActionController's `allow_browser` renders this exact path, so its name is
     # not ours to change — see ApplicationController.
     assert_includes HttpError::STATIC_PAGES.keys, "406-unsupported-browser.html"
+  end
+
+  # The copy Render's maintenance mode serves. It is published by the docs site
+  # rather than by the app, because the app is what is unavailable — so every
+  # URL in it has to be absolute, and it must ask for nothing the dead service
+  # would owe it.
+  test "the hosted maintenance page links home absolutely and requests no asset" do
+    html = ErrorPages.hosted
+
+    assert_includes html, %(href="#{ErrorPages::HOSTED[:home_url]}")
+    assert_no_match(%r{(href|src)="/}, html, "a root-relative URL would resolve against the docs site")
+    assert_no_match(/icon/, html, "an icon would be fetched from the service that is down")
+    assert_includes html, I18n.t("error_pages.503.title", locale: :th)
+  end
+
+  test "the served 503 keeps the app-relative links the hosted copy drops" do
+    html = ErrorPages.all.fetch("503.html")
+
+    assert_includes html, %(href="/")
+    assert_includes html, "icon"
   end
 
   test "a static page carries both languages and needs nothing from the app" do

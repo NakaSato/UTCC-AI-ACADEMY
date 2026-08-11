@@ -9,9 +9,14 @@
     <title><%= copy[:th][:title] %> · <%= copy[:en][:title] %> (<%= code %>)</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#17120F">
+<%- if icons -%>
+    <%# Root-relative on purpose: the app serves this from its own origin.
+        The hosted copy is served from elsewhere while the app is down, so it
+        asks for no icon at all rather than one the dead service would owe. -%>
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/icon.png">
+<%- end -%>
 
     <style>
       /* The design tokens this page needs, copied rather than imported: the
@@ -141,7 +146,7 @@
   <body>
     <header>
       <div class="bar">
-        <a href="/" style="text-decoration: none">
+        <a href="<%= home_url %>" style="text-decoration: none">
           <span class="wordmark">UTCC<span>AI Academy</span></span>
         </a>
       </div>
@@ -163,7 +168,7 @@
             <p class="body"><%= copy[:en][:body] %></p>
           </div>
 
-          <a class="home" href="/"><%= copy[:th][:home] %> · <span lang="en"><%= copy[:en][:home] %></span></a>
+          <a class="home" href="<%= home_url %>"><%= copy[:th][:home] %> · <span lang="en"><%= copy[:en][:home] %></span></a>
         </div>
       </div>
     </main>

@@ -45,6 +45,24 @@ services:
     domains:
       - academy.boring9.dev
 
+    # Planned downtime, answered with the academy's own 503 rather than
+    # Render's default page. `enabled` stays false: this is the wiring, not the
+    # state — flipping it is a deliberate act, see RB-0006.
+    #
+    # The page cannot live on this service, which is the point of it: Render
+    # requires a `uri` that is not the service in maintenance, because the
+    # service is what is unavailable. It is `docs/maintenance.html`, generated
+    # from the same locale copy as public/503.html by
+    # `bin/rails error_pages:build` and published by the documentation site.
+    #
+    # 502 and 504 have no equivalent. They are what Render's own proxy emits
+    # when this service is unreachable or too slow to answer, and its blueprint
+    # exposes no way to replace them; public/502.html and public/504.html exist
+    # for a proxy that can, not for this one. See SPEC-0045.
+    maintenanceMode:
+      enabled: false
+      uri: https://nakasato.github.io/UTCC-AI-ACADEMY/maintenance.html
+
     envVars:
       - key: RAILS_MASTER_KEY
         sync: false

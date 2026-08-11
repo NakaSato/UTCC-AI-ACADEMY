@@ -22,24 +22,52 @@ module ErrorPages
   # Thai first, as the app is. A visitor reads whichever of the two they have.
   LOCALES = %i[ th en ].freeze
 
+  # Render's maintenance mode answers 503 and serves a page of our choosing —
+  # but the URL "must not be a URL of the service in maintenance mode", which
+  # is the whole point: it is what the visitor sees when the service is off.
+  # So one copy of the 503 is published to the documentation site instead, and
+  # render.yaml points `maintenanceMode.uri` at it. See RB-0006.
+  #
+  # It cannot be the file in public/ unchanged. That one is served *by the app*
+  # from the app's own origin, so its root-relative `/` and `/icon.png` resolve
+  # correctly; from the docs origin they would point at the docs site, and
+  # pointing them back at the app means asking a browser to fetch an icon from
+  # the service that is down. The hosted copy therefore links home absolutely
+  # and carries no icon at all.
+  HOSTED = {
+    path: Rails.root.join("docs/maintenance.html"),
+    code: 503,
+    home_url: "https://academy.boring9.dev/"
+  }.freeze
+
   class << self
     # filename => rendered HTML, for every page in HttpError::STATIC_PAGES.
     def all = HttpError.static_pages.transform_values { render(it) }
 
-    def render(page)
+    def render(page, home_url: "/", icons: true)
       ERB.new(TEMPLATE.read, trim_mode: "-")
-         .result_with_hash(code: page.code, copy: copy_for(page))
+         .result_with_hash(code: page.code, copy: copy_for(page), home_url:, icons:)
     end
 
-    # The filenames whose committed contents no longer match what the copy would
+    # The 503 as Render's maintenance mode serves it, from the docs origin.
+    def hosted = render(HttpError.for(HOSTED[:code]), home_url: HOSTED[:home_url], icons: false)
+
+    # Every generated page, keyed by the path it belongs at — the flat files in
+    # public/ plus the hosted maintenance copy.
+    def generated
+      all.to_h { |filename, html| [ path_for(filename), html ] }.merge(HOSTED[:path] => hosted)
+    end
+
+    # The paths whose committed contents no longer match what the copy would
     # produce. Empty is the only passing state — see the freshness test.
     def stale
-      all.reject { |filename, html| path_for(filename).exist? && path_for(filename).read == html }
-         .keys
+      generated.reject { |path, html| path.exist? && path.read == html }
+               .keys.map { it.relative_path_from(Rails.root).to_s }
     end
 
     def write_all
-      all.each { |filename, html| path_for(filename).write(html) }.keys
+      generated.each { |path, html| path.write(html) }
+               .keys.map { it.relative_path_from(Rails.root).to_s }
     end
 
     def path_for(filename) = DESTINATION.join(filename)

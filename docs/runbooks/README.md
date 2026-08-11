@@ -13,3 +13,4 @@ operating a production dependency or recovery procedure.
 - [RB-0003 — Verify backup freshness and isolated restore evidence](rb-backup-restore-verification.md) — draft; provider-neutral contract and synthetic drill verification only
 - [RB-0004 — Deploy and roll back the Render production image](rb-render-deployment.md) — draft; target and release procedure, no live credentials
 - [RB-0005 — Upgrade the production PostgreSQL database from 17 to 18](rb-postgres-18-upgrade.md) — draft; provider-dashboard procedure, dev/test already on 18
+- [RB-0006 — Put the academy into maintenance mode and take it out again](rb-maintenance-mode.md) — draft; 503 is wired and off, 502/504 are not customisable on Render, and the page is inert until the documentation site publishes

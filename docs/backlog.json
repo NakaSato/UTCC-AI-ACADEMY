@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-11T09:30:00+07:00",
+  "updated_at": "2026-08-11T21:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2253,6 +2253,33 @@
         }
       ],
       "updated_at": "2026-08-11T09:30:00+07:00"
+    },
+    {
+      "id": "OPS-001",
+      "title": "Serve the academy's own page during planned downtime",
+      "status": "in_progress",
+      "priority": 3,
+      "owner": "Platform Owner and Release Owner",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-002"
+      ],
+      "blocker": {
+        "summary": "The maintenance page is published by the documentation site, which has never built: every GitHub Actions run is refused because the account is locked for a billing issue. Render's maintenanceMode uri therefore 404s and falls back to Render's default page. 502 and 504 are not customisable on Render at all.",
+        "decision_owner": "Repository owner",
+        "next_action": "Clear the GitHub billing lock so Actions run again; the Pages build then publishes docs/maintenance.html and the wiring becomes live with no further change."
+      },
+      "evidence": [
+        {
+          "label": "Maintenance mode runbook",
+          "url": "runbooks/rb-maintenance-mode.html"
+        },
+        {
+          "label": "Error pages specification",
+          "url": "specs/spec-error-pages.html"
+        }
+      ],
+      "updated_at": "2026-08-11T21:10:00+07:00"
     }
   ],
   "recently_completed": [
