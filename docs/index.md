@@ -98,6 +98,19 @@ This is the current project status page. It is generated from the machine-readab
 {% else %}
 <p class="section-lede">{{ active_items.size }} item{% unless active_items.size == 1 %}s{% endunless %} not finished. Owner and dependencies sit under each title; evidence opens on demand.</p>
 
+{%- comment -%}
+  Ships hidden and is revealed by assets/js/status.js. Without the script
+  there are no rows to filter — every row is already on the page — so an
+  input that did nothing would be worse than none.
+{%- endcomment -%}
+<div class="status-search" data-status-search hidden>
+  <label for="work-search">Search work</label>
+  <input id="work-search" type="search" autocomplete="off" spellcheck="false"
+         placeholder="ID, title, owner, or status — e.g. blocked, MAIL, Platform Owner">
+  <p class="search-readout" role="status" aria-live="polite" data-search-count></p>
+</div>
+
+<div class="table-scroll">
 <table class="work-table">
   <thead>
     <tr>
@@ -106,7 +119,7 @@ This is the current project status page. It is generated from the machine-readab
       <th>Evidence</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody data-list data-search>
     {% for item in active_items %}
       <tr>
         <td>
@@ -122,11 +135,13 @@ This is the current project status page. It is generated from the machine-readab
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% endif %}
 
 <details class="disclosure">
   <summary>Completed work — {{ finished_items.size }} items</summary>
 
+  <div class="table-scroll">
   <table class="work-table">
     <thead>
       <tr>
@@ -134,7 +149,7 @@ This is the current project status page. It is generated from the machine-readab
         <th>Evidence</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody data-list data-search data-paginate>
       {% for item in finished_items %}
         <tr>
           <td>
@@ -146,6 +161,7 @@ This is the current project status page. It is generated from the machine-readab
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </details>
 
 ## Status flow
@@ -245,7 +261,7 @@ Every backlog change appends an entry; existing history is never rewritten.
 <details class="disclosure">
   <summary>Earlier history — {{ updates.size | minus: 12 }} entries</summary>
 
-  <ol class="update-history" start="13">
+  <ol class="update-history" start="13" data-list data-paginate>
     {% for update in updates offset: 12 %}
       <li>
         <strong>{{ update.at }}</strong> · <code>{{ update.item_id }}</code> ·

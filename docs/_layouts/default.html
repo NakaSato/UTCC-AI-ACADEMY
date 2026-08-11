@@ -72,5 +72,13 @@
         Git remains the audit trail.
       </p>
     </footer>
+
+    {%- comment -%}
+      Deferred, and the only script on the site. It reveals the search box and
+      builds the pagination controls, both of which ship hidden — so a page
+      served without it is the page as it was: every row rendered, nothing to
+      click. It no-ops on documents that have no lists.
+    {%- endcomment -%}
+    <script src="{{ '/assets/js/status.js' | relative_url }}" defer></script>
   </body>
 </html>
