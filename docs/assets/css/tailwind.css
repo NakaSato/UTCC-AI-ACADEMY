@@ -583,3 +583,141 @@ footer {
     border-radius: 0.9rem;
   }
 }
+
+/* ---- Reading the status page -----------------------------------------
+ *
+ * The page answers one question: what is happening now. Everything that is
+ * not that — sixty-six finished items, thirteen evidence links on a single
+ * row, two hundred history entries — is still here, behind a disclosure,
+ * because a monitor nobody scrolls is a monitor nobody reads.
+ */
+
+.section-lede {
+  margin: 0 0 0.9rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.empty-state {
+  margin: 1.2rem 0 2rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px dashed var(--color-hairline);
+  border-radius: 0.9rem;
+  background: var(--color-surface-4);
+  color: var(--color-muted);
+}
+
+/* The work table carries two lines per item: the title, and the people and
+   dependencies under it. Folding those two columns into the first is what
+   let the table drop from six columns to three and stop wrapping every cell
+   into a narrow ribbon. */
+.work-table .work-title {
+  display: block;
+  color: var(--color-ink);
+  line-height: 1.45;
+}
+
+.work-table .work-title code {
+  margin-right: 0.4rem;
+}
+
+.work-table .work-meta {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.work-table td:first-child {
+  min-width: 22rem;
+}
+
+/* Evidence: inline when there are one or two, counted when there are more. */
+.evidence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.evidence-none {
+  color: var(--color-muted-3);
+}
+
+details.evidence {
+  font-size: 0.86rem;
+}
+
+details.evidence > summary {
+  color: var(--color-brand-deep);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+details.evidence[open] > summary {
+  margin-bottom: 0.35rem;
+}
+
+details.evidence .evidence-list {
+  padding-left: 0.1rem;
+}
+
+/* The shared disclosure: completed work, earlier history, a long commit. */
+details.disclosure {
+  margin: 1.4rem 0 2rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 0.9rem;
+  background: var(--color-surface-4);
+}
+
+details.disclosure > summary {
+  padding: 0.85rem 1.1rem;
+  color: var(--color-ink-4);
+  font-size: 0.86rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+details.disclosure > summary:hover {
+  color: var(--color-brand-deep);
+}
+
+details.disclosure[open] > summary {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+/* The tables and lists inside a disclosure already sit in a bordered box. */
+details.disclosure > table,
+details.disclosure > ol {
+  margin: 0;
+  border: 0;
+  border-radius: 0 0 0.9rem 0.9rem;
+}
+
+details.disclosure > ol {
+  padding: 1rem 1.1rem 1.1rem 2.4rem;
+}
+
+details.disclosure-inline {
+  margin: 0.45rem 0 0;
+  background: transparent;
+  border: 0;
+}
+
+details.disclosure-inline > summary {
+  padding: 0;
+  font-size: 0.82rem;
+}
+
+details.disclosure-inline[open] > summary {
+  margin-bottom: 0.5rem;
+  border-bottom: 0;
+}
+
+.commit-body {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}

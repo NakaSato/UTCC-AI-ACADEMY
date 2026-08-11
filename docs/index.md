@@ -13,6 +13,14 @@ This is the current project status page. It is generated from the machine-readab
 {% assign in_progress_items = current_items | where: "status", "in_progress" %}
 {% assign verification_items = current_items | where: "status", "verification" %}
 {% assign queued_items = current_items | where: "status", "queued" %}
+{% comment %}
+  "Current work" means work that is not finished. Rendering all of it —
+  sixty-six complete items against five live ones — buried the answer to the
+  only question this page is asked, and made the table forty screens long.
+  Finished work is still here, one disclosure away.
+{% endcomment %}
+{% assign active_items = current_items | where_exp: "item", "item.status != 'complete'" %}
+{% assign finished_items = current_items | where: "status", "complete" %}
 
 <div class="status-overview my-7 grid grid-cols-2 gap-3 lg:grid-cols-3" aria-label="Current project summary">
   <div class="rounded-2xl border border-hairline bg-surface-4 p-4">
@@ -58,49 +66,87 @@ This is the current project status page. It is generated from the machine-readab
       <dt>Commit</dt>
       <dd><a href="{{ site.data.build.commit_url }}"><code>{{ site.data.build.commit_short_sha }}</code></a> on <code>{{ site.data.build.branch | escape }}</code></dd>
     </div>
+    {%- comment -%}
+      The subject line, then the body behind a disclosure. This repository
+      writes long commit messages on purpose, and printing one in full put
+      thirty lines of prose between the reader and the work table.
+    {%- endcomment -%}
+    {%- assign message_lines = site.data.build.commit_message | strip | split: "
+" -%}
+    {%- assign subject = message_lines | first -%}
+    {%- assign body = message_lines | shift | join: "
+" | strip -%}
     <div class="sm:col-span-2">
       <dt>Commit message</dt>
-      <dd>{{ site.data.build.commit_message | escape | newline_to_br }}</dd>
+      <dd>
+        {{ subject | escape }}
+        {%- if body != "" %}
+          <details class="disclosure disclosure-inline">
+            <summary>Full message</summary>
+            <span class="commit-body">{{ body | escape | newline_to_br }}</span>
+          </details>
+        {%- endif %}
+      </dd>
     </div>
   </dl>
 </div>
 
 ## Current work
 
-<table>
+{% if active_items.size == 0 %}
+<p class="empty-state">Nothing is in flight. Every item in the backlog is complete.</p>
+{% else %}
+<p class="section-lede">{{ active_items.size }} item{% unless active_items.size == 1 %}s{% endunless %} not finished. Owner and dependencies sit under each title; evidence opens on demand.</p>
+
+<table class="work-table">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Work item</th>
+      <th>Item</th>
       <th>Status</th>
-      <th>Owner</th>
-      <th>Dependency</th>
       <th>Evidence</th>
     </tr>
   </thead>
   <tbody>
-    {% for item in current_items %}
+    {% for item in active_items %}
       <tr>
-        <td><code>{{ item.id }}</code></td>
-        <td>{{ item.title | escape }}</td>
+        <td>
+          <span class="work-title"><code>{{ item.id }}</code> {{ item.title | escape }}</span>
+          <span class="work-meta">
+            {{ item.owner | escape }}
+            {%- if item.depends_on.size > 0 %} · needs {{ item.depends_on | join: ", " }}{% endif -%}
+          </span>
+        </td>
         <td><span class="status status-{{ item.status }}">{{ item.status | replace: "_", " " | capitalize }}</span></td>
-        <td>{{ item.owner | escape }}</td>
-        <td>
-          {% if item.depends_on.size > 0 %}
-            {{ item.depends_on | join: ", " }}
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% for evidence in item.evidence %}
-            <a href="{{ evidence.url }}">{{ evidence.label | escape }}</a>{% unless forloop.last %}<br>{% endunless %}
-          {% endfor %}
-        </td>
+        <td>{% include evidence.html evidence=item.evidence %}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
+
+<details class="disclosure">
+  <summary>Completed work — {{ finished_items.size }} items</summary>
+
+  <table class="work-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Evidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in finished_items %}
+        <tr>
+          <td>
+            <span class="work-title"><code>{{ item.id }}</code> {{ item.title | escape }}</span>
+            <span class="work-meta">{{ item.owner | escape }}</span>
+          </td>
+          <td>{% include evidence.html evidence=item.evidence %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</details>
 
 ## Status flow
 
@@ -174,9 +220,16 @@ An item moves to **Complete** only when its evidence is recorded here and the re
 
 Every backlog change appends an entry; existing history is never rewritten.
 
+{%- comment -%}
+  Newest first, and only the newest twelve on arrival. The history is
+  append-only and already runs to two hundred entries, so showing all of it
+  meant the page ended in a wall nobody scrolls to the bottom of.
+{%- endcomment -%}
+{% assign updates = site.data.backlog.updates | reverse %}
+{% assign recent_updates = updates | slice: 0, 12 %}
+
 <ol class="update-history">
-  {% assign updates = site.data.backlog.updates | reverse %}
-  {% for update in updates %}
+  {% for update in recent_updates %}
     <li>
       <strong>{{ update.at }}</strong> · <code>{{ update.item_id }}</code> ·
       {{ update.from | replace: "_", " " }} → {{ update.to | replace: "_", " " }}<br>
@@ -187,6 +240,25 @@ Every backlog change appends an entry; existing history is never rewritten.
     </li>
   {% endfor %}
 </ol>
+
+{% if updates.size > 12 %}
+<details class="disclosure">
+  <summary>Earlier history — {{ updates.size | minus: 12 }} entries</summary>
+
+  <ol class="update-history" start="13">
+    {% for update in updates offset: 12 %}
+      <li>
+        <strong>{{ update.at }}</strong> · <code>{{ update.item_id }}</code> ·
+        {{ update.from | replace: "_", " " }} → {{ update.to | replace: "_", " " }}<br>
+        {{ update.summary | escape }}
+        {% if update.evidence_url %}
+          · <a href="{{ update.evidence_url }}">Evidence</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</details>
+{% endif %}
 
 ## Agent update protocol
 

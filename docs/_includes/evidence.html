@@ -1,0 +1,32 @@
+{%- comment -%}
+  An item's evidence links, in the least space that still shows them.
+
+  One or two links read fine inline. Beyond that they stacked vertically and
+  set the height of the whole row — the deployment item carries thirteen, which
+  on its own made a row seven hundred pixels tall. Past two, the count is the
+  useful summary and the links open on demand.
+
+  Takes: evidence — the item's evidence array, addressed as
+  `include.evidence`. A bare `evidence` is nil inside an include, and nil
+  fails every size comparison silently, so it falls to the last branch and
+  renders a disclosure with no count and no links — losing the evidence
+  rather than failing the build.
+{%- endcomment -%}
+{%- if include.evidence.size == 0 -%}
+  <span class="evidence-none">—</span>
+{%- elsif include.evidence.size <= 2 -%}
+  <span class="evidence-list">
+    {%- for link in include.evidence -%}
+      <a href="{{ link.url }}">{{ link.label | escape }}</a>
+    {%- endfor -%}
+  </span>
+{%- else -%}
+  <details class="evidence">
+    <summary>{{ include.evidence.size }} documents</summary>
+    <span class="evidence-list">
+      {%- for link in include.evidence -%}
+        <a href="{{ link.url }}">{{ link.label | escape }}</a>
+      {%- endfor -%}
+    </span>
+  </details>
+{%- endif -%}
