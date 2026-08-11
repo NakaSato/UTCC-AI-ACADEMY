@@ -72,6 +72,9 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
    off the page; `--color-surface` is lighter than both.
 6. Every text pair in `DarkPaletteTest::PAIRS` clears WCAG 2.2 AA — 4.5:1 for
    body text, 3.0:1 for large text and non-text UI — in **both** palettes.
+6a. `muted-2` clears 4.5:1 on every background it sits on: `surface`, `canvas`,
+    `surface-2` and `surface-4`. It may not be lightened to restore a visible
+    step below `muted`; `muted-3` and `muted-4` are exempt as inactive states.
 7. White on a `bg-brand` fill clears 4.5:1 in both palettes.
 
 ### The fill/ink split
@@ -138,11 +141,14 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
 
 ## Out of scope
 
-**The light palette's own AA gaps.** `muted-2` is 3.81:1 on a card and 3.48:1 on
-the page against a 4.5:1 floor, and it carries meta text, captions and table
-cells. It predates this work and fixing it moves a shipped colour, which is a
-design decision rather than a dark-mode one. It is recorded as
-`DarkPaletteTest::LIGHT_BELOW_AA` and the dark palette's equivalents pass.
+**Restoring the light palette's grey hierarchy.** `muted-2` was 3.81:1 on a card
+and 3.48:1 on the page and is now `#746A62`, which clears AA everywhere it sits
+(invariant 6a). The cost is that it lands 1.06× from `muted` and the two read as
+one weight in light mode — a compliant value needs a luminance at or below
+0.1507 and `muted` is 0.1373, so the ramp has one step more than the budget
+allows. Getting the hierarchy back means darkening `muted` to make room, which
+moves supporting copy across 515 more occurrences and belongs to the design
+owner. See the amendment in ADR-0047.
 
 **The language toggle.** An earlier draft of this spec claimed it had the same
 staleness — it does not. Turbo copies exactly two attributes from the incoming

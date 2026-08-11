@@ -17,6 +17,10 @@ class DarkPaletteTest < ActiveSupport::TestCase
     [ "ink", "canvas", 4.5 ], [ "ink", "surface", 4.5 ],
     [ "ink-2", "surface", 4.5 ], [ "ink-3", "surface", 4.5 ], [ "ink-4", "surface", 4.5 ],
     [ "muted", "canvas", 4.5 ], [ "muted", "surface", 4.5 ],
+    # muted-2 carries meta, captions and table cells, and sits on four
+    # backgrounds. surface-2 is the darkest of them and so the binding one.
+    [ "muted-2", "surface", 4.5 ], [ "muted-2", "canvas", 4.5 ],
+    [ "muted-2", "surface-2", 4.5 ], [ "muted-2", "surface-4", 4.5 ],
     [ "brand-ink", "canvas", 4.5 ], [ "brand-ink", "surface", 4.5 ],
     [ "brand-ink-deep", "surface", 4.5 ],
     [ "brand-ink", "brand-tint", 4.5 ],
@@ -27,14 +31,13 @@ class DarkPaletteTest < ActiveSupport::TestCase
     [ "brand-ink", "surface", 3.0 ]
   ].freeze
 
-  # Pairs deliberately left out of PAIRS because the *light* palette has never
-  # met AA on them — `muted-2` is 3.81:1 on a card and 3.48:1 on the page, and
-  # it carries meta text, captions and table cells. That predates dark mode and
-  # fixing it means moving a shipped colour, which is a design decision rather
-  # than a dark-mode one. Recorded here so the gap is visible in the suite
-  # rather than only in a commit message; the test below pins the dark palette,
-  # where the same pairs do pass, so this can only get better.
-  LIGHT_BELOW_AA = [ [ "muted-2", "surface" ], [ "muted-2", "canvas" ] ].freeze
+  # The light palette's grey ramp is one step longer than the contrast budget
+  # allows: a `muted-2` that clears AA on surface-2 needs a luminance at or
+  # below 0.1507, and `muted` is already 0.1373. So these two are within 1.06x
+  # of each other in light and read as one weight. Pinned, because the tempting
+  # "fix" is to lighten muted-2 back into a visible step, which is exactly the
+  # AA failure that was just repaired.
+  RAMP_FLOOR = 1.25
 
   setup { @css = STYLESHEET.read }
 
@@ -80,13 +83,13 @@ class DarkPaletteTest < ActiveSupport::TestCase
     end
   end
 
-  test "the pairs the light palette fails do meet AA in dark" do
+  # The step that light mode cannot afford, dark mode can — its surfaces are
+  # dark enough to leave room below `muted`.
+  test "dark keeps a visible step between the two supporting greys" do
     dark = light_palette.merge(dark_blocks.first)
 
-    LIGHT_BELOW_AA.each do |foreground, background|
-      assert_operator contrast(dark[foreground], dark[background]).round(2), :>=, 4.5,
-                      "#{foreground} on #{background} must not repeat the light palette's shortfall"
-    end
+    assert_operator contrast(dark["muted-2"], dark["muted"]), :>=, RAMP_FLOOR,
+                    "the dark palette's muted and muted-2 have collapsed into one weight"
   end
 
   private

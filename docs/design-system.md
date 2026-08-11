@@ -95,9 +95,15 @@ Text sitting on chrome has its own ramp, brightest to dimmest: `on-chrome-bright
 | `ink-3` | `#2F2925` | list-row label |
 | `ink-4` | `#4A423C` | secondary body, form labels |
 | `muted` | `#6F6660` | supporting copy |
-| `muted-2` | `#8B8179` | meta, captions, table cells |
+| `muted-2` | `#746A62` | meta, captions, table cells — **do not lighten**, see below |
 | `muted-3` | `#B6ACA5` | disabled text, empty counters |
 | `muted-4` | `#C9C1BA` | locked badge hint, completed topic dot |
+
+**`muted` and `muted-2` are nearly the same colour in light mode, and have to be.** `muted-2` was `#8B8179` until it was measured: 3.81:1 on a card and 3.48:1 on the page, against the 4.5:1 floor SPEC-0023 sets, on text carrying dates, counts and table cells. The lightest value that clears AA on every background it sits on — white, canvas, `surface-2`, `surface-4` — is `#746A62`, which is 1.06× off `muted`. To do better a colour would need a luminance at or below 0.1507 and `muted` is already 0.1373: **the light ramp has one more grey step than the contrast budget allows.** Lightening `muted-2` to make the step visible again re-introduces the failure, and `test/assets/dark_palette_test.rb` will say so.
+
+The dark palette keeps a real step, because its surfaces leave room below `muted`. If the light hierarchy is wanted back, the move is to darken `muted` to make space — not to lighten `muted-2`.
+
+`muted-3` and `muted-4` are below the floor and stay there: they mark disabled controls and inactive states, which WCAG 1.4.3 exempts.
 
 ### Accents
 

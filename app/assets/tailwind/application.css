@@ -72,7 +72,18 @@
   --color-ink-3:   #2F2925;  /* list-row label                            */
   --color-ink-4:   #4A423C;  /* secondary body, form labels               */
   --color-muted:   #6F6660;  /* supporting copy                           */
-  --color-muted-2: #8B8179;  /* meta, captions, table cells               */
+  /* Was #8B8179, which measured 3.81:1 on a card and 3.48:1 on the page —
+     below the 4.5:1 AA floor SPEC-0023 sets, on text that carries dates,
+     counts and table cells. This is the lightest value that clears 4.5:1 on
+     every background it actually sits on (white, canvas, surface-2, surface-4;
+     worst case 4.54 on surface-2).
+
+     It sits only 1.06x off `muted` above it, and that is not a choice: to
+     clear AA on surface-2 a colour needs a luminance at or below 0.1507, and
+     `muted` is already 0.1373. The light palette has one more grey step than
+     the contrast budget allows, so in light mode these two now read as one
+     weight. The dark palette keeps a real step — see the dark block. */
+  --color-muted-2: #746A62;  /* meta, captions, table cells               */
   --color-muted-3: #B6ACA5;  /* disabled text, empty counters             */
   --color-muted-4: #C9C1BA;  /* locked badge hint, completed topic dot    */
 

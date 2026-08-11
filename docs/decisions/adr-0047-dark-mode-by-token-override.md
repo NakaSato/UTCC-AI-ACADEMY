@@ -133,12 +133,33 @@ are what this implements.
 - `text-surface` is gone too — all 38 uses meant "white on a dark field", and a
   surface colour that goes dark with the palette is the wrong token for that.
   They are `text-white` now.
-- **A pre-existing accessibility defect surfaced and is not fixed here:**
-  `muted-2` — meta text, captions, table cells — is 3.81:1 on a card and 3.48:1
-  on the page in the *light* palette, below the 4.5:1 AA floor. It predates this
-  work, moving it is a visible change to shipped design, and the dark palette's
-  equivalent passes. Recorded in `test/assets/dark_palette_test.rb` as
-  `LIGHT_BELOW_AA` so it is visible in the suite rather than only here.
+- **A pre-existing accessibility defect surfaced and was then fixed** (see the
+  amendment below): `muted-2` — meta text, captions, table cells — was 3.81:1
+  on a card and 3.48:1 on the page in the *light* palette, below the 4.5:1 AA
+  floor. It predated this work; measuring the palette for dark mode is what
+  found it.
+
+## Amendment, 2026-08-11: the light palette's grey ramp
+
+`muted-2` is now `#746A62`, the lightest value that clears 4.5:1 on every
+background it sits on — white, canvas, `surface-2`, `surface-4`, worst case
+4.54 on `surface-2`. It was `#8B8179`.
+
+The consequence is worth recording, because it is not a preference. A compliant
+`muted-2` needs a relative luminance at or below **0.1507**, and `muted` above
+it is already **0.1373**; the two therefore sit 1.06× apart and read as one
+weight in light mode. **The light ramp has one more grey step than the contrast
+budget allows.** Dark mode keeps a real step, because its surfaces leave room
+below `muted`.
+
+The alternative, not taken, is to darken `muted` (`#6F6660` → roughly `#5B534E`)
+to make room, which restores a visible hierarchy and keeps both compliant. It
+was rejected for scope rather than for merit: it moves supporting copy across
+515 more occurrences and is a visible change to shipped design that belongs to
+the design owner rather than to a dark-mode slice.
+
+`muted-3` and `muted-4` stay below the floor: they carry disabled text and
+inactive states, which WCAG 1.4.3 exempts.
 
 ## Fitness Functions
 
