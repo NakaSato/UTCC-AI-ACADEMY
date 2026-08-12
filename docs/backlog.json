@@ -2265,9 +2265,9 @@
         "UX-002"
       ],
       "blocker": {
-        "summary": "The host changed under it. As of 2026-08-12 the documentation site answers every path - the maintenance page, the dashboard, the root - with a 403 Vercel Security Checkpoint. It answered 200 hours earlier, so this is a setting on the host rather than a deploy: bot protection or attack-challenge mode. A human browser may pass the interstitial; a headless one does not, and neither will any check. A visitor who meets a challenge during planned downtime has not been told the academy is down.",
+        "summary": "Neither the page nor the host was ever the problem: nothing has published since 2026-08-07, and both publishing paths are down for separate reasons. GitHub Actions is locked - every run of pages.yml since at least 2026-08-11T13:47 fails in about nine seconds with 'The job was not started because your account is locked due to a billing issue', including the two pushes to main on 2026-08-12, and nakasato.github.io/UTCC-AI-ACADEMY answers 404 at its root. Vercel is serving commit 37b6250d from 2026-08-08, which is a merge into the branch agent/recruitment-platform-vertical-slices rather than any commit on main, so its production branch or Git integration is pointed somewhere else and a push to main produces no deployment at all. The repository is healthy and is not what is failing: script/build-dashboard was run end to end at commit 293748f and passed every gate it has - bin/docs, the three validators, Tailwind, Jekyll, and validate-rendered-doc-links over 170 pages and 3751 links. This also explains the two earlier readings of this item. The 403 Vercel Security Checkpoint and the 404 on /maintenance were both symptoms of a site frozen five days ago, which is why the page went from 404 to 403 and back without anybody deploying it.",
         "decision_owner": "Platform Owner",
-        "next_action": "Decide the maintenance host: turn the challenge off for utcc-ai-academy.vercel.app, or move the page to a host that does not challenge readers. Then run bin/rails error_pages:published and mark OPS-001 complete when it passes. 502 and 504 stay uncustomisable."
+        "next_action": "Two account-level actions, neither of them in this repository and neither available to an agent. Clear the GitHub billing lock so Actions can run, and repoint the Vercel project's production branch at main or reconnect its Git integration. Then push any commit and confirm the site's build stamp moves off 37b6250d before running bin/rails error_pages:published, which stays the acceptance check. 502 and 504 remain uncustomisable."
       },
       "evidence": [
         {
@@ -2277,9 +2277,17 @@
         {
           "label": "Error pages specification",
           "url": "specs/spec-error-pages.html"
+        },
+        {
+          "label": "Maintenance page publication check",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/lib/tasks/error_pages.rake"
+        },
+        {
+          "label": "Dashboard build the deploy runs",
+          "url": "https://github.com/NakaSato/UTCC-AI-ACADEMY/blob/main/script/build-dashboard"
         }
       ],
-      "updated_at": "2026-08-13T02:10:00+07:00"
+      "updated_at": "2026-08-12T11:35:00+07:00"
     },
     {
       "id": "UX-006",
@@ -4479,6 +4487,14 @@
       "to": "complete",
       "summary": "A timestamp in the future is how this file stops being a record and starts being a plan, and it was introduced here by hand today: writing several entries in one sitting and spacing them half an hour apart to keep them ordered walked DEV-006, DOCS-014, and DEV-007 past the clock, so each claimed to be finished before it was. Those three are corrected to 10:25, 10:45, and 11:00, and the top-level updated_at with them. The ordering instinct was right and the method was wrong: updates is not sorted and does not need to be, so an entry never has to be dated later than the one above it. script/validate-backlog now warns on any item or update timestamp in the future and errors on one that will not parse at all. It warns rather than aborts because 19 timestamps across 8 items from earlier sessions are still ahead of the clock, by an hour for DEV-002 through OPS-002 and by up to twenty for INT-005, OPS-001, and UX-007. Whether those clocks were wrong or the entries were deliberately post-dated is for whoever wrote them; the check asks on every run instead of nobody asking.",
       "evidence_url": "mdlc.html"
+    },
+    {
+      "at": "2026-08-12T11:35:00+07:00",
+      "item_id": "OPS-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Recorded a diagnosis, not a fix. Chasing the /maintenance 404 after a push showed the whole documentation site is frozen: it serves a backlog stamped 2026-08-07T22:51:23 and a build stamp of commit 37b6250d, a 2026-08-08 merge into agent/recruitment-platform-vertical-slices. Probing by document age gives a clean cutoff - everything created on or before 2026-08-07 serves 200, everything after it 404s, including all of M11-SIR and both documents written today. The cause is two separate failures on the hosting side. GitHub Actions is locked for billing, so every pages.yml run fails in nine seconds without starting a step, and one earlier run titled 'fix: unbreak the dashboard deploy' failed the same way while looking like a code problem. Vercel is building a branch that is not main. The repository builds clean at 293748f through every gate the deploy runs. Two consequences worth carrying: this item cannot be fixed from the codebase, and every evidence_url in this file currently resolves to nothing, because script/validate-backlog checks that a URL looks like a rendered page and never fetches it.",
+      "evidence_url": "runbooks/rb-maintenance-mode.html"
     }
   ]
 }
