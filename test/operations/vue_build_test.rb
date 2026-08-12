@@ -1,64 +1,85 @@
 require "test_helper"
 
-# Vue is pinned as the runtime-only build, and this is what keeps it that way.
+# The island bundle Vite builds, and the property everything else rests on
+# (ADR-0053).
 #
-# `bin/importmap pin vue` fetches `vue.esm-browser.prod.js` — the full build,
-# which compiles template strings into render functions with `Function(…)`. The
-# CSP this application sends is `script-src 'self'` with a nonce and no
-# `unsafe-eval`, so that call is blocked in every browser that honours it: an
-# island written with a `template:` would render nothing in production and
-# everything in a test that never loaded the policy.
+# Vue has two builds. The full one carries a template compiler and turns
+# `<template>` into render code with `Function(…)` **in the browser** — which
+# this application's CSP blocks (`script-src 'self'`, no `unsafe-eval`). The
+# runtime one cannot compile anything and does not need to, because Vite
+# compiled the components at build time.
 #
-# The failure is therefore invisible exactly where it matters, which is why it
-# is asserted against the vendored bytes rather than trusted to a comment in
-# `config/importmap.rb`. Re-running `bin/importmap pin vue` after an upgrade is
-# the way this regresses, and this test is what catches it. ADR-0051.
+# Single-file components therefore only work here as long as the compiler stays
+# in the toolchain. `vite.config.mts` aliasing `vue` to the full build, or a
+# component built with a runtime `template:` string, would put it back — and the
+# failure is invisible where it matters: it renders in a dev server that has no
+# policy loaded, and silently does nothing in production. So this asserts the
+# emitted bytes rather than the intent.
 class VueBuildTest < ActiveSupport::TestCase
-  VENDORED = Rails.root.join("vendor/javascript/vue.js")
-  IMPORTMAP = Rails.root.join("config/importmap.rb")
+  ROOT = Rails.root
+  FRONTEND = ROOT.join("app/frontend")
 
-  test "the vendored build carries no template compiler" do
-    source = VENDORED.read
+  # Cheap enough to do rather than assume: the whole bundle builds in well under
+  # a second, and asserting a build somebody else made is asserting nothing.
+  def bundle
+    @@bundle ||= begin
+      assert ViteRuby.commands.build, "vite build failed; run bin/vite build to see why"
+      output = ViteRuby.config.build_output_dir
+      files = Dir.glob(output.join("assets/islands-*.js"))
 
-    assert_no_match(/\bnew Function\s*\(/, source, compiler_message)
-    assert_no_match(/[^.\w]Function\s*\(\s*`/, source, compiler_message)
-    assert_no_match(/compileToFunction/, source, compiler_message)
-  end
-
-  test "the vendored build is the one the importmap points at, and is really Vue" do
-    assert_match(/^pin "vue", to: "vue\.js"/, IMPORTMAP.read)
-    assert_match(%r{vue\.runtime\.esm-browser\.prod\.js}, VENDORED.read.lines.first.to_s,
-      "the first line records where the file came from; it must be the runtime build's URL")
-    assert_match(/export\s*\{/, VENDORED.read, "an ES module is what the importmap can load")
-  end
-
-  # Every island the registry names has a file, and every island file is
-  # reachable through the importmap. A name that resolves to nothing is a
-  # console warning in production and nothing on screen.
-  test "the registry names islands that exist" do
-    registry = Rails.root.join("app/javascript/islands/registry.js").read
-    named = registry.scan(/^import (\w+) from "islands\/([a-z0-9_]+)"$/)
-
-    assert_operator named.length, :>, 0, "the registry imports nothing, so nothing can mount"
-
-    named.each do |_binding, file|
-      assert_path_exists Rails.root.join("app/javascript/islands/#{file}.js")
+      assert_equal 1, files.length, "expected one islands bundle in #{output}, found #{files.inspect}"
+      File.read(files.first)
     end
-
-    assert_match(/^pin_all_from "app\/javascript\/islands", under: "islands"$/, IMPORTMAP.read)
   end
 
-  # One bridge, and the only place `createApp` is called. Vue mounted from
-  # anywhere else is an app nothing unmounts when Turbo replaces the page.
-  test "nothing mounts Vue except the island controller" do
-    callers = Rails.root.glob("app/javascript/**/*.js").select { it.read.match?(/\bcreateApp\s*\(/) }
+  test "the shipped bundle carries no template compiler" do
+    message = "the island bundle contains Vue's template compiler, which this application's CSP " \
+              "blocks. Check vite.config.mts for an alias to vue/dist/vue.esm-bundler, and check " \
+              "no island uses a runtime `template:` string. See ADR-0053."
 
-    assert_equal [ Rails.root.join("app/javascript/controllers/vue_island_controller.js") ], callers
+    assert_no_match(/\bnew Function\s*\(/, bundle, message)
+    assert_no_match(/compileToFunction/, bundle, message)
+    assert_no_match(/@vue\/compiler-dom/, bundle, message)
   end
 
-  private
-    def compiler_message
-      "vendor/javascript/vue.js is the full Vue build. It compiles templates with Function(), " \
-      "which this application's CSP blocks — re-vendor vue.runtime.esm-browser.prod.js. See ADR-0051."
-    end
+  test "the bundle is really the island layer" do
+    assert_match(/data-vue-island/, bundle, "the bridge is what this entrypoint exists for")
+  end
+
+  # One bridge, and one place an app is created. A second `createApp` is an app
+  # nothing unmounts when Turbo replaces the page around it.
+  test "nothing mounts Vue except the island entrypoint" do
+    callers = ROOT.glob("app/{frontend,javascript}/**/*.{js,vue}").select { it.read.match?(/\bcreateApp\s*\(/) }
+
+    assert_equal [ FRONTEND.join("entrypoints/islands.js") ], callers
+  end
+
+  # A name in the registry that resolves to nothing is a console warning in
+  # production and nothing on screen.
+  test "the registry names components that exist" do
+    entrypoint = FRONTEND.join("entrypoints/islands.js").read
+    imported = entrypoint.scan(%r{^import (\w+) from "\.\./islands/([\w.]+)"$})
+
+    assert_operator imported.length, :>, 0, "the entrypoint imports no island, so nothing can mount"
+
+    imported.each { |_binding, file| assert_path_exists FRONTEND.join("islands/#{file}") }
+    imported.each { |binding, _file| assert_match(/"[a-z-]+": #{binding}/, entrypoint, "#{binding} is imported and never registered") }
+  end
+
+  # The two toolchains are separate on purpose: import maps own Hotwire and
+  # Tiptap, Vite owns the islands. Vue in both is two copies of Vue.
+  test "the import map does not also carry Vue" do
+    importmap = ROOT.join("config/importmap.rb").read
+
+    assert_no_match(/^pin "vue"/, importmap)
+    assert_not ROOT.join("vendor/javascript/vue.js").exist?,
+      "the vendored Vue is what Vite replaced; two copies is the bug this test exists for"
+  end
+
+  test "Vite builds only the island layer" do
+    entrypoints = FRONTEND.glob("entrypoints/*").map { it.basename.to_s }
+
+    assert_equal [ "islands.js" ], entrypoints,
+      "a second entrypoint is a second bundle, and a decision (ADR-0053) rather than a file"
+  end
 end

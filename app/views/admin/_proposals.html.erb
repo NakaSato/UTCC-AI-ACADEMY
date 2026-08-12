@@ -66,9 +66,9 @@
               <%= form.text_field :reason, required: true, maxlength: 1000, size: nil, id: reason_field_id,
                     placeholder: t("admin.proposals.reason_placeholder"),
                     class: "w-full rounded-lg border border-hairline-2 bg-surface px-3 py-2 text-13 text-ink" %>
-              <div data-controller="vue-island" data-vue-island-island-value="character-counter"
-                   data-vue-island-props-value="<%= { fieldId: reason_field_id, max: 1000,
-                                                     template: t("forms.characters_left") }.to_json %>"></div>
+              <div data-vue-island="character-counter"
+                   data-vue-island-props="<%= { fieldId: reason_field_id, max: 1000,
+                                                template: t("forms.characters_left") }.to_json %>"></div>
             </label>
             <%= form.submit t("admin.proposals.record"),
                   class: "rounded-full bg-brand px-3.5 py-2 text-12 font-semibold text-white hover:bg-brand-deep" %>

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T23:12:00+07:00",
+  "updated_at": "2026-08-13T00:26:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3058,6 +3058,32 @@
         }
       ],
       "updated_at": "2026-08-12T23:12:00+07:00"
+    },
+    {
+      "id": "UX-012",
+      "title": "Build the island layer with Vite, and leave the rest on import maps",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead, Security Owner and Platform Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-010"
+      ],
+      "evidence": [
+        {
+          "label": "Vite island build decision",
+          "url": "decisions/adr-0053-vite-island-build.html"
+        },
+        {
+          "label": "Vue islands specification",
+          "url": "specs/spec-vue-islands.html"
+        },
+        {
+          "label": "Vue islands decision",
+          "url": "decisions/adr-0051-vue-islands.html"
+        }
+      ],
+      "updated_at": "2026-08-13T00:26:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5073,6 +5099,14 @@
       "to": "complete",
       "summary": "The user answered ADR-0052 by taking all five recommendations as written, so the decision is accepted and SPEC-0053 records what shipped. /notifications is the reader-s own history now - every row ever written for them, newest first, paged at twenty-five like every other list that grows - and the bell-s frame endpoint moved to /notifications/bell, because the readable URL belongs to the reader-s screen and the frame is an implementation detail of the header. It is a history rather than an inbox: read rows stay, since an inbox that empties as you read it answers what is waiting, which the dot already answers, and the question this screen exists for is what was I told. Reading the screen marks nothing read - a dot that clears by being looked at means you have not visited rather than something happened, and would dismiss the seven the reader did not come for - so the one write stays the explicit button, which the screen carries a copy of when something is unread. The bell keeps its eight and gains see all at the foot of the panel, which is the route the ninth row was missing, and there is no navigation entry because the bell is where a reader already goes to ask this. Nothing is deleted and nothing prunes, matching AuditEvent, with the counter-argument recorded rather than dismissed. Two predictions in the decision were corrected against what shipped: notifications#show stops being a route-reachability exception because it is the page now, but notifications#bell takes its place, so the exception moved rather than disappeared; and the bell and the screen do not share a partial - they share the model, which is what actually keeps the sentence, the action link and the read state from drifting, while a dropdown row and a card differ in markup by design. This is the sixteenth paged screen and the last list SPEC-0051 named as growing without a bound.",
       "evidence_url": "specs/spec-notification-history.html"
+    },
+    {
+      "at": "2026-08-13T00:26:00+07:00",
+      "item_id": "UX-012",
+      "from": "queued",
+      "to": "complete",
+      "summary": "ADR-0051 took Vue with no build step and paid for it in one place: the CSP is script-src self with no unsafe-eval, which blocks Vue-s template compiler, so an island had to be a hand-written h() render function - recorded at the time as the reason a bundler would be the next decision if single-file components turned out to matter. The user asked for Vite after being shown what it costs, and it resolves the problem without touching the policy, because the compiler moves to the toolchain: a .vue file is compiled at build time and the browser receives render code and the runtime alone. Vite builds the island layer and nothing else. app/javascript stays the import map-s - Turbo, Stimulus, seventeen controllers, sixty Tiptap pins - and app/frontend is Vite-s, with neither importing from the other, because a shared module would ship twice. Vue left the import map and the vendored runtime build was deleted, since two toolchains carrying Vue is two Vues. The counter island was rewritten as a single-file component with the same behavior, which is the proof the path works. The bridge moved with it: Stimulus cannot host it any more because its bundle cannot import Vite-s, so the entrypoint owns the lifecycle with a MutationObserver plus a turbo:before-cache unmount, which covers what Stimulus covered - Drive replacing the body, and a Stream replacing one node with no page event at all. createApp still has exactly one caller and an island is still a name in a registry rather than an import. The CSP is unchanged in production and test and weaker in development only, where the HMR client needs unsafe_eval and its own origin; it is a conditional in the policy rather than a comment, so it cannot silently apply elsewhere. Node is a build dependency and never a runtime one: the Dockerfile installs a pinned version in the build stage, runs npm ci and precompile, and deletes node_modules before the final image. npm audit joins bundler-audit and importmap audit in the security gate, because a Vite dependency tree was the third supply chain and nothing watched it. The bundle is 61KB against 110KB vendored, tree-shaken. Inertia was rejected and written down as rejected: it replaces the view layer, does not coexist with Turbo, moves copy out of the locale files and leaves a screen blank without JavaScript, so it would be a rewrite with its own ADR rather than an extension of this one.",
+      "evidence_url": "decisions/adr-0053-vite-island-build.html"
     }
   ]
 }

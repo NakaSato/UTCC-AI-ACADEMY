@@ -11,14 +11,16 @@ Follow the [System Development Flow Master](docs/system-development-flow-master.
 
 Rails 8.1 · PostgreSQL · Hotwire (Turbo + Stimulus, import maps, Propshaft) · Tailwind CSS 4 · Minitest/Capybara.
 
-Two JavaScript libraries, both taken for behavior and refused for styling: **Tiptap** for the academic-post editor (ADR-0007) and **Vue 3** for islands (ADR-0051) — the runtime-only build, render functions rather than templates because the CSP blocks the compiler, mounted only by `vue_island_controller.js`. Stimulus stays the default; read [SPEC-0052](docs/specs/spec-vue-islands.md) before writing an island, and note that upgrading Vue is two steps.
+**Two JavaScript toolchains, and no file belongs to both.** Import maps and Propshaft own `app/javascript` — Turbo, Stimulus, the seventeen controllers, and Tiptap for the academic-post editor (ADR-0007). **Vite** owns `app/frontend` and builds one thing: the Vue island layer (ADR-0051, ADR-0053), as single-file components compiled at build time because the CSP blocks a runtime compiler. Both libraries were taken for behavior and refused for styling.
+
+Stimulus stays the default for behavior attached to markup; Vue is for state-shaped UI. Read [SPEC-0052](docs/specs/spec-vue-islands.md) before writing an island. Node is a build dependency only — `bin/setup` installs it, the Dockerfile drops `node_modules` before the final image, and nothing in production runs it.
 
 ## Commands
 
 - `bin/setup` — install dependencies and prepare the database
-- `bin/dev` — run the app (Rails server + Tailwind watcher)
+- `bin/dev` — run the app (Rails server + Tailwind watcher + Vite dev server)
 - `bin/rails test` — unit and integration tests; `bin/rails test:system` for system tests
-- `bin/verify` — the full local CI gate (docs freshness, RuboCop, bundler-audit, importmap audit, Brakeman, all tests, seed replant). Run it before pushing.
+- `bin/verify` — the full local CI gate (docs freshness, RuboCop, bundler-audit, importmap audit, Brakeman, npm audit, the Vite build, all tests, seed replant). Run it before pushing.
 
 ## Architecture
 

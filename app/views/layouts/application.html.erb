@@ -2,6 +2,16 @@
 <html lang="<%= I18n.locale %>" class="<%= theme_class %>">
   <head>
     <%= render "shared/head" %>
+
+    <%# The Vue island bundle, and the only thing Vite builds (ADR-0053). The
+        rest of the application's JavaScript is the import map, in
+        `shared/head`. `defer` because islands enhance markup that already
+        rendered, so nothing waits on this; `nonce` because `script-src` is
+        `:self` plus a per-request nonce and a tag without one does not run.
+        `vite_client_tag` is the HMR client and emits nothing outside
+        development. %>
+    <%= vite_client_tag nonce: true %>
+    <%= vite_javascript_tag "islands", defer: true, nonce: true %>
   </head>
 
   <body class="bg-canvas font-sans text-16 leading-body text-ink antialiased">

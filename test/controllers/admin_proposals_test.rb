@@ -50,10 +50,10 @@ class AdminProposalsTest < ActionDispatch::IntegrationTest
     assert_not_nil field, "the reason field must carry the id the island is given"
     assert_equal "1000", field["maxlength"]
 
-    island = css_select("[data-controller=vue-island]").first
-    props = JSON.parse(island["data-vue-island-props-value"])
+    island = css_select("[data-vue-island]").first
+    props = JSON.parse(island["data-vue-island-props"])
 
-    assert_equal "character-counter", island["data-vue-island-island-value"]
+    assert_equal "character-counter", island["data-vue-island"]
     assert_equal field["id"], props["fieldId"]
     assert_equal field["maxlength"].to_i, props["max"]
     assert_equal I18n.t("forms.characters_left"), props["template"]

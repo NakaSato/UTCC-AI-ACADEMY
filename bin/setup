@@ -15,6 +15,17 @@ FileUtils.chdir APP_ROOT do
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
+  # JavaScript dependencies, which are Vite and the Vue island layer and nothing
+  # else — the rest of the application’s JavaScript is vendored under the import
+  # map and needs no install step. `npm ci` rather than `install` so a fresh
+  # clone gets exactly the lockfile’s versions; it is skipped when they are
+  # already in place, because this script is run repeatedly and reinstalling is
+  # the slowest thing in it. See ADR-0053.
+  if File.exist?("package-lock.json")
+    puts "\n== Installing JavaScript dependencies =="
+    system!("npm ci") unless system("npm ls --depth 0", out: File::NULL, err: File::NULL)
+  end
+
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"

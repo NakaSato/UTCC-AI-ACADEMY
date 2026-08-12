@@ -70,3 +70,5 @@ gem "tailwindcss-rails", "~> 4.6"
 # Pure-Ruby PDF generation for localized course documents; Thai text uses the
 # bundled Noto Sans Thai font rather than a host-specific system font.
 gem "prawn", "~> 2.5"
+
+gem "vite_rails", "~> 3.11"

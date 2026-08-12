@@ -20,7 +20,7 @@ class VueIslandWalkTest < ApplicationSystemTestCase
     sign_in_through_the_form(users(:admin))
     visit admin_path(tab: :proposals)
 
-    counter = find("[data-controller=vue-island] p")
+    counter = find("[data-vue-island] p")
     field = find("input[id$=_reason]")
 
     # Mounted, and counting the empty field rather than nothing.
@@ -28,15 +28,15 @@ class VueIslandWalkTest < ApplicationSystemTestCase
 
     field.send_keys("สั้น")
 
-    assert_selector "[data-controller=vue-island] p",
+    assert_selector "[data-vue-island] p",
                     text: I18n.t("forms.characters_left", locale: :th).sub("%{count}", "996")
 
     # Near the limit the line changes tone, which is the only thing the island
     # decides for itself.
-    assert_no_selector "[data-controller=vue-island] p.text-gold-ink"
+    assert_no_selector "[data-vue-island] p.text-gold-ink"
     field.send_keys("x" * 901)
 
-    assert_selector "[data-controller=vue-island] p.text-gold-ink"
+    assert_selector "[data-vue-island] p.text-gold-ink"
   end
 
   # An island is an enhancement over markup that already works (SPEC-0052 rule

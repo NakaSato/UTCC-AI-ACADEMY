@@ -60,32 +60,38 @@ The library is one line of `importmap.rb`. The contract is this document.
 
 ## The build
 
-`vendor/javascript/vue.js` is `vue.runtime.esm-browser.prod.js`, vendored with
-the URL it came from on its first line and pinned as `vue`.
+Vite builds one entrypoint, `app/frontend/entrypoints/islands.js`, into
+`public/vite` through `assets:precompile`. Vue comes from npm and is bundled;
+nothing is vendored and the import map pins no `vue`.
 
-**Upgrading is two steps, not one.** `bin/importmap pin vue` fetches
-`vue.esm-browser.prod.js` — the full build, with the compiler — so the vendored
-file must be replaced with the runtime build from the same version afterwards.
-`test/operations/vue_build_test.rb` fails on the compiler's `Function(` call,
-which is what makes the second step non-optional rather than remembered.
+**The property everything rests on:** a `.vue` file is compiled at build time,
+so the browser receives render code and the Vue runtime alone. Vue's template
+compiler would need `Function(…)` at runtime, which this application's CSP
+blocks, and `test/operations/vue_build_test.rb` builds the bundle and asserts
+the compiler is not in it. The two ways to break that are an alias to
+`vue/dist/vue.esm-bundler` in `vite.config.mts`, and an island written with a
+runtime `template:` string; both fail that test.
+
+**Two directories, two toolchains.** `app/javascript` belongs to the import map,
+`app/frontend` to Vite, and neither imports from the other — a shared module
+would ship twice.
 
 ## The mount contract
 
 | Rule | Why |
 | --- | --- |
-| `createApp` is called in `vue_island_controller.js` and nowhere else | An app mounted outside the bridge is one nothing unmounts |
-| Mount on Stimulus `connect`, unmount on `disconnect` | Turbo drives both, for navigation and for Streams |
-| `unmount()` empties the element | So the snapshot Turbo caches holds the server's markup, not Vue's output |
+| `createApp` is called in `entrypoints/islands.js` and nowhere else | An app mounted outside the bridge is one nothing unmounts |
+| A `MutationObserver` mounts an island when its element appears and unmounts it when the element leaves | Turbo Drive replaces the body and a Stream replaces one node with no page event at all; this is the rule Stimulus used to apply for us |
+| `turbo:before-cache` unmounts everything | So the snapshot Turbo caches holds the server's markup, not Vue's output |
 | The element is a `div` the server rendered, and the island replaces its contents | The island has a home in the layout before it exists |
-| An island is named by `data-vue-island-island-value` | Markup selects from an allow-list; it does not import code |
-| Props arrive as JSON in `data-vue-island-props-value` | One place, typed by Stimulus, escaped by ERB |
+| An island is named by `data-vue-island` | Markup selects from an allow-list; it does not import code |
+| Props arrive as JSON in `data-vue-island-props` | One place, escaped by ERB, parsed once |
 
 ## The registry
 
-`app/javascript/islands/registry.js` maps a name to a component, and
-`pin_all_from "app/javascript/islands", under: "islands"` makes each file
-importable. A name the registry does not answer to warns in the console and
-mounts nothing; the screen is unchanged, because of the next section.
+The entrypoint imports each island and maps a name to it. A name the registry
+does not answer to warns in the console and mounts nothing; the screen is
+unchanged, because of the next section.
 
 Registered today:
 
@@ -102,8 +108,9 @@ Registered today:
 3. **Be the only way something works.** Every island enhances markup that
    already functions with JavaScript off. The counter's limit is `maxlength` and
    the model's validation; the island only says how much is left.
-4. **Carry a `template:` string, or any in-DOM template.** The runtime build has
-   no compiler and the CSP would block one. Islands render with `h`.
+4. **Carry a runtime `template:` string, or any in-DOM template.** A single-file
+   component's `<template>` is compiled at build time and is the way to write
+   markup; a `template:` option is compiled in the browser, which the CSP blocks.
 5. **Hold translated copy.** Words come from `config/locales` as props, already
    translated, with only computed values left to interpolate.
 6. **Carry appearance of its own.** Classes come from the Tailwind token system,
@@ -115,8 +122,9 @@ Registered today:
 
 ## Invariants
 
-1. The vendored Vue build contains no template compiler.
-2. `createApp` appears in exactly one file in `app/javascript`.
+1. The built island bundle contains no template compiler.
+2. `createApp` appears in exactly one file across `app/frontend` and
+   `app/javascript`.
 3. Every name in the registry resolves to a file, and that directory is pinned.
 4. An island's props name a field that exists on the same page, and any limit it
    displays equals the limit that field actually enforces.
@@ -125,10 +133,11 @@ Registered today:
 
 ## Acceptance Criteria
 
-- `vendor/javascript/vue.js` matches neither `new Function(` nor `Function(\`` nor
-  `compileToFunction`, and its first line records the runtime build's URL.
-- `config/importmap.rb` pins `vue` to `vue.js` and pins the islands directory.
-- Exactly one file under `app/javascript` calls `createApp`.
+- The bundle Vite builds matches neither `new Function(` nor `compileToFunction`
+  nor `@vue/compiler-dom`.
+- `config/importmap.rb` pins no `vue`, and `vendor/javascript/vue.js` is gone.
+- Exactly one file across the two source directories calls `createApp`, and
+  exactly one Vite entrypoint exists.
 - On `/admin?tab=proposals`, the reason field has the id the island's `fieldId`
   prop names, the island's `max` equals the field's `maxlength`, and its
   `template` is `forms.characters_left` with `%{count}` still unresolved.
@@ -136,8 +145,9 @@ Registered today:
 
 ## Verification
 
-- `test/operations/vue_build_test.rb` — the build, the pins, the registry, and
-  the single caller of `createApp`.
+- `test/operations/vue_build_test.rb` — builds the bundle, then asserts the
+  compiler is absent, the registry resolves, `createApp` has one caller, the
+  import map carries no Vue, and there is one entrypoint.
 - `test/controllers/admin_proposals_test.rb` — the island's props against the
   field they describe.
 - `test/operations/locale_parity_test.rb` — the copy exists in both languages.

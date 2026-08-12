@@ -14,10 +14,8 @@ implemented_by:
   - SPEC-0052
 touches:
   - config/importmap.rb
-  - vendor/javascript/vue.js
-  - app/javascript/controllers/vue_island_controller.js
-  - app/javascript/islands/registry.js
-  - app/javascript/islands/character_counter.js
+  - app/frontend/entrypoints/islands.js
+  - app/frontend/islands/CharacterCounter.vue
   - app/views/admin/_proposals.html.erb
   - config/locales/en.yml
   - config/locales/th.yml
@@ -36,6 +34,16 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 > be available to the frontend for some code after being shown the constraints
 > below and reaffirming. The capability is what was asked for; this document is
 > the boundary that comes with it.
+>
+> **Amended the same day by [ADR-0053](adr-0053-vite-island-build.md)**, which
+> took Vite. Decision 1 (a vendored runtime build, islands written as `h()`
+> render functions) and decision 3 (a Stimulus controller as the bridge) are
+> superseded there: the compiler now runs at build time, islands are single-file
+> components, and the bridge is the Vite entrypoint. **Decisions 2 and 4 to 8
+> stand unchanged** — islands not pages, a named registry, copy from the server,
+> enhancement over working markup, Stimulus as the default, and the character
+> counter as the first island. The reasoning below is the reasoning that led to
+> Vite; it is kept rather than rewritten.
 
 > [Decision Records](README.md) ·
 > [Vue islands specification](../specs/spec-vue-islands.md) ·

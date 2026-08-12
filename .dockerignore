@@ -38,6 +38,7 @@
 !/app/assets/builds/fonts/
 !/app/assets/builds/fonts/*.woff2
 /public/assets
+/public/vite*
 
 # Ignore CI service files.
 /.github

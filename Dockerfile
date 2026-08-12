@@ -39,8 +39,18 @@ FROM base AS build
 # normally does not compile it — but this is the throw-away stage, and a missing
 # header here would fail the build rather than the image.
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev node-gyp pkg-config python-is-python3 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Node is a *build* dependency and never a runtime one: Vite compiles the Vue
+# island bundle here, and the final image below copies the built files without
+# Node, npm, or node_modules. See ADR-0053. The version is pinned in .node-version
+# so the image and a developer machine agree.
+ARG NODE_VERSION=24.18.0
+ENV PATH=/usr/local/node/bin:$PATH
+RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    rm -rf /tmp/node-build-master
 
 # Install application gems
 COPY vendor/* ./vendor/
@@ -51,6 +61,11 @@ RUN bundle install && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
 
+# Install JavaScript dependencies before the rest of the code, so a change to a
+# template does not reinstall them.
+COPY package.json package-lock.json ./
+RUN npm ci
+
 # Copy application code
 COPY . .
 
@@ -58,8 +73,14 @@ COPY . .
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY.
+# vite_rails hooks the Vite build into this task, so the island bundle is built
+# here and lands in public/vite with the rest of the compiled assets.
+# node_modules goes no further than this stage: the final image runs Ruby and
+# serves built files, and shipping a build-time dependency is attack surface
+# that never executes.
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && \
+    rm -rf node_modules
 
 
 

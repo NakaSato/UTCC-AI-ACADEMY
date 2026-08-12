@@ -26,7 +26,20 @@ Rails.application.configure do
     # and module script with `request.content_security_policy_nonce`; the one tag
     # it does not reach is the JSON-LD in SchemaHelper#json_ld, which passes the
     # nonce by hand. There are no inline `on*` handlers anywhere in app/views.
-    policy.script_src  :self
+    #
+    # **Vite changes nothing here in production or test.** What it builds is an
+    # ordinary file served from this origin with a nonce, because single-file
+    # components are compiled at build time — the compiler is in the toolchain,
+    # never in the browser, which is the whole reason ADR-0053 took Vite rather
+    # than relaxing this line.
+    #
+    # Development is the exception, and only development: Vite’s HMR client
+    # loads from its own dev server and evaluates the modules it pushes, which
+    # needs `unsafe_eval` and that origin. A developer runs with a weaker policy
+    # than production, which is a real cost, taken knowingly and bounded to the
+    # one environment where nothing is served to anybody.
+    policy.script_src(*[ :self, (:unsafe_eval if Rails.env.development?),
+                         ("http://#{ViteRuby.config.host_with_port}" if Rails.env.development?) ].compact)
 
     # `unsafe_inline` here is unavoidable, and is the honest trade. Nineteen
     # `style="…"` attributes across ten templates carry progress-bar widths and
@@ -36,6 +49,7 @@ Rails.application.configure do
     # so the alternative is not a stricter policy but a broken layout. The XSS
     # value of this header is in script-src regardless.
     policy.style_src   :self, :unsafe_inline, "https://fonts.googleapis.com"
+
     policy.font_src    :self, :data, "https://fonts.gstatic.com"
 
     # A theory block renders its image as a background-image, and that URL is
@@ -49,7 +63,11 @@ Rails.application.configure do
     # WebSocket as well as the fetch — CSP3 matches `ws://`/`wss://` on the page's
     # own origin against `'self'`, which is why there is no `wss://` entry here
     # and why there must not be a hardcoded host. Still no JSON either way.
-    policy.connect_src :self
+    #
+    # In development the list gains Vite’s dev server and its HMR websocket, for
+    # the reason above and nowhere else.
+    policy.connect_src(*[ :self, ("http://#{ViteRuby.config.host_with_port}" if Rails.env.development?),
+                          ("ws://#{ViteRuby.config.host_with_port}" if Rails.env.development?) ].compact)
   end
 
   # Random per request, not `request.session.id`. The landing page is served to
