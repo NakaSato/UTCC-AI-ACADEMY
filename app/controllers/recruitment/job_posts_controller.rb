@@ -16,9 +16,14 @@ module Recruitment
           @saved_job_ids = Current.user.saved_jobs.where(job_post_id: @job_posts.map(&:id)).pluck(:job_post_id)
           @recommendations = Recruitment::JobDiscovery.recommend(user: Current.user)
           Recruitment::JobAlertNotifier.call(user: Current.user, recommendations: @recommendations)
+          # What they dismissed, so dismissing is reversible. The undo action
+          # has existed since job discovery shipped with nothing linking to it,
+          # which made a misclick permanent.
+          @dismissals = Current.user.job_discovery_dismissals.includes(:job_post).order(created_at: :desc)
         else
           @saved_job_ids = []
           @recommendations = []
+          @dismissals = []
         end
       end
     end

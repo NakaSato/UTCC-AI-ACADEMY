@@ -236,8 +236,8 @@ A change is ready to implement when:
 
 Run the tests that belong to the feature you are building, not the whole suite
 after every edit. Which files those are is recorded, not guessed: a
-specification's `enforced_by` names them and its Verification section carries
-the command. See [test-strategy.md](test-strategy.md#run-tests-feature-by-feature).
+specification's `enforced_by` names them, and `bin/rails test:spec[SPEC-0041]`
+runs exactly those. See [test-strategy.md](test-strategy.md#run-tests-feature-by-feature).
 
 The full suite is the gate at the end, not the loop in the middle — and it stays
 the gate. Run `bin/verify` before pushing, and earlier than that whenever a

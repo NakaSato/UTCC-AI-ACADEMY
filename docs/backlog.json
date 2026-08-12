@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T09:30:00+07:00",
+  "updated_at": "2026-08-12T10:20:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2393,6 +2393,26 @@
         }
       ],
       "updated_at": "2026-08-12T09:30:00+07:00"
+    },
+    {
+      "id": "DEV-001",
+      "title": "Run a spec's own tests with one command, and close two dead ends",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        },
+        {
+          "label": "Development flow",
+          "url": "development-flow.html"
+        }
+      ],
+      "updated_at": "2026-08-12T10:20:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4144,6 +4164,14 @@
       "to": "complete",
       "summary": "ADR-0041 decision 5, and the finding that reframed it: the platform was never document-free. CandidateProfile has accepted a resume and portfolio files since SPEC-0029, under a content-type allowlist, a ten-megabyte ceiling, candidate-owned export, and a delete that removes attachments before the row. So the question was not what a document contract should say - most of it was already written - but what internship records may attach and what that contract did not cover: scanning, a retention clock, and post-internship access. The user answered all four questions. A request shares the resume rather than storing one: resume_shared_at is a timestamp, not a blob, because a second copy would mean two retention clocks and two deletions for the one document the platform is least entitled to duplicate, and it would break the promise that deleting a resume from a profile deletes it everywhere - which a test now pins. A deliverable is a new record because the work a student produces during a placement had no home anywhere. The safety envelope is SPEC-0029's, reused rather than reinvented, and nothing is scanned - which is exactly why the other half matters more: this is the first path in the application by which one person reads a file another person uploaded, so every download is served by an app route as an attachment under nosniff, with the content type re-identified by Active Storage rather than trusted from the uploader, and never through a signed blob URL, because a signed URL authorizes the link rather than the reader and outlives both the placement and the membership that justified it. Access ends with its record: a company reads a shared resume while the request is open and while the internship it produced runs, never after a rejection or completion, and reads deliverables only while the placement is open. The faculty supervisor was offered a reader's seat and the user declined it - the assignment grants the placement and its weekly reports, not the student's files. The student deletes their own work and nothing expires on a timer. Two things came out of building it rather than specifying it: the model's transition! leaves a record dirty on status after it syncs, so a plain update! for the sharing stamp was refused by the guard that catches untracked status changes - it uses update_columns now, the same idiom acknowledgement already used - and opening the screen showed the request notice still promising no resume or file uploads, which the same page now disproved. That copy is corrected in both locales, and the two places the ADR and spec still said text only are marked superseded rather than quietly edited.",
       "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-12T10:20:00+07:00",
+      "item_id": "DEV-001",
+      "from": "queued",
+      "to": "complete",
+      "summary": "bin/rails test:spec[SPEC-0041] reads a lifecycle document's enforced_by and runs exactly those files, so the rule recorded this morning is a command rather than a copy-paste from a doc. It works on decision records too, names the system tests instead of running them because they are the slow half that belongs to the gate, and refuses with a useful message when a spec lists nothing - an empty enforced_by is the actual bug, and the fix is to fill it in rather than to run everything. It shells out rather than calling Rake::Task[test].invoke: the Rails test task takes its files from the command line, so invoking it in process quietly ran all 1,204 tests, which is the one thing the task exists to avoid. Alongside it, the two dead ends the route sweep found are closed. A dismissed job recommendation can be brought back: the undo action had existed since job discovery shipped with nothing linking to it, so a misclick hid a recommendation permanently for anyone who did not know the route. And the company internship-applications index is gone rather than linked - it had no template at all, so an authorized reader would have met a missing-template error, while the program's own screen already lists its applications with the decide and evaluate controls on them. The one test that used that route to prove cross-organization refusal now proves it through the accept action, which is the stronger assertion.",
+      "evidence_url": "test-strategy.html"
     }
   ]
 }

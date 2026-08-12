@@ -55,15 +55,26 @@ percentage does not replace explicit invariant tests.
 
 **While building, run the tests for the feature you are building — not the whole
 suite after every edit.** The files to run are not a guess: every specification
-lists them in `enforced_by`, and its Verification section carries the command
-ready to paste. That is what those fields are for.
+lists them in `enforced_by`. That is what the field is for, and one command
+reads it:
 
 ```bash
-# The feature: what the spec you are changing says enforces it.
+bin/rails test:spec[SPEC-0041]     # every test SPEC-0041 says enforces it
+bin/rails test:spec[ADR-0048]      # decision records work too
+```
+
+It runs the Rails tests and *names* the system tests rather than running them —
+they are the slow half, and they belong to the gate. Naming the files by hand
+does the same job when you want a subset:
+
+```bash
 bin/rails test test/models/internship_request_test.rb \
-  test/controllers/internship_requests_controller_test.rb \
   test/operations/internship_request_boundary_test.rb
 ```
+
+A specification whose `enforced_by` is empty or stale is the actual bug: the
+task will say so, and the fix is to fill in the field rather than to run
+everything.
 
 The full suite is the **gate**, not the loop. Run `bin/verify` before pushing,
 when a change touches shared chrome — navigation, layout, the header, session
@@ -77,7 +88,8 @@ permission to keep working.
 ## Commands
 
 ```bash
-bin/rails test test/models/example_test.rb        # the loop: this feature
+bin/rails test:spec[SPEC-0041]                    # the loop: this feature
+bin/rails test test/models/example_test.rb        # or name the files yourself
 bin/rails test test/models/example_test.rb:42     # one case, while fixing it
 bin/rails test                                    # every Rails test, before the gate
 bin/rails test:system                             # slowest; browser journeys

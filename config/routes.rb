@@ -128,7 +128,11 @@ Rails.application.routes.draw do
           post :reject, on: :member
           post :regenerate, on: :member
         end
-        resources :applications, only: :index, controller: "internship_applications" do
+        # No index: the program's own screen lists its applications with the
+        # decide and evaluate controls on them, and the second screen that used
+        # to be routed here had no template — an authorized reader would have
+        # met a missing-template error, and nothing ever linked to it.
+        resources :applications, only: [], controller: "internship_applications" do
           post :accept, on: :member
           post :reject, on: :member
           resource :evaluation, only: %i[create update], controller: "internship_evaluations"

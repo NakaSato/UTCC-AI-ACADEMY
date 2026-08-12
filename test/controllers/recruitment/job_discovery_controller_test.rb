@@ -42,6 +42,25 @@ class Recruitment::JobDiscoveryControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The undo existed from the start with nothing linking to it, so dismissing a
+  # recommendation was one-way for anyone who did not know the route.
+  test "a dismissed recommendation is listed with a way to bring it back" do
+    post recruitment_dismiss_job_recommendation_path(@job)
+
+    get recruitment_jobs_path
+
+    assert_response :success
+    assert_select "h2", I18n.t("recruitment.jobs.dismissed_title")
+    assert_select "form[action=?]", recruitment_undismiss_job_recommendation_path(@job)
+  end
+
+  test "a student who has dismissed nothing sees no dismissed section" do
+    get recruitment_jobs_path
+
+    assert_response :success
+    assert_select "h2", { text: I18n.t("recruitment.jobs.dismissed_title"), count: 0 }
+  end
+
   test "duplicate save and dismiss requests are idempotent" do
     post recruitment_save_job_path(@job)
     assert_no_difference [ "Recruitment::SavedJob.count", "AuditEvent.count" ] do

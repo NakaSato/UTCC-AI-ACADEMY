@@ -1,10 +1,5 @@
 module Recruitment
   class InternshipApplicationsController < ApplicationController
-    def index
-      load_reviewable_program
-      @applications = @program.applications.includes(:student, :evaluation).newest_first
-    end
-
     def create
       @program = InternshipProgram.published_for_candidates.find(params[:id])
       raise ActiveRecord::RecordNotFound unless Current.user&.student?

@@ -56,6 +56,25 @@
         </div>
       </section>
     <% end %>
+
+    <%# Dismissing was one-way until now: the undo action existed and nothing
+        linked to it, so a misclick removed a recommendation permanently. %>
+    <% if @dismissals.present? %>
+      <section class="mb-10">
+        <h2 class="text-16 font-semibold text-ink"><%= t("recruitment.jobs.dismissed_title") %></h2>
+        <p class="mt-1 text-12 leading-relaxed text-muted"><%= t("recruitment.jobs.dismissed_subtitle") %></p>
+        <ul class="mt-4 space-y-2">
+          <% @dismissals.each do |dismissal| %>
+            <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline p-4">
+              <span class="text-13 text-muted"><%= dismissal.job_post.title %></span>
+              <%= button_to t("recruitment.jobs.restore_recommendation"),
+                    recruitment_undismiss_job_recommendation_path(dismissal.job_post), method: :delete,
+                    class: "text-12 font-semibold text-brand-ink hover:underline" %>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
   <% end %>
 
   <% if @job_posts.empty? %>

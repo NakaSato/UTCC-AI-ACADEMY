@@ -55,8 +55,13 @@ class Recruitment::InternshipApplicationsControllerTest < ActionDispatch::Integr
     sign_out
     sign_in_as users(:instructor)
 
-    get company_internship_program_applications_path(outsider, @program)
+    # Through the decide action rather than an index screen: the index was
+    # removed with the template it never had, and accepting is the stronger
+    # assertion anyway.
+    application = @program.apply!(student: users(:two), statement: "Ready")
+    post accept_company_internship_program_application_path(outsider, @program, application)
 
     assert_response :not_found
+    assert_predicate application.reload, :pending?
   end
 end
