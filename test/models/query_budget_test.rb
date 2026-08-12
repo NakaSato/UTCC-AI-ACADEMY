@@ -125,7 +125,50 @@ class QueryBudgetTest < ActiveSupport::TestCase
       "deliverables went from #{small} to #{large} queries when the pile grew — a per-file check is back"
   end
 
+  # ADR-0048 said four counts run on each page load, and that if that stopped
+  # being true the fix was caching rather than fewer numbers. It was already
+  # untrue when it was written: the four are the dashboard's own, and underneath
+  # them OrganizationReporting was counting once per status across two
+  # vocabularies of six and seven. Every number on the board survived; they are
+  # asked for in grouped counts now, so a new status costs nothing.
+  test "the company work surface costs the same however many applicants there are" do
+    organization = active_placement.organization
+    viewer = organization.memberships.active.first.user
+    job = published_job(organization)
+
+    apply_to(job, 2)
+    Recruitment::CompanyDashboard.call(organization:, viewer:)
+    small = count_queries { Recruitment::CompanyDashboard.call(organization:, viewer:) }
+
+    apply_to(job, 20)
+    large = count_queries { Recruitment::CompanyDashboard.call(organization:, viewer:) }
+
+    assert_equal small, large,
+      "the work surface went from #{small} to #{large} queries as applications arrived"
+    assert_operator large, :<=, 13,
+      "the work surface now costs #{large} queries, up from 13; a per-status count is probably back"
+  end
+
   private
+    def published_job(organization)
+      job = organization.job_posts.create!(creator: organization.memberships.active.first.user,
+                                           title: "Budget Job", summary: "Summary", description: "Description",
+                                           category: "Product", department: "Academy", team: "Platform",
+                                           seniority: "Junior", location: "Bangkok")
+      job.transition_to!("review")
+      job.transition_to!("published")
+      job
+    end
+
+    def apply_to(job, count)
+      count.times do
+        candidate = User.create!(name: "Applicant #{User.count}", student_id: next_student_id,
+                                 password: "loadTest#{User.count}9")
+        CandidateProfile.create!(user: candidate, application_data_reuse_consent: true)
+        Recruitment::JobApplication.submit!(job_post: job, candidate:, statement: "Statement")
+      end
+    end
+
     def active_placement
       organization = Organization.create!(name: "Budget Org", creator: users(:admin),
                                           accepts_internship_requests: true)

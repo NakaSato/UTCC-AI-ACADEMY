@@ -46,10 +46,10 @@ module Recruitment
       # four, which is what a threshold is allowed to leak.
       hidden = thin || cells.any?(&:suppressed)
 
+      job_counts = Recruitment::JobPost.where(organization_id:).group(:status).count
+
       Summary.new(
-        Recruitment::JobPost::STATUSES.map do |status|
-          JobStatus.new(status, Recruitment::JobPost.where(organization_id:, status:).count)
-        end,
+        Recruitment::JobPost::STATUSES.map { |status| JobStatus.new(status, job_counts.fetch(status, 0)) },
         hidden ? nil : total,
         hidden,
         cells,

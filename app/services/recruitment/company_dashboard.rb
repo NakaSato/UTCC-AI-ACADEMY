@@ -59,11 +59,12 @@ module Recruitment
       end
 
       def postings
+        jobs = by_status(@organization.job_posts)
+        internships = by_status(@organization.internship_programs)
+
         [
-          Posting.new(:jobs, count_by_status(@organization.job_posts, "published"),
-                      count_by_status(@organization.job_posts, "review")),
-          Posting.new(:internships, count_by_status(@organization.internship_programs, "published"),
-                      count_by_status(@organization.internship_programs, "review"))
+          Posting.new(:jobs, jobs.fetch("published", 0), jobs.fetch("review", 0)),
+          Posting.new(:internships, internships.fetch("published", 0), internships.fetch("review", 0))
         ]
       end
 
@@ -82,7 +83,11 @@ module Recruitment
         )
       end
 
-      def count_by_status(relation, status) = relation.where(status:).count
+      # One grouped count per relation rather than one query per status. The
+      # screen asks for two states of each and would happily grow a third; a
+      # query apiece is how a board of counts quietly becomes the slowest page
+      # in the workspace.
+      def by_status(relation) = relation.group(:status).count
 
       def unacknowledged_reports
         InternshipProgressReport.where(acknowledged_at: nil)
