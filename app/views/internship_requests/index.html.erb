@@ -13,6 +13,37 @@
     <% end %>
   </div>
 
+  <%# An internship that is running comes first: the request that started it is
+      history, and a missing weekly report is the only thing on this screen
+      somebody else is waiting for. %>
+  <% if @placements.any? %>
+    <section class="mb-8">
+      <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("internship_placements.mine_heading") %></h2>
+      <ul class="space-y-4">
+        <% @placements.each do |placement| %>
+          <li>
+            <%= link_to internship_placement_path(placement),
+                  class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand-ink hover:shadow-sm" do %>
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h3 class="text-18 font-semibold text-ink"><%= placement.organization.name %></h3>
+                  <p class="mt-1 text-13 text-muted"><%= t("internship_placements.status.#{placement.status}") %></p>
+                </div>
+                <% if placement.missing_current_week_report? %>
+                  <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-brand-ink">
+                    <%= t("internship_placements.week_missing") %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <%= link_to t("internship_requests.all_internships"), internship_placements_path,
+            class: "mt-4 inline-flex text-13 font-semibold text-brand-ink hover:underline" %>
+    </section>
+  <% end %>
+
   <div class="mb-8 rounded-card border border-hairline bg-surface-2 p-4 text-13 leading-[1.65] text-muted">
     <%= t("internship_requests.positionless_notice") %>
   </div>

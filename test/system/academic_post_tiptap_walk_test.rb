@@ -5,7 +5,7 @@ class AcademicPostTiptapWalkTest < ApplicationSystemTestCase
     student = users(:one)
     sign_in_through_the_form(student)
 
-    click_link I18n.t("chrome.nav.writing", locale: :th)
+    navigate_to I18n.t("chrome.nav.writing", locale: :th)
     click_link I18n.t("academic.new", locale: :th)
     fill_in "academic_post_title", with: "สมการพื้นฐาน"
     accept_prompt("Enter a LaTeX expression", with: "E=mc^2") do

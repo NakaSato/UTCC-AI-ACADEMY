@@ -5,8 +5,8 @@ title: Give each population its own navigation, front door, and company address
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@recruitment-domain-owner"]
 created: 2026-08-09
-updated: 2026-08-09
-review_by: 2026-08-21
+updated: 2026-08-13
+review_by: 2026-08-27
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0042, ADR-0043, ADR-0024]
@@ -40,6 +40,10 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 > and where `/` lands. A company's screens move under `/company/:slug` and
 > organizations are addressed by name in every URL. Dashboard *content* per
 > role is explicitly a later slice.
+>
+> **Amended 2026-08-13:** the navigation is one dropdown at every width. The
+> rail-plus-drawer pair it shipped with is gone — see point 2 and the
+> consequences.
 >
 > **Amended 2026-08-09, same day:** the profile was briefly at the bare root
 > (`/northstar`) before the `/company` prefix replaced it — see the alternative
@@ -87,7 +91,7 @@ The accepted policy is:
 1. `User#workspace` returns one of `:admin`, `:instructor`, `:company`,
    `:student`, in that order of precedence. **Membership is asked before role**,
    because a company member holds the student role.
-2. One shell, not four layouts. The header, the burger drawer, and the front
+2. One shell, not four layouts. The header, its navigation menu, and the front
    door all read the workspace; the layout, the account menu, notifications, and
    the language toggle stay shared.
 3. Each workspace has a navigation of doors it can actually open, matching the
@@ -109,6 +113,12 @@ The accepted policy is:
 8. **Out of scope, deferred to its own slice:** dashboard *content*. No new
    summary screens, counts, or activity feeds. Each workspace lands on the best
    screen that already exists.
+
+   **Taken up for one workspace on 2026-08-12 by [ADR-0048](adr-0048-company-work-surface.md).**
+   The company workspace gained a work surface at `/company/:slug/work` and `/`
+   now lands a company member there rather than on the company's record, which
+   amends point 4 for that workspace only. The admin, instructor, and student
+   landings are unchanged, and summary content for them stays deferred.
 
 ## Alternatives
 
@@ -161,8 +171,10 @@ removes the whole problem.
 
 ## Fitness Functions
 
-- Each of the four workspaces gets its own navigation, and the burger drawer
-  never disagrees with the rail.
+- Each of the four workspaces gets its own navigation, rendered once in the
+  header dropdown. (Until 2026-08-13 it was rendered twice — a rail above
+  1180px and a drawer below — and the fitness function was that the two agreed.
+  One list in one place is the stronger version of that guarantee.)
 - A company member sees no coursework entry and no heart counter, despite
   holding the student role; revoking the membership returns them to the learner
   app entirely.

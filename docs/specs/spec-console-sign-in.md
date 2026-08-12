@@ -69,7 +69,10 @@ system with rules of its own.
    message is identical to the one a wrong password receives.
 6. On success the destination is the stashed `return_to_after_authenticating`
    URL when one exists; otherwise `/admin` for an admin, `/instructor` for an
-   instructor, and the recruitment organizations index for a company member.
+   instructor, and for a company member wherever `/` would send them — their
+   company's work surface, or the chooser when they belong to more than one.
+   Both doors read `ApplicationController#company_home_path`, so they cannot
+   drift apart. (Until SPEC-0048 this was the organizations index outright.)
 7. `POST /console` carries two rate limits, keyed on the request IP and on the
    submitted identifier, at the same 10-per-3-minutes as `/login`.
 8. `/console` renders `noindex, nofollow` and appears in
@@ -123,7 +126,7 @@ test only, all with the password `utcc2026`:
 | --- | --- | --- |
 | Instructor | `wichai` or `wichai@utcc.ac.th` | `/instructor` |
 | Administrator | `utcc-admin` or `admin@utcc.ac.th` | `/admin` |
-| Company owner | `northstar` or `recruiter@northstar.co.th` | their company at `/company/:slug` |
+| Company owner | `northstar` or `recruiter@northstar.co.th` | their company's work surface at `/company/:slug/work` |
 
 None of the three has a student ID — see SPEC-0043. The company account carries
 no role either: its reach is an active `owner` membership of the seeded

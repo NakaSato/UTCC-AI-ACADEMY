@@ -62,11 +62,20 @@ class InternshipPlacementsControllerTest < ActionDispatch::IntegrationTest
       assert_response :not_found
       assert_predicate placement.reload, :planned?
 
-      get internship_placement_path(placement)
-      assert_response :not_found
-
       sign_out
     end
+
+    # An unassigned instructor cannot open it at all. An administrator can,
+    # since assigning the supervisor happens on this screen — and reads no week
+    # of it, which `internship_faculty_assignments_controller_test` covers.
+    sign_in_as users(:instructor)
+    get internship_placement_path(placement)
+    assert_response :not_found
+    sign_out
+
+    sign_in_as users(:admin)
+    get internship_placement_path(placement)
+    assert_response :success
   end
 
   test "the placed student reads the placement, submits a week, and cannot advance it" do

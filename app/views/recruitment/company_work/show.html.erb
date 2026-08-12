@@ -1,0 +1,104 @@
+<% content_for :title, "#{t('recruitment.company_work.title')} — #{@organization.name}" %>
+
+<% waiting = @dashboard[:queues].select(&:any?) %>
+
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8">
+    <p class="mb-2 font-mono text-12 text-muted"><%= @organization.slug %></p>
+    <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("recruitment.company_work.title") %></h1>
+    <p class="mt-2 text-13 text-muted"><%= t("recruitment.company_work.subtitle", name: @organization.name) %></p>
+    <%= link_to t("recruitment.company_work.company_record"), company_path(@organization),
+          class: "mt-5 inline-flex rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand-ink hover:border-brand-ink" %>
+  </div>
+
+  <section class="mb-8">
+    <h2 class="mb-4 text-20 font-semibold text-ink"><%= t("recruitment.company_work.waiting.title") %></h2>
+
+    <% if waiting.any? %>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <% waiting.each do |queue| %>
+          <%= link_to queue.path,
+                class: "rounded-card border border-hairline bg-surface-1 p-6 hover:border-brand-ink" do %>
+            <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= queue.count %></div>
+            <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.queues.#{queue.key}") %></div>
+            <div class="mt-1 text-12-5 text-muted-2"><%= t("recruitment.company_work.queues.#{queue.key}_note") %></div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <%# Not a row of zeroes: three noughts read as a broken screen, and the
+          one thing a member wants to know is that they are clear. %>
+      <div class="rounded-card border border-hairline bg-surface-1 p-6">
+        <p class="text-13 font-semibold text-ink"><%= t("recruitment.company_work.waiting.empty_title") %></p>
+        <p class="mt-1 text-13 text-muted"><%= t("recruitment.company_work.waiting.empty_body") %></p>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="mb-8">
+    <h2 class="mb-4 text-20 font-semibold text-ink"><%= t("recruitment.company_work.running.title") %></h2>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <% placements = @dashboard[:queues].find { |queue| queue.key == :active_placements } %>
+      <div class="rounded-card border border-hairline bg-surface-1 p-6">
+        <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= placements.count %></div>
+        <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.queues.active_placements") %></div>
+        <%= link_to t("recruitment.company_work.open_queue"), placements.path,
+              class: "mt-2 inline-flex text-12-5 font-semibold text-brand-ink hover:underline" %>
+      </div>
+
+      <% @dashboard[:postings].each do |posting| %>
+        <div class="rounded-card border border-hairline bg-surface-1 p-6">
+          <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= posting.published %></div>
+          <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.postings.#{posting.key}") %></div>
+          <div class="mt-1 text-12-5 text-muted-2">
+            <%= t("recruitment.company_work.postings.in_review", count: posting.in_review) %>
+          </div>
+        </div>
+      <% end %>
+
+      <% collaboration = @dashboard[:collaboration] %>
+      <div class="rounded-card border border-hairline bg-surface-1 p-6">
+        <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= collaboration.published_cases %></div>
+        <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.collaboration.title") %></div>
+        <div class="mt-1 text-12-5 text-muted-2">
+          <%= t("recruitment.company_work.collaboration.note",
+                milestones: collaboration.open_milestones, submissions: collaboration.submissions) %>
+        </div>
+        <%= link_to t("recruitment.company_work.open_queue"), collaboration.path,
+              class: "mt-2 inline-flex text-12-5 font-semibold text-brand-ink hover:underline" %>
+      </div>
+    </div>
+  </section>
+
+  <%# Candidate figures are governed: OrganizationReporting returns nothing at
+      all to a member outside the reporter roles, and suppresses populations
+      under five. This screen renders whatever it is given and asks nothing
+      itself. SPEC-0037, ADR-0048 decision 5. %>
+  <% if (applications = @dashboard[:applications]) %>
+    <section>
+      <h2 class="mb-1 text-20 font-semibold text-ink"><%= t("recruitment.company_work.applications.title") %></h2>
+      <p class="mb-4 text-13 text-muted"><%= applications.uncertainty %></p>
+
+      <div class="rounded-card border border-hairline bg-surface-1 p-6">
+        <% if applications.application_total_suppressed %>
+          <p class="text-13 text-muted"><%= t("recruitment.company_work.applications.suppressed") %></p>
+        <% else %>
+          <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= applications.application_total %></div>
+          <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.applications.total") %></div>
+          <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <% applications.application_statuses.each do |cell| %>
+              <div>
+                <dt class="text-12-5 text-muted-2"><%= t("recruitment.applications.statuses.#{cell.status}") %></dt>
+                <dd class="text-15 font-semibold text-ink"><%= cell.count %></dd>
+              </div>
+            <% end %>
+          </dl>
+        <% end %>
+
+        <%= link_to t("recruitment.reporting.title"), reporting_company_path(@organization),
+              class: "mt-4 inline-flex text-12-5 font-semibold text-brand-ink hover:underline" %>
+      </div>
+    </section>
+  <% end %>
+</main>

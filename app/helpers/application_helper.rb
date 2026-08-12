@@ -29,31 +29,52 @@ module ApplicationHelper
   #
   # Every entry is a door its workspace can actually open, matching the
   # `allow_only` on each controller and, for the company entries, the membership
-  # scoping inside them. Both the desktop nav and the burger drawer read this.
-  def app_nav_items
+  # scoping inside them.
+  #
+  # Grouped, because the menu is a list of nine for a learner and an unheaded
+  # list of nine is a wall. A group is a claim about what a destination is *for*
+  # — learning it, tracking it, or the work beyond the course — and the headings
+  # match the footer's, which sorts the same screens the same way.
+  def app_nav_groups
     case current_workspace
-    in :admin then admin_nav_items
-    in :instructor then instructor_nav_items
-    in :company then company_nav_items
-    else student_nav_items
+    in :admin then admin_nav_groups
+    in :instructor then instructor_nav_groups
+    in :company then company_nav_groups
+    else student_nav_groups
     end
   end
 
+  # The flat list behind the groups: what the nav *offers*, regardless of how it
+  # is sorted. Every "an entry is a door its workspace can open" check reads
+  # this, so grouping cannot quietly add or drop a destination.
+  def app_nav_items = app_nav_groups.flat_map { it[:items] }
+
   # `Course` and `Lesson` are shortcuts into AI1101 — the course a student is
   # currently working through.
-  def student_nav_items
-    items = [
-      [ t("chrome.nav.catalog"),     root_path ],
+  def student_nav_groups
+    track = [
       [ t("chrome.nav.my_learning"), my_learning_path ],
-      [ t("chrome.nav.course"),      course_path("AI1101") ],
-      [ t("chrome.nav.lesson"),      lesson_path ],
-      [ t("chrome.nav.map"),         knowledge_map_path ],
-      [ t("chrome.nav.progress"),    progress_path ],
-      [ t("chrome.nav.writing"),     academic_posts_path ]
+      [ t("chrome.nav.progress"),    progress_path ]
     ]
+    track << [ t("chrome.nav.ranking"), leaderboard_path ] if FeatureSetting.enabled?(:leaderboard)
 
-    items.insert(-2, [ t("chrome.nav.ranking"), leaderboard_path ]) if FeatureSetting.enabled?(:leaderboard)
-    items
+    [
+      { label: t("chrome.nav_group.learn"), items: [
+        [ t("chrome.nav.catalog"), root_path ],
+        [ t("chrome.nav.course"),  course_path("AI1101") ],
+        [ t("chrome.nav.lesson"),  lesson_path ],
+        [ t("chrome.nav.map"),     knowledge_map_path ]
+      ] },
+      { label: t("chrome.nav_group.track"), items: track },
+      # Beyond the coursework, and the reason the group exists: the internship
+      # lifecycle starts with a request, so that is the door. A student who has
+      # never made one still needs to learn the feature exists, which is why it
+      # is unconditional — for two increments it was reachable only by URL.
+      { label: t("chrome.nav_group.beyond"), items: [
+        [ t("chrome.nav.internships"), internship_requests_path ],
+        [ t("chrome.nav.writing"),     academic_posts_path ]
+      ] }
+    ]
   end
 
   # Admin first — it is the admin's index. Organizations because creating one
@@ -63,30 +84,58 @@ module ApplicationHelper
   # teach, so for them it is somebody else's screen. An admin who genuinely
   # teaches holds the instructor role and gets that workspace; the route still
   # admits any staff member who types it.
-  def admin_nav_items
+  def admin_nav_groups
     [
-      [ t("chrome.nav.admin"),         admin_path ],
-      [ t("chrome.nav.organizations"), companies_path ]
+      { label: t("chrome.nav_group.administration"), items: [
+        [ t("chrome.nav.admin"),         admin_path ],
+        [ t("chrome.nav.organizations"), companies_path ]
+      ] },
+      # An administrator assigns every internship's university supervisor, and
+      # supervises and hosts none of them — so without this entry the screen
+      # that grants supervision has no door for the only role that may use it.
+      { label: t("chrome.nav_group.university"), items: [
+        [ t("chrome.nav.internships"), internship_placements_path ]
+      ] }
     ]
   end
 
   # Short on purpose: this is everything an instructor has that a learner does
   # not. Padding it with the catalog and the knowledge map would be padding it
   # with screens about somebody else's coursework.
-  def instructor_nav_items
+  def instructor_nav_groups
     [
-      [ t("chrome.nav.instructor"), instructor_path ],
-      [ t("chrome.nav.writing"),    academic_posts_path ]
+      { label: t("chrome.nav_group.teaching"), items: [
+        [ t("chrome.nav.instructor"), instructor_path ]
+      ] },
+      # The internships this account supervises for the university. Offered to
+      # every staff member rather than only the assigned, for the same reason
+      # the student's entry is: a screen nobody is told about is a screen
+      # nobody opens. It lists assignments only, so an unassigned instructor
+      # sees an empty one. SPEC-0041 increment 3.
+      { label: t("chrome.nav_group.university"), items: [
+        [ t("chrome.nav.internships"), internship_placements_path ],
+        [ t("chrome.nav.writing"),     academic_posts_path ]
+      ] }
     ]
   end
 
-  # A company member's three: the organizations they belong to, the case work
-  # they run, and the students they have placed. None of it is coursework.
-  def company_nav_items
+  # A company member's four: what is waiting on them, the companies they belong
+  # to, the case work they run, and the students they have placed. None of it is
+  # coursework.
+  #
+  # Work points at `/` rather than at a slug, because a member of two companies
+  # has no single work surface — `/` sends one of them to their board and the
+  # other to the chooser, which is the same answer the redirect already gives.
+  def company_nav_groups
     [
-      [ t("chrome.nav.organizations"),  companies_path ],
-      [ t("chrome.nav.business_cases"), business_cases_path ],
-      [ t("chrome.nav.placements"),     internship_placements_path ]
+      { label: t("chrome.nav_group.company"), items: [
+        [ t("chrome.nav.work"),          root_path ],
+        [ t("chrome.nav.organizations"), companies_path ]
+      ] },
+      { label: t("chrome.nav_group.students"), items: [
+        [ t("chrome.nav.business_cases"), business_cases_path ],
+        [ t("chrome.nav.placements"),     internship_placements_path ]
+      ] }
     ]
   end
 

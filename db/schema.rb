@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -322,6 +322,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
     t.index ["key", "scope"], name: "index_feature_settings_on_key_and_scope", unique: true
   end
 
+  create_table "internship_faculty_assignments", force: :cascade do |t|
+    t.bigint "assigned_by_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "faculty_id", null: false
+    t.bigint "internship_placement_id", null: false
+    t.datetime "revoked_at"
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_by_id"], name: "index_internship_faculty_assignments_on_assigned_by_id"
+    t.index ["faculty_id", "status"], name: "index_internship_faculty_assignments_on_faculty_id_and_status"
+    t.index ["internship_placement_id"], name: "internship_faculty_assignments_one_active", unique: true, where: "((status)::text = 'active'::text)"
+    t.check_constraint "status::text <> 'revoked'::text OR revoked_at IS NOT NULL", name: "internship_faculty_assignments_revoked_at"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'revoked'::character varying]::text[])", name: "internship_faculty_assignments_status"
+  end
+
   create_table "internship_placements", force: :cascade do |t|
     t.datetime "activated_at"
     t.bigint "application_id"
@@ -353,6 +368,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
     t.text "activities", null: false
     t.text "blockers"
     t.datetime "created_at", null: false
+    t.datetime "faculty_acknowledged_at"
+    t.bigint "faculty_acknowledged_by_id"
     t.decimal "hours", precision: 5, scale: 1
     t.bigint "internship_placement_id", null: false
     t.text "outcomes"
@@ -360,6 +377,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
     t.datetime "updated_at", null: false
     t.date "week_starting_on", null: false
     t.index ["acknowledged_by_id"], name: "index_internship_progress_reports_on_acknowledged_by_id"
+    t.index ["faculty_acknowledged_by_id"], name: "idx_on_faculty_acknowledged_by_id_3bf38c7c61"
     t.index ["internship_placement_id", "week_starting_on"], name: "internship_progress_reports_one_per_week", unique: true
     t.check_constraint "hours IS NULL OR hours >= 0::numeric AND hours <= 168::numeric", name: "internship_progress_reports_hours"
   end
@@ -1059,12 +1077,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_200000) do
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "internship_faculty_assignments", "internship_placements"
+  add_foreign_key "internship_faculty_assignments", "users", column: "assigned_by_id"
+  add_foreign_key "internship_faculty_assignments", "users", column: "faculty_id"
   add_foreign_key "internship_placements", "internship_requests"
   add_foreign_key "internship_placements", "organizations"
   add_foreign_key "internship_placements", "recruitment_internship_applications", column: "application_id"
   add_foreign_key "internship_placements", "users", column: "student_id"
   add_foreign_key "internship_progress_reports", "internship_placements"
   add_foreign_key "internship_progress_reports", "users", column: "acknowledged_by_id"
+  add_foreign_key "internship_progress_reports", "users", column: "faculty_acknowledged_by_id"
   add_foreign_key "internship_requests", "organizations"
   add_foreign_key "internship_requests", "users", column: "decided_by_id"
   add_foreign_key "internship_requests", "users", column: "student_id"

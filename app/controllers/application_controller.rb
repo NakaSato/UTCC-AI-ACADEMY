@@ -25,5 +25,15 @@ class ApplicationController < ActionController::Base
 
     def progress = Current.user&.progress || LearnerProgress.new(nil)
 
+    # Where a company member's front door leads: the work waiting on their
+    # company, or the chooser when they belong to more than one. It lives here
+    # because two doors lead there — `/` and the console sign-in — and a member
+    # of one company handed a list of one is the drift this prevents. SPEC-0048.
+    def company_home_path(user)
+      organizations = user.organizations.merge(Organization.active)
+
+      organizations.one? ? work_company_path(organizations.first) : companies_path
+    end
+
     def notification_bell = @notification_bell ||= NotificationBell.new(Current.user)
 end

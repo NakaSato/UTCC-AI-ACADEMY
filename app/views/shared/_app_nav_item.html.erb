@@ -1,0 +1,11 @@
+<%# One destination in a navigation panel. Shared by the menubar's per-category
+    panels and the compact button's single panel, so the two cannot style or
+    mark the current page differently. %>
+<% current = nav_current?(path) %>
+<%= link_to label, path,
+      "aria-current": ("page" if current),
+      class: class_names(
+        "block rounded-[9px] px-3 py-[11px] text-14",
+        "bg-chrome-3 font-semibold text-white" => current,
+        "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !current
+      ) %>

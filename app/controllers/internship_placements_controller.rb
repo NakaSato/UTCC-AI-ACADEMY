@@ -12,6 +12,24 @@ class InternshipPlacementsController < ApplicationController
                                                     })
                                              .includes(:organization, :student)
                                              .newest_first
+    # What this account supervises for the university. Assigned placements only:
+    # the assignment is the consent and therefore the boundary, so a staff
+    # member sees no internship they were not given — ADR-0041 decision 7.
+    @supervised_placements = InternshipPlacement.joins(:faculty_assignments)
+                                                .where(internship_faculty_assignments: {
+                                                         faculty_id: Current.user.id, status: "active"
+                                                       })
+                                                .includes(:organization, :student)
+                                                .newest_first
+    # An administrator supervises nothing and hosts nothing, so every list above
+    # is empty for them — and assigning a supervisor happens on a placement they
+    # would have had no way to reach. This is that way. It carries the same
+    # reach `administrable_by?` grants: the record, never a weekly report.
+    @administered_placements = if Current.user.admin?
+      InternshipPlacement.includes(:organization, :student, faculty_assignments: :faculty).newest_first
+    else
+      InternshipPlacement.none
+    end
     @placeable_requests = placeable_requests
     @placeable_applications = placeable_applications
   end
@@ -20,7 +38,17 @@ class InternshipPlacementsController < ApplicationController
     @placement = visible_placement
     @manageable = @placement.manageable_by?(Current.user)
     @is_student = @placement.student_id == Current.user.id
-    @reports = @placement.progress_reports.newest_first.includes(:acknowledged_by)
+    @supervising = @placement.supervised_by?(Current.user)
+    @assignment = @placement.faculty_assignments.active.includes(:faculty).first
+    # Only an administrator assigns, so only an administrator is offered the
+    # list of who could be assigned — see ADR-0041 decision 2.
+    @assignable_faculty = User.where(role: %w[ instructor admin ]).order(:name) if Current.user.admin?
+    # An administrator opens this page to assign a supervisor, not to read a
+    # student's weeks. The rows are not loaded for them at all, so there is
+    # nothing for a template change to leak later.
+    @reads_reports = @placement.visible_to?(Current.user)
+    @reports = @reads_reports ? @placement.progress_reports.newest_first
+                                          .includes(:acknowledged_by, :faculty_acknowledged_by) : []
   end
 
   # One entry point, two origins: an approved request or an accepted recruitment
@@ -96,9 +124,14 @@ class InternshipPlacementsController < ApplicationController
                                        .includes(:student, program: :organization)
     end
 
+    # An administrator gets in because assigning the supervisor happens here and
+    # nowhere else — but on the narrower ticket: see `administrable_by?` and the
+    # `@reads_reports` split in `show`.
     def visible_placement
       placement = InternshipPlacement.find(params[:id])
-      raise ActiveRecord::RecordNotFound unless placement.visible_to?(Current.user)
+      unless placement.visible_to?(Current.user) || placement.administrable_by?(Current.user)
+        raise ActiveRecord::RecordNotFound
+      end
 
       placement
     end

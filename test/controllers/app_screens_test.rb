@@ -304,7 +304,8 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     get admin_url
 
     assert_response :success
-    # Once in the nav rail, once in the burger drawer.
+    # Twice: once in the menubar's category panel, once in the compact button
+    # that replaces the bar below `md`. Both render `app_nav_groups`.
     assert_select "header a[href=?]", admin_path, count: 2
     assert_select "header a[href=?]", companies_path, count: 2
     # /instructor is a report on a section an admin does not teach, so the nav

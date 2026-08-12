@@ -142,7 +142,7 @@ Layout tokens:
 - `max-w-narrow` — 1000px, the leaderboard
 - `h-header` / `--spacing-header` — 64px
 - `xs:` — a non-standard **576px** breakpoint (inherited from the earlier system; used by two-up form rows)
-- `nav:` — **1180px**, below which the header's eight nav destinations no longer fit beside the utility rail and the nav collapses into the burger drawer
+- `nav:` — **1180px**. Named for the header rail it was cut for: below it the destinations no longer fitted beside the utility rail. The header now carries one dropdown at every width and no longer reads it, but the admin two-column screens fold here
 
 ## Motion
 

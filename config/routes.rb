@@ -82,6 +82,9 @@ Rails.application.routes.draw do
   # `:organization_id` both carry the name — no controller reads an id here.
   scope module: :recruitment do
     resources :organizations, path: "company", as: :companies, only: %i[index new create show] do
+      # Where a company member lands. The slug root is the company's record;
+      # this is the work waiting on it. ADR-0048.
+      get :work, on: :member, to: "company_work#show"
       get :reporting, on: :member, to: "reporting#show"
       post :memberships, on: :member, to: "organizations#create_membership"
       delete "memberships/:user_id", on: :member, to: "organizations#revoke_membership",
@@ -260,6 +263,15 @@ Rails.application.routes.draw do
     post :reports, on: :member, to: "internship_progress_reports#create"
     post "reports/:report_id/acknowledge", on: :member,
          to: "internship_progress_reports#acknowledge", as: :acknowledge_report
+    # Faculty oversight (SPEC-0041, increment 3, ADR-0041 decision 2 answered
+    # 2026-08-12). An administrator assigns and revokes; the supervisor reads
+    # and acknowledges. There is deliberately no route that lets them approve,
+    # advance, or complete anything, and the boundary test checks for it.
+    post :faculty, on: :member, to: "internship_faculty_assignments#create"
+    delete "faculty/:assignment_id", on: :member,
+           to: "internship_faculty_assignments#destroy", as: :revoke_faculty
+    post "reports/:report_id/faculty-acknowledge", on: :member,
+         to: "internship_progress_reports#faculty_acknowledge", as: :faculty_acknowledge_report
   end
   # End internship requests
 

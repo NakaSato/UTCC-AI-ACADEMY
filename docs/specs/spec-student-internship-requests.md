@@ -5,8 +5,8 @@ title: Student-initiated internship requests, placements, and progress reporting
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-09
-updated: 2026-08-09
-review_by: 2026-08-21
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0041, ADR-0024, ADR-0028, ADR-0040, SPEC-0024, SPEC-0028]
@@ -19,8 +19,12 @@ implemented_by:
   - app/controllers/organization_internship_settings_controller.rb
   - app/controllers/internship_placements_controller.rb
   - app/controllers/internship_progress_reports_controller.rb
+  - app/models/internship_faculty_assignment.rb
+  - app/controllers/internship_faculty_assignments_controller.rb
+  - app/helpers/application_helper.rb
   - db/migrate/20260809160000_create_internship_requests.rb
   - db/migrate/20260809180000_create_internship_placements.rb
+  - db/migrate/20260812210000_create_internship_faculty_assignments.rb
 enforced_by:
   - test/models/internship_request_test.rb
   - test/models/internship_placement_test.rb
@@ -31,6 +35,9 @@ enforced_by:
   - test/operations/internship_request_boundary_test.rb
   - test/system/internship_request_walk_test.rb
   - test/system/internship_placement_walk_test.rb
+  - test/controllers/student_internship_door_test.rb
+  - test/models/internship_faculty_assignment_test.rb
+  - test/controllers/internship_faculty_assignments_controller_test.rb
 touches:
   - app/models
   - app/services
@@ -60,6 +67,13 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003]
 > completed, and cancelled lifecycle, originating from either an approved
 > request or an accepted `Recruitment::InternshipApplication`, plus weekly
 > progress reports with supervisor acknowledgement.
+>
+> **Increment 3 recorded and implemented 2026-08-12:** ADR-0041 decisions 2 and
+> 7 are answered, so the university is finally in the path it is accountable
+> for. An administrator assigns one staff account to one placement; that
+> assignment lets them read the placement and acknowledge its weeks, and grants
+> nothing else. Documents, an academic gate, rubric evaluation, email, REST
+> APIs, and academic credit remain unauthorized.
 
 > [Executable Specifications](README.md) ·
 > [Student internship request ADR](../decisions/adr-0041-student-internship-request-boundary.md) ·
@@ -120,10 +134,37 @@ internship request models.
 - Privacy-safe audit events for placement creation, each transition, report
   submission, and acknowledgement.
 
+### Included in increment 3 (implemented)
+
+- An `InternshipFacultyAssignment` naming one staff account as the university's
+  supervisor of one placement. An administrator grants it and an administrator
+  revokes it; both are audited at warn level, as a privilege change is.
+- One active assignment per placement, enforced by a partial unique index. A
+  revoked assignment is kept as evidence of who could read what and when.
+- The supervisor reads that placement and its weekly reports, and nothing else.
+  Revocation closes the reading immediately, re-derived per request.
+- Acknowledgement of a week by the supervisor, in its own pair of columns beside
+  the company's, rewriting no part of the student's report.
+- An in-app notification to the student when a supervisor is assigned.
+- A supervising section on the placement index and an Internships entry in the
+  instructor navigation, so an assigned staff member has a door.
+- An administrator has a list of every placement and which of them lack a
+  supervisor, and an Internships entry in the admin navigation. They host and
+  supervise none, so without it the screen that grants supervision had no door
+  for the only role that may use it.
+- An administrator may open a placement to assign its supervisor, and reads
+  no weekly report there: the rows are not loaded and the screen says so.
+  Reading the weeks means assigning yourself, which is audited and notifies
+  the student.
+
 ### Deferred to later increments (unauthorized, enforced absent)
 
-- A faculty assignment and academic review record; the `instructor` role
-  continues to grant nothing in this context.
+- Any faculty gate: approval of a request before the company sees it, of a
+  placement transition, or of completion. ADR-0041 decision 4 keeps academic
+  eligibility open, and the lifecycle stays the company's.
+- Faculty reading of the *request* behind a placement — its motivation text and
+  the company's decision reason.
+- An academic review record, a score, a rubric, or any assessment output.
 - Résumé, portfolio, and deliverable uploads.
 - Rubric evaluation dimensions, interviews, email, REST APIs, and any field
   holding academic credit or converting hours to credit.
@@ -196,13 +237,14 @@ namespace, its own table prefix, and its own route scope.
 | --- | --- | --- | --- |
 | Requesting student | Own requests, own placements, own reports | Draft, submit, withdraw a request; author reports on an active placement | Cannot see another student's request to the same company, nor the company's internal decision notes |
 | Company supervisor/reviewer | Requests addressed to their organization; placements hosted by it | Record a decision with a reason; acknowledge reports; advance a placement per approved policy | Organization membership alone is not access to a request; no cross-organization read |
-| Faculty reviewer | Only explicitly assigned requests and placements | Record academic review and oversight evidence | The `instructor` account role alone grants nothing |
-| Administrator | Support and reporting scope only | Documented support actions | Every content access needs least privilege and audit evidence; no unbounded browsing of student documents |
+| Faculty supervisor | Only placements they are assigned to, and those placements weekly reports | Acknowledge a week, on their own record | The `instructor` account role alone grants nothing; the assignment is granted by an administrator, carries no gate, and does not reach the request behind the placement |
+| Administrator | A placement record, to assign or revoke its supervisor. Not its weekly reports | Assign and revoke a faculty supervisor | Every content access needs least privilege and audit evidence; no unbounded browsing of student documents. Reading the weeks means self-assigning, which is audited at warn level and notifies the student |
 | Unauthenticated or non-participant | None | None | Safe not-found; no disclosure of a request's existence, its company, or its student |
 
 The final matrix is human-owned; this table is the proposed minimum, not
 approval to grant access. Which membership roles count as company supervisor is
-ADR-0041 decision 4, and the faculty role is decision 2.
+ADR-0041 decision 4. The faculty row was decision 2 and was answered on
+2026-08-12 — it now describes what ships.
 
 ## Invariants
 
@@ -272,8 +314,22 @@ moves beyond draft.
 - [x] Progress reporting defines weekly cadence, required fields, append-only
       behavior, and acknowledgement authority
       (`test/models/internship_progress_report_test.rb`).
-- [ ] Faculty assignment, academic review authority, and visibility per role are
-      recorded by the academic and privacy owners — deferred.
+- [x] Faculty assignment and its visibility are recorded by the academic and
+      privacy owners (ADR-0041 decisions 2 and 7, 2026-08-12): an administrator
+      assigns one staff account to one placement, one active assignment at a
+      time, audited on grant and revoke
+      (`test/models/internship_faculty_assignment_test.rb`).
+- [x] The supervisor reads only the placements they were assigned, and
+      revocation closes that reading immediately
+      (`test/models/internship_faculty_assignment_test.rb`,
+      `test/controllers/internship_faculty_assignments_controller_test.rb`).
+- [x] The supervisor acknowledges a week in their own columns, cannot advance,
+      complete, or cancel the placement, and rewrites nothing the student wrote
+      (`test/models/internship_faculty_assignment_test.rb`,
+      `test/operations/internship_request_boundary_test.rb`).
+- [ ] Academic review authority — whether faculty gate a request, a transition,
+      or completion — is recorded by the academic owner. Deliberately not taken
+      on 2026-08-12; see ADR-0041 decision 4.
 - [ ] The document contract for résumés, portfolios, and deliverables is
       recorded before any upload route is designed — deferred.
 - [x] The audit and privacy contract covers redaction and cross-domain
@@ -298,7 +354,9 @@ moves beyond draft.
 | Placement lifecycle | `test/models/internship_placement_test.rb`, `test/controllers/internship_placements_controller_test.rb` |
 | Placement origin and non-mutation | `test/models/internship_placement_test.rb` — both origins accepted, exactly one required, and the shipped application untouched |
 | Progress reporting | `test/models/internship_progress_report_test.rb` |
-| Faculty authority · document contract · rubric evaluation | Later increments; not yet authorized, absence enforced by `test/operations/internship_request_boundary_test.rb` |
+| Student navigation and cross-links | `test/controllers/student_internship_door_test.rb` |
+| Faculty assignment, its boundary, and its absence of a gate | `test/models/internship_faculty_assignment_test.rb`, `test/controllers/internship_faculty_assignments_controller_test.rb`, `test/operations/internship_request_boundary_test.rb` |
+| Academic gate · document contract · rubric evaluation | Later increments; not yet authorized, absence enforced by `test/operations/internship_request_boundary_test.rb` |
 
 ## Error and boundary cases
 
@@ -365,6 +423,33 @@ bin/rails test test/models/internship_placement_test.rb \
   test/models/internship_progress_report_test.rb \
   test/controllers/internship_placements_controller_test.rb
 bin/rails test test/system/internship_request_walk_test.rb test/system/internship_placement_walk_test.rb
+bin/rails test test/controllers/student_internship_door_test.rb
+bin/rails test test/models/internship_faculty_assignment_test.rb \
+  test/controllers/internship_faculty_assignments_controller_test.rb
 bin/docs
 git diff --check
 ```
+
+## Amendment, 2026-08-12: the student's door
+
+Increments 1 and 2 shipped the student's screens without a way in. Nothing in
+the application linked to `/internship-requests` or to `/internships/placements`,
+so a learner reached either only by typing the URL — and the company work
+surface added on the same day counts the weekly reports those students are
+expected to write. Three changes, no new record and no new decision:
+
+- **The student navigation carries an Internships entry, unconditionally.** It
+  points at the request index, because that is where the lifecycle starts. It is
+  offered to every learner rather than only to those with a request, since the
+  navigation is how a student learns the capability exists at all — the accepted
+  answer on 2026-08-12.
+- **The request index shows a running internship first**, with the week's report
+  marked missing when it is, using `InternshipPlacement#missing_current_week_report?`
+  — a predicate the model had computed for two increments with no reader.
+- **The two screens point at each other.** The placement index's link back to
+  requests is rendered only for the student workspace: `/internship-requests` is
+  student-only and a company decider reaches its own queue from its work
+  surface (SPEC-0048).
+
+Visibility is unchanged. `open_placements` scopes the new section to the
+student's own placements, which ADR-0041 decision 6 already grants them.

@@ -66,7 +66,7 @@ remaining labels are planning states.
 | 15 | AI M2 | Job Management | Companies can manage and publish structured jobs and programs | AI M1 | Complete |
 | 16 | AI M3 | AI Job Creation | AI helps produce quality job specifications with human approval | AI M2 | Complete |
 | 17 | AI M4 | Internship Management | Internship programs, applications, mentorship, and evaluation are supported | AI M1, M2 | Complete |
-| 18 | Ecosystem M11 | Student Internship Request Platform | Students can request internships and complete a supported learning cycle | Ecosystem M10, AI M1, institutional internship policy | Proposed |
+| 18 | Ecosystem M11 | Student Internship Request Platform | Students can request internships and complete a supported learning cycle | Ecosystem M10, AI M1, institutional internship policy | Increments 1–3 implemented |
 | 19 | AI M5 | Candidate Profile | Candidates have structured, consented, searchable profiles | AI M1 | Complete |
 | 20 | AI M6 | AI Resume Analysis | Candidate data, skills, and gaps can be extracted with reviewable AI assistance | AI M5 | Complete |
 | 21 | AI M7 | Job Discovery | Candidates can find relevant opportunities | AI M2, M5 | Complete |
@@ -1142,7 +1142,7 @@ later milestones remain proposals
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
 | M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
-| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–2 implemented | M10 company boundary, shared identity, and institutional internship policy |
+| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–3 implemented | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
 | M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | Proposed | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
 | M14 | Core Team Internal Work Dashboard | Core team members can manage private Markdown work records and connect them to governed Slack collaboration | Proposed | Core-team identity, repository lifecycle records, Slack policy, and M13 proposal decisions |
@@ -1575,11 +1575,14 @@ boundaries established by M10; it does not replace UTCC Academy M10 Academic
 Writing, AI Recruitment Platform M4 Internship Management, or AI Recruitment
 Platform M11 AI Candidate Agent.
 
-**Status:** Increments 1 and 2 implemented (2026-08-09) — student-initiated,
-position-less internship requests to companies that opt in, a recorded company
-decision, and placements with weekly progress reports. A placement originates
-from either an approved request or an accepted recruitment application. Faculty
-oversight, documents, rubric evaluation, and academic credit remain proposals.
+**Status:** Increments 1 to 3 implemented (2026-08-09 and 2026-08-12) —
+student-initiated, position-less internship requests to companies that opt in, a
+recorded company decision, placements with weekly progress reports, and faculty
+oversight. A placement originates from either an approved request or an accepted
+recruitment application. A supervisor is an administrator-granted assignment of
+one staff account to one placement, who reads it and acknowledges its weeks and
+holds no gate over the company or the student. Documents, an academic gate,
+rubric evaluation, and academic credit remain proposals.
 
 Corrected 2026-08-09: company internship **positions and evaluations already
 exist** and ship under

@@ -183,8 +183,10 @@
 
   /* ---- Layout --------------------------------------------------------- */
   --breakpoint-xs: 576px;
-  /* Below this the header's eight nav destinations no longer fit beside the
-     utility rail, and the nav collapses into the burger menu. */
+  /* Named for the header rail it was cut for: below 1180px the destinations no
+     longer fitted beside the utility rail. The header now carries one dropdown
+     at every width and no longer reads this, but the admin screens do — it is
+     where their two-column layouts fold. */
   --breakpoint-nav: 1180px;
   --container-page:   1320px;  /* every app screen but the leaderboard     */
   --container-narrow: 1000px;  /* the leaderboard                          */

@@ -8,6 +8,10 @@ class InternshipProgressReport < ApplicationRecord
                          inverse_of: :progress_reports
   belongs_to :acknowledged_by, class_name: "User", optional: true,
                                inverse_of: :acknowledged_internship_progress_reports
+  # The supervisor's own pair of columns. Two different people confirm they read
+  # the same week for two different reasons, and neither overwrites the other.
+  belongs_to :faculty_acknowledged_by, class_name: "User", optional: true,
+                                       inverse_of: :faculty_acknowledged_internship_progress_reports
 
   normalizes :activities, with: ->(value) { value.to_s.strip }
   normalizes :outcomes, with: ->(value) { value.to_s.strip.presence }
@@ -33,12 +37,25 @@ class InternshipProgressReport < ApplicationRecord
   scope :newest_first, -> { order(week_starting_on: :desc, id: :desc) }
 
   def acknowledged? = acknowledged_at.present?
+  def faculty_acknowledged? = faculty_acknowledged_at.present?
 
   def acknowledge!(actor:)
     raise ActiveRecord::RecordInvalid, self if acknowledged?
     raise ActiveRecord::RecordInvalid, self unless placement.manageable_by?(actor)
 
     update_columns(acknowledged_by_id: actor.id, acknowledged_at: Time.current, updated_at: Time.current)
+    reload
+  end
+
+  # The university's acknowledgement of the same week. It records that the
+  # assigned supervisor read it and nothing more — no score, no comment, and no
+  # edit to the student's text, which stays append-only for them too.
+  def faculty_acknowledge!(actor:)
+    raise ActiveRecord::RecordInvalid, self if faculty_acknowledged?
+    raise ActiveRecord::RecordInvalid, self unless placement.supervised_by?(actor)
+
+    update_columns(faculty_acknowledged_by_id: actor.id, faculty_acknowledged_at: Time.current,
+                   updated_at: Time.current)
     reload
   end
 

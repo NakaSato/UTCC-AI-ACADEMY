@@ -25,6 +25,9 @@ class InternshipPlacement < ApplicationRecord
   belongs_to :application, class_name: "Recruitment::InternshipApplication", optional: true
   has_many :progress_reports, class_name: "InternshipProgressReport", dependent: :restrict_with_exception,
                               inverse_of: :placement
+  has_many :faculty_assignments, class_name: "InternshipFacultyAssignment",
+                                 foreign_key: :internship_placement_id,
+                                 dependent: :restrict_with_exception, inverse_of: :placement
 
   attr_accessor :status_transition_context
 
@@ -93,8 +96,29 @@ class InternshipPlacement < ApplicationRecord
   def visible_to?(user)
     return false if user.blank?
 
-    student_id == user.id || manageable_by?(user)
+    student_id == user.id || manageable_by?(user) || supervised_by?(user)
   end
+
+  # The assigned faculty supervisor, and only for this placement: the assignment
+  # is the consent, so it is also the boundary. Re-derived from the database for
+  # the same reason `manageable_by?` is — a revoked assignment must fail closed
+  # mid-session. ADR-0041 decision 7, answered 2026-08-12.
+  #
+  # Deliberately not part of `manageable_by?`: reading is not deciding, and the
+  # supervisor advances nothing.
+  def supervised_by?(user)
+    return false if user.blank?
+
+    InternshipFacultyAssignment.active.exists?(internship_placement_id: id, faculty_id: user.id)
+  end
+
+  def supervisor = faculty_assignments.active.first&.faculty
+
+  # An administrator assigns the supervisor, so they must be able to open the
+  # placement — but ADR-0041 holds them to support scope and no unbounded
+  # browsing of student content. So this is deliberately *not* `visible_to?`:
+  # it opens the record, and the screen shows no word of a weekly report.
+  def administrable_by?(user) = user.present? && user.admin?
 
   def activate!(actor:)
     transition!("active", actor:, stamps: { activated_at: Time.current })

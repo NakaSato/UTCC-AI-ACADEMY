@@ -7,8 +7,9 @@ class HomeController < ApplicationController
   # so each workspace is sent to its own home rather than to a catalog of
   # courses three of the four are not taking.
   #
-  # A company member is sent to their organizations because that is the best
-  # screen that exists today, not because it is a dashboard — see SPEC-0044.
+  # A company member is sent to their company's work surface — the slice
+  # SPEC-0044 deferred and ADR-0048 accepted. Everyone else's landing is
+  # unchanged.
   def index
     # Signed out this falls through to `home/index`, the landing page — whose
     # view reads `Landing` directly and so needs no assigns, the same way the
@@ -18,20 +19,12 @@ class HomeController < ApplicationController
     case Current.user.workspace
     in :admin then redirect_to admin_path
     in :instructor then redirect_to instructor_path
-    in :company then redirect_to company_home
+    in :company then redirect_to company_home_path(Current.user)
     else render_catalog
     end
   end
 
   private
-    # Most company members belong to one organization, and for them the front
-    # door is that company's profile — /northstar, the page about them. The list
-    # is only worth showing to someone who has to choose.
-    def company_home
-      organizations = Current.user.organizations.merge(Organization.active)
-
-      organizations.one? ? company_path(organizations.first) : companies_path
-    end
     def render_catalog
       @filter = filter_param
       # The learner's own counts, so a card's progress bar is their progress.

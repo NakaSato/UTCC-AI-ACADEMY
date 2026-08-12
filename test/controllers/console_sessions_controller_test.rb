@@ -75,11 +75,24 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id].present?
   end
 
-  test "a company member lands on their organizations" do
+  # One company, so the console door lands them on the work waiting on it —
+  # the same rule `/` reads, through the same method. SPEC-0048.
+  test "a company member lands on the work waiting on their company" do
     sign_in_to_console identifier: @recruiter.student_id
 
-    assert_redirected_to companies_url
+    assert_redirected_to work_company_path(@organization)
     assert cookies[:session_id].present?
+  end
+
+  # Two companies and there is a choice to make first, so the chooser is still
+  # the destination — from this door as much as from `/`.
+  test "a company member of two companies lands on the chooser" do
+    second = Organization.create!(name: "Second Co", creator: users(:admin))
+    second.memberships.create!(user: @recruiter, role: "recruiter")
+
+    sign_in_to_console identifier: @recruiter.student_id
+
+    assert_redirected_to companies_path
   end
 
   # The reason the field takes all three: a recruiter thinks of themselves as an
@@ -87,7 +100,7 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
   test "a company member signs in with their email address" do
     sign_in_to_console identifier: @recruiter.email_address.upcase
 
-    assert_redirected_to companies_url
+    assert_redirected_to work_company_path(@organization)
     assert cookies[:session_id].present?
   end
 
@@ -108,7 +121,7 @@ class ConsoleSessionsControllerTest < ActionDispatch::IntegrationTest
 
     sign_in_to_console identifier: partner.username
 
-    assert_redirected_to companies_url
+    assert_redirected_to work_company_path(@organization)
     assert cookies[:session_id].present?
   end
 

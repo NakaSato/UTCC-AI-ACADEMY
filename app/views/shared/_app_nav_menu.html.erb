@@ -1,30 +1,76 @@
-<%# The primary nav below the `nav` breakpoint, where the eight destinations no
-    longer fit beside the utility rail. A plain panel rather than a second
-    <nav>: only one of the two is ever visible, and duplicating the landmark
-    would give a screen reader two navigations to choose between. %>
-<div class="relative flex-none nav:hidden"
-     data-controller="dropdown"
-     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
-  <button type="button"
-          aria-haspopup="true" aria-expanded="false" aria-label="<%= t("chrome.nav_toggle") %>"
-          data-dropdown-target="button" data-action="dropdown#toggle"
-          class="grid size-[38px] place-items-center rounded-[10px] border border-chrome-line bg-chrome-2
-                 text-15 text-on-chrome hover:border-chrome-edge hover:text-white">
-    <span aria-hidden="true">☰</span>
-  </button>
+<%# The primary navigation: a menubar of categories immediately after the brand,
+    each opening its own dropdown. A category says what its destinations are
+    *for* — see `app_nav_groups` — so the bar stays short whatever the
+    workspace, and a learner's nine destinations arrive three or four at a time
+    instead of as one wall.
 
-  <div class="absolute top-[46px] right-0 z-50 hidden w-[240px] rounded-[14px] border border-chrome-line
-              bg-chrome p-1.5 shadow-menu-dark"
-       data-menu="nav" data-dropdown-target="panel">
-    <% app_nav_items.each do |label, path| %>
-      <% current = nav_current?(path) %>
-      <%= link_to label, path,
-            "aria-current": ("page" if current),
-            class: class_names(
-              "block rounded-[9px] px-3 py-[11px] text-14",
-              "bg-chrome-3 font-semibold text-white" => current,
-              "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !current
-            ) %>
-    <% end %>
+    Each category is its own dropdown controller, which is what makes opening
+    one close the others: a click on another button is outside the first, and
+    `closeOnOutsideClick` handles it with no shared state.
+
+    Below `md` the bar becomes one button. Three category labels plus the
+    utility rail do not fit a phone, and the bar must not scroll: a scrolling
+    row is a clipping container, and it clips the panels it exists to open.
+    Both renderings read `app_nav_groups`, so the categories and their contents
+    cannot disagree — only how many buttons carry them. %>
+<nav class="flex min-w-0 items-center gap-1" aria-label="<%= t("chrome.nav_label") %>">
+  <% app_nav_groups.each do |group| %>
+    <% open_here = group[:items].any? { |_, path| nav_current?(path) } %>
+    <div class="relative hidden flex-none md:block"
+         data-controller="dropdown"
+         data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+      <button type="button"
+              aria-haspopup="true" aria-expanded="false"
+              data-dropdown-target="button" data-action="dropdown#toggle"
+              data-nav-group="<%= group[:label] %>"
+              class="<%= class_names(
+                       "flex h-[38px] items-center gap-1.5 rounded-[10px] px-2.5 text-13 font-medium",
+                       "tracking-[-0.01em] whitespace-nowrap transition-colors",
+                       "bg-chrome-3 text-white" => open_here,
+                       "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !open_here
+                     ) %>">
+        <%= group[:label] %>
+        <span aria-hidden="true" class="text-9-5">▾</span>
+      </button>
+
+      <div class="absolute top-[46px] left-0 z-50 hidden w-[220px] rounded-[14px] border border-chrome-line
+                  bg-chrome p-1.5 shadow-menu-dark"
+           data-menu="nav" data-dropdown-target="panel">
+        <% group[:items].each do |label, path| %>
+          <%= render "shared/app_nav_item", label:, path: %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# The same categories under one button, for a viewport the bar does not fit. %>
+  <div class="relative flex-none md:hidden"
+       data-controller="dropdown"
+       data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+    <button type="button"
+            aria-haspopup="true" aria-expanded="false" aria-label="<%= t("chrome.nav_toggle") %>"
+            data-dropdown-target="button" data-action="dropdown#toggle"
+            class="flex h-[38px] items-center gap-2 rounded-[10px] border border-chrome-line bg-chrome-2 px-2.5
+                   text-on-chrome hover:border-chrome-edge hover:text-white">
+      <span aria-hidden="true" class="text-15">☰</span>
+      <span aria-hidden="true" class="hidden text-13 font-medium whitespace-nowrap xs:inline">
+        <%= t("chrome.nav_menu") %>
+      </span>
+    </button>
+
+    <div class="absolute top-[46px] left-0 z-50 hidden w-[248px] rounded-[14px] border border-chrome-line
+                bg-chrome p-1.5 shadow-menu-dark"
+         data-menu="nav-compact" data-dropdown-target="panel">
+      <% app_nav_groups.each_with_index do |group, index| %>
+        <div class="<%= "mt-1 border-t border-chrome-line pt-1" unless index.zero? %>">
+          <p class="px-3 pt-2 pb-1 text-10-5 font-bold tracking-[0.11em] text-on-chrome-dim uppercase">
+            <%= group[:label] %>
+          </p>
+          <% group[:items].each do |label, path| %>
+            <%= render "shared/app_nav_item", label:, path: %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+</nav>

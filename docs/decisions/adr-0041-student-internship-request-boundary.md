@@ -5,8 +5,8 @@ title: Define a student-initiated internship request, placement, and progress bo
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-09
-updated: 2026-08-09
-review_by: 2026-08-21
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0024, ADR-0028, ADR-0033, ADR-0036, ADR-0040]
@@ -25,6 +25,8 @@ touches:
   - docs/runbooks
 enforced_by:
   - test/operations/internship_request_boundary_test.rb
+  - test/models/internship_faculty_assignment_test.rb
+  - test/controllers/internship_faculty_assignments_controller_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-ARCH-004, SKILL-SPEC-001, SKILL-SPEC-002]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
@@ -46,6 +48,12 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
 > or an accepted `Recruitment::InternshipApplication` as a read-only reference.
 > Faculty oversight, documents, interviews, rubric evaluation, email, REST APIs,
 > and academic credit remain unauthorized.
+>
+> **Increment 3 recorded 2026-08-12:** decisions 2 and 7 are answered. Faculty
+> oversight is an administrator-granted assignment of one staff account to one
+> placement, carrying the authority to read that placement and acknowledge its
+> weeks and nothing else. Documents, interviews, rubric evaluation, email, REST
+> APIs, and academic credit remain unauthorized.
 
 > [Decision Records](README.md) ·
 > [Student internship request specification](../specs/spec-student-internship-requests.md) ·
@@ -334,16 +342,72 @@ the four that shape increment 1. Everything else in the list below stays open.
     export and deletion requests route to the policy owner rather than being
     executed in-app.
 
+## Recorded decisions (2026-08-12, increment 3)
+
+The user, acting as the accountable owners, answered decisions 2 and 7. The
+platform's stated purpose is to connect the student, the company, **and the
+university**, and until now the third party was absent from a path the
+university is accountable for.
+
+1. **Faculty authority is an assignment, granted by an administrator, on one
+   placement.** It is not the `instructor` role — the alternative above rejected
+   that, and the reason still holds: teaching a course is not consent to read a
+   named student's internship. It is not a second identity store either. It is
+   an `InternshipFacultyAssignment` naming one `User`, exactly as company reach
+   is an `OrganizationMembership`, and it is granted and revoked in one place by
+   one accountable person, with an audit row for each.
+2. **Any staff account may be assigned; which one is the administrator's
+   judgement.** The platform enforces only that a learner is never a supervisor.
+   Which member of faculty supervises which internship is an academic matter the
+   platform has no rule for and should not invent one.
+3. **One active supervisor per placement.** A revoked assignment is kept as
+   evidence of who could read what and when, so the uniqueness is on the active
+   assignment rather than on the placement.
+4. **The authority is read and acknowledge, and carries no gate.** A supervisor
+   does not approve a request, activate a placement, complete or cancel one, and
+   records no score. This is deliberate: a gate would mean an absent supervisor
+   could strand a student mid-internship, and the company keeps the lifecycle it
+   already owns. Decision 8 is unchanged — nothing here records credit.
+5. **The acknowledgement is the supervisor's own record.** It sits in its own
+   columns beside the company's, because two people confirming they read the
+   same week are two different facts and neither may overwrite the other. It
+   rewrites no word of the student's report, which stays append-only.
+6. **Visibility is the assigned placement and its reports, and nothing else
+   (decision 7).** The assignment is the consent, so the assignment is also the
+   boundary: a supervisor reads the internships they were given and no others,
+   and revocation closes that reading immediately. Whether faculty ever read a
+   *request* — the student's motivation, the company's decision reason — is
+   **not** answered here and stays out.
+7. **The student is told.** Assigning a supervisor notifies the student through
+   the existing bell: somebody new can read their internship, and they learn it
+   from the platform rather than by inference.
+8. **An administrator opens the placement to assign, and reads no week of it.**
+   The assignment happens on the placement screen, so an administrator has to
+   reach it — but the administrator row of the access contract says support
+   scope and no unbounded browsing of student content, and a weekly report is
+   student content. So `administrable_by?` is deliberately not `visible_to?`:
+   it opens the record and its supervisor control, and the report rows are not
+   even loaded. An administrator who genuinely needs to read the weeks assigns
+   themselves, which is audited at warn level and notifies the student — a
+   documented, visible path rather than a silent one. It follows that an
+   administrator is also given a list of every placement: they host none and
+   supervise none, so the screen that grants supervision would otherwise be
+   one they could open and never find.
+
 ## Human decisions still required
 
-The agent can draft models and controls but cannot decide these. Decision 1 has
-been answered; the rest remain open and gate their own increments.
+The agent can draft models and controls but cannot decide these. Decisions 1, 2,
+and 7 have been answered; the rest remain open and gate their own increments.
 
 1. ~~Whether a student may direct a request at a company with no published
    position.~~ **Answered yes on 2026-08-09; the request layer is built.**
-2. Which account role represents faculty for internship purposes, whether
+2. ~~Which account role represents faculty for internship purposes, whether
    `instructor` is that role, who may assign a faculty reviewer, and what
-   academic eligibility and approval authority they hold.
+   academic eligibility and approval authority they hold.~~ **Answered on
+   2026-08-12: an administrator-granted assignment of one staff account to one
+   placement, carrying no approval authority.** Academic *eligibility* — whether
+   faculty gate a request before a company sees it — was considered and
+   deliberately not taken; it stays part of decision 4.
 3. Student eligibility, whether a student may hold more than one active
    request, and how withdrawal, duplicate requests, expiry, and rejection
    behave — including whether a rejected student may re-approach the same
@@ -355,8 +419,11 @@ been answered; the rest remain open and gate their own increments.
    post-internship access, and consent — before any upload exists.
 6. Report cadence, required fields, whether hours are recorded, who
    acknowledges a report, and what happens when reports are missed.
-7. Visibility: which reports, deliverables, evaluations, and scores each of
-   student, company supervisor, faculty, and administrator may read.
+7. ~~Visibility: which reports, deliverables, evaluations, and scores each of
+   student, company supervisor, faculty, and administrator may read.~~
+   **Answered for faculty on 2026-08-12: the assigned placement and its reports,
+   and nothing else.** Deliverables and scores do not exist to be read, and
+   whether faculty read the *request* behind a placement stays open.
 8. Whether any internship result affects academic credit or hours, and if so
    the institutional record that holds it — this platform holds none until
    decided.

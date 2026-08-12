@@ -66,13 +66,17 @@ class ConsoleSessionsController < ApplicationController
     end
 
     # Admin first, because an admin is also staff and /admin is the wider screen.
+    #
+    # A company member lands where `/` would send them — the work waiting on
+    # their company — through the one rule both doors read, so the console
+    # cannot drift into handing a member of one company a list of one.
     def console_home_url(user)
       if user.admin?
         admin_url
       elsif user.instructor?
         instructor_url
       else
-        companies_url
+        company_home_path(user)
       end
     end
 end

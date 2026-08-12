@@ -96,6 +96,22 @@ class User < ApplicationRecord
   has_many :acknowledged_internship_progress_reports, class_name: "InternshipProgressReport",
                                                      foreign_key: :acknowledged_by_id, dependent: :nullify,
                                                      inverse_of: :acknowledged_by
+  has_many :faculty_acknowledged_internship_progress_reports, class_name: "InternshipProgressReport",
+                                                              foreign_key: :faculty_acknowledged_by_id,
+                                                              dependent: :nullify,
+                                                              inverse_of: :faculty_acknowledged_by
+  # The university's side of an internship: what this account supervises, and
+  # what it granted. Restricted rather than nullified — an assignment is the
+  # evidence of who could read a student's internship. See ADR-0041 decision 2.
+  has_many :internship_faculty_assignments, class_name: "InternshipFacultyAssignment",
+                                            foreign_key: :faculty_id,
+                                            dependent: :restrict_with_exception, inverse_of: :faculty
+  has_many :assigned_internship_faculty_assignments, class_name: "InternshipFacultyAssignment",
+                                                     foreign_key: :assigned_by_id,
+                                                     dependent: :restrict_with_exception,
+                                                     inverse_of: :assigned_by
+  has_many :supervised_internship_placements, through: :internship_faculty_assignments,
+                                              source: :placement
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

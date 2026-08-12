@@ -14,7 +14,8 @@ class Notification < ApplicationRecord
               recruitment_organization_invitation recruitment_job_alert
               business_case_invitation business_case_submission_received
               internship_request_received internship_request_decided
-              internship_placement_updated internship_progress_report_acknowledged ].freeze
+              internship_placement_updated internship_progress_report_acknowledged
+              internship_faculty_assigned ].freeze
 
   validates :kind, inclusion: { in: KINDS }
 
@@ -63,7 +64,7 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.company_internship_requests_path(slug) if slug
     when "internship_request_decided"
       Rails.application.routes.url_helpers.internship_request_path(params.fetch("id"))
-    when "internship_placement_updated", "internship_progress_report_acknowledged"
+    when "internship_placement_updated", "internship_progress_report_acknowledged", "internship_faculty_assigned"
       Rails.application.routes.url_helpers.internship_placement_path(params.fetch("id"))
     end
   end
@@ -72,7 +73,8 @@ class Notification < ApplicationRecord
     return unless %w[ academic_post_invitation recruitment_organization_invitation recruitment_job_alert
                       business_case_invitation business_case_submission_received
                       internship_request_received internship_request_decided
-                      internship_placement_updated internship_progress_report_acknowledged ].include?(kind)
+                      internship_placement_updated internship_progress_report_acknowledged
+                      internship_faculty_assigned ].include?(kind)
 
     I18n.t("notifications.#{kind}_action")
   end

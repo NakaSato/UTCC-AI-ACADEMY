@@ -5,9 +5,16 @@
     <p class="mb-2 text-11 font-semibold tracking-[0.14em] text-muted uppercase"><%= t("internship_placements.eyebrow") %></p>
     <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("internship_placements.title") %></h1>
     <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("internship_placements.subtitle") %></p>
+    <%# The way back to the other half of the lifecycle. Only for a learner: a
+        company decider reaches its own queue from its work surface, and
+        /internship-requests is a student-only screen. %>
+    <% if current_workspace == :student %>
+      <%= link_to t("internship_placements.back_to_requests"), internship_requests_path,
+            class: "mt-4 inline-flex text-13 font-semibold text-brand-ink hover:underline" %>
+    <% end %>
   </div>
 
-  <% if @student_placements.empty? && @company_placements.empty? %>
+  <% if @student_placements.empty? && @company_placements.empty? && @supervised_placements.empty? && @administered_placements.empty? %>
     <div class="rounded-card border border-dashed border-hairline bg-surface-1 p-8 text-center">
       <h2 class="text-18 font-semibold text-ink"><%= t("internship_placements.empty_title") %></h2>
       <p class="mt-2 text-14 text-muted"><%= t("internship_placements.empty_body") %></p>
@@ -45,7 +52,38 @@
     </section>
   <% end %>
 
-  <% { mine: @student_placements, hosting: @company_placements }.each do |key, placements| %>
+  <%# The administrator's list, which exists so a supervisor can be assigned to a
+      placement at all. It prints who supervises each one, because "which of
+      these still needs somebody" is the question that brings them here. %>
+  <% if @administered_placements.any? %>
+    <section class="mb-10">
+      <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("internship_placements.administering_heading") %></h2>
+      <ul class="space-y-4">
+        <% @administered_placements.each do |placement| %>
+          <li>
+            <%= link_to internship_placement_path(placement),
+                  class: "block rounded-card border border-hairline bg-surface-1 p-6 transition hover:border-brand-ink hover:shadow-sm" do %>
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h3 class="text-18 font-semibold text-ink"><%= placement.organization.name %></h3>
+                  <p class="mt-1 text-13 text-muted"><%= placement.student.name %></p>
+                </div>
+                <div class="text-right">
+                  <span class="rounded-full bg-surface-2 px-2.5 py-1 text-11 font-semibold text-muted"><%= t("internship_placements.status.#{placement.status}") %></span>
+                  <% supervisor = placement.faculty_assignments.find(&:active?)&.faculty %>
+                  <p class="mt-2 text-12 <%= supervisor ? "text-muted" : "text-brand-ink font-semibold" %>">
+                    <%= supervisor ? t("internship_placements.supervised_by", name: supervisor.name) : t("internship_placements.no_supervisor") %>
+                  </p>
+                </div>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <% { mine: @student_placements, hosting: @company_placements, supervising: @supervised_placements }.each do |key, placements| %>
     <% next if placements.empty? %>
     <section class="mb-10">
       <h2 class="mb-4 text-18 font-semibold text-ink"><%= t("internship_placements.#{key}_heading") %></h2>

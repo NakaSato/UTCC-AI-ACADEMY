@@ -5,7 +5,7 @@ class AcademicPostWalkTest < ApplicationSystemTestCase
     student = users(:one)
     sign_in_through_the_form(student)
 
-    click_link I18n.t("chrome.nav.writing", locale: :th)
+    navigate_to I18n.t("chrome.nav.writing", locale: :th)
     assert_selector "h1", text: I18n.t("academic.title", locale: :th)
 
     click_link I18n.t("academic.new", locale: :th)

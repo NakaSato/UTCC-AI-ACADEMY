@@ -33,12 +33,43 @@ class InternshipRequestBoundaryTest < ActiveSupport::TestCase
   end
 
   test "no deferred increment ships before its own decision is recorded" do
-    refute ROOT.join("app/models/internship_faculty_assignment.rb").exist?,
-      "faculty oversight needs ADR-0041 decision 2 from the Academic Owner first"
+    routes = internship_request_routes
+
+    refute_includes routes, "academic_review",
+      "an academic-review route implies a deferred increment shipped early"
+
+    # Faculty oversight stopped being deferred on 2026-08-12, when ADR-0041
+    # decisions 2 and 7 were answered. What the boundary now protects is the
+    # shape of the answer rather than its absence.
+    assert ROOT.join("app/models/internship_faculty_assignment.rb").exist?,
+      "ADR-0041 decision 2 is recorded, so the assignment it authorizes must exist"
+    assert_includes adr_text, "## Recorded decisions (2026-08-12, increment 3)",
+      "the faculty increment ships only against a recorded decision"
+  end
+
+  # The whole of the authority ADR-0041 decision 2 granted: read the placement,
+  # acknowledge the week. A supervisor who could approve a request, advance a
+  # placement, or complete one would be a different decision than the one taken.
+  test "faculty oversight carries no gate over the company or the student" do
+    assignment = code_of("app/models/internship_faculty_assignment.rb")
+    placement = code_of("app/models/internship_placement.rb")
+
+    refute_match(/def (approve|activate|complete|cancel|transition)/, assignment,
+      "an assignment records who supervises; it advances nothing")
+    refute_match(/supervised_by\?/, placement[/def manageable_by\?.*?\n  end/m].to_s,
+      "supervision is not management: manageable_by? decides the lifecycle and must not read it")
+    assert_match(/supervised_by\?/, placement[/def visible_to\?.*?\n  end/m].to_s,
+      "the assignment is what lets a supervisor read the placement at all")
 
     routes = internship_request_routes
-    %w[faculty academic_review].each do |word|
-      refute_includes routes, word, "a #{word} route implies a deferred increment shipped early"
+    %w[approve_faculty faculty_activate faculty_complete faculty_evaluation].each do |word|
+      refute_includes routes, word, "a #{word} route would give the supervisor a gate"
+    end
+
+    assert_not_includes InternshipFacultyAssignment.column_names, "score"
+    %w[credit grade].each do |word|
+      assert_not_includes InternshipFacultyAssignment.column_names, word,
+        "decision 8 still holds: nothing in this context records academic #{word}"
     end
   end
 
@@ -81,6 +112,10 @@ class InternshipRequestBoundaryTest < ActiveSupport::TestCase
   end
 
   private
+    def adr_text
+      ROOT.join("docs/decisions/adr-0041-student-internship-request-boundary.md").read
+    end
+
     # Comments explain the boundary and naturally name the very things the
     # boundary forbids, so every check reads code with the prose stripped out.
     def code_of(path)

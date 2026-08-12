@@ -11,15 +11,21 @@ module Recruitment
   # asks `OrganizationReporting`, so the suppression rule is inherited rather
   # than copied, and a change there changes here.
   #
-  # The second is that every number is a queue the viewer can already open. A
-  # count of rows they cannot read would be a statistic about other people
-  # dressed up as a task list.
+  # The second is that every number is a queue the viewer can open. Not one they
+  # can empty: ADR-0048 decision 4 says an active member sees the whole board,
+  # because a mentor who cannot decide a request is still better off knowing a
+  # student has been waiting since Tuesday. Whether they may act is settled by
+  # the controller that owns the action, which refuses today and keeps refusing.
   class CompanyDashboard
     Queue = Data.define(:key, :count, :path) do
       def any? = count.positive?
     end
 
     Posting = Data.define(:key, :published, :in_review)
+
+    Collaboration = Data.define(:published_cases, :open_milestones, :submissions, :path) do
+      def any? = published_cases.positive?
+    end
 
     def self.call(organization:, viewer:) = new(organization:, viewer:).call
 
@@ -34,6 +40,7 @@ module Recruitment
       {
         queues: queues,
         postings: postings,
+        collaboration: collaboration,
         applications: OrganizationReporting.call(organization: @organization, viewer: @viewer)
       }
     end
@@ -43,9 +50,11 @@ module Recruitment
       # student waiting on a decision has been waiting longest.
       def queues
         [
-          Queue.new(:internship_requests, decidable_requests, company_internship_requests_path),
+          Queue.new(:internship_requests, @organization.internship_requests.awaiting_company.count,
+                    company_internship_requests_path),
           Queue.new(:progress_reports, unacknowledged_reports, internship_placements_path),
-          Queue.new(:active_placements, open_placements, internship_placements_path)
+          Queue.new(:active_placements, @organization.internship_placements.open_placements.count,
+                    internship_placements_path)
         ]
       end
 
@@ -58,36 +67,27 @@ module Recruitment
         ]
       end
 
-      def count_by_status(relation, status) = relation.where(status:).count
+      # Deliberately not a queue. A submission has no reviewed state and no
+      # acknowledgement — SPEC-0040 never gave it one — so a count of them is
+      # what is running, not what is waiting, and the screen says so.
+      def collaboration
+        cases = @organization.business_cases.where(status: "published")
+        case_ids = cases.select(:id)
 
-      # Only a decider sees the decision queue, because only a decider can empty
-      # it — see InternshipRequest::DECIDER_ROLES.
-      def decidable_requests
-        return 0 unless member_in?(InternshipRequest::DECIDER_ROLES)
-
-        @organization.internship_requests.awaiting_company.count
+        Collaboration.new(
+          cases.count,
+          BusinessCaseMilestone.where(business_case_id: case_ids, status: "open").count,
+          BusinessCaseSubmission.where(business_case_id: case_ids).count,
+          Rails.application.routes.url_helpers.business_cases_path
+        )
       end
 
-      def unacknowledged_reports
-        return 0 unless member_in?(InternshipPlacement::DECIDER_ROLES)
+      def count_by_status(relation, status) = relation.where(status:).count
 
+      def unacknowledged_reports
         InternshipProgressReport.where(acknowledged_at: nil)
                                 .where(internship_placement_id: @organization.internship_placements.select(:id))
                                 .count
-      end
-
-      def open_placements
-        return 0 unless member_in?(InternshipPlacement::DECIDER_ROLES)
-
-        @organization.internship_placements.open_placements.count
-      end
-
-      # An admin is not a member and holds no organization role, but may read
-      # any organization — the same rule `Organization#visible_to?` applies.
-      def member_in?(roles)
-        return true if @viewer&.admin?
-
-        @organization.memberships.active.exists?(user_id: @viewer&.id, role: roles)
       end
 
       def company_internship_requests_path

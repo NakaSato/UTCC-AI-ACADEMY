@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T10:30:00+07:00",
+  "updated_at": "2026-08-13T06:50:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2265,9 +2265,9 @@
         "UX-002"
       ],
       "blocker": {
-        "summary": "Resolved. The maintenance page publishes on Vercel, not GitHub Pages: an earlier reading treated the failing pages.yml workflow as the only publisher and pointed maintenanceMode.uri at a github.io address that does not resolve. It now points at utcc-ai-academy.vercel.app. Separately, the dashboard deploy had been failing since 2026-08-09 because backlog evidence URLs were bare repository paths, which abort script/validate-rendered-doc-links.",
+        "summary": "The host changed under it. As of 2026-08-12 the documentation site answers every path - the maintenance page, the dashboard, the root - with a 403 Vercel Security Checkpoint. It answered 200 hours earlier, so this is a setting on the host rather than a deploy: bot protection or attack-challenge mode. A human browser may pass the interstitial; a headless one does not, and neither will any check. A visitor who meets a challenge during planned downtime has not been told the academy is down.",
         "decision_owner": "Platform Owner",
-        "next_action": "Confirm the next Vercel deploy publishes /maintenance.html, then mark OPS-001 complete. 502 and 504 stay uncustomisable on Render."
+        "next_action": "Decide the maintenance host: turn the challenge off for utcc-ai-academy.vercel.app, or move the page to a host that does not challenge readers. Then run bin/rails error_pages:published and mark OPS-001 complete when it passes. 502 and 504 stay uncustomisable."
       },
       "evidence": [
         {
@@ -2279,7 +2279,98 @@
           "url": "specs/spec-error-pages.html"
         }
       ],
-      "updated_at": "2026-08-12T10:30:00+07:00"
+      "updated_at": "2026-08-13T02:10:00+07:00"
+    },
+    {
+      "id": "UX-006",
+      "title": "Give a company the work waiting on it",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-001",
+        "INT-003"
+      ],
+      "evidence": [
+        {
+          "label": "Company work surface decision",
+          "url": "decisions/adr-0048-company-work-surface.html"
+        },
+        {
+          "label": "Company work surface specification",
+          "url": "specs/spec-company-work-surface.html"
+        }
+      ],
+      "updated_at": "2026-08-12T22:05:00+07:00"
+    },
+    {
+      "id": "INT-004",
+      "title": "Give the student a door to their internship",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-003",
+        "UX-006"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Role-aware workspaces specification",
+          "url": "specs/spec-role-aware-workspaces.html"
+        }
+      ],
+      "updated_at": "2026-08-12T23:30:00+07:00"
+    },
+    {
+      "id": "INT-005",
+      "title": "Implement increment 3: faculty oversight of an internship",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner, Academic Owner, and Privacy Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-003",
+        "INT-004"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship request boundary",
+          "url": "decisions/adr-0041-student-internship-request-boundary.html"
+        },
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        }
+      ],
+      "updated_at": "2026-08-13T03:05:00+07:00"
+    },
+    {
+      "id": "UX-007",
+      "title": "Make the header navigation one dropdown at every width",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "UX-001"
+      ],
+      "evidence": [
+        {
+          "label": "Role-aware workspaces specification",
+          "url": "specs/spec-role-aware-workspaces.html"
+        },
+        {
+          "label": "Design system: breakpoints",
+          "url": "design-system.html"
+        }
+      ],
+      "updated_at": "2026-08-13T06:50:00+07:00"
     }
   ],
   "recently_completed": [
@@ -3975,6 +4066,54 @@
       "to": "in_progress",
       "summary": "Repointed the Render maintenance page at the Vercel-published documentation site and repaired the dashboard build, which had aborted on bare repository paths in backlog evidence since 2026-08-09.",
       "evidence_url": "runbooks/rb-maintenance-mode.html"
+    },
+    {
+      "at": "2026-08-12T18:40:00+07:00",
+      "item_id": "OPS-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "Repointing the uri at the right host on 2026-08-12 did not make it resolve, and the check the runbook prescribed could not have told anyone: curl -sI reads the 308 that cleanUrls answers /maintenance.html with as a live page. Both forms in fact returned 404, because the documentation site has published nothing since commit 37b6250 on 2026-08-09 — planned downtime would have shown Render's default page while the repository, its tests, and its runbook all said otherwise. Three changes, and only one is the URL. maintenanceMode.uri now names /maintenance, so Render is never asked to follow a hop on the one screen a visitor sees while the academy is down. test/release/deployment_configuration_test.rb reads cleanUrls out of vercel.json and asserts the uri is the path that host will serve the generated page at, so flipping the setting fails a test rather than silently costing a redirect. And bin/rails error_pages:published fetches the uri and compares the body to ErrorPages.hosted, distinguishing a redirect, a 404, and a live-but-older copy — the failure this whole item kept hitting is a deploy that aborts and leaves the previous copy online looking current, which nothing local can see. It is a precondition of RB-0006, not a bin/verify gate, because it asserts a fact about the outside world. OPS-001 stays in_progress: the page is still 404, and the deploy is a Vercel-side question.",
+      "evidence_url": "specs/spec-error-pages.html"
+    },
+    {
+      "at": "2026-08-12T21:15:00+07:00",
+      "item_id": "UX-006",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The slice UX-001 deferred, and it turned out to be one workspace rather than four. /admin has live metrics, /instructor has the section report, a student lands on the catalog — three screens built for the people who land on them. The company was the one where \"the best screen that already exists\" was carrying weight it could not: a member landed on their company's record, a members table with revoke buttons, while students waited on a decision or an acknowledgement and nothing said so. Recruitment::CompanyDashboard had been written for this on 2026-08-09 and left unwired — no route, no view, no test, no specification named it. /company/:slug/work is now where / lands a company member; the slug root keeps the record, so each page answers one question and every link to it still works. The board carries four things, all already shipped: internship requests awaiting a decision, submitted progress reports nobody has acknowledged, open placements, and the company's published cases, postings, and applications. The user ruled that every active member sees the same board — the dead service had returned zero to anyone outside the decider roles, which meant a mentor saw an empty screen and concluded there was no work, while whether they may act was already settled by the controller that owns each action and still is. The one exception is candidate figures: they come from OrganizationReporting and nowhere else, so ADR-0037's reporter-role gate and five-row suppression are inherited rather than reimplemented, and a member outside those roles sees the rest of the board and no application statistics. Counts and links only — no student name, no request or report text. A company with nothing waiting is told so rather than shown a row of zeroes. Running it in a browser found the half of the front door the tests did not describe: /console has its own destination list, and it still sent a company member to the organizations index while / sent them to the board. Both doors now read one ApplicationController#company_home_path, so a member of one company is never handed a list of one, and a member of two still gets the chooser from either door.",
+      "evidence_url": "specs/spec-company-work-surface.html"
+    },
+    {
+      "at": "2026-08-12T23:30:00+07:00",
+      "item_id": "INT-004",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The counterpart to UX-006, and the same failure on the other side of the desk. Increments 1 and 2 shipped the student screens and nothing that led to them: no view in the application linked to /internship-requests or /internships/placements, so a learner reached either only by typing the URL - while the company board built the day before counts the weekly reports those same students are expected to write. The student navigation now carries an Internships entry pointing at the request index, where the lifecycle starts. The user ruled it unconditional rather than shown only to students who already hold a request: the navigation is how a learner finds out the capability exists, and hiding it from everyone who has not used it is the bug being fixed. The request index leads with a running internship and marks the week's report missing when it is, which finally gives InternshipPlacement#missing_current_week_report? a reader - the model had computed it for two increments with nothing calling it. The two screens now point at each other, with the placement screen's link back rendered only for the student workspace, because /internship-requests is student-only and a company decider reaches its own queue from its work surface. No new record, no new route, and no new visibility: open_placements scopes the section to the student's own placements, which ADR-0041 decision 6 already granted them. Ranking moved to a third-from-last insert so adding an entry did not silently push it past Academic writing, and a test pins it there.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-13T01:20:00+07:00",
+      "item_id": "INT-005",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The last of the three things SPEC-0041 said were missing. Two shipped on 2026-08-09 - a request to a company that published nothing, and a placement with weekly reports - and the third was that no faculty member took part in a path the university is accountable for. ADR-0041 decisions 2 and 7 were the gate, and the user answered both. Faculty authority is an assignment, not a role: ADR-0041 had already rejected reading it off the instructor role, because teaching a course is not consent to read a named student's internship, and rejected a second identity store. So an administrator assigns one staff account to one placement, exactly as company reach is an OrganizationMembership, with an audit row at warn level on grant and on revoke and one active supervisor at a time enforced by a partial unique index. A revoked assignment stays as evidence of who could read what and when. The authority is read and acknowledge and nothing more: the user chose no gate, so a supervisor cannot approve a request, activate, complete, or cancel a placement, or record a score - an absent supervisor never strands a student mid-internship, and the lifecycle stays where the company already had it. Their acknowledgement of a week sits in its own columns beside the company's, because two people confirming they read the same week are two different facts and neither may overwrite the other, and neither rewrites a word the student wrote. Visibility is the assigned placement and its reports and nothing else - the assignment is the consent, so it is also the boundary, re-derived per request so a revocation closes reading mid-session. Whether faculty ever read the request behind a placement was deliberately left open, as was any academic gate, which stays part of decision 4. The student is told through the bell when a supervisor is assigned: somebody new can read their internship and they learn it from the platform rather than by inference. The boundary test that had asserted no faculty model exists now asserts the shape of the answer instead - that the assignment advances nothing, that supervised_by? reaches visible_to? and never manageable_by?, and that no score, credit, or grade column appeared. Driving it in a browser found what the tests had not: an administrator could not open the placement at all, because visible_to? is the student, the company deciders, and the supervisor - so the one person authorized to assign a supervisor could not reach the form. The controller test had only posted to the action, never opened the screen. administrable_by? now opens the record for an administrator without making it visible_to? them: the weekly report rows are not loaded, and the screen says why. An administrator who needs the weeks assigns themselves, which is audited at warn level and notifies the student - a visible path rather than a silent one. A second pass found the same failure one step further out, and this one was mine: an administrator hosts no placement and supervises none, so every list on the placements screen was empty for them and the placement they must assign a supervisor to could not be found at all. The feature was unreachable by the only role authorized to use it - the third time today that a slice shipped its records and its screens without a door. An administrator now has a list of every placement, marked with who supervises it or that nobody does, and an Internships entry in the admin navigation. It carries the same reach administrable_by? grants: the placement record, never a weekly report.",
+      "evidence_url": "decisions/adr-0041-student-internship-request-boundary.html"
+    },
+    {
+      "at": "2026-08-13T02:10:00+07:00",
+      "item_id": "OPS-001",
+      "from": "in_progress",
+      "to": "in_progress",
+      "summary": "The page went from 404 to 403 without anybody deploying it. Every path on the documentation host now answers with a Vercel Security Checkpoint - the maintenance page, the roadmap, the dashboard root - where the root had answered 200 the same afternoon. That is bot protection or attack-challenge mode on the host, not the failed build this item chased for three days, and a real browser driven headless gets Failed to verify your browser, Code 21. So bin/rails error_pages:published now tells a challenge apart from a missing page and names the host setting rather than sending the reader to the deploy log, and RB-0006 gained the escalation: a maintenance page a visitor has to pass a challenge to read is not a maintenance page. The host question is the Platform Owner's, and it is now the whole of what OPS-001 waits on. It is also wider than this item - while the challenge is on, the development dashboard is unreadable to anyone the project shares it with.",
+      "evidence_url": "runbooks/rb-maintenance-mode.html"
+    },
+    {
+      "at": "2026-08-13T04:30:00+07:00",
+      "item_id": "UX-007",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The user asked for the menubar to become a dropdown menu. The header had carried the destinations twice: a horizontal rail above 1180px and a burger panel below it, with a test whose job was to prove the two agreed. They are now one list in one dropdown at every width, so a destination sits in the same place on a phone and on a desk and adding one cannot quietly overflow a rail that had run out of room - which it nearly had, at nine entries for a student after today's Internships addition. The panel and its Stimulus controller already existed and were reused unchanged, so the change is mostly subtraction: the rail markup is gone, the panel carries the nav landmark and its label rather than being a second one, and the button gained a visible Menu label from the sm breakpoint up because a lone burger on a wide header reads as an afterthought rather than as the way in. The nav: breakpoint stays - the admin two-column screens fold there - but its comment no longer claims the header reads it. Two system walks clicked a nav link directly and now open the menu first through a navigate_to helper, which is the honest cost of the change: reaching a destination is two clicks rather than one. The user then moved it after the brand icon and asked for categories. The button now sits immediately after the shield, where the mark and the way into the app read as one gesture and the rail on the right stays what it is - preferences, notifications, and the account; the panel opens left-aligned under it. app_nav_groups replaces app_nav_items as the source, with app_nav_items kept as its flattening so every check that a nav entry is a door its workspace can open still reads one list and grouping can reorder destinations without adding or dropping one. A learner reads Learn, Track, and Beyond the course; an instructor Teaching and University; an administrator Administration and University; a company member Your company and Students. The headings match how the footer already sorts the same screens. Moving the control left also shortened the keyboard path to it: it is the third tab stop from the top now - skip link, brand, menu - where it had been at the end of the utility rail, and Enter opens it, Tab walks into the panel, Escape closes it and returns focus to the button. Then the categories themselves became the menubar, which is where this ends up: Learn, Track and Beyond the course sit after the brand, each its own dropdown, rather than three headings inside one panel. Each category is a separate dropdown controller, which is what makes opening one close the others - a click on another button is outside the first, and closeOnOutsideClick already handled that with no shared state. The category holding the current screen is marked on the bar, so the section is legible without opening anything. Two things came out of driving it rather than testing it. The bar had overflow-x-auto so it could scroll when tight, and a scrolling row is a clipping container: the panels opened and were invisible, clipped by the bar they hung from. And three category buttons plus the utility rail do not fit a phone at all. So the bar never scrolls, and below md it becomes one button carrying every category as a heading - two renderings again, but both read app_nav_groups and a shared item partial, so they cannot disagree about what exists or how the current page is marked, only about how many buttons carry it.",
+      "evidence_url": "specs/spec-role-aware-workspaces.html"
     }
   ]
 }

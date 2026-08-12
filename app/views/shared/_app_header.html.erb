@@ -20,24 +20,13 @@
       </span>
     <% end %>
 
-    <%# The nav scrolls horizontally rather than wrapping when it is tight, and
-        below `nav` it gives way to the burger menu at the end of the rail. %>
-    <nav class="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto nav:flex"
-         aria-label="<%= t("chrome.nav_label") %>">
-      <% app_nav_items.each do |label, path| %>
-        <% current = nav_current?(path) %>
-        <%= link_to label, path,
-              "aria-current": ("page" if current),
-              class: class_names(
-                "flex-none rounded-[9px] px-2.5 py-2 text-13 font-medium tracking-[-0.01em] whitespace-nowrap transition-colors",
-                "bg-chrome-3 text-white" => current,
-                "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !current
-              ) %>
-      <% end %>
-    </nav>
+    <%# Straight after the brand: the mark and the way into the app read as one
+        gesture at the left edge, and the rail on the right stays what it is —
+        preferences, notifications, and the account. %>
+    <%= render "shared/app_nav_menu" %>
 
-    <%# `ml-auto` rather than the nav's `flex-1`: the nav is hidden below `nav`,
-        and the rail still belongs against the right edge. %>
+    <%# `ml-auto` keeps the rail against the right edge; the menubar beside it
+        takes only the width its categories need and scrolls if it cannot. %>
     <div class="ml-auto flex flex-none items-center gap-2">
       <%= render "shared/language_toggle" %>
       <%# Beside the language toggle because they are the same kind of thing: a
@@ -50,7 +39,6 @@
       <%= turbo_stream_from notification_bell.stream %>
       <%= render "shared/app_notifications", bell: notification_bell %>
       <%= render "shared/app_account_menu" %>
-      <%= render "shared/app_nav_menu" %>
     </div>
   </div>
 
