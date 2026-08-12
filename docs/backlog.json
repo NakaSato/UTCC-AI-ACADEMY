@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T00:04:00+07:00",
+  "updated_at": "2026-08-13T00:41:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3106,6 +3106,28 @@
         }
       ],
       "updated_at": "2026-08-13T00:04:00+07:00"
+    },
+    {
+      "id": "DEV-023",
+      "title": "Prove the island bridge re-mounts, by breaking it first",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and QA Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-012"
+      ],
+      "evidence": [
+        {
+          "label": "Vue islands specification",
+          "url": "specs/spec-vue-islands.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-13T00:41:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5137,6 +5159,14 @@
       "to": "complete",
       "summary": "bin/dev has been unusable outside an interactive shell, and it took two failures today to see it rather than one. Tailwind-s watcher exits immediately when stdout is not a terminal, and foreman stops the whole group the moment any process exits, so the symptom is the server booting and dying two seconds later with no error of its own - which reads as a port problem or a crash, not as a watcher that declined to watch. The gem-s own answer is the always argument, so Procfile.dev now runs tailwindcss:watch[always] with a comment saying why. All three processes stay up, including the Vite dev server, and the page carries the client tag and the entrypoint from localhost:3036 with a nonce, under the development-only CSP relaxation ADR-0053 describes and nothing wider. The second failure in the same sequence was a stale tmp/pids/server.pid left by a killed server, which is worth remembering as the other reason web exits at once. The production image was then built and inspected, which is the step the Vite commit said it could not run. All four properties hold: the island bundle and its manifest are present under public/vite, node_modules is absent, node and npm are not on the PATH, and /usr/local/node - where the build stage installs it - does not exist in the final stage. Node is a build dependency and nothing in the running image can execute it.",
       "evidence_url": "decisions/adr-0053-vite-island-build.html"
+    },
+    {
+      "at": "2026-08-13T00:41:00+07:00",
+      "item_id": "DEV-023",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The bridge moved from Stimulus to a MutationObserver when Vite arrived, and the path that replaced Stimulus-s connect had no test: an island mounted on first load and nothing proved it mounted again after Turbo replaced or restored the DOM. The walk now navigates away through Turbo Drive, comes back, and asserts one counter - not two, not none - that is still live rather than a leftover string, by typing into the field and watching the number move. Both halves of the bridge were then mutated to see what the test is worth. Deleting the observer-s mount of added nodes fails it: the restored page has an empty div. Deleting the turbo:before-cache unmount does not fail it, because Turbo clones the snapshot and the observer mounts a fresh app over whatever it held - so the comment claiming that failure was corrected rather than left standing. The unmount is defensive and stays: it keeps Vue-s output out of the cached HTML, so what a reader sees during the restore flash is the server-s markup rather than a stale render. That is written down as what this test is not evidence for. The same observer path is what a Turbo Stream takes when it replaces a node, which is still undriven by any test and is named as such.",
+      "evidence_url": "specs/spec-vue-islands.html"
     }
   ]
 }

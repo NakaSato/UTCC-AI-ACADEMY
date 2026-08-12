@@ -39,6 +39,50 @@ class VueIslandWalkTest < ApplicationSystemTestCase
     assert_selector "[data-vue-island] p.text-gold-ink"
   end
 
+  # Turbo replaces the body on every navigation and restores a cached copy on the
+  # back button, and the MutationObserver in the entrypoint is what mounts an
+  # island into whatever arrives. Nothing else can see this: the server sends the
+  # same empty div either way.
+  #
+  # **What this catches**, checked by breaking it rather than assumed: delete the
+  # observer's mount of added nodes and the restored page has an empty div and no
+  # counter — the assertion below fails. That is the same path a Turbo Stream
+  # takes when it replaces a node, which no test drives yet.
+  #
+  # **What it does not catch:** deleting the `turbo:before-cache` unmount changes
+  # nothing here, because Turbo clones the snapshot and the observer mounts a
+  # fresh app over whatever it held. That unmount is defensive — it keeps Vue's
+  # output out of the cached HTML, so what a reader sees during the restore flash
+  # is the server's markup rather than a stale render — and this test is not
+  # evidence for it.
+  test "the counter survives a navigation and the back button, exactly once" do
+    ProposalRequest.create!(user: users(:one), title: "Weekly project clinic", category: "feature",
+                            problem: "Learners need somewhere to unblock their projects.",
+                            idea: "A weekly session with a contributor and a shared queue.",
+                            impact: "Projects move forward with less waiting.")
+
+    sign_in_through_the_form(users(:admin))
+    visit admin_path(tab: :proposals)
+    assert_selector "[data-vue-island] p", count: 1
+
+    # Away, through Turbo Drive rather than a fresh load.
+    click_link I18n.t("admin.tabs.users", locale: :th)
+    assert_no_selector "[data-vue-island]"
+
+    page.go_back
+
+    assert_selector "[data-vue-island] p", count: 1,
+      wait: 10 # one counter, not two, and not none
+    assert_equal I18n.t("forms.characters_left", locale: :th).sub("%{count}", "1000"),
+                 find("[data-vue-island] p").text
+    # And still live rather than a leftover string: the restored app is a real
+    # one, listening to the field it was given.
+    find("input[id$=_reason]").send_keys("กลับมา")
+
+    assert_selector "[data-vue-island] p",
+                    text: I18n.t("forms.characters_left", locale: :th).sub("%{count}", "994")
+  end
+
   # An island is an enhancement over markup that already works (SPEC-0052 rule
   # 3), and the form is the part that must not depend on it.
   test "the reason still submits with the island present" do
