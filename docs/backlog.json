@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T05:26:00+07:00",
+  "updated_at": "2026-08-13T05:52:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3170,6 +3170,28 @@
         }
       ],
       "updated_at": "2026-08-13T05:26:00+07:00"
+    },
+    {
+      "id": "DEV-025",
+      "title": "Hold the sentence unsafe-inline rests on, and correct the counts around it",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Security Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-013"
+      ],
+      "evidence": [
+        {
+          "label": "Coding standard",
+          "url": "coding-standard.html"
+        },
+        {
+          "label": "Design system",
+          "url": "design-system.html"
+        }
+      ],
+      "updated_at": "2026-08-13T05:52:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5225,6 +5247,14 @@
       "to": "complete",
       "summary": "A comment in the lesson view said KaTeX was unavailable because the app vendored no CSS or fonts, and offered the monospace branch as the fallback it expects. Both halves were stale. katex.js, katex.css and twenty font files have been vendored since the academic-post editor took Tiptap, the stylesheet is in shared/_head, and the editor typesets with them - so math was already rendered in this application, in the one place authors write LaTeX. The first reading of this was wrong in the other direction: the twelve real topics carry prose formulas, not LaTeX, and running a typesetter over input + model to output to evaluation would italicise every word and choke on the arrows, so monospace is the right rendering for them. The guard written to hold that line failed on its first run and found the actual defect. The generic placeholder copy, which the three topics outside REAL_TOPIC_KEYS fall back to, is genuine LaTeX - n_{train} = \\lceil 0.8\\,N \\rceil, \\quad n_{test} = N - n_{train} - in both locales, and every learner reaching 5-2, 6-1 or 6-2 was shown that string as monospace source. Block#latex? now decides per block: a backslash command or a $ pair means maths and gets a Stimulus controller that calls katex.render, anything else is printed as written. Subscript braces alone are deliberately not enough, because w_{new} = w_{old} - learning rate is a sentence. Stimulus rather than a Vue island, since this is behavior attached to server-rendered markup and holds no state - ADR-0051 decision 7. The source is in the markup either way, so a reader without JavaScript sees the expression rather than an empty plate. Three tests: the split asserted from both sides in both locales, the server handing the controller only to the LaTeX block, and a browser walk proving it is typeset rather than merely wrapped, with MathML present for a screen reader. The walk was mutation-checked - stub the render call and it fails.",
       "evidence_url": "decisions/adr-0007-integrate-tiptap-with-stimulus-importmap.html"
+    },
+    {
+      "at": "2026-08-13T05:52:00+07:00",
+      "item_id": "DEV-025",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The KaTeX defect hid behind a comment claiming a limitation that had stopped being true, so the same class was swept for rather than the instance being called done. Numeric claims are the checkable part of it, and every one checked was wrong. The style policy said nineteen inline style attributes across ten templates; there are thirty across fifteen. Three documents and CLAUDE.md said seventeen Stimulus controllers; there are thirteen, and the number was probably absorbed from Organization#from_param!, whose own seventeen is correct - seventeen Rails controllers really do look an organization up. ADR-0053 said sixty pins where there are sixty-three, and carried a consequence that autoBuild covers test, which the race fix had already made false the same night. The substance under the count matters more than the count. unsafe-inline is in style-src because every inline style is a value Ruby worked out - a progress width, a stagger delay, a toast offset, one background-image URL - and a utility class cannot express those. That was true of twenty-nine of the thirty. The thirtieth was style=animation-delay: 60ms on the catalogue subtitle, which a utility could express and which nothing would have noticed a second or a tenth of. It is [animation-delay:60ms] now, and inline_style_boundary_test.rb holds the rule from both sides: an inline style must carry a computed value, and the computed ones must still be there - so the policy cannot be satisfied by quietly deleting the feature it exists for.",
+      "evidence_url": "coding-standard.html"
     }
   ]
 }

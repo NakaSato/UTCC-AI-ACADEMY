@@ -54,7 +54,7 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 ## Context
 
 The application renders HTML on the server and enhances it with Stimulus over
-import maps: seventeen controllers, a thousand lines between them, and no build
+import maps: thirteen controllers, a thousand lines between them, and no build
 step. `docs/coding-standard.md` says a JavaScript package arrives only behind an
 accepted ADR naming the capability, the alternatives *including no dependency*,
 maintenance and security ownership, failure and removal paths, and the licence
@@ -120,7 +120,7 @@ listeners.
    by accident.
 
 7. **Stimulus stays the default.** Vue is the exception for genuinely stateful
-   UI, and the existing seventeen controllers are not rewritten. A rewrite for
+   UI, and the existing controllers are not rewritten. A rewrite for
    its own sake is churn on working, spec-governed screens.
 
 8. **The first island is the character counter** on the proposal decision

@@ -11,7 +11,7 @@ Follow the [System Development Flow Master](docs/system-development-flow-master.
 
 Rails 8.1 · PostgreSQL · Hotwire (Turbo + Stimulus, import maps, Propshaft) · Tailwind CSS 4 · Minitest/Capybara.
 
-**Two JavaScript toolchains, and no file belongs to both.** Import maps and Propshaft own `app/javascript` — Turbo, Stimulus, the seventeen controllers, and Tiptap for the academic-post editor (ADR-0007). **Vite** owns `app/frontend` and builds one thing: the Vue island layer (ADR-0051, ADR-0053), as single-file components compiled at build time because the CSP blocks a runtime compiler. Both libraries were taken for behavior and refused for styling.
+**Two JavaScript toolchains, and no file belongs to both.** Import maps and Propshaft own `app/javascript` — Turbo, Stimulus, the thirteen controllers, and Tiptap for the academic-post editor (ADR-0007). **Vite** owns `app/frontend` and builds one thing: the Vue island layer (ADR-0051, ADR-0053), as single-file components compiled at build time because the CSP blocks a runtime compiler. Both libraries were taken for behavior and refused for styling.
 
 Stimulus stays the default for behavior attached to markup; Vue is for state-shaped UI. Read [SPEC-0052](docs/specs/spec-vue-islands.md) before writing an island. Node is a build dependency only — `bin/setup` installs it, the Dockerfile drops `node_modules` before the final image, and nothing in production runs it.
 

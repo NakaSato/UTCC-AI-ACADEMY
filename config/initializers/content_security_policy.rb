@@ -41,13 +41,18 @@ Rails.application.configure do
     policy.script_src(*[ :self, (:unsafe_eval if Rails.env.development?),
                          ("http://#{ViteRuby.config.host_with_port}" if Rails.env.development?) ].compact)
 
-    # `unsafe_inline` here is unavoidable, and is the honest trade. Nineteen
-    # `style="…"` attributes across ten templates carry progress-bar widths and
-    # stagger delays computed in Ruby — a percentage cannot be expressed as a
-    # utility class, so those are inline by necessity rather than by habit. CSP
-    # has no nonce mechanism for style *attributes*, only for <style> elements,
-    # so the alternative is not a stricter policy but a broken layout. The XSS
-    # value of this header is in script-src regardless.
+    # `unsafe_inline` here is unavoidable, and is the honest trade. Thirty
+    # `style="…"` attributes across fifteen templates carry progress-bar widths,
+    # stagger delays, a toast’s entry offset and one background-image URL — every
+    # one of them a value Ruby worked out, which a utility class cannot express.
+    # CSP has no nonce mechanism for style *attributes*, only for <style>
+    # elements, so the alternative is not a stricter policy but a broken layout.
+    # The XSS value of this header is in script-src regardless.
+    #
+    # The count is not the point; "every one is computed" is, and it is what
+    # `test/operations/inline_style_boundary_test.rb` holds. Before that test
+    # there was one static attribute sitting in a template, and nothing would
+    # have noticed a second.
     policy.style_src   :self, :unsafe_inline, "https://fonts.googleapis.com"
 
     policy.font_src    :self, :data, "https://fonts.gstatic.com"

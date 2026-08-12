@@ -4,8 +4,12 @@
   <h1 class="mb-3.5 animate-rise text-32 leading-[1.1] font-bold tracking-[-0.03em] text-balance sm:text-38 lg:text-46">
     <%= t("catalog.title") %>
   </h1>
-  <p class="mb-8 max-w-[640px] animate-rise text-16-5 text-balance text-muted"
-     style="animation-delay: 60ms"><%= t("catalog.subtitle") %></p>
+  <%# The one inline style in the application that was not a computed value, and
+      therefore the one a utility could express. It is `[animation-delay:60ms]`
+      now, which is what keeps "every inline style is a number Ruby worked out"
+      true — and that sentence is the justification for `unsafe-inline` in the
+      style policy. See content_security_policy.rb and the test that holds it. %>
+  <p class="mb-8 max-w-[640px] animate-rise text-16-5 text-balance text-muted [animation-delay:60ms]"><%= t("catalog.subtitle") %></p>
 
   <nav class="mb-9 flex flex-wrap gap-2.5" aria-label="<%= t("catalog.filters.all") %>">
     <% CourseCatalog::FILTERS.each_with_index do |filter, index| %>

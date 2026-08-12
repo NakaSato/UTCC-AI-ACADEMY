@@ -70,7 +70,7 @@ is unchanged; what changes is who does the compiling and when.
 
 1. **Vite builds the Vue island layer, and only that.** `vite_rails`, one
    entrypoint, output under `public/vite`, hooked into `assets:precompile`.
-   Turbo, Stimulus, Tiptap and the seventeen controllers stay exactly where they
+   Turbo, Stimulus, Tiptap and the thirteen controllers stay exactly where they
    are, on import maps and Propshaft.
 
 2. **Two directories, two toolchains, no file in both.** `app/javascript` is the
@@ -124,8 +124,8 @@ island is the reason this decision exists.
 
 The tidier end state: one toolchain, no vendored ProseMirror, no sixty-line
 importmap file. Rejected as a much larger change with no benefit to show for it
-today — sixty pins and seventeen controllers work, are tested, and would all be
-touched. It stays available, and this decision does not block it.
+today — sixty-three pins and thirteen controllers work, are tested, and would
+all be touched. It stays available, and this decision does not block it.
 
 ### Inertia.js, and a JavaScript view layer
 
@@ -153,8 +153,11 @@ the dev-server ergonomics are the thing being bought.
 - Two toolchains is a real maintenance surface: two lockfiles, two audits, two
   upgrade paths. The boundary in decision 2 is what keeps it from becoming
   worse than one.
-- `bin/dev` gains a `vite` process. `autoBuild` covers test and any developer
-  who does not run it.
+- `bin/dev` gains a `vite` process, and `autoBuild` covers a developer who does
+  not run it. **Test does not use `autoBuild`**: eight parallel workers all
+  discovering a stale bundle at once is a race, one reading `public/vite-test`
+  while another rewrites it, so `test_helper` builds once in the parent before
+  it forks. That cost a green run and two red ones to find.
 - The vendored-bytes test that guarded the runtime build is replaced by one that
   builds the bundle and asserts the compiler is not in it — the same invariant,
   one step later in the pipeline.
