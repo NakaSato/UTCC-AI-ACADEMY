@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T15:25:00+07:00",
+  "updated_at": "2026-08-12T16:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2794,6 +2794,28 @@
         }
       ],
       "updated_at": "2026-08-12T14:30:00+07:00"
+    },
+    {
+      "id": "DEV-016",
+      "title": "Give nineteen strings the keys the code asks for",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-015"
+      ],
+      "evidence": [
+        {
+          "label": "SPEC-0005 academic post authoring and reader tools",
+          "url": "specs/spec-academic-post-authoring-reader-tools.html"
+        },
+        {
+          "label": "Coding standard",
+          "url": "coding-standard.html"
+        }
+      ],
+      "updated_at": "2026-08-12T16:10:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4713,6 +4735,14 @@
       "to": "complete",
       "summary": "The user accepted SPEC-0049 on 2026-08-12, which satisfies ADR-0049 decision 1 and closes the gap that had blocked any change to proposals: the intake shipped without an ADR or a specification, so there was no recorded statement of who may submit, what is stored, who may read it, or what happens next, and nothing to keep consistent with. The confirmation the document was waiting on was specifically invariant 4, that three of the four statuses cannot be reached and the author-facing page displays one of them as though it were live. Accepting the specification settles what the boundary is, not that all of it is desirable - the defect is now recorded rather than unknown, and ADR-0049 decision 6 still governs whether those statuses gain a code path or are removed. Acceptance authorizes nothing else. Ecosystem M13 stays Proposed on the roadmap with no backlog item, and increment 1 remains unscheduled.",
       "evidence_url": "specs/spec-proposal-request-intake.html"
+    },
+    {
+      "at": "2026-08-12T16:10:00+07:00",
+      "item_id": "DEV-016",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Nineteen user-visible strings rendered \"translation missing\" in both languages, on four shipped screens, from three separate mistakes. Twelve reader controls - width, font size, theme, export, contents and their aria-labels - were filed under proposal_request rather than academic, so every label on the reader bar of a published academic post was missing while a complete set of translations sat two hundred lines away under the wrong parent. Four more were written yes: and no:, which YAML 1.1 reads as booleans, so the key stopped being the word the file plainly shows and the mentor evaluation's outcomes-met options and the job application's timing line asked for keys that were not there. Two flash keys across three refusal paths were never written at all. SPEC-0005 is accepted and states reader controls carry Thai and English labels; it had been false since the increment shipped. What is worth keeping is why none of it was caught. The parity gate added the same week compares English to Thai, and both files were identically wrong, so it passed - parity is agreement, not correctness. The system test renders that screen and asserts nothing about the control bar. And raise_on_missing_translations was commented out, which is the only check that reads what a screen actually resolved rather than what the file appears to say. The neighbouring paid: true/false keys were quoted too. They resolve today by accident of how I18n normalises a path segment, and depending on that is how the yes/no pair was written in the first place.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
     }
   ]
 }
