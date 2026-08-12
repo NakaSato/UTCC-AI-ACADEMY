@@ -65,6 +65,8 @@ th:
     course_state_changed: "%{course} เปลี่ยนสถานะวงจรแล้ว"
     approval_requested: "คำขอเปลี่ยนวงจรของ %{course} กำลังรอตรวจสอบ"
     approval_decided: "บันทึกผลการอนุมัติแล้ว"
+    proposal_decided: "ตอบ %{reference} แล้ว และผู้เสนออ่านเหตุผลได้"
+    proposal_decision_invalid: "ไม่สามารถบันทึกการตัดสินนี้ได้"
     approval_invalid: "คำขอนี้ไม่พร้อมให้ดำเนินการแล้ว"
     feature_setting_changed: "%{name} เปลี่ยนเป็น%{state}แล้ว"
     feature_setting_invalid: "ไม่มีการตั้งค่าฟีเจอร์นี้"
@@ -1517,6 +1519,7 @@ th:
     role_changed: "เปลี่ยนสิทธิ์ของ %{name} เป็น%{role}"
     course_state_changed: "เปลี่ยนสถานะ %{course} จาก%{from}เป็น%{to}"
     approval_decided: "%{outcome}คำขอเปลี่ยนวงจรของ %{course} จาก%{from}เป็น%{to}"
+    proposal_decided: "ตอบข้อเสนอ %{reference} เป็น%{status}"
     feature_setting_changed: "เปลี่ยน %{key} จาก%{from_state}เป็น%{to_state}"
     section_created: "สร้างหมู่เรียน %{label}"
     section_updated: "เปลี่ยนอาจารย์ผู้สอนของ %{label}"
@@ -1578,6 +1581,7 @@ th:
       landing: "หน้าแรก"
       sections: "หมู่เรียน"
       queue: "รออนุมัติ"
+      proposals: "ข้อเสนอ"
       integrity: "ความซื่อสัตย์"
       perms: "สิทธิ์"
       audit: "บันทึกระบบ"
@@ -1765,6 +1769,15 @@ th:
         pending: "คำขอที่รอตรวจสอบ"
         approved: "อนุมัติเดือนนี้"
         none: "—"
+    proposals:
+      empty: "ยังไม่มีข้อเสนอ — หน้านี้คือที่ตอบไอเดียของนักศึกษาและอาจารย์"
+      author: "เสนอโดย %{name}"
+      decision: "คำตอบ"
+      reason: "เหตุผลที่ผู้เสนอจะได้อ่าน"
+      reason_placeholder: "บอกว่าตัดสินอย่างไรและเพราะอะไร ด้วยถ้อยคำที่ผู้เสนอนำไปใช้ต่อได้"
+      record: "บันทึกการตัดสิน"
+      told_author: "แจ้งผู้เสนอแล้วว่า: %{status}"
+      answered: "ตอบแล้ว การตัดสินบันทึกครั้งเดียวและไม่ทบทวนซ้ำ"
     audit:
       title: "บันทึกระบบ"
       sub: "การกระทำล่าสุดในหน้าผู้ดูแล"
@@ -2420,6 +2433,8 @@ th:
       planned: "วางแผนไว้แล้ว"
       declined: "ยังไม่อยู่ในแผน"
 
+    decision:
+      heading: "ทีมงานตัดสินอย่างไร"
   business_cases:
     eyebrow: "ความร่วมมือกับภาคอุตสาหกรรม"
     title: "โจทย์ธุรกิจ"

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T17:10:00+07:00",
+  "updated_at": "2026-08-12T18:20:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2860,6 +2860,36 @@
         }
       ],
       "updated_at": "2026-08-12T17:10:00+07:00"
+    },
+    {
+      "id": "M13-001",
+      "title": "Answer a proposal: triage, a recorded decision, and the reason its author reads",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M13",
+      "depends_on": [
+        "DOCS-013"
+      ],
+      "evidence": [
+        {
+          "label": "SPEC-0050 proposal triage",
+          "url": "specs/spec-proposal-triage.html"
+        },
+        {
+          "label": "ADR-0049 proposal triage before a public platform",
+          "url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+        },
+        {
+          "label": "The intake as built",
+          "url": "specs/spec-proposal-request-intake.html"
+        },
+        {
+          "label": "M13 roadmap context",
+          "url": "roadmap.html#milestone-m13--public-feature-request-and-core-team-development-platform"
+        }
+      ],
+      "updated_at": "2026-08-12T18:20:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4803,6 +4833,14 @@
       "to": "complete",
       "summary": "ADR-0049 decision 7 says no proposal writes to docs/ or docs/backlog.json automatically, because the backlog is the source of truth for delivery and its updates carry recorded human approval - a queue that can append to it is a queue that can approve work. The ADR's own fitness function said the decision is enforced by the absence of any write path from application code, which no test asserts today. This is that test, written for the class rather than for proposals: nothing under app/ or lib/ writes a file at all, which is stronger than any per-feature check and needs no revisiting when the triage screen arrives. Two writers are named with the sentence saying what each writes, in the shape the route reachability list already uses, and a second test fails when a named writer stops writing so the list cannot quietly become fiction. The carve-out found while reading the code is that one generated file does live under docs/: lib/error_pages.rb writes the hosted 503 that Render's maintenance mode serves from the documentation origin, and the test pins it to exactly that path and asserts every other generated page belongs in public/. A fourth check states the point in the ADR's own terms - no specification, decision, runbook, or the backlog itself is inside the set of files any code generates. Three injections confirmed it fails: a File.write to the backlog from a service was named with its file and line, the generator repointed at docs/backlog.json failed two checks at once, and a writer that writes nothing was reported as stale. Note what this does not do - script/ writes the dashboard and is deliberately out of scope, because it is tooling a person runs rather than something a request can reach.",
       "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+    },
+    {
+      "at": "2026-08-12T18:20:00+07:00",
+      "item_id": "M13-001",
+      "from": "queued",
+      "to": "complete",
+      "summary": "M13's stated outcome is the proportion of proposals receiving an auditable decision and an author-visible explanation, and that proportion was zero by construction: nothing assigned status, no screen existed on which anybody could answer a proposal, and the author's page rendered a status that could never move. The user answered the two questions ADR-0049 left open and increment 1 shipped against them. The triage screen is a Proposals tab in the admin console rather than the existing Approvals queue - reuse looked cheaper than it is, because approval_requests requires a course, its decisions require an administrator by a rule written for course lifecycle, and its outcomes are approved and rejected, which a triage outcome is not - and rather than the instructor workspace, because user_must_be_a_contributor admits instructors as authors, so instructors would be deciding proposals they may themselves submit. The status vocabulary stays at the four already shipped and all four become reachable, which turned the migration decision 6 anticipated into no migration of proposal_requests at all: the check constraint and STATUSES already listed exactly these four, and the defect was that three had no code path. A decision is a row, not a column - actor, time, the status it moved to, and the reason - written in the same transaction as the status under a row lock, so a status without the record explaining it cannot exist and two administrators deciding at once produce one decision and one refusal. planned and declined are terminal, because an author must not be told two contradictory things about one submission. There is exactly one reason field and no internal note, since a second one immediately raises the field-visibility question §15 has not answered. The author is told on the page they already have, at their next visit, which is ADR-0049 decision 4 standing while ADR-0004 defers production email; telling them through the bell would have been small and was deliberately not done, because notifications are §15 decision 9 and unanswered. Deciding is audited at warn level naming the reference and the outcome and never the reason, which is the author's words back to them rather than an audit concern. The assertion SPEC-0049 said could not be written until decision 6 was settled is now the last test in the model file: every status the constraint allows is reached for real, one at a time, and no other status is. No public surface was opened and none is authorized - the roadmap section says so in the same paragraph that records what shipped.",
+      "evidence_url": "specs/spec-proposal-triage.html"
     }
   ]
 }

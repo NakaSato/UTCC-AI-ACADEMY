@@ -64,6 +64,8 @@ en:
     course_state_changed: "%{course} is now using the updated lifecycle state"
     approval_requested: "The %{course} lifecycle change is waiting for review"
     approval_decided: "The approval decision was recorded"
+    proposal_decided: "%{reference} was answered, and its author can read the reason"
+    proposal_decision_invalid: "That decision could not be recorded"
     approval_invalid: "That approval request is no longer available"
     feature_setting_changed: "%{name} is now %{state}"
     feature_setting_invalid: "That feature setting is not available"
@@ -1513,6 +1515,7 @@ en:
     role_changed: "Set %{name} to %{role}"
     course_state_changed: "Changed %{course} from %{from} to %{to}"
     approval_decided: "%{outcome} the %{course} lifecycle request from %{from} to %{to}"
+    proposal_decided: "Answered proposal %{reference} as %{status}"
     feature_setting_changed: "Changed %{key} from %{from_state} to %{to_state}"
     section_created: "Created section %{label}"
     section_updated: "Changed the instructor for %{label}"
@@ -1574,6 +1577,7 @@ en:
       landing: "Landing page"
       sections: "Sections"
       queue: "Approvals"
+      proposals: "Proposals"
       integrity: "Integrity"
       perms: "Permissions"
       audit: "Audit log"
@@ -1761,6 +1765,15 @@ en:
         pending: "Pending requests"
         approved: "Approved this month"
         none: "—"
+    proposals:
+      empty: "No proposals yet — this is where a student or instructor idea is answered."
+      author: "Proposed by %{name}"
+      decision: "Answer"
+      reason: "Reason the author will read"
+      reason_placeholder: "Say what was decided and why, in words the author can act on"
+      record: "Record decision"
+      told_author: "The author has been told: %{status}"
+      answered: "Answered. A decision is recorded once and not revisited."
     audit:
       title: "Audit log"
       sub: "the most recent actions taken here"
@@ -2413,6 +2426,8 @@ en:
       planned: "Planned"
       declined: "Not planned"
 
+    decision:
+      heading: "What the team decided"
   business_cases:
     eyebrow: "Industry collaboration"
     title: "Business cases"

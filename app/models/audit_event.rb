@@ -21,6 +21,7 @@ class AuditEvent < ApplicationRecord
     role_changed
     course_state_changed
     approval_decided
+    proposal_decided
     feature_setting_changed
     lesson_integrity_setting_changed
     section_created section_updated enrolled unenrolled
@@ -71,7 +72,7 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ console_account_created console_password_reissued role_changed course_state_changed approval_decided feature_setting_changed lesson_integrity_setting_changed
+  WARN = %w[ console_account_created console_password_reissued role_changed course_state_changed approval_decided proposal_decided feature_setting_changed lesson_integrity_setting_changed
               unenrolled integrity_escalated card_removed recruitment_membership_revoked
               business_case_closed business_case_participant_revoked
               internship_requests_opened internship_request_rejected
@@ -129,6 +130,7 @@ class AuditEvent < ApplicationRecord
       values[:to] = I18n.t("admin.courses.state.#{values[:to]}") if values.key?(:to)
       values[:outcome] = I18n.t("admin.queue.status.#{values[:outcome]}") if values.key?(:outcome)
       values[:key] = I18n.t("admin.features.keys.#{values[:key]}") if values.key?(:key)
+      values[:status] = I18n.t("proposal_request.status.#{values[:status]}") if values.key?(:status)
       %i[from_state to_state].each do |state|
         values[state] = I18n.t("admin.features.state.#{values[state]}") if values.key?(state)
       end

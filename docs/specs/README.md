@@ -58,3 +58,4 @@ owner.
 - [SPEC-0046 — Toast notifications and the two ways to raise one](spec-toast-notifications.md) — accepted; one host, one row template, one clock, four kinds, six positions, reached by a Stimulus dispatch or by turbo_stream.toast
 - [SPEC-0048 — The company work surface at /company/:slug/work](spec-company-work-surface.md) — accepted; counts with links to the queues they count, the same board for every active member, and application figures delegated to OrganizationReporting
 - [SPEC-0049 — The proposal request intake as built](spec-proposal-request-intake.md) — accepted; records the shipped intake that had no governing document, including the dead statuses, so any change to proposals has a baseline
+- [SPEC-0050 — Proposal triage, increment 1](spec-proposal-triage.md) — accepted; an administrator answers a proposal with a recorded decision and a reason the author reads, which makes all four statuses reachable and no public surface

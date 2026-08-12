@@ -306,6 +306,9 @@ Rails.application.routes.draw do
   post "admin/users/:id/password", to: "admin#reissue_password", as: :admin_user_password
   patch "admin/courses/:id/state", to: "admin#update_course_state", as: :admin_course_state
   post "admin/approvals/:id/decision", to: "admin#decide_approval", as: :admin_approval_decision
+  # One recorded answer to a proposal, with the reason its author reads.
+  # ADR-0049 decision 5 and SPEC-0050.
+  post "admin/proposals/:id/decision", to: "admin#decide_proposal", as: :admin_proposal_decision
   patch "admin/features/:key", to: "admin#update_feature_setting", as: :admin_feature_setting
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case

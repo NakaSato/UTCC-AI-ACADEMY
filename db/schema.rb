@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -534,6 +534,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_220000) do
     t.index ["user_id", "occurred_at"], name: "index_proctor_events_on_user_id_and_occurred_at"
     t.index ["user_id", "reviewed_at"], name: "index_proctor_events_on_user_id_and_reviewed_at"
     t.index ["user_id"], name: "index_proctor_events_on_user_id"
+  end
+
+  create_table "proposal_decisions", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "proposal_request_id", null: false
+    t.text "reason", null: false
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_proposal_decisions_on_actor_id"
+    t.index ["proposal_request_id", "created_at"], name: "proposal_decisions_history"
+    t.check_constraint "length(reason) >= 1 AND length(reason) <= 1000", name: "proposal_decisions_reason"
+    t.check_constraint "to_status::text = ANY (ARRAY['in_review'::character varying, 'planned'::character varying, 'declined'::character varying]::text[])", name: "proposal_decisions_to_status"
   end
 
   create_table "proposal_requests", force: :cascade do |t|
@@ -1117,6 +1130,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_220000) do
   add_foreign_key "proctor_events", "courses"
   add_foreign_key "proctor_events", "topics"
   add_foreign_key "proctor_events", "users"
+  add_foreign_key "proposal_decisions", "proposal_requests"
+  add_foreign_key "proposal_decisions", "users", column: "actor_id"
   add_foreign_key "proposal_requests", "users"
   add_foreign_key "recruitment_candidate_resume_analyses", "candidate_profiles"
   add_foreign_key "recruitment_candidate_resume_analyses", "users", column: "requested_by_id"

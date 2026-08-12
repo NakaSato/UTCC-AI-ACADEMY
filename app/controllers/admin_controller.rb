@@ -36,6 +36,7 @@ class AdminController < ApplicationController
       @events = AuditEvent.at_level(@level).newest_first.includes(:user).limit(AuditEvent::RECENT)
     in :courses then @query = FeatureSetting.enabled?(:search) ? params[:q].to_s.strip : ""
     in :queue then nil
+    in :proposals then @proposals = AdminConsole.proposals
     else nil
     end
   end
@@ -48,6 +49,18 @@ class AdminController < ApplicationController
     redirect_to admin_path(tab: :queue), notice: t("flash.approval_requested", course: course.code)
   rescue ActiveRecord::RecordInvalid => invalid
     redirect_to admin_path(tab: :courses), alert: invalid.record.errors.full_messages.to_sentence
+  end
+
+  # A proposal is answered here or nowhere. The reason is not optional and is
+  # not an internal note: it is the text its author reads — SPEC-0050.
+  def decide_proposal
+    proposal = ProposalRequest.find(params[:id])
+    proposal.decide!(actor: Current.user, to_status: params[:status], reason: params[:reason])
+    AuditEvent.record("proposal_decided", reference: proposal.reference, status: proposal.status)
+
+    redirect_to admin_path(tab: :proposals), notice: t("flash.proposal_decided", reference: proposal.reference)
+  rescue ActiveRecord::RecordInvalid
+    redirect_to admin_path(tab: :proposals), alert: t("flash.proposal_decision_invalid")
   end
 
   def decide_approval

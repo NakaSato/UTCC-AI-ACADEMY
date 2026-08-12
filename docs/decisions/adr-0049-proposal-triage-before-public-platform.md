@@ -246,6 +246,32 @@ Two questions this ADR raises that §15 does not:
 - Which existing console owns the triage screen, given ADR-0044's four
   workspaces and ADR-0013's admin boundary.
 
+**Answered by the user on 2026-08-12.** The second one: the **admin console,
+with a new Proposals tab**. `AdminConsole::TABS` already carries nine tabs
+behind `allow_only :admin`, and the admin console is where every recorded
+decision in this project is already made. The existing Queue tab was considered
+and rejected as the home: `approval_requests.course_id` is `null: false`,
+`ApprovalDecision#actor_is_approver` requires an administrator, and its outcome
+vocabulary is `approved`/`rejected`, which a triage outcome is not — reuse would
+mean widening a shipped and audited course-lifecycle path to carry a record it
+was not shaped for. The proposal decision is its own record modelled on that
+one: append-only, actor, outcome, note, immutable after creation. The
+instructor workspace was rejected because `user_must_be_a_contributor` admits
+students *and* instructors, so instructors would decide proposals they may
+themselves submit.
+
+The first one stands as decision 4 wrote it: the explanation is in-app, and
+M13's first increment does not wait on MAIL-002.
+
+And decision 6 is settled with them: **the four shipped statuses stay, and all
+four become reachable.** `submitted → in_review → planned | declined`.
+`ProposalRequest::STATUSES` and the `proposal_requests_status` check constraint
+already list exactly these four; the defect was that three had no code path, not
+that the vocabulary was wrong. Nothing is added to either, nothing is removed
+from either, and the migration decision 6 anticipated turns out to be no
+migration at all — which is the outcome that leaves the shipped records
+untouched.
+
 ## Decision owner
 
 Product Owner, with Tech Lead, Security owner, Privacy owner, Data owner, and
@@ -258,3 +284,11 @@ needs a backlog item and the roadmap gate before it is scheduled; acceptance of
 a boundary is not a delivery commitment. Everything outside those seven
 decisions remains unauthorized and is refused by the same rule that refused it
 yesterday.
+
+**Scheduled 2026-08-12**, once the two open questions above were answered.
+Increment 1 is specified by [SPEC-0050](../specs/spec-proposal-triage.md) and
+delivered as backlog item M13-001. The sentence above still holds for everything
+else: the seven §15 questions this ADR did not answer are not answered by
+scheduling this one, and the deferred surfaces — discovery, voting, following,
+comments, revision history, moderation, attachments, duplicate detection, AI
+assistance — remain unauthorized.

@@ -10,7 +10,7 @@
 # Add a row here and you must add one to both locale files, or every label
 # after it shifts. `placeholder_content_test.rb` asserts the lengths agree.
 module AdminConsole
-  TABS = %i[ features overview users courses landing sections queue integrity perms audit ].freeze
+  TABS = %i[ features overview users courses landing sections queue proposals integrity perms audit ].freeze
 
   # ---- The dark header ------------------------------------------------------
 
@@ -143,6 +143,17 @@ module AdminConsole
 
     def pending_count = ApprovalRequest.pending.count
 
+    # ---- Proposals ----------------------------------------------------------
+
+    # Every proposal, newest first, with the decisions that answered it. The
+    # console is the only screen that reads somebody else's proposal at all —
+    # SPEC-0050's access contract, and SPEC-0049's before it.
+    def proposals
+      ProposalRequest.includes(:user, :decisions).newest_first.to_a
+    end
+
+    def undecided_proposal_count = ProposalRequest.undecided.count
+
     def queue_sla
       pending = ApprovalRequest.pending
       oldest = pending.minimum(:created_at)
@@ -167,11 +178,13 @@ module AdminConsole
       LEVEL_FILTERS.include?(param.to_s.to_sym) ? param.to_s.to_sym : :all
     end
 
-    # Only two tabs carry a badge; the rest would show a meaningless zero.
+    # Only the tabs with something waiting carry a badge; the rest would show a
+    # meaningless zero.
     def badge_for(tab)
       case tab
       in :features  then flags_off
       in :queue     then pending_count
+      in :proposals then undecided_proposal_count
       in :integrity then Proctoring.open_case_count
       else nil
       end

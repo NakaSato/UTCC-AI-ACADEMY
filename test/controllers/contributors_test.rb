@@ -76,6 +76,52 @@ class ContributorsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, proposal.reference
   end
 
+  # The whole of the explanation M13 promises, read where ADR-0049 decision 4
+  # said it would be: on the page the author already has, at their next visit.
+  # Before SPEC-0050 this page rendered a status that could never move.
+  test "an author reads the decision and the reason on their own proposal" do
+    proposal = ProposalRequest.create!(
+      user: users(:one), title: "Weekly project clinic", category: "feature",
+      problem: "Learners need a place to unblock their projects.",
+      idea: "Add a weekly session with a contributor and a shared queue.",
+      impact: "Projects move forward with less waiting."
+    )
+    sign_in_as users(:one)
+
+    get proposal_request_path(proposal)
+    assert_response :success
+    assert_includes response.body, I18n.t("proposal_request.status.submitted")
+    assert_not_includes response.body, I18n.t("proposal_request.decision.heading")
+
+    proposal.decide!(actor: users(:admin), to_status: "planned",
+                     reason: "Scheduled for the next increment.")
+    get proposal_request_path(proposal)
+
+    assert_response :success
+    assert_includes response.body, I18n.t("proposal_request.status.planned")
+    assert_includes response.body, I18n.t("proposal_request.decision.heading")
+    assert_includes response.body, "Scheduled for the next increment."
+  end
+
+  # Only the current answer. An author is not shown the console's working out.
+  test "an author reads the latest reason and not the ones before it" do
+    proposal = ProposalRequest.create!(
+      user: users(:one), title: "Weekly project clinic", category: "feature",
+      problem: "Learners need a place to unblock their projects.",
+      idea: "Add a weekly session with a contributor and a shared queue.",
+      impact: "Projects move forward with less waiting."
+    )
+    proposal.decide!(actor: users(:admin), to_status: "in_review", reason: "Reading it this week.")
+    proposal.decide!(actor: users(:admin), to_status: "declined", reason: "Not this term, sorry.")
+    sign_in_as users(:one)
+
+    get proposal_request_path(proposal)
+
+    assert_response :success
+    assert_includes response.body, "Not this term, sorry."
+    assert_not_includes response.body, "Reading it this week."
+  end
+
   test "the proposal form requires authentication" do
     sign_out
     get new_proposal_request_path

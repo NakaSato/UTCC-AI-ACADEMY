@@ -16,6 +16,9 @@ class ProposalRequestsController < ApplicationController
 
   def show
     @proposal = Current.user.proposal_requests.find(params[:id])
+    # The last decision is the current answer; the ones before it are the
+    # console's history and not the author's business — SPEC-0050.
+    @decision = @proposal.latest_decision
   end
 
   private

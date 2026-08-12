@@ -2642,8 +2642,8 @@ Academic Writing, Company Business Case Platform M10, Student Internship
 Request Platform M11, Technical Blog Translation Platform M12, or AI
 Recruitment Platform M13 Analytics and Reporting.
 
-**Status:** Proposal — extends an early intake, but the complete platform is
-not implemented
+**Status:** Increment 1 delivered 2026-08-12 — the rest of the platform is
+still a proposal
 
 The current application has a limited `proposal_requests` path for signed-in
 student or instructor contributors. It captures a title, category, problem,
@@ -2653,6 +2653,28 @@ moderation, product and technical assessments, roadmap links, development
 tracking, or release outcome review. M13 describes the complete future
 capability and requires Product Owner, core-team, security/privacy, moderation,
 and technical review before execution.
+
+**What has shipped, and what it deliberately is not.**
+[ADR-0049](decisions/adr-0049-proposal-triage-before-public-platform.md) took
+the first increment as triage rather than participation, on the reasoning that
+every deferred surface opens the abuse, identity, and privacy questions above
+while none of them moves this milestone's stated outcome — the proportion of
+proposals receiving an auditable decision and an author-visible explanation.
+That proportion was zero by construction: three of the four statuses could not
+be reached and no screen existed on which anybody could answer a proposal.
+[SPEC-0050](specs/spec-proposal-triage.md) delivered as backlog item M13-001 on
+2026-08-12: an administrator answers a proposal from the console's Proposals
+tab, each transition writes a decision recording who decided it and the reason,
+and the author reads that reason on the page they already have. All four
+statuses are now reachable, which retires the defect
+[SPEC-0049](specs/spec-proposal-request-intake.md) recorded.
+
+**No public surface was opened.** Intake is still signed-in students and
+instructors, and discovery, voting, following, comments, moderation, revision
+history, attachments, duplicate detection, AI assistance, search, an API, and
+every form of notification remain unbuilt and unauthorized. Seven of the twelve
+product decisions in §15 are still open, and the outcome now has a number
+somebody can measure rather than a baseline nobody had.
 
 ### 1. Executive Summary
 
