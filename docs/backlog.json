@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T11:00:00+07:00",
+  "updated_at": "2026-08-12T14:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2670,6 +2670,130 @@
         }
       ],
       "updated_at": "2026-08-12T11:43:00+07:00"
+    },
+    {
+      "id": "DEV-010",
+      "title": "Suppress the status cell, not just the total, in organization reporting",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0037 privacy-safe recruitment reporting",
+          "url": "decisions/adr-0037-privacy-safe-recruitment-reporting.html"
+        },
+        {
+          "label": "SPEC-0037 recruitment reporting",
+          "url": "specs/spec-recruitment-reporting.html"
+        }
+      ],
+      "updated_at": "2026-08-12T13:20:00+07:00"
+    },
+    {
+      "id": "DEV-011",
+      "title": "Cut the company work surface from 27 queries to 13, and put a budget on it",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0048 company work surface",
+          "url": "decisions/adr-0048-company-work-surface.html"
+        },
+        {
+          "label": "Performance budgets",
+          "url": "performance.html"
+        }
+      ],
+      "updated_at": "2026-08-12T13:35:00+07:00"
+    },
+    {
+      "id": "DEV-012",
+      "title": "Test the two services that had none",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T13:45:00+07:00"
+    },
+    {
+      "id": "DEV-013",
+      "title": "Pin the lesson answer key against the two constants that must agree",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T14:00:00+07:00"
+    },
+    {
+      "id": "DEV-014",
+      "title": "Gate the bilingual invariant the repository states but never checked",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "Coding standard",
+          "url": "coding-standard.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T14:15:00+07:00"
+    },
+    {
+      "id": "DEV-015",
+      "title": "Refuse a suspended company's record the way its other screens do",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-009"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0048 decision 7, amended",
+          "url": "decisions/adr-0048-company-work-surface.html"
+        },
+        {
+          "label": "SPEC-0048 company work surface",
+          "url": "specs/spec-company-work-surface.html"
+        }
+      ],
+      "updated_at": "2026-08-12T14:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4525,6 +4649,54 @@
       "to": "complete",
       "summary": "Diagnosing OPS-001 showed this file's evidence links had been resolving to nothing since 2026-08-07 with no check noticing, because the check read their shape and stopped: a URL ending in .html passed whether or not any document stood behind it. Fetching them would tie the build to a deploy it does not control, which is the wrong trade. The half that is ours is checkable offline - the site is built from docs/, so specs/spec-x.html is a promise that docs/spec-x.md exists, and validate-markdown-graph already holds every Markdown link to exactly that rule. Backlog evidence was the one link surface without it, on both evidence[].url and evidence_url. All 122 relative links resolve today, so a passing run proved nothing and the rule was tested against injected breakage instead: two invented links, one on an item and one on an update, both caught by name. This is a guard rather than a repair. It does nothing for the outage - those links still resolve to nothing in practice until the GitHub billing lock clears - but the next bad link now fails at the gate instead of silently, which is the same reasoning as the route reachability invariant: close the class, not the instance.",
       "evidence_url": "mdlc.html"
+    },
+    {
+      "at": "2026-08-12T13:20:00+07:00",
+      "item_id": "DEV-010",
+      "from": "queued",
+      "to": "complete",
+      "summary": "An audit of app/services found the one real defect it produced. ADR-0037 suppresses application totals and status cells below five, and its fitness function says counts below the threshold are suppressed consistently; the code decided it on the total alone, so once the total cleared five every per-status cell published its exact count. Six applications, five submitted and one screening, produced a cell of one and named the single person who had reached screening to a reader who can see who applied - while the line under the table told them populations below five were suppressed. Suppressing the cell alone would have hidden nothing, because five published beside a total of six returns the sixth by subtraction, so the total is withheld whenever any cell is. Zero is still published: a cell of zero names nobody and hiding it would redact six of seven statuses. All four existing tests passed unmodified, which is the better evidence that this restored the recorded intent rather than bending it.",
+      "evidence_url": "decisions/adr-0037-privacy-safe-recruitment-reporting.html"
+    },
+    {
+      "at": "2026-08-12T13:35:00+07:00",
+      "item_id": "DEV-011",
+      "from": "queued",
+      "to": "complete",
+      "summary": "ADR-0048 records that four counts run on each page load. Measured, the work surface cost 20 queries when application figures were suppressed and 27 when they were not: the four are the dashboard's own, and underneath them OrganizationReporting counted once per status across vocabularies of six and seven while postings asked each relation twice. Thirteen now, on both paths, by grouping the counts - every number on the board survived, so the ADR's prescribed remedy of caching does not apply either. Nothing had guarded this screen; the query budget covered the instructor report, the roster, the catalog, standings and deliverables and stopped there. The new ceiling was measured rather than guessed, by forcing the assertion to fail once to read the true number.",
+      "evidence_url": "decisions/adr-0048-company-work-surface.html"
+    },
+    {
+      "at": "2026-08-12T13:45:00+07:00",
+      "item_id": "DEV-012",
+      "from": "queued",
+      "to": "complete",
+      "summary": "JobAlertNotifier and Observability::Instrumentation had no test anywhere. The first decides whether a student hears about new matches and how often, so the rule that stops a daily alert firing twice - a lock, a re-read of alerts_due? inside it, and a timestamp written only when a notification was created - was resting on nothing. The second is three global subscribers installed from an initializer, and untested a subscriber is a particular risk: it fails by going quiet, and a silent failure detector reads exactly like a healthy system. Thirteen tests, all passing on the first run; neither service was broken, both were unasserted. One asserts install is idempotent, because a second subscription would report every incident twice, and another passes a password in a payload and asserts it never reaches the emitted signal.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-12T14:00:00+07:00",
+      "item_id": "DEV-013",
+      "from": "queued",
+      "to": "complete",
+      "summary": "REAL_TOPIC_KEYS and TOPIC_GRADING both list the twelve real topics and are linked by a fetch that raises, so a topic added to one and not the other is a KeyError found by the first learner who opens it. An empty check list is worse: it grades every submission as a pass, because an empty array is all-true, and then divides by zero working out the score, so the learner is credited and immediately shown a 500. The guard for that divisor exists three method definitions away on the default grading path and not on the real-topic one. That asymmetry is deliberately left alone - whether a topic with no checks should pass, fail, or refuse to grade is a decision about grading and belongs to whoever owns the curriculum - but the table should never reach that state, and being a frozen constant it can only get there in a code change. Four invariants now fail there instead, including that every recorded solution passes its own topic's checks, which would otherwise let the course present an answer it marks wrong.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-12T14:15:00+07:00",
+      "item_id": "DEV-014",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The repository states the English and Thai locale files must stay in sync and nothing checked it. Discipline had held - 2426 keys each, no difference in either direction - but this was the second stated invariant of the week being kept by hand rather than by a gate, and the first had already drifted by the time anybody looked. The failure does not announce itself: Rails is configured with fallbacks to English, so a key missing from Thai neither raises nor renders a translation-missing marker. It renders English to a reader who chose Thai, on a page that looks like it worked, and Thai is the default locale. Three checks, reading the two files rather than the I18n backend because the backend also carries the framework's English defaults. One empty Thai key was injected to confirm two of the three fire before the file was restored.",
+      "evidence_url": "coding-standard.html"
+    },
+    {
+      "at": "2026-08-12T14:30:00+07:00",
+      "item_id": "DEV-015",
+      "from": "queued",
+      "to": "complete",
+      "summary": "ADR-0048 decision 7 said an inactive organization is not reachable, the same way its other screens are not. The second clause was untrue when written: the work surface and the reporting page both refused a suspended company, while /company/:slug served a member its record normally, so the screen the decision was about was the strictest of the three rather than one of a set. The record refuses a member now. Administrators are a deliberate exception and a load-bearing one - /admin lists only active organizations and every membership action redirects back to this page, so refusing them too would let somebody suspend a company and leave no screen anywhere that could manage it. Decision 7 is amended rather than rewritten, keeping the original sentence with the correction underneath. This came out of an audit finding that was first reported backwards and withdrawn; reading the caller to withdraw it is what turned up that visible_to? has no status check at all.",
+      "evidence_url": "decisions/adr-0048-company-work-surface.html"
     }
   ]
 }

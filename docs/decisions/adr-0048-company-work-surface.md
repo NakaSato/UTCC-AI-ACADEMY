@@ -178,6 +178,18 @@ is waiting — which a feed does not.
 - Four counts run on each page load. They are indexed foreign-key counts against
   one organization, and the screen is not on a hot path; if that stops being
   true, the fix is caching, not fewer numbers.
+
+  **Corrected 2026-08-12.** Four was never the number. The four are the
+  dashboard's own; beneath them `OrganizationReporting` counted once per status
+  across vocabularies of six and seven, and `postings` asked each relation twice.
+  Measured, the screen cost 20 queries with the application figures suppressed
+  and 27 without. It is 13 now, on both paths, because the counts are grouped —
+  which is neither of the two options this paragraph offered, since every number
+  on the board survived. The prediction that the remedy would be caching was
+  wrong in the same way the count was: it assumed the cost came from how many
+  numbers the screen asks for rather than from how it asks for them. A budget in
+  `test/models/query_budget_test.rb` now holds the ceiling, so the next answer to
+  this question is measured rather than estimated.
 - The screen is bilingual, like every other. Both locale files gain one section.
 
 ## Fitness Functions
