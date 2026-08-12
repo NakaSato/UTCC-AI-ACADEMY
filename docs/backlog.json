@@ -2648,6 +2648,28 @@
         }
       ],
       "updated_at": "2026-08-12T11:15:00+07:00"
+    },
+    {
+      "id": "DEV-009",
+      "title": "Hold backlog evidence links to the rule every other link already obeys",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-008"
+      ],
+      "evidence": [
+        {
+          "label": "Documentation lifecycle and gates",
+          "url": "mdlc.html"
+        },
+        {
+          "label": "Maintenance mode runbook",
+          "url": "runbooks/rb-maintenance-mode.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:43:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4495,6 +4517,14 @@
       "to": "in_progress",
       "summary": "Recorded a diagnosis, not a fix. Chasing the /maintenance 404 after a push showed the whole documentation site is frozen: it serves a backlog stamped 2026-08-07T22:51:23 and a build stamp of commit 37b6250d, a 2026-08-08 merge into agent/recruitment-platform-vertical-slices. Probing by document age gives a clean cutoff - everything created on or before 2026-08-07 serves 200, everything after it 404s, including all of M11-SIR and both documents written today. The cause is two separate failures on the hosting side. GitHub Actions is locked for billing, so every pages.yml run fails in nine seconds without starting a step, and one earlier run titled 'fix: unbreak the dashboard deploy' failed the same way while looking like a code problem. Vercel is building a branch that is not main. The repository builds clean at 293748f through every gate the deploy runs. Two consequences worth carrying: this item cannot be fixed from the codebase, and every evidence_url in this file currently resolves to nothing, because script/validate-backlog checks that a URL looks like a rendered page and never fetches it.",
       "evidence_url": "runbooks/rb-maintenance-mode.html"
+    },
+    {
+      "at": "2026-08-12T11:43:00+07:00",
+      "item_id": "DEV-009",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Diagnosing OPS-001 showed this file's evidence links had been resolving to nothing since 2026-08-07 with no check noticing, because the check read their shape and stopped: a URL ending in .html passed whether or not any document stood behind it. Fetching them would tie the build to a deploy it does not control, which is the wrong trade. The half that is ours is checkable offline - the site is built from docs/, so specs/spec-x.html is a promise that docs/spec-x.md exists, and validate-markdown-graph already holds every Markdown link to exactly that rule. Backlog evidence was the one link surface without it, on both evidence[].url and evidence_url. All 122 relative links resolve today, so a passing run proved nothing and the rule was tested against injected breakage instead: two invented links, one on an item and one on an update, both caught by name. This is a guard rather than a repair. It does nothing for the outage - those links still resolve to nothing in practice until the GitHub billing lock clears - but the next bad link now fails at the gate instead of silently, which is the same reasoning as the route reachability invariant: close the class, not the instance.",
+      "evidence_url": "mdlc.html"
     }
   ]
 }

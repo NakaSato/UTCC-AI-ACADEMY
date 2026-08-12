@@ -14,7 +14,32 @@ def renderable_link?(url)
   url.split("#").first.to_s.end_with?(".html", ".json")
 end
 
+# A link with the right shape pointing at nothing is the failure this file could
+# not see. `renderable_link?` stops at the shape, so an evidence link naming a
+# document that does not exist passes. On 2026-08-12 the documentation site
+# turned out to have been frozen since 2026-08-07, and every relative link in
+# this file was resolving to nothing with no check noticing — the shape was
+# right the whole time.
+#
+# Fetching them would tie the build to a deploy it does not control, which is
+# the wrong trade. What is checkable offline is the half that is ours: the site
+# is built from docs/, so `specs/spec-x.html` is a promise that `docs/spec-x.md`
+# exists. validate-markdown-graph already holds every Markdown link to that
+# rule. Backlog evidence was the one link surface without it.
+def unresolved_source(url, root)
+  return if url.match?(%r{\A[a-z][a-z0-9+.-]*:}i) || url.start_with?("#")
+
+  target = url.split("#").first.to_s.split("?").first.to_s
+  return if target.empty?
+
+  source = File.join("docs", target.sub(/\.html\z/, ".md"))
+
+  source unless File.file?(File.join(root, source)) ||
+                File.file?(File.join(root, "docs", target))
+end
+
 path = ARGV.fetch(0, "docs/backlog.json")
+root = File.dirname(File.dirname(path))
 backlog = JSON.parse(File.read(path, encoding: Encoding::UTF_8))
 errors = []
 
@@ -58,6 +83,14 @@ if allowed_statuses.is_a?(Array) && items.is_a?(Array)
 
       errors << "#{id}: evidence #{url.inspect} is neither an absolute URL nor a " \
                 "rendered site file — a repository path must be a full github.com link"
+    end
+
+    (item["evidence"] || []).each do |evidence|
+      missing = unresolved_source(evidence["url"].to_s, root)
+      next if missing.nil?
+
+      errors << "#{id}: evidence #{evidence['url'].inspect} names a page the site " \
+                "does not build — no #{missing}"
     end
   end
 end
@@ -214,6 +247,10 @@ if updates.is_a?(Array)
 
     errors << "update #{index} (#{update['item_id']}): evidence_url #{url.inspect} " \
               "is neither an absolute URL nor a rendered site file" unless renderable_link?(url)
+
+    missing = unresolved_source(url, root)
+    errors << "update #{index} (#{update['item_id']}): evidence_url #{url.inspect} " \
+              "names a page the site does not build — no #{missing}" if missing
   end
 end
 
