@@ -57,13 +57,18 @@ services:
     # which deploys to Vercel from this repository — a different origin from
     # the academy, which is what Render requires.
     #
+    # The URL carries no `.html`. `vercel.json` sets `cleanUrls: true`, so the
+    # documentation site serves the generated page at `/maintenance` and answers
+    # `/maintenance.html` with a 308 to it. Naming the file would point Render
+    # at a redirect on the one screen that must not need a second hop.
+    #
     # 502 and 504 have no equivalent. They are what Render's own proxy emits
     # when this service is unreachable or too slow to answer, and its blueprint
     # exposes no way to replace them; public/502.html and public/504.html exist
     # for a proxy that can, not for this one. See SPEC-0045.
     maintenanceMode:
       enabled: false
-      uri: https://utcc-ai-academy.vercel.app/maintenance.html
+      uri: https://utcc-ai-academy.vercel.app/maintenance
 
     envVars:
       - key: RAILS_MASTER_KEY

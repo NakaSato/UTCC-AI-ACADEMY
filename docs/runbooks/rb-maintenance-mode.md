@@ -5,14 +5,16 @@ title: Put the academy into maintenance mode and take it out again
 status: draft
 owners: ["@platform-owner", "@release-owner", "@on-call-owner"]
 created: 2026-08-11
-updated: 2026-08-11
-review_by: 2026-08-25
+updated: 2026-08-12
+review_by: 2026-08-26
 depends_on: [ADR-0045, SPEC-0045, ADR-0022, SPEC-0022]
 touches:
   - render.yaml
   - docs/maintenance.html
   - lib/error_pages.rb
+  - lib/tasks/error_pages.rake
   - lib/templates/error_page.html.erb
+  - vercel.json
 enforced_by:
   - test/release/deployment_configuration_test.rb
   - test/lib/error_pages_test.rb
@@ -45,11 +47,17 @@ otherwise, and are not reachable through Render today. Do not promise a branded
 
 ## Preconditions
 
-- [ ] The maintenance page is live. Open
-      <https://utcc-ai-academy.vercel.app/maintenance.html> and confirm it
-      returns 200 and renders in Thai and English. It appears one deploy after
-      the page is generated and merged — the documentation site builds on push
-      to `main`, from this repository, on Vercel.
+- [ ] The maintenance page is live and current:
+
+      ```
+      bin/rails error_pages:published
+      ```
+
+      It fetches the `uri` in `render.yaml` and fails unless the answer is a 200
+      whose body is the page this repository generates — so a redirect, a 404, or
+      a stale deploy each fail with the reason. It appears one deploy after the
+      page is generated and merged: the documentation site builds on push to
+      `main`, from this repository, on Vercel.
       The GitHub Pages workflow in `.github/workflows/pages.yml` is a second,
       currently failing publisher: its runs are refused for an account billing
       lock. It is **not** what serves this page, and the `github.io` address
@@ -59,13 +67,18 @@ otherwise, and are not reachable through Render today. Do not promise a branded
 - [ ] The downtime is announced to whoever is teaching that day.
 - [ ] You hold Render dashboard access for the `utcc-ai-academy` service.
 
+> The URL has no `.html`. `vercel.json` sets `cleanUrls: true`, so the page is
+> served at `/maintenance` and `/maintenance.html` answers 308. Checking it with
+> a bare `curl -sI` reads that 308 as a live page and tells you nothing — which
+> is how the `uri` sat pointing at a 404 for three days.
+
 ## Procedure
 
 1. Confirm the page one more time — a maintenance page that 404s is worse than
    Render's default, because nobody will look again until the next outage:
 
    ```
-   curl -sI https://utcc-ai-academy.vercel.app/maintenance.html | head -1
+   bin/rails error_pages:published
    ```
 
 2. Turn maintenance **on** in the Render dashboard: *utcc-ai-academy →
@@ -110,17 +123,29 @@ without touching the service.
 - `curl -sI https://academy.boring9.dev/` returns 503 while on, 200 while off.
 - The 503 body is the academy's page, in Thai and English, not Render's default.
 - `bin/rails error_pages:check` passes on `main`.
+- `bin/rails error_pages:published` passes, so the `uri` resolves to the current
+  page rather than a redirect, a 404, or an older deploy.
 - `test/release/deployment_configuration_test.rb` keeps `enabled: false` in the
-  repository and the `uri` pointing at the generated page.
+  repository and the `uri` pointing at the path the documentation host serves
+  the generated page at, `cleanUrls` included.
 
 ## Escalation
 
-- Page renders but is not the academy's → the `uri` is unreachable; check that
-  the last Vercel deploy of the documentation site succeeded. Its build runs
-  `bin/docs` and `script/validate-rendered-doc-links`, so a bad link anywhere
-  in the documentation aborts it — and the previous deploy stays online looking
-  current, which is how it went unnoticed for two days in August 2026. Then
-  Platform Owner.
+- **The page is challenged rather than served** (403, "Vercel Security
+  Checkpoint") → the documentation host has bot protection or attack-challenge
+  mode on, and it applies to every path including the dashboard itself. This
+  began on 2026-08-12. A human browser may pass the interstitial; automation
+  never will, and a visitor meeting a challenge during downtime is not being
+  told the academy is down. Turn the protection off for this host, or move the
+  page to one that does not challenge readers, before relying on maintenance
+  mode. Platform Owner owns that call.
+- Page renders but is not the academy's → the `uri` is unreachable; run
+  `bin/rails error_pages:published`, which names the reason. If the page 404s,
+  check that the last Vercel deploy of the documentation site succeeded: its
+  build runs `bin/docs` and `script/validate-rendered-doc-links`, so a bad link
+  anywhere in the documentation aborts it — and the previous deploy stays online
+  looking current, which is how it went unnoticed for three days in August 2026.
+  Then Platform Owner.
 - Maintenance mode absent from the dashboard → it is a paid-plan feature; the
   service is on `starter`, so escalate to whoever owns the Render account.
 - 502 or 504 instead of 503 → not maintenance mode; the service is genuinely

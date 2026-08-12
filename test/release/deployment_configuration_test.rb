@@ -1,4 +1,5 @@
 require "test_helper"
+require "json"
 require "yaml"
 
 class DeploymentConfigurationTest < ActiveSupport::TestCase
@@ -43,11 +44,12 @@ class DeploymentConfigurationTest < ActiveSupport::TestCase
     refute variables.key?("MAILPIT_HOST")
   end
 
-  # Maintenance mode is wired but off. The two halves — the URL Render fetches
-  # and the file the repository publishes — are written in different places and
-  # nothing at runtime notices when they stop agreeing: a `uri` pointing at
-  # nothing makes Render fall back to its own default page, silently, on the
-  # one screen a visitor sees during planned downtime.
+  # Maintenance mode is wired but off. The three halves — the URL Render fetches,
+  # the file the repository generates, and the rule the documentation host serves
+  # it under — are written in three places and nothing at runtime notices when
+  # they stop agreeing: a `uri` pointing at nothing makes Render fall back to its
+  # own default page, silently, on the one screen a visitor sees during planned
+  # downtime.
   test "maintenance mode is wired, off, and points at a page this repository publishes" do
     maintenance = @service.fetch("maintenanceMode")
 
@@ -56,8 +58,8 @@ class DeploymentConfigurationTest < ActiveSupport::TestCase
 
     uri = URI.parse(maintenance.fetch("uri"))
     assert_equal "https", uri.scheme
-    assert_equal File.basename(ErrorPages::HOSTED[:path]), File.basename(uri.path),
-                 "the uri and the generated page have drifted apart"
+    assert_equal published_path(ErrorPages::HOSTED[:path]), uri.path,
+                 "the uri and the path the documentation site serves the page at have drifted apart"
 
     # Render refuses a maintenance page hosted on the service being maintained.
     refute_includes @service.fetch("domains"), uri.host
@@ -71,4 +73,15 @@ class DeploymentConfigurationTest < ActiveSupport::TestCase
     assert_includes workflow, "RENDER_DEPLOY_HOOK_URL"
     assert_includes workflow, "environment: production"
   end
+
+  private
+    # Where the documentation site actually serves a generated page. Vercel's
+    # `cleanUrls` strips the extension and answers the `.html` form with a 308,
+    # so the file name is not the URL — pointing Render at it costs a redirect
+    # hop, and cost the page entirely once already.
+    def published_path(source)
+      name = File.basename(source)
+      name = name.delete_suffix(".html") if JSON.parse(ROOT.join("vercel.json").read)["cleanUrls"]
+      "/#{name}"
+    end
 end
