@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T00:26:00+07:00",
+  "updated_at": "2026-08-13T00:04:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3084,6 +3084,28 @@
         }
       ],
       "updated_at": "2026-08-13T00:26:00+07:00"
+    },
+    {
+      "id": "DEV-022",
+      "title": "Keep bin/dev alive without a TTY, and verify the production image",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Platform Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-012"
+      ],
+      "evidence": [
+        {
+          "label": "Vite island build decision",
+          "url": "decisions/adr-0053-vite-island-build.html"
+        },
+        {
+          "label": "Build and release",
+          "url": "build-release.html"
+        }
+      ],
+      "updated_at": "2026-08-13T00:04:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5106,6 +5128,14 @@
       "from": "queued",
       "to": "complete",
       "summary": "ADR-0051 took Vue with no build step and paid for it in one place: the CSP is script-src self with no unsafe-eval, which blocks Vue-s template compiler, so an island had to be a hand-written h() render function - recorded at the time as the reason a bundler would be the next decision if single-file components turned out to matter. The user asked for Vite after being shown what it costs, and it resolves the problem without touching the policy, because the compiler moves to the toolchain: a .vue file is compiled at build time and the browser receives render code and the runtime alone. Vite builds the island layer and nothing else. app/javascript stays the import map-s - Turbo, Stimulus, seventeen controllers, sixty Tiptap pins - and app/frontend is Vite-s, with neither importing from the other, because a shared module would ship twice. Vue left the import map and the vendored runtime build was deleted, since two toolchains carrying Vue is two Vues. The counter island was rewritten as a single-file component with the same behavior, which is the proof the path works. The bridge moved with it: Stimulus cannot host it any more because its bundle cannot import Vite-s, so the entrypoint owns the lifecycle with a MutationObserver plus a turbo:before-cache unmount, which covers what Stimulus covered - Drive replacing the body, and a Stream replacing one node with no page event at all. createApp still has exactly one caller and an island is still a name in a registry rather than an import. The CSP is unchanged in production and test and weaker in development only, where the HMR client needs unsafe_eval and its own origin; it is a conditional in the policy rather than a comment, so it cannot silently apply elsewhere. Node is a build dependency and never a runtime one: the Dockerfile installs a pinned version in the build stage, runs npm ci and precompile, and deletes node_modules before the final image. npm audit joins bundler-audit and importmap audit in the security gate, because a Vite dependency tree was the third supply chain and nothing watched it. The bundle is 61KB against 110KB vendored, tree-shaken. Inertia was rejected and written down as rejected: it replaces the view layer, does not coexist with Turbo, moves copy out of the locale files and leaves a screen blank without JavaScript, so it would be a rewrite with its own ADR rather than an extension of this one.",
+      "evidence_url": "decisions/adr-0053-vite-island-build.html"
+    },
+    {
+      "at": "2026-08-13T00:04:00+07:00",
+      "item_id": "DEV-022",
+      "from": "queued",
+      "to": "complete",
+      "summary": "bin/dev has been unusable outside an interactive shell, and it took two failures today to see it rather than one. Tailwind-s watcher exits immediately when stdout is not a terminal, and foreman stops the whole group the moment any process exits, so the symptom is the server booting and dying two seconds later with no error of its own - which reads as a port problem or a crash, not as a watcher that declined to watch. The gem-s own answer is the always argument, so Procfile.dev now runs tailwindcss:watch[always] with a comment saying why. All three processes stay up, including the Vite dev server, and the page carries the client tag and the entrypoint from localhost:3036 with a nonce, under the development-only CSP relaxation ADR-0053 describes and nothing wider. The second failure in the same sequence was a stale tmp/pids/server.pid left by a killed server, which is worth remembering as the other reason web exits at once. The production image was then built and inspected, which is the step the Vite commit said it could not run. All four properties hold: the island bundle and its manifest are present under public/vite, node_modules is absent, node and npm are not on the PATH, and /usr/local/node - where the build stage installs it - does not exist in the final stage. Node is a build dependency and nothing in the running image can execute it.",
       "evidence_url": "decisions/adr-0053-vite-island-build.html"
     }
   ]

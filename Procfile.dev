@@ -1,3 +1,8 @@
 web: bin/rails server
-css: bin/rails tailwindcss:watch
+# `[always]` is what keeps the watcher alive without a TTY. Tailwind's watcher
+# exits immediately when stdout is not a terminal — which is what happens when
+# `bin/dev` runs under anything but an interactive shell — and foreman stops the
+# whole group the moment one process exits. The symptom is the server booting
+# and dying two seconds later with no error of its own.
+css: bin/rails "tailwindcss:watch[always]"
 vite: bin/vite dev
