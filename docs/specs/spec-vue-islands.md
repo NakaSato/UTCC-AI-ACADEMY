@@ -20,6 +20,7 @@ implemented_by:
 enforced_by:
   - test/operations/vue_build_test.rb
   - test/controllers/admin_proposals_test.rb
+  - test/system/vue_island_walk_test.rb
   - test/operations/locale_parity_test.rb
 touches:
   - app/javascript
@@ -140,9 +141,11 @@ Registered today:
 - `test/controllers/admin_proposals_test.rb` — the island's props against the
   field they describe.
 - `test/operations/locale_parity_test.rb` — the copy exists in both languages.
-- **Behavior in a browser is not covered by any of the above.** An island's
-  counting, mounting and unmounting are visible only to `bin/rails test:system`,
-  and a system test for the first island is the open item this document carries.
+- `test/system/vue_island_walk_test.rb` — the half no other test can see: that
+  the island mounts at all, counts down as somebody types, changes tone near the
+  limit, and that the form still records a decision with the island on the page.
+  Three failures are only visible here — a CSP that blocks the build, a bridge or
+  registry that never mounts, and an island bound to the wrong field.
 
 ## Consequences
 

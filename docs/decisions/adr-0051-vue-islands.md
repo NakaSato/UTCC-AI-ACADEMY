@@ -24,6 +24,7 @@ touches:
 enforced_by:
   - test/operations/vue_build_test.rb
   - test/controllers/admin_proposals_test.rb
+  - test/system/vue_island_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-ARCH-002, SKILL-SPEC-001]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
@@ -169,9 +170,10 @@ prerequisite for knowing.
   server-rendered form. Nothing else imports Vue, which decision 3 exists to
   keep true.
 - Islands are verifiable only in a browser, so `bin/rails test:system` is where
-  their behavior is proven. What the server owns — that the island names a field
-  that exists, with the limit that field enforces, and the copy from both locale
-  files — is asserted without one.
+  their behavior is proven — `vue_island_walk_test.rb` for the first one, run
+  and passing. What the server owns — that the island names a field that exists,
+  with the limit that field enforces, and the copy from both locale files — is
+  asserted without one.
 - This is the second JavaScript dependency taken for behavior and refused for
   styling, after Tiptap. The token system stays the only source of appearance.
 

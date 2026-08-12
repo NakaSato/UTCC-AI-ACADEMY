@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T22:14:00+07:00",
+  "updated_at": "2026-08-12T22:31:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3010,6 +3010,28 @@
         }
       ],
       "updated_at": "2026-08-12T22:14:00+07:00"
+    },
+    {
+      "id": "DEV-021",
+      "title": "Walk the first Vue island in a browser, which is the only place it is visible",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and QA Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-010"
+      ],
+      "evidence": [
+        {
+          "label": "Vue islands specification",
+          "url": "specs/spec-vue-islands.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T22:31:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5001,6 +5023,14 @@
       "to": "complete",
       "summary": "DEV-019 corrected three roadmap tables by hand and left two of them outside the gate, which is how they drifted in the first place: the check read the consolidated table, the UTCC summary table and the UTCC section status lines, and neither track table. It reads all five now. The obstacle was that a track table names a bare M10 and there are three different M10s in the file, so the enclosing section heading is tracked and the bare ID resolved through it - AI Recruitment Platform Roadmap to AI-M10, Company Business Case Platform Roadmap to M10-CBP, M11-SIR and M13. A row under a section with no mapping is nobody-s milestone and is left alone rather than guessed at. One bug fell out of turning it on: status is the fourth column in a track table and the last in the two planning tables, so reading the last cell in all three reported every AI row as saying whatever its dependency column held, which is why the first run complained that AI-M8 says M6, M7. Both facts are now asserted in the gate-s own test. Turning the check on also forced two ecosystem rows into the two-label vocabulary. M10 is First slice - phase 1 is invitation-only and text-only, and uploads, email and reporting remain proposals. M11 is Complete, because its own section says every authorized increment of SPEC-0041 has shipped and the remainder - interviews, an academic gate, rubric evaluation, email, REST APIs, academic credit - is unauthorized rather than pending, and is enforced absent by a boundary test.",
       "evidence_url": "roadmap.html#ai-recruitment-platform-roadmap"
+    },
+    {
+      "at": "2026-08-12T22:31:00+07:00",
+      "item_id": "DEV-021",
+      "from": "queued",
+      "to": "complete",
+      "summary": "UX-010 shipped the first Vue island with its server-side half asserted and its browser half not, and said so in both documents: the island names a field that exists with the limit that field enforces and the copy from both locale files, none of which proves it mounts. Three failures are visible nowhere else - a CSP that blocks the build, which is exactly what the full Vue build would have done and what the vendored-bytes test exists to prevent; a bridge or registry that never mounts; and an island bound to the wrong field, which counts nothing while looking correct. The walk covers all three: the counter reads a thousand on an empty field, counts down as an administrator types, changes tone within a hundred of the limit, and the decision still records with the island on the page - which is the enhancement rule from the other side, since the form owes the island nothing. The full system suite was run first and passed at 28, then at 30 with these two. The spec and the decision no longer carry this as an open item.",
+      "evidence_url": "specs/spec-vue-islands.html"
     }
   ]
 }
