@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T10:20:00+07:00",
+  "updated_at": "2026-08-12T11:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2413,6 +2413,28 @@
         }
       ],
       "updated_at": "2026-08-12T10:20:00+07:00"
+    },
+    {
+      "id": "DEV-002",
+      "title": "Prove every route leads somewhere, and keep it that way",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "DEV-001"
+      ],
+      "evidence": [
+        {
+          "label": "Agent flow: invariant registry",
+          "url": "agent-flow.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:10:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4172,6 +4194,14 @@
       "to": "complete",
       "summary": "bin/rails test:spec[SPEC-0041] reads a lifecycle document's enforced_by and runs exactly those files, so the rule recorded this morning is a command rather than a copy-paste from a doc. It works on decision records too, names the system tests instead of running them because they are the slow half that belongs to the gate, and refuses with a useful message when a spec lists nothing - an empty enforced_by is the actual bug, and the fix is to fill it in rather than to run everything. It shells out rather than calling Rake::Task[test].invoke: the Rails test task takes its files from the command line, so invoking it in process quietly ran all 1,204 tests, which is the one thing the task exists to avoid. Alongside it, the two dead ends the route sweep found are closed. A dismissed job recommendation can be brought back: the undo action had existed since job discovery shipped with nothing linking to it, so a misclick hid a recommendation permanently for anyone who did not know the route. And the company internship-applications index is gone rather than linked - it had no template at all, so an authorized reader would have met a missing-template error, while the program's own screen already lists its applications with the decide and evaluate controls on them. The one test that used that route to prove cross-organization refusal now proves it through the accept action, which is the stronger assertion.",
       "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-12T11:10:00+07:00",
+      "item_id": "DEV-002",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The company internship-applications index removed earlier today was one instance of a class: a route that exists, resolves, and is a 500 waiting for its first authorized visitor, because the action has no template and nothing links to it. test/operations/route_reachability_test.rb closes the class. It asserts every route resolves to an action that exists, and that every GET either renders a template or appears in WITHOUT_TEMPLATE with a sentence saying why - nine do today, all of them send_data or a partial, each now named. Writing it was a lesson in the repo's own rule that a test must fail for the intended reason before it is trusted: the first version passed against a deliberately planted template-less route, because it decided an action was safe by reading forty lines from the method definition and swept up a render from the next method down. The second version read only the method's own body and then produced two false positives - policies#privacy and #terms are endless methods delegating to a private show that renders, and both answer 200. Source-sniffing cannot decide this, so the heuristic is gone: a template-less GET is now a written exception rather than a guess, which is also the version that fails loudly when the next one appears. Both defect shapes were planted and confirmed failing before the test was kept. Registered in the agent-flow invariant table and in the CLAUDE.md invariant list, because a rule not written as a test does not exist.",
+      "evidence_url": "agent-flow.html"
     }
   ]
 }

@@ -28,3 +28,4 @@ Rails 8.1 · PostgreSQL · Hotwire (Turbo + Stimulus, import maps, Propshaft) ·
 
 - Every phase of work produces a Markdown artifact in `docs/` — `decisions/adr-*.md`, `specs/spec-*.md`, `releases/`, `runbooks/`, `postmortems/`. Before changing existing behavior, find the governing spec in `docs/specs/` and ADR in `docs/decisions/` and keep them consistent with the code.
 - CI (`config/ci.rb`) treats security scans as gates, not advice: Brakeman, bundler-audit, and importmap audit failures block the build.
+- Every route leads somewhere: a route's action must exist, and a GET that renders no template must be listed with its reason in `test/operations/route_reachability_test.rb`. A screen nothing links to is still a screen someone can reach.

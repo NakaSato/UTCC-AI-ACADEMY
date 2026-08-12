@@ -72,6 +72,7 @@ This is the strongest argument in this document for eventually working on a bran
 | Every mutating admin action records exactly one audit row | `test/controllers/admin_audit_test.rb` |
 | A broadcast carries no copy and no CSRF token | `test/models/notification_bell_test.rb` |
 | Student ID and profile PII never reach a log line | `test/controllers/log_filtering_test.rb` |
+| Every route leads to an action that renders, and a template-less GET is declared in writing | `test/operations/route_reachability_test.rb` |
 
 That table is the registry the canonical design builds with ArchUnit. **The "Invariants" section of `CLAUDE.md` is its index**, and the rule that keeps it honest is: an invariant added to that list without a test named beside it is a comment, and an agent will violate it inside a week. When an agent proposes a change that touches one of the rows above, the test in the right-hand column is the thing to run first and read hardest.
 
