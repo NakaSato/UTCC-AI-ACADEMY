@@ -44,7 +44,9 @@ class NotificationBellTest < ActiveSupport::TestCase
     frame = pushed.at_css("turbo-frame")
     html = pushed.to_html
 
-    assert_equal "/notifications", frame["src"]
+    # The bell, not the reader’s screen: /notifications is the history a person
+    # reads, and the frame comes back for the panel alone (ADR-0052).
+    assert_equal "/notifications/bell", frame["src"]
     assert_no_match(/authenticity_token/, html, "a token minted without a session is one nobody can submit")
     I18n.available_locales.each do |locale|
       assert_not_includes html, I18n.t("chrome.notif_title", locale: locale),

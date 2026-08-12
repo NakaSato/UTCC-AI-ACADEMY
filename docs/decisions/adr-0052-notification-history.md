@@ -2,7 +2,7 @@
 id: ADR-0052
 type: adr
 title: Give a notification somewhere to be read after the ninth
-status: proposed
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@qa-owner"]
 created: 2026-08-12
 updated: 2026-08-12
@@ -10,9 +10,20 @@ review_by: 2026-08-19
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0050, ADR-0044, ADR-0004]
-implemented_by: []
-touches: []
-enforced_by: []
+implemented_by:
+  - SPEC-0053
+touches:
+  - config/routes.rb
+  - app/controllers/notifications_controller.rb
+  - app/views/notifications/show.html.erb
+  - app/views/shared/_app_notifications.html.erb
+  - app/views/shared/_app_notifications_refetch.html.erb
+  - config/locales/en.yml
+  - config/locales/th.yml
+enforced_by:
+  - test/controllers/notifications_test.rb
+  - test/controllers/notification_broadcast_test.rb
+  - test/operations/route_reachability_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-002, SKILL-SPEC-001]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
@@ -20,12 +31,12 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Give a Notification Somewhere to Be Read After the Ninth
 
-> **Decision state:** **Proposed, and not accepted.** Nothing here is
-> implemented and no work is authorized by it. It exists because ADR-0050
-> decision 8 named the notification bell as the one list that grows and was
-> deliberately not paged, and said the fix is a screen rather than a page —
-> which is a new surface, and therefore a decision rather than a pull request.
-> Five questions below need a human answer; each carries a recommendation.
+> **Decision state:** **Accepted by the user on 2026-08-12**, who took all five
+> recommendations as written. It exists because ADR-0050 decision 8 named the
+> notification bell as the one list that grows and was deliberately not paged,
+> and said the fix is a screen rather than a page — which is a new surface, and
+> therefore a decision rather than a pull request. The five questions below are
+> answered by their recommendations; SPEC-0053 is what shipped.
 
 > [Decision Records](README.md) ·
 > [Paged lists](adr-0050-paged-lists.md) ·
@@ -59,11 +70,11 @@ bell is the **only** channel. A student invited to a business case, a company
 told a request arrived, a supervisor assigned to a placement — each learns about
 it here or not at all. Eight is one busy week.
 
-## The five open questions
+## The five questions, and their answers
 
 **1. Where does the screen live, and what happens to `/notifications`?**
 
-*Recommendation:* `/notifications` becomes the screen, and the bell's frame
+*Answered as recommended:* `/notifications` becomes the screen, and the bell's frame
 endpoint moves to `/notifications/bell`. The reader-facing URL should be the
 readable one, and the frame is an implementation detail of the header. Costs one
 line in `NotificationBell`, one route, and one entry in
@@ -72,27 +83,27 @@ exception, because it becomes a page that renders a template.
 
 **2. Is it a history or an inbox — do read notifications stay?**
 
-*Recommendation:* a history. Read rows stay, marked as read, and paging goes
+*Answered as recommended:* a history. Read rows stay, marked as read, and paging goes
 back to the first row ever written. An inbox that empties as you read it answers
 "what is waiting" — which the bell already answers, with a dot. The question
 this screen exists for is "what was I told?", and that one has no other home.
 
 **3. Does opening the screen mark everything read?**
 
-*Recommendation:* no. Marking read stays the explicit action it is today, on the
+*Answered as recommended:* no. Marking read stays the explicit action it is today, on the
 button that already exists. A screen that clears the dot by being looked at
 makes the dot mean "you have not visited" rather than "something happened", and
 a reader who opened it to find one thing has silently dismissed the other seven.
 
 **4. Does the bell keep its cap of eight?**
 
-*Recommendation:* yes, with a link. The panel stays a sidebar of the most recent
+*Answered as recommended:* yes, with a link. The panel stays a sidebar of the most recent
 eight and gains "see all", which is the route the ninth row was missing. The cap
 stops being a bound with nothing past it the moment the link exists.
 
 **5. Can a notification be deleted, and does anything prune?**
 
-*Recommendation:* no to both, matching `AuditEvent` — a history somebody can
+*Answered as recommended:* no to both, matching `AuditEvent` — a history somebody can
 edit is not one, and at classroom scale nothing needs pruning. If that changes
 it is a recurring job, not a button. **This is the one recommendation with a
 real counter-argument:** these are personal rows rather than an institutional
@@ -124,17 +135,24 @@ Fifty would push the cliff out and leave it exactly as invisible.
 
 ### Do nothing
 
-Defensible today and the reason this is proposed rather than assumed. At current
-volume most readers never reach the ninth row, and the dot still tells them
-something happened. It stops being defensible the first time somebody is told
-something that matters and cannot find it again — and because nothing is
-delivered anywhere else, that failure is silent on both sides.
+Defensible at current volume, where most readers never reach the ninth row and
+the dot still tells them something happened, and it is why this was proposed
+rather than assumed. It was rejected because it stops being defensible the first
+time somebody is told something that matters and cannot find it again — and
+because nothing is delivered anywhere else, that failure is silent on both
+sides.
 
-## Consequences if accepted
+## Consequences
 
-- One screen, one route change, one nav entry, and roughly the amount of code
-  the paged lists increment spent on a single list.
-- `notifications#show` stops being an exception in `route_reachability_test.rb`.
+- One screen and one route change, and roughly the amount of code the paged
+  lists increment spent on a single list. **No navigation entry:** the way in is
+  the bell's own "see all", which is where a reader already goes to ask this
+  question, and a tenth item in the menu is a cost every reader pays for a screen
+  most visit rarely.
+- `notifications#show` stops being an exception in `route_reachability_test.rb`,
+  because it is the page now. `notifications#bell` takes its place there — the
+  exception moved rather than disappeared, which is what the frame endpoint
+  honestly is.
 - The reader gains a place to answer "what was I told?", which no surface in the
   application answers today.
 - `Notification::RECENT` keeps its meaning — the size of a sidebar — rather than
@@ -142,17 +160,17 @@ delivered anywhere else, that failure is silent on both sides.
 
 ## Fitness Functions
 
-*Written for the specification this would produce; none is satisfied today.*
-
 - A reader with more than eight notifications reaches the ninth from the bell in
   one click, and the oldest from the screen in a bounded number of pages.
 - Opening the screen does not change any row's `read_at`.
 - The screen renders at most `Page::SIZE` rows for any request, whatever the
   count, and an impossible page clamps.
-- The bell and the screen render the same row identically, in the reader's
-  language, from one partial.
+- The bell and the screen say the same thing about a row, because both take the
+  sentence, the action link and the read state from `Notification` rather than
+  from either template. The markup differs — a dropdown row is not a card — and
+  that is the only difference permitted.
 
 ## Decision owner
 
 Product Owner for questions 2, 3 and 5; Tech Lead for 1 and 4; QA owner for the
-accessibility of the screen. **Not accepted. No work is authorized.**
+accessibility of the screen. **Accepted by the user on 2026-08-12.**

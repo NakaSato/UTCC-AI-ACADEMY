@@ -65,10 +65,16 @@ Rails.application.routes.draw do
   # post the lock does not guard.
   post "lesson/incident", to: "lessons#incident", as: :lesson_incident
   # The bell on its own, for the frame a broadcast pushes to come back to. It is a
-  # GET because it is a read, and it exists because a broadcast has no session:
-  # this request carries the reader's own cookies, and so their language and their
-  # CSRF token. See NotificationBell.
+  # The reader's own history, and the route the ninth notification was missing:
+  # the bell shows the most recent eight and nothing reached past them, on the
+  # only channel there is while production email is deferred (ADR-0052).
   get "notifications", to: "notifications#show", as: :notifications
+  # The bell itself, which the header's frame comes back for. GET because it is
+  # a read, and separate because a broadcast has no session: this request
+  # carries the reader's own cookies, and so their language and their CSRF
+  # token. See NotificationBell. The readable URL belongs to the reader's
+  # screen, not to the header's implementation detail.
+  get "notifications/bell", to: "notifications#bell", as: :notifications_bell
   # The bell's "mark all read" — one write, back to where you were.
   post "notifications/read", to: "notifications#read_all", as: :read_notifications
   # A company's own screens live at /company/:slug — the profile and everything

@@ -63,6 +63,14 @@
         </div>
       </div>
     <% end %>
+
+    <%# The route the ninth notification was missing. The panel stays eight rows
+        deep; this is where the rest of them live (ADR-0052 decision 4). Out of
+        the frame, like every other destination in this menu. %>
+    <%= link_to t("chrome.notif_see_all"), notifications_path,
+          data: { turbo_frame: "_top" },
+          class: "block border-t border-surface-3 px-4 py-3 text-center text-12-5 font-semibold
+                  text-brand-ink hover:text-brand-ink-deep" %>
   </div>
 </div>
 <% end %>

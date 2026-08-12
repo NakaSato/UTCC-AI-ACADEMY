@@ -26,7 +26,7 @@ class FrameRecoveryTest < ApplicationSystemTestCase
     # production cannot reach a browser here: Action Cable's test adapter does not
     # deliver, so a real `broadcast_refresh!` would arrive nowhere. Setting the
     # src is precisely what the pushed frame does on arrival.
-    execute_script %(document.getElementById("#{NotificationBell::ID}").src = "#{notifications_path}")
+    execute_script %(document.getElementById("#{NotificationBell::ID}").src = "#{notifications_bell_path}")
 
     # The redirect was right, only aimed at the wrong scope — so it is promoted to
     # the navigation it should have been, flash and all.

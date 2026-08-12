@@ -18,7 +18,7 @@ class RouteReachabilityTest < ActiveSupport::TestCase
   WITHOUT_TEMPLATE = {
     "policies#privacy" => "shares policies/show with #terms — both documents are the same shape",
     "policies#terms" => "shares policies/show with #privacy",
-    "notifications#show" => "renders the bell partial for the dropdown, not a page",
+    "notifications#bell" => "renders the bell partial the header frame comes back for, not a page",
     "course_documents#syllabus" => "send_data: the syllabus PDF",
     "instructor#grades" => "send_data: the section's grades as CSV",
     "academic_posts#export" => "send_data: the post as a standalone HTML document",

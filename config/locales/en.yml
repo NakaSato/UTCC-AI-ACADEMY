@@ -237,6 +237,7 @@ en:
     notif_title: "Notifications"
     notif_read_all: "Mark all read"
     notif_empty: "Nothing yet — activity about your account will appear here"
+    notif_see_all: "See all notifications"
     notif_toggle: "Open notifications"
     toast_dismiss: "Dismiss this message"
     theme_label: "Colour theme"
@@ -357,6 +358,15 @@ en:
     learners: "%{count} learning now"
     topics_learned: "%{done} / %{total} topics learned"
     section: "Section %{name}"
+
+  notifications_page:
+    title: "Notifications"
+    subtitle: "Everything the academy has told you, newest first. The bell shows the most recent few; this is all of them."
+    empty_title: "Nothing yet"
+    empty_body: "When something happens that concerns your account, it appears here."
+    state:
+      unread: "Unread"
+      read: "Read"
 
   forms:
     characters_left: "%{count} characters left"

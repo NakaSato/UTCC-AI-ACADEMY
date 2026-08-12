@@ -26,6 +26,7 @@ implemented_by:
   - app/controllers/internship_placements_controller.rb
 enforced_by:
   - test/models/page_test.rb
+  - test/controllers/notifications_test.rb
   - test/controllers/paged_lists_test.rb
   - test/models/query_budget_test.rb
   - test/models/audit_event_test.rb
@@ -60,8 +61,10 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002]
 > lists** and added the one rule increment 1 had no need of: a screen with more
 > than one paged list gives each list its own param.
 >
-> One list from that group is deliberately still not paged, and is the only
-> thing this document leaves open: **the notification bell**. See the end.
+> The one list increment 2 left — **the notification bell** — is paged now too,
+> on a screen of its own: it needed [ADR-0052](../decisions/adr-0052-notification-history.md)
+> first, because the fix was a surface rather than a control. Sixteen screens,
+> and nothing left on the list.
 
 > [Executable Specifications](README.md) ·
 > [Paged lists decision](../decisions/adr-0050-paged-lists.md) ·
@@ -96,16 +99,16 @@ nineteen places.
 
 ## Scope
 
-**In:** one `Page` object; a pagination control; the nine screens named below;
-the removal of `AuditEvent::RECENT`.
+**In:** one `Page` object; a pagination control; the screens named below; the
+removal of `AuditEvent::RECENT`.
 
 **Out:** infinite scroll, "load more", cursor paging, sorting controls, a
 per-page selector, and any new dependency. ADR-0050 rejected the first two on
 linkability and the back button, the third as a different object for a scale
 nothing here reaches, and Kaminari and Pagy as more than this needs.
 
-**Deferred, and named rather than left implicit:** the notification bell, under
-"Grows, and still not paged" below.
+**Elsewhere:** the notification bell, which needed a screen rather than a
+control — see "Grows, and now paged elsewhere" below.
 
 ## The page object
 
@@ -177,8 +180,10 @@ about it is per-screen.
 
 ## Which lists page
 
-Fifteen screens and seventeen lists. The first nine are increment 1, inside the
-four controllers ADR-0050 named; the rest are increment 2.
+Sixteen screens and eighteen lists. The first nine are increment 1, inside the
+four controllers ADR-0050 named; six more are increment 2; the sixteenth is the
+notification history, which needed a decision of its own before it could exist
+(ADR-0052).
 
 | Screen | List | Why it grows |
 | --- | --- | --- |
@@ -199,6 +204,7 @@ four controllers ADR-0050 named; the rest are increment 2.
 | `/internships/placements` | placements this account supervises (`supervising_page`) | a career of assignments |
 | `/internships/placements` | every placement, for an administrator (`administering_page`) | the institution's whole history |
 | `/company` | organizations this account can see | every partner ever created |
+| `/notifications` | a reader's whole notification history | one row per thing anybody tells them, on the only channel there is |
 
 **Increment 1 is nine, and ADR-0050's consequences predicted seven.** The prediction
 was made from the four lists its context names plus the audit log; the
@@ -239,20 +245,22 @@ by something real, and leaving it alone is a decision rather than an oversight.
 | A student's own internship requests and open placements | one student's own |
 | `/contributors` | four editorial entries |
 
-## Grows, and still not paged
+## Grows, and now paged elsewhere
 
-One list, and it is the only thing this document leaves open.
+**The notification bell** was the one list this document left open. It is capped
+at `Notification::RECENT` — eight rows — and nothing reached the ninth, which is
+the audit log's defect in miniature. It was not fixed here because **the fix is
+a screen, not a page**: the bell is a dropdown in the header, and paging a
+dropdown is not what a reader of it wants.
 
-**The notification bell** is capped at `Notification::RECENT` — eight rows — and
-nothing reaches the ninth. That is the audit log's defect in miniature: a bound
-with no route past it, on a screen that does not say so. It is deliberately not
-fixed here, because **the fix is a screen, not a page**. There is nowhere to add
-a control: the bell is a dropdown in the header, and paging a dropdown is not
-what a reader of it wants. Somebody's notification history needs a route, a
-place in the workspace navigation, and a decision about whether a read
-notification stays visible — a new surface, and therefore an ADR rather than one
-more `Page.new`. Until that decision exists the cap stays, and this paragraph is
-the record that it is known rather than missed.
+That screen exists now. [ADR-0052](../decisions/adr-0052-notification-history.md)
+answered the five questions it needed — where it lives, history rather than
+inbox, that reading it marks nothing read, that the bell keeps its eight and
+gains a link, and that nothing is deleted — and [SPEC-0053](spec-notification-history.md)
+records what shipped. The panel still shows eight; the link at the foot of it is
+the route the ninth row was missing.
+
+**Nothing is left on this list.**
 
 ## Invariants
 
@@ -313,8 +321,8 @@ the record that it is known rather than missed.
 
 ## Consequences
 
-- Fifteen screens gain a page and a control across the two increments; every
-  other list is unchanged and this document records why.
+- Sixteen screens gain a page and a control; every other list is unchanged and
+  this document records why.
 - The audit log gains reachable history and loses `RECENT`.
 - Each paged screen costs one more query, and the approval queue costs one
   fewer; `docs/performance.md` carries the figures.

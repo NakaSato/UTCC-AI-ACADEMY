@@ -62,7 +62,7 @@ class NotificationBroadcastTest < ActionDispatch::IntegrationTest
   test "the refetched bell is the bell, and brings no chrome with it" do
     Notification.notify(users(:one), "enrolled", label: "BA-2")
 
-    get notifications_url, headers: { "Turbo-Frame" => FRAME }
+    get notifications_bell_url, headers: { "Turbo-Frame" => FRAME }
 
     assert_response :success
     assert_select "turbo-frame##{FRAME}[src]", count: 0, message: "or it fetches itself forever"
@@ -77,7 +77,7 @@ class NotificationBroadcastTest < ActionDispatch::IntegrationTest
     post language_path(:en)
     I18n.with_locale(:th) { Notification.notify(users(:one), "enrolled", label: "BA-2") }
 
-    get notifications_url, headers: { "Turbo-Frame" => FRAME }
+    get notifications_bell_url, headers: { "Turbo-Frame" => FRAME }
 
     assert_select "turbo-frame##{FRAME}", text: /#{I18n.t("notifications.enrolled", label: "BA-2", locale: :en)}/
     assert_select "turbo-frame##{FRAME}", { text: /#{I18n.t("chrome.notif_title", locale: :th)}/, count: 0 }
@@ -85,7 +85,7 @@ class NotificationBroadcastTest < ActionDispatch::IntegrationTest
 
   test "the bell is not something a stranger can read" do
     sign_out
-    get notifications_url
+    get notifications_bell_url
 
     assert_redirected_to root_path
     assert_equal I18n.t("flash.sign_in_required"), flash[:alert]
@@ -100,7 +100,7 @@ class NotificationBroadcastTest < ActionDispatch::IntegrationTest
     Notification.notify(users(:one), "enrolled", label: "BA-2")
 
     with_forgery_protection do
-      get notifications_url, headers: { "Turbo-Frame" => FRAME }
+      get notifications_bell_url, headers: { "Turbo-Frame" => FRAME }
       token = css_select("input[name=authenticity_token]").first&.[]("value")
 
       assert_not_nil token, "the refetched bell has to carry a token at all"

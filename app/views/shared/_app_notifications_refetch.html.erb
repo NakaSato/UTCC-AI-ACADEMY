@@ -7,7 +7,7 @@
     for the length of the fetch and the whole right-hand rail of the header jumps
     sideways. It is a 38px square because the bell button is, and it is wordless
     because a broadcast has no language to write words in. %>
-<%= turbo_frame_tag NotificationBell::ID, src: notifications_path,
+<%= turbo_frame_tag NotificationBell::ID, src: notifications_bell_path,
       class: "relative block flex-none" do %>
   <span aria-hidden="true"
         class="block size-[38px] animate-shimmer rounded-[10px] skeleton-on-chrome"></span>

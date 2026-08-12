@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T22:44:00+07:00",
+  "updated_at": "2026-08-12T23:12:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3035,8 +3035,8 @@
     },
     {
       "id": "UX-011",
-      "title": "Decide whether a notification gets somewhere to be read after the ninth",
-      "status": "queued",
+      "title": "Give a notification somewhere to be read after the ninth",
+      "status": "complete",
       "priority": 3,
       "owner": "Product Owner and Tech Lead",
       "milestone": "M1",
@@ -3051,9 +3051,13 @@
         {
           "label": "Paged lists decision",
           "url": "decisions/adr-0050-paged-lists.html"
+        },
+        {
+          "label": "Notification history specification",
+          "url": "specs/spec-notification-history.html"
         }
       ],
-      "updated_at": "2026-08-12T22:44:00+07:00"
+      "updated_at": "2026-08-12T23:12:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5061,6 +5065,14 @@
       "to": "queued",
       "summary": "ADR-0052 is proposed and not accepted, and no work is authorized by it. Notification::RECENT is eight and no route reaches the ninth, which is the defect ADR-0050 took out of the audit log with one difference that matters: the audit log is a screen and the bell is a dropdown in the header, so a pagination control inside a menu that closes on outside-click is worse than the cap. The fix is a screen, which is a new surface and therefore a decision. It matters more than the row count suggests because ADR-0004 defers production email, so the bell is the only channel there is - a student invited to a business case, a company told a request arrived, a supervisor assigned to a placement each learn about it there or not at all, and eight is one busy week. Five questions carry recommendations and need a human answer: whether the reader-facing URL takes /notifications while the bell-s frame endpoint moves under it, whether read rows stay so the screen answers what was I told rather than what is waiting, whether opening the screen marks everything read - recommended no, because a dot that clears by being looked at means you have not visited rather than something happened, whether the bell keeps its eight and gains a link, and whether a notification can be deleted. The last has a real counter-argument recorded with it: these are personal rows rather than an institutional record, and a screen built on nothing is deleted differs from one built on the reader owns their list in more than a button. Doing nothing is listed as an alternative and is defensible today, which is why this is proposed rather than assumed.",
       "evidence_url": "decisions/adr-0052-notification-history.html"
+    },
+    {
+      "at": "2026-08-12T23:12:00+07:00",
+      "item_id": "UX-011",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The user answered ADR-0052 by taking all five recommendations as written, so the decision is accepted and SPEC-0053 records what shipped. /notifications is the reader-s own history now - every row ever written for them, newest first, paged at twenty-five like every other list that grows - and the bell-s frame endpoint moved to /notifications/bell, because the readable URL belongs to the reader-s screen and the frame is an implementation detail of the header. It is a history rather than an inbox: read rows stay, since an inbox that empties as you read it answers what is waiting, which the dot already answers, and the question this screen exists for is what was I told. Reading the screen marks nothing read - a dot that clears by being looked at means you have not visited rather than something happened, and would dismiss the seven the reader did not come for - so the one write stays the explicit button, which the screen carries a copy of when something is unread. The bell keeps its eight and gains see all at the foot of the panel, which is the route the ninth row was missing, and there is no navigation entry because the bell is where a reader already goes to ask this. Nothing is deleted and nothing prunes, matching AuditEvent, with the counter-argument recorded rather than dismissed. Two predictions in the decision were corrected against what shipped: notifications#show stops being a route-reachability exception because it is the page now, but notifications#bell takes its place, so the exception moved rather than disappeared; and the bell and the screen do not share a partial - they share the model, which is what actually keeps the sentence, the action link and the read state from drifting, while a dropdown row and a card differ in markup by design. This is the sixteenth paged screen and the last list SPEC-0051 named as growing without a bound.",
+      "evidence_url": "specs/spec-notification-history.html"
     }
   ]
 }

@@ -1,4 +1,21 @@
 class NotificationsController < ApplicationController
+  # What was I told? The bell answers what is waiting — the dot — and until this
+  # screen existed nothing answered the other question: `Notification::RECENT`
+  # is eight and no route reached the ninth, on the only channel there is while
+  # ADR-0004 defers production email.
+  #
+  # Paged like every other list that grows with the institution (ADR-0050), and
+  # a history rather than an inbox: read rows stay, because a list that empties
+  # as you read it answers the question the dot already answered.
+  #
+  # **Reading this page marks nothing read.** That stays the explicit action on
+  # the button the bell already has (ADR-0052 decision 3): a dot that clears by
+  # being looked at means "you have not visited" rather than "something
+  # happened", and would silently dismiss the seven the reader did not come for.
+  def show
+    @notifications = Page.new(Current.user.notifications.newest_first, params[:page])
+  end
+
   # The bell, alone. This is what the frame a broadcast pushes comes back for, and
   # the whole reason the broadcast pushes a frame instead of the bell itself: an
   # ordinary request has the reader's session, so the copy is in their language
@@ -7,7 +24,7 @@ class NotificationsController < ApplicationController
   # It renders the same partial the header does, so the pushed bell and the loaded
   # one cannot drift apart. turbo-rails swaps in its own minimal layout for a
   # frame request, which is why no chrome comes with it.
-  def show
+  def bell
     render partial: "shared/app_notifications", locals: { bell: notification_bell }
   end
 

@@ -1,0 +1,62 @@
+<% content_for :title, "#{t("notifications_page.title")} — UTCC AI Academy" %>
+
+<%# The reader's own history. The bell is a sidebar of the most recent eight;
+    this is every row ever written for this account, newest first and paged
+    (ADR-0052, ADR-0050).
+
+    A row reads the same here as it does in the bell — same `text`, same action
+    link, same read state — because both come from the model rather than from
+    either template. Nothing on this page writes: reading it marks nothing read,
+    which is the bell's button and stays there. %>
+<main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-32 font-bold tracking-[-0.035em] text-ink"><%= t("notifications_page.title") %></h1>
+      <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("notifications_page.subtitle") %></p>
+    </div>
+    <%# The same write as the bell's, from the screen that shows what it acts on.
+        Only when there is something to do — a button that clears nothing is a
+        button that teaches a reader it does nothing. %>
+    <% if Current.user.notifications.unread.any? %>
+      <%= button_to t("chrome.notif_read_all"), read_notifications_path,
+            class: "cursor-pointer rounded-full border border-hairline px-4 py-2 text-13 font-semibold
+                    text-brand-ink transition-colors hover:border-brand-ink" %>
+    <% end %>
+  </div>
+
+  <% if @notifications.empty? %>
+    <section class="rounded-card border border-dashed border-hairline bg-surface-1 px-6 py-12 text-center">
+      <h2 class="text-20 font-bold text-ink"><%= t("notifications_page.empty_title") %></h2>
+      <p class="mt-2 text-14 text-muted"><%= t("notifications_page.empty_body") %></p>
+    </section>
+  <% else %>
+    <ul class="flex flex-col gap-3">
+      <% @notifications.each do |notification| %>
+        <li class="flex gap-3.5 rounded-card border border-hairline bg-surface px-5 py-4
+                   <%= "border-brand-ink/25 bg-brand-tint" if notification.unread? %>"
+            data-notification-id="<%= notification.id %>">
+          <span aria-hidden="true"
+                class="mt-2 size-[7px] flex-none rounded-full <%= notification.unread? ? "bg-brand" : "bg-transparent" %>"></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-14-5 leading-[1.5] text-ink"><%= notification.text %></p>
+            <% if notification.action_path %>
+              <%= link_to notification.action_label, notification.action_path,
+                    class: "mt-1.5 inline-block text-13 font-semibold text-brand-ink hover:text-brand-ink-deep" %>
+            <% end %>
+          </div>
+          <%# Numeric and in the reader's zone, like the audit log and the bell:
+              Thai writes the Buddhist year and no strftime of a Gregorian date
+              produces it. %>
+          <span class="flex-none self-start font-mono text-11-5 text-muted-2">
+            <%= notification.created_at.in_time_zone.strftime("%d/%m/%y %H:%M") %>
+          </span>
+          <span class="sr-only">
+            <%= t("notifications_page.state.#{notification.unread? ? :unread : :read}") %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= render "shared/pagination", page: @notifications %>
+  <% end %>
+</main>

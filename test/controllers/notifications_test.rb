@@ -118,6 +118,81 @@ class NotificationsTest < ActionDispatch::IntegrationTest
                   text: I18n.t("notifications.academic_post_invitation_action")
   end
 
+  # ---- The history screen (ADR-0052) ----------------------------------------
+
+  # The defect this screen exists for: the bell shows eight and nothing reached
+  # the ninth, on the only channel there is while production email is deferred.
+  test "the screen reaches a notification the bell cannot show" do
+    reader = users(:one)
+    ninth = nil
+    (Notification::RECENT + 1).times do |index|
+      note = Notification.notify(reader, "enrolled", label: "BA-#{index}")
+      ninth ||= note
+    end
+    sign_in_as reader
+
+    get notifications_url
+
+    assert_response :success
+    assert_select "[data-notification-id=?]", ninth.id.to_s, { count: 1 },
+      "the oldest row is exactly the one the bell could not reach"
+  end
+
+  test "the screen pages like every other list that grows" do
+    reader = users(:one)
+    (Page::SIZE + 4).times { |index| Notification.notify(reader, "enrolled", label: "BA-#{index}") }
+    sign_in_as reader
+
+    get notifications_url
+    assert_select "[data-notification-id]", Page::SIZE
+
+    get notifications_url(page: 2)
+    assert_select "[data-notification-id]", 4
+  end
+
+  # ADR-0052 decision 3. A dot that clears by being looked at means "you have not
+  # visited" rather than "something happened", and would dismiss the seven the
+  # reader did not come for.
+  test "reading the screen marks nothing read" do
+    reader = users(:one)
+    Notification.notify(reader, "enrolled", label: "BA-2")
+    sign_in_as reader
+
+    assert_no_changes -> { reader.notifications.unread.count } do
+      get notifications_url
+    end
+
+    # In `main`, not the page: the header carries the bell and its own copy
+    # of this button on every screen.
+    assert_select "main form[action=?]", read_notifications_path, { count: 1 },
+      "the write stays an explicit button, and this screen shows it"
+  end
+
+  test "the screen shows only the reader's own notifications" do
+    Notification.notify(users(:two), "enrolled", label: "Someone else's")
+    sign_in_as users(:one)
+
+    get notifications_url
+
+    assert_response :success
+    assert_select "[data-notification-id]", 0
+  end
+
+  test "a stranger is sent to sign in rather than shown a history" do
+    get notifications_url
+
+    assert_redirected_to root_path
+  end
+
+  # Decision 4: the panel keeps its eight and gains the route past them.
+  test "the bell links to the screen" do
+    sign_in_as users(:one)
+
+    get root_url
+
+    assert_select "a[href=?]", notifications_path, text: I18n.t("chrome.notif_see_all")
+  end
+
   private
     def make_event(user)
       ProctorEvent.create!(user:, course: Course.find_by!(code: "AI1101"),
