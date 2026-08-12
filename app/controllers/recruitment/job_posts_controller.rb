@@ -3,16 +3,18 @@ module Recruitment
     def index
       if params[:company_id]
         @organization = readable_organization
-        @job_posts = @organization.job_posts.order(updated_at: :desc, id: :desc)
+        @job_posts = Page.new(@organization.job_posts.order(updated_at: :desc, id: :desc), params[:page])
         @public = false
         @can_create = Current.user.admin? || @organization.memberships.active.exists?(user_id: Current.user.id,
                                                                                          role: Recruitment::JobPost::AUTHOR_ROLES)
       else
         @filters = params.permit(:query, :category, :employment_type, :location, :remote_policy).to_h
         @job_categories = Recruitment::JobPost.published_for_candidates.where.not(category: "").distinct.order(:category).pluck(:category)
-        @job_posts = Recruitment::JobDiscovery.search(@filters)
+        @job_posts = Page.new(Recruitment::JobDiscovery.search(@filters), params[:page])
         @public = true
         if Current.user.student?
+          # The page's rows, not every published job — which is also what this
+          # asked for before the list had a bound.
           @saved_job_ids = Current.user.saved_jobs.where(job_post_id: @job_posts.map(&:id)).pluck(:job_post_id)
           @recommendations = Recruitment::JobDiscovery.recommend(user: Current.user)
           Recruitment::JobAlertNotifier.call(user: Current.user, recommendations: @recommendations)

@@ -1,11 +1,11 @@
 <div class="grid grid-cols-1 items-start gap-5 nav:grid-cols-[minmax(0,1fr)_320px]">
   <div class="flex flex-col gap-3.5">
-    <% if AdminConsole.queue.empty? %>
+    <% if @queue.empty? %>
       <div class="rounded-card border border-dashed border-hairline-2 bg-surface px-6 py-10 text-center">
         <p class="text-15 font-medium text-ink"><%= t("admin.queue.empty") %></p>
       </div>
     <% else %>
-      <% AdminConsole.queue.each do |request| %>
+      <% @queue.each do |request| %>
         <div class="flex flex-wrap items-center gap-5 rounded-box border border-hairline-2 bg-surface px-6 py-5"
              data-approval-request-id="<%= request.id %>">
           <div class="min-w-0 flex-1">
@@ -44,6 +44,8 @@
         </div>
       <% end %>
     <% end %>
+
+    <%= render "shared/pagination", page: @queue %>
   </div>
 
   <aside class="rounded-card bg-chrome px-7 py-6.5">

@@ -1,0 +1,48 @@
+<%# The control ADR-0050 decision 9 describes: a nav a keyboard can use, links
+    rather than buttons, an accessible name, and the current page marked. A
+    pagination control is exactly the kind of thing that ships as two unlabelled
+    arrows, and `Quality::BudgetPolicy` makes accessibility blocking rather than
+    advisory.
+
+    Nothing renders on a single page, and every link keeps the reader's filters
+    — `page_url` replaces the page and nothing else. %>
+<% if page.multiple? %>
+  <nav class="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="<%= t("pagination.label") %>">
+    <% if page.first? %>
+      <span class="rounded-full border border-hairline px-3.5 py-1.75 text-13 font-medium text-muted-3"
+            aria-hidden="true"><%= t("pagination.previous") %></span>
+    <% else %>
+      <%= link_to t("pagination.previous"), page_url(page.previous), rel: "prev",
+            class: "rounded-full border border-hairline bg-surface px-3.5 py-1.75 text-13 font-medium
+                    text-ink-2 transition-colors hover:border-muted-3" %>
+    <% end %>
+
+    <% page.window.each do |number| %>
+      <% if number.nil? %>
+        <span class="px-1 text-13 text-muted-3" aria-hidden="true">…</span>
+      <% else %>
+        <%= link_to number, page_url(number),
+              "aria-label": t("pagination.go_to", number: number),
+              "aria-current": ("page" if number == page.number),
+              class: class_names(
+                "rounded-full border-[1.5px] px-3.25 py-1.5 text-13 font-medium tabular-nums transition-colors",
+                "border-brand-ink bg-brand-tint text-brand-ink-deep" => number == page.number,
+                "border-hairline bg-surface text-ink-2 hover:border-muted-3" => number != page.number
+              ) %>
+      <% end %>
+    <% end %>
+
+    <% if page.last? %>
+      <span class="rounded-full border border-hairline px-3.5 py-1.75 text-13 font-medium text-muted-3"
+            aria-hidden="true"><%= t("pagination.next") %></span>
+    <% else %>
+      <%= link_to t("pagination.next"), page_url(page.next), rel: "next",
+            class: "rounded-full border border-hairline bg-surface px-3.5 py-1.75 text-13 font-medium
+                    text-ink-2 transition-colors hover:border-muted-3" %>
+    <% end %>
+
+    <p class="w-full text-center text-12 text-muted-2">
+      <%= t("pagination.position", number: page.number, pages: page.pages, total: page.count) %>
+    </p>
+  </nav>
+<% end %>

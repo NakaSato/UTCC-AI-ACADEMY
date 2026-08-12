@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T18:20:00+07:00",
+  "updated_at": "2026-08-12T18:28:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2890,6 +2890,50 @@
         }
       ],
       "updated_at": "2026-08-12T18:20:00+07:00"
+    },
+    {
+      "id": "UX-008",
+      "title": "Give a long list a page, and the audit log its history back",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-006"
+      ],
+      "evidence": [
+        {
+          "label": "Paged lists decision",
+          "url": "decisions/adr-0050-paged-lists.html"
+        },
+        {
+          "label": "Paged lists specification",
+          "url": "specs/spec-paged-lists.html"
+        },
+        {
+          "label": "Performance evidence",
+          "url": "performance.html"
+        }
+      ],
+      "updated_at": "2026-08-12T18:28:00+07:00"
+    },
+    {
+      "id": "UX-009",
+      "title": "Page the six lists SPEC-0051 named and did not reach",
+      "status": "queued",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-008"
+      ],
+      "evidence": [
+        {
+          "label": "Paged lists specification",
+          "url": "specs/spec-paged-lists.html"
+        }
+      ],
+      "updated_at": "2026-08-12T18:28:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4841,6 +4885,14 @@
       "to": "complete",
       "summary": "M13's stated outcome is the proportion of proposals receiving an auditable decision and an author-visible explanation, and that proportion was zero by construction: nothing assigned status, no screen existed on which anybody could answer a proposal, and the author's page rendered a status that could never move. The user answered the two questions ADR-0049 left open and increment 1 shipped against them. The triage screen is a Proposals tab in the admin console rather than the existing Approvals queue - reuse looked cheaper than it is, because approval_requests requires a course, its decisions require an administrator by a rule written for course lifecycle, and its outcomes are approved and rejected, which a triage outcome is not - and rather than the instructor workspace, because user_must_be_a_contributor admits instructors as authors, so instructors would be deciding proposals they may themselves submit. The status vocabulary stays at the four already shipped and all four become reachable, which turned the migration decision 6 anticipated into no migration of proposal_requests at all: the check constraint and STATUSES already listed exactly these four, and the defect was that three had no code path. A decision is a row, not a column - actor, time, the status it moved to, and the reason - written in the same transaction as the status under a row lock, so a status without the record explaining it cannot exist and two administrators deciding at once produce one decision and one refusal. planned and declined are terminal, because an author must not be told two contradictory things about one submission. There is exactly one reason field and no internal note, since a second one immediately raises the field-visibility question §15 has not answered. The author is told on the page they already have, at their next visit, which is ADR-0049 decision 4 standing while ADR-0004 defers production email; telling them through the bell would have been small and was deliberately not done, because notifications are §15 decision 9 and unanswered. Deciding is audited at warn level naming the reference and the outcome and never the reason, which is the author's words back to them rather than an audit concern. The assertion SPEC-0049 said could not be written until decision 6 was settled is now the last test in the model file: every status the constraint allows is reached for real, one at a time, and no other status is. No public surface was opened and none is authorized - the roadmap section says so in the same paragraph that records what shipped.",
       "evidence_url": "specs/spec-proposal-triage.html"
+    },
+    {
+      "at": "2026-08-12T18:28:00+07:00",
+      "item_id": "UX-008",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Twenty-five list screens loaded every row they could see, and the per-screen query budget could not see it: the budget counts queries, not rows, so every one of them was constant-cost while the result set, the HTML and the transfer grew with the institution. One list had a bound and its bound was worse than none - the audit tab took AuditEvent::RECENT, the most recent fifty after the level filter, and no route reached the rest, on a log the model says cannot be cleared. The user chose paging over a frontend library, and ADR-0050 settled the rest: one Page object of about forty lines rather than Kaminari or Pagy, whose view helpers would have been fought back into the token system the way ADR-0007 refused Tiptap-s styling; ?page= beside the tab, role, q, level and search params, so a page is linkable, survives the back button and needs no JavaScript; twenty-five rows in one constant; an impossible page clamping to the nearest real one, which is the whitelist-or-default rule tab_for and role_filter already run; and a filter change landing on page 1 while a page link keeps the filter. The consequence paragraph predicted seven screens and the enumeration produced nine - the approval queue, which is every course-lifecycle request ever raised, and the public job search, which is the most-read list in the application - both inside controllers the decision already named, and both corrected in the ADR rather than rounded to. The queue came out one query cheaper than it went in, because its template asked AdminConsole.queue twice, once to test for empty and once to render. Every other list is named in SPEC-0051 as either bounded by construction - a cohort, a term, a company-s staff - or growing and deferred, which is the honest half of decision 8: the internship queues, the programs, the placements, the organization index and the notification bell grow with the institution, are outside the decision-s touches, and are UX-009 rather than an omission nobody wrote down.",
+      "evidence_url": "specs/spec-paged-lists.html"
     }
   ]
 }

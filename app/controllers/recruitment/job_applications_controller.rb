@@ -3,11 +3,12 @@ module Recruitment
     def index
       if params[:company_id]
         load_reviewable_job
-        @applications = @job_post.applications.includes(:candidate, :events).newest_first
+        @applications = Page.new(@job_post.applications.includes(:candidate, :events).newest_first, params[:page])
         @organization_view = true
       else
         require_student
-        @applications = Current.user.job_applications.includes(:job_post, :events).newest_first
+        @applications = Page.new(Current.user.job_applications.includes(:job_post, :events).newest_first,
+                                 params[:page])
         @candidate_view = true
       end
     end

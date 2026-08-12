@@ -21,6 +21,7 @@ class AdminController < ApplicationController
           "name LIKE :q OR student_id LIKE :q OR username LIKE :q OR email_address LIKE :q", q: needle
         )
       end
+      @users = Page.new(@users, params[:page])
       # For the create-account form's organization select — a company account is
       # an account plus a membership, so it needs somewhere to be a member of.
       @organizations = Organization.active.order(:name)
@@ -31,12 +32,17 @@ class AdminController < ApplicationController
     in :integrity then @cases = Proctoring.cases
     in :audit
       @level = AdminConsole.level_filter(params[:level])
-      # Filtered in SQL, so the cap is what survives the filter rather than what
-      # went into it.
-      @events = AuditEvent.at_level(@level).newest_first.includes(:user).limit(AuditEvent::RECENT)
+      # Filtered in SQL, so the page is taken from what survives the filter
+      # rather than from what went into it. It used to be `limit(RECENT)` — a
+      # bound with no way past it, which is the older half of the log quietly
+      # removed with nothing on the screen saying so (ADR-0050 decision 7).
+      @events = Page.new(AuditEvent.at_level(@level).newest_first.includes(:user), params[:page])
     in :courses then @query = FeatureSetting.enabled?(:search) ? params[:q].to_s.strip : ""
-    in :queue then nil
-    in :proposals then @proposals = AdminConsole.proposals
+    # Read here rather than from the view, which asked `AdminConsole.queue` twice
+    # — once to find out whether it was empty and once to render it — and would
+    # have counted twice as well now that it pages.
+    in :queue then @queue = Page.new(AdminConsole.queue, params[:page])
+    in :proposals then @proposals = Page.new(AdminConsole.proposals, params[:page])
     else nil
     end
   end

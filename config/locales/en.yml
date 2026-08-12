@@ -358,6 +358,13 @@ en:
     topics_learned: "%{done} / %{total} topics learned"
     section: "Section %{name}"
 
+  pagination:
+    label: "Pages"
+    previous: "Previous"
+    next: "Next"
+    go_to: "Page %{number}"
+    position: "Page %{number} of %{pages} — %{total} in total"
+
   catalog:
     title: "What do you want to learn today?"
     subtitle: "Pick a course that matches your interests and background — every course counts toward the UTCC AI Fundamental curriculum."

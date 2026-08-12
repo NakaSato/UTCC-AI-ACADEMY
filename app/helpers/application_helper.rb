@@ -18,6 +18,20 @@ module ApplicationHelper
     I18n.available_locales.index_with { locale_url(it, path:) }
   end
 
+  # A page link keeps the filter (ADR-0050 decision 6). The reader is on
+  # `?tab=audit&level=warn` or a job search five fields deep, and a link that
+  # replaced all of that with `?page=2` would answer a question nobody asked.
+  #
+  # Built from `request.path` and the query string rather than `url_for`, which
+  # carries route segments but drops the params these screens keep their state
+  # in. Page 1 is the bare URL, so the first page of a list has one address.
+  def page_url(number)
+    query = request.query_parameters.merge("page" => number.to_s)
+    query.delete("page") if number == 1
+
+    query.empty? ? request.path : "#{request.path}?#{query.to_query}"
+  end
+
   # Which of the four apps the signed-in account is in. Signed out there is no
   # header to fill, and the learner nav is the harmless default.
   def current_workspace = Current.user&.workspace || :student

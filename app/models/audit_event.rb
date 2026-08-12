@@ -79,15 +79,15 @@ class AuditEvent < ApplicationRecord
               internship_placement_cancelled
               internship_faculty_assignment_created internship_faculty_assignment_revoked ].freeze
 
-  # The tab is a sidebar, not an archive — the rows are all still there.
-  RECENT = 50
-
   validates :action, inclusion: { in: ACTIONS }
 
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
 
-  # In SQL rather than folded in Ruby, so that RECENT caps what is left after
-  # the filter rather than what was there before it.
+  # In SQL rather than folded in Ruby, so that a page is taken from what is left
+  # after the filter rather than from what was there before it. This used to cap
+  # the tab at the most recent fifty rows, which is worse than no bound: the
+  # older half of the log was unreachable and nothing on the screen said so. The
+  # tab pages now, and every row is reachable — ADR-0050 decision 7.
   scope :at_level, ->(level) do
     case level&.to_sym
     in :warn then where(action: WARN)

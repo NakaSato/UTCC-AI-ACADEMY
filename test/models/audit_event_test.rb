@@ -57,17 +57,23 @@ class AuditEventTest < ActiveSupport::TestCase
     end
   end
 
-  # Filtered in SQL so RECENT caps what survives the filter. Folded in Ruby it
-  # would cap first and the warn tab would come back short.
-  test "the level filter runs before the cap, not after it" do
-    (AuditEvent::RECENT + 1).times { AuditEvent.record("enrolled", name: "x", label: "y") }
+  # Filtered in SQL so a page is taken from what survives the filter. Folded in
+  # Ruby it would page first and the warn tab would come back short — which is
+  # the same mistake the old `limit(RECENT)` made, one step earlier.
+  test "the level filter runs before the page, not after it" do
+    (Page::SIZE + 1).times { AuditEvent.record("enrolled", name: "x", label: "y") }
     AuditEvent.record("role_changed", name: "x", role: "admin")
 
-    warned = AuditEvent.at_level(:warn).newest_first.limit(AuditEvent::RECENT)
-
-    assert_equal(1, warned.size)
-    assert_equal(AuditEvent::RECENT, AuditEvent.at_level(:info).newest_first.limit(AuditEvent::RECENT).size)
+    assert_equal(1, Page.new(AuditEvent.at_level(:warn).newest_first, 1).count)
+    assert_equal(Page::SIZE + 1, Page.new(AuditEvent.at_level(:info).newest_first, 1).count)
     assert_equal(AuditEvent.count, AuditEvent.at_level(:all).count)
+  end
+
+  # The bound this model used to carry was worse than none: fifty rows, with the
+  # older half unreachable and nothing on the screen saying so. ADR-0050 removed
+  # it, and a constant that comes back is a log that starts truncating again.
+  test "nothing caps the log" do
+    assert_not(AuditEvent.const_defined?(:RECENT), "AuditEvent::RECENT is back — the audit log truncates again")
   end
 
   test "every recordable action has a sentence in both locales" do

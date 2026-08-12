@@ -14,7 +14,8 @@
   <% else %>
     <div class="space-y-4">
       <% @applications.each do |application| %>
-        <article class="rounded-card border border-hairline bg-surface-1 p-6">
+        <article class="rounded-card border border-hairline bg-surface-1 p-6"
+                 data-application-id="<%= application.id %>">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p class="text-12 text-muted"><%= @organization_view ? application.candidate.name : application.job_post.organization.name %></p>
@@ -27,5 +28,7 @@
         </article>
       <% end %>
     </div>
+
+    <%= render "shared/pagination", page: @applications %>
   <% end %>
 </main>

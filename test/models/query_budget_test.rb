@@ -149,7 +149,33 @@ class QueryBudgetTest < ActiveSupport::TestCase
       "the work surface now costs #{large} queries, up from 13; a per-status count is probably back"
   end
 
+  # The budget counts queries, not rows, which is why every screen here could
+  # pass while rendering ten thousand of them. Paging is the bound on the other
+  # axis, and it is only worth having if reaching for it costs one more query —
+  # the count — rather than one per row (ADR-0050 decision 5).
+  test "a paged list costs one query more than an unpaged one, whatever the row count" do
+    AuditEvent.delete_all
+    record_events(Page::SIZE + 5)
+    scope = AuditEvent.newest_first
+
+    whole = count_queries { scope.to_a }
+    paged = count_queries { Page.new(scope, 1).records }
+
+    assert_equal whole + 1, paged, "a page is the rows and the count, and nothing else"
+
+    record_events(Page::SIZE * 4)
+
+    assert_equal paged, count_queries { Page.new(scope, 1).records },
+      "the page's query count moved when the list grew"
+  end
+
   private
+    def record_events(count)
+      count.times do
+        AuditEvent.create!(user: users(:admin), action: "enrolled", params: { name: "x", label: "y" })
+      end
+    end
+
     def published_job(organization)
       job = organization.job_posts.create!(creator: organization.memberships.active.first.user,
                                            title: "Budget Job", summary: "Summary", description: "Description",

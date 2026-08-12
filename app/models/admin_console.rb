@@ -137,8 +137,10 @@ module AdminConsole
       rows.select { it.code.downcase.include?(needle) || it.name.downcase.include?(needle) }
     end
 
+    # A relation, not an array: the console pages it, and a page has to be taken
+    # in SQL rather than out of a list that was loaded whole first.
     def queue
-      ApprovalRequest.includes(:course, :requester, :decisions).newest_first.to_a
+      ApprovalRequest.includes(:course, :requester, :decisions).newest_first
     end
 
     def pending_count = ApprovalRequest.pending.count
@@ -149,7 +151,7 @@ module AdminConsole
     # console is the only screen that reads somebody else's proposal at all —
     # SPEC-0050's access contract, and SPEC-0049's before it.
     def proposals
-      ProposalRequest.includes(:user, :decisions).newest_first.to_a
+      ProposalRequest.includes(:user, :decisions).newest_first
     end
 
     def undecided_proposal_count = ProposalRequest.undecided.count

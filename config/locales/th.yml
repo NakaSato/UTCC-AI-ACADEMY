@@ -365,6 +365,13 @@ th:
     topics_learned: "%{done} / %{total} หัวข้อที่เรียนแล้ว"
     section: "หมู่เรียน %{name}"
 
+  pagination:
+    label: "หน้า"
+    previous: "ก่อนหน้า"
+    next: "ถัดไป"
+    go_to: "หน้า %{number}"
+    position: "หน้า %{number} จาก %{pages} — ทั้งหมด %{total} รายการ"
+
   catalog:
     title: "วันนี้อยากเรียนอะไรดี?"
     subtitle: "เลือกวิชาที่ตรงกับความสนใจและพื้นฐานของคุณ — ทุกวิชานับหน่วยกิตในหลักสูตร AI Fundamental ของ UTCC"

@@ -115,7 +115,7 @@
 
   <% @users.each do |user| %>
     <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-surface-5 px-4 py-3.5
-                sm:grid-cols-[136px_minmax(0,1fr)_112px_240px] sm:px-6">
+                sm:grid-cols-[136px_minmax(0,1fr)_112px_240px] sm:px-6" data-user-id="<%= user.id %>">
       <span class="hidden font-mono text-12-5 text-muted sm:block"><%= user.identifier %></span>
 
       <span class="truncate text-14-5">
@@ -163,4 +163,6 @@
       <% end %>
     </div>
   <% end %>
+
+  <div class="px-6 pb-2"><%= render "shared/pagination", page: @users %></div>
 </section>

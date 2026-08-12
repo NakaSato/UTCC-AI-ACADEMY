@@ -5,7 +5,8 @@ class AcademicPostsController < ApplicationController
   def index
     owned = Current.user.academic_posts.select(:id)
     shared = Current.user.academic_post_memberships.active.select(:academic_post_id)
-    @posts = AcademicPost.where(id: owned).or(AcademicPost.where(id: shared)).order(updated_at: :desc)
+    reachable = AcademicPost.where(id: owned).or(AcademicPost.where(id: shared)).order(updated_at: :desc)
+    @posts = Page.new(reachable, params[:page])
   end
 
   def new

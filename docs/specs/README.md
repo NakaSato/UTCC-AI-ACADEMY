@@ -59,3 +59,4 @@ owner.
 - [SPEC-0048 — The company work surface at /company/:slug/work](spec-company-work-surface.md) — accepted; counts with links to the queues they count, the same board for every active member, and application figures delegated to OrganizationReporting
 - [SPEC-0049 — The proposal request intake as built](spec-proposal-request-intake.md) — accepted; records the shipped intake that had no governing document, including the dead statuses, so any change to proposals has a baseline
 - [SPEC-0050 — Proposal triage, increment 1](spec-proposal-triage.md) — accepted; an administrator answers a proposal with a recorded decision and a reason the author reads, which makes all four statuses reachable and no public surface
+- [SPEC-0051 — Paged lists, the page object, and the end of the audit log's truncation](spec-paged-lists.md) — accepted; nine screens page at twenty-five rows, a filter change lands on page 1, and every audit row ever written is reachable

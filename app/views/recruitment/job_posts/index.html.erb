@@ -84,7 +84,7 @@
   <% else %>
     <div class="grid gap-4 md:grid-cols-2">
       <% @job_posts.each do |job_post| %>
-        <article class="rounded-card border border-hairline bg-surface-1 p-6">
+        <article class="rounded-card border border-hairline bg-surface-1 p-6" data-job-post-id="<%= job_post.id %>">
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-12 text-muted"><%= @public ? job_post.organization.name : job_post.category %></p>
@@ -112,5 +112,7 @@
         </article>
       <% end %>
     </div>
+
+    <%= render "shared/pagination", page: @job_posts %>
   <% end %>
 </main>

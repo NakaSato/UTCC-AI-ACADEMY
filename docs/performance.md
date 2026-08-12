@@ -23,9 +23,17 @@ Measured per render against the seeds:
 | catalog | 13 |
 | progress | 14 |
 | instructor | 16 |
-| admin | 12–20 |
+| admin | 12–21 (13–21 on a paged tab; the queue tab lost one and every paged tab gained one) |
 
 **Every screen is constant-cost in the size of the data it folds**, and `test/models/query_budget_test.rb` is what keeps it that way — it grows a section and asserts the roster's query count does not move. The figures above are a snapshot; the test is the guarantee. If you change a screen's loading and the count moves, that is the thing to explain, not to update quietly.
+
+## The budget counts queries, not rows
+
+Which is the half this table cannot see. A screen can ask four questions and render ten thousand answers, and every figure above stays exactly where it is while the result set, the HTML and the transfer all grow with the institution. Twenty-five lists loaded every row they could see; one had a bound, and its bound was worse than none — the audit tab took the most recent fifty and no route reached the rest.
+
+`Page` is the bound on the other axis (ADR-0050, SPEC-0051). Nine screens take twenty-five rows in SQL with `LIMIT`/`OFFSET`, and **a page costs exactly one more query — the count — and never one per row**, which is asserted in `query_budget_test.rb` alongside everything else here. The approval queue came out one query cheaper: its template asked `AdminConsole.queue` twice, once to test for empty and once to render, and it is assigned in the controller now.
+
+Offset paging is correct and cheap at this scale. `OFFSET 10000` is a full scan in Postgres, so deep pages are honest but not fast; nothing here has ten thousand rows in one list, and the day something does the fix is a cursor rather than a bigger offset.
 
 ## A cohort is loaded once, never once per member
 
