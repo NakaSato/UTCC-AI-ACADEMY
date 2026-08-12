@@ -290,6 +290,76 @@ if Rails.env.local?
 
   puts "Seeded 1 organization (#{company.name}) with #{company.memberships.active.count} active member"
 
+  # ---- One internship, all the way through -----------------------------------
+  # SPEC-0041 ships four increments and a fresh database showed none of them: no
+  # request to decide, no placement to advance, no week to acknowledge, no
+  # supervisor, no file. Every screen was an empty state, which is the one thing
+  # a demo cannot demonstrate.
+  #
+  # Walked through the real APIs rather than written straight into the tables —
+  # submit!, approve!, from_request!, activate! — so the seeded rows are the ones
+  # the app itself would produce, guards and all. Keyed on the student so a
+  # replant finds the request it made last time instead of making another.
+  demo_student = User.find_by!(student_id: "2011071730001")
+  faculty = User.find_by!(username: "wichai")
+  admin = User.find_by!(username: "utcc-admin")
+
+  # A profile with a résumé first, because sharing one is only allowed while the
+  # request is open — a student decides what the company may read *before* the
+  # company decides. Sharing is a timestamp on the request: SPEC-0041 stores no
+  # second copy of the file.
+  profile = CandidateProfile.find_or_create_by!(user: demo_student) do |record|
+    record.application_data_reuse_consent = true
+  end
+  unless profile.resume.attached?
+    profile.resume.attach(io: StringIO.new("%PDF-1.4 demo résumé"), filename: "resume.pdf",
+                          content_type: "application/pdf")
+  end
+
+  internship_request = company.internship_requests.find_by(student: demo_student)
+  if internship_request.nil?
+    internship_request = company.internship_requests.create!(
+      student: demo_student,
+      motivation: "อยากร่วมงานกับทีมที่วางเส้นทางส่งของจริง และได้เห็นว่าการวัดผลเปลี่ยนการตัดสินใจอย่างไร",
+      learning_goals: "การหาเส้นทางที่เหมาะสม การวัดผล และการอ่านข้อมูลปฏิบัติการ"
+    )
+    internship_request.submit!(actor: demo_student)
+    internship_request.share_resume!(actor: demo_student)
+    internship_request.approve!(actor: recruiter)
+  end
+
+  placement = internship_request.placement ||
+              InternshipPlacement.from_request!(internship_request, actor: recruiter)
+  placement.activate!(actor: recruiter) if placement.planned?
+
+  if placement.progress_reports.none?
+    placement.progress_reports.create!(
+      activities: "สำรวจเส้นทางส่งของรอบเย็นทั้งหมด และจับเวลาช่วงที่ช้าที่สุด",
+      outcomes: "ได้เส้นฐานของรอบเย็นไว้เปรียบเทียบ",
+      blockers: "ยังรอข้อมูลของเดือนที่แล้ว",
+      hours: 32
+    )
+  end
+
+  # The university's seat, and the student's own work. An administrator assigns
+  # the supervisor because that is the only way one is granted (ADR-0041
+  # decision 2), and the deliverable belongs to the student who uploaded it.
+  if placement.faculty_assignments.active.none?
+    placement.faculty_assignments.create!(faculty:, assigned_by: admin)
+  end
+
+  if placement.deliverables.none?
+    deliverable = placement.deliverables.new(title: "สรุปเส้นทางรอบเย็น", author: demo_student)
+    deliverable.file.attach(io: StringIO.new("%PDF-1.4 demo deliverable"),
+                            filename: "route-analysis.pdf", content_type: "application/pdf")
+    deliverable.save!
+  end
+
+  puts "Seeded 1 internship — #{demo_student.name} at #{company.name}: " \
+       "request #{internship_request.status}, placement #{placement.status}, " \
+       "#{placement.progress_reports.count} weekly report, supervisor #{placement.supervisor&.name}, " \
+       "#{placement.deliverables.count} deliverable"
+
   puts "Seeded #{User.count} users — student 2011071730001 at /login; " \
        "instructor wichai, admin utcc-admin, company northstar at /console; password utcc2026 for all"
   puts "Seeded #{TopicCompletion.count} topic completions"

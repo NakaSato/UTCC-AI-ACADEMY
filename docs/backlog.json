@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T11:10:00+07:00",
+  "updated_at": "2026-08-12T12:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2435,6 +2435,44 @@
         }
       ],
       "updated_at": "2026-08-12T11:10:00+07:00"
+    },
+    {
+      "id": "OPS-002",
+      "title": "Patch the Active Storage and JSON advisories that landed today",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Platform Owner and Security Owner",
+      "milestone": "M9",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "CVE-2026-66066",
+          "url": "https://www.cve.org/CVERecord/SearchResults?query=CVE-2026-66066"
+        },
+        {
+          "label": "CVE-2026-71847",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-71847"
+        }
+      ],
+      "updated_at": "2026-08-12T12:00:00+07:00"
+    },
+    {
+      "id": "DEV-003",
+      "title": "Seed one internship all the way through",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-006"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        }
+      ],
+      "updated_at": "2026-08-12T12:00:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4202,6 +4240,22 @@
       "to": "complete",
       "summary": "The company internship-applications index removed earlier today was one instance of a class: a route that exists, resolves, and is a 500 waiting for its first authorized visitor, because the action has no template and nothing links to it. test/operations/route_reachability_test.rb closes the class. It asserts every route resolves to an action that exists, and that every GET either renders a template or appears in WITHOUT_TEMPLATE with a sentence saying why - nine do today, all of them send_data or a partial, each now named. Writing it was a lesson in the repo's own rule that a test must fail for the intended reason before it is trusted: the first version passed against a deliberately planted template-less route, because it decided an action was safe by reading forty lines from the method definition and swept up a render from the next method down. The second version read only the method's own body and then produced two false positives - policies#privacy and #terms are endless methods delegating to a private show that renders, and both answer 200. Source-sniffing cannot decide this, so the heuristic is gone: a template-less GET is now a written exception rather than a guess, which is also the version that fails loudly when the next one appears. Both defect shapes were planted and confirmed failing before the test was kept. Registered in the agent-flow invariant table and in the CLAUDE.md invariant list, because a rule not written as a test does not exist.",
       "evidence_url": "agent-flow.html"
+    },
+    {
+      "at": "2026-08-12T12:00:00+07:00",
+      "item_id": "OPS-002",
+      "from": "queued",
+      "to": "complete",
+      "summary": "bundler-audit went red on a run that had passed an hour earlier, and nothing in this repository had changed to cause it: the ruby-advisory-db refreshed at 02:25 with two new entries. CVE-2026-66066 is arbitrary file read and remote code execution in Active Storage variant processing, against activestorage 8.1.3; CVE-2026-71847 is a use-after-free in JSON::ResumableParser on truncated duplicate-key streams, against json 2.21.1. Rails is now 8.1.3.1 and json 2.21.2, both the versions the advisories name, taken conservatively so nothing else moved. The application builds no variants anywhere - a grep finds no .variant call - so the exposure was narrower than the title suggests, but the repository treats a security scan as a gate rather than as advice and the fix is a patch release. Worth noting for its own sake: this is the second time today the timing mattered more than the content. A gate is only as good as the day it last ran, and this one would have blocked the build for anyone who pulled main tomorrow morning without touching a line of it.",
+      "evidence_url": "https://www.cve.org/CVERecord/SearchResults?query=CVE-2026-66066"
+    },
+    {
+      "at": "2026-08-12T12:00:00+07:00",
+      "item_id": "DEV-003",
+      "from": "queued",
+      "to": "complete",
+      "summary": "SPEC-0041 ships four increments and a fresh database showed none of them: no request to decide, no placement to advance, no week to acknowledge, no supervisor, no file. Every screen built over the last two days was an empty state, which is the one thing a demo cannot demonstrate. The seeds now walk one internship the whole way - a student's request, a shared resume, the company's approval, an active placement, a weekly report, an administrator-assigned supervisor, and a deliverable - through the real APIs rather than written straight into the tables, so the seeded rows are the ones the app itself would produce, guards and all. The replant caught the ordering error immediately: sharing a resume is only allowed while a request is open, and the first version shared it after approval. It had passed in development because the flag was already set there by hand, which is exactly the kind of thing a wiped database is for. Two replants in a row produce the same single set of rows.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
     }
   ]
 }
