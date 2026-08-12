@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T16:10:00+07:00",
+  "updated_at": "2026-08-12T16:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2816,6 +2816,28 @@
         }
       ],
       "updated_at": "2026-08-12T16:10:00+07:00"
+    },
+    {
+      "id": "DEV-017",
+      "title": "Gate key existence, not only key parity",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-016"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        },
+        {
+          "label": "Coding standard",
+          "url": "coding-standard.html"
+        }
+      ],
+      "updated_at": "2026-08-12T16:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4743,6 +4765,14 @@
       "to": "complete",
       "summary": "Nineteen user-visible strings rendered \"translation missing\" in both languages, on four shipped screens, from three separate mistakes. Twelve reader controls - width, font size, theme, export, contents and their aria-labels - were filed under proposal_request rather than academic, so every label on the reader bar of a published academic post was missing while a complete set of translations sat two hundred lines away under the wrong parent. Four more were written yes: and no:, which YAML 1.1 reads as booleans, so the key stopped being the word the file plainly shows and the mentor evaluation's outcomes-met options and the job application's timing line asked for keys that were not there. Two flash keys across three refusal paths were never written at all. SPEC-0005 is accepted and states reader controls carry Thai and English labels; it had been false since the increment shipped. What is worth keeping is why none of it was caught. The parity gate added the same week compares English to Thai, and both files were identically wrong, so it passed - parity is agreement, not correctness. The system test renders that screen and asserts nothing about the control bar. And raise_on_missing_translations was commented out, which is the only check that reads what a screen actually resolved rather than what the file appears to say. The neighbouring paid: true/false keys were quoted too. They resolve today by accident of how I18n normalises a path segment, and depending on that is how the yes/no pair was written in the first place.",
       "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-12T16:30:00+07:00",
+      "item_id": "DEV-017",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Close the class rather than the instance. Two checks join locale parity and one flag is turned on. The first reads every key the code names literally - 1135 of them across app/ and lib/ - and fails on any that is defined nowhere, naming the file and line rather than the key alone; run against the tree before DEV-016 it reports all twenty references by name. The second fails on any locale key that is not a String after YAML parses it, which is five lines and the only thing that makes the yes:/no: trap visible, since the file reads correctly and the lookup is what is wrong; it names twelve keys on the old tree. Neither can see an interpolated key, and there are 177 of those, so raise_on_missing_translations is on in the test environment for the half that is only observable at render time. Turning it on immediately found a twentieth string neither static check could reach: enrollment validates that a section holds students and adds :not_student, a message defined in neither locale, so an administrator who tried to enrol a staff account was refused in words the reader could not read. That is the argument for the flag in one example - the static check reads what the code asks for by name, and this key is never named by the code at all. A green run over files that already agree proves nothing, so both checks were run against the pre-fix tree first and each fired with the offending keys spelled out.",
+      "evidence_url": "test-strategy.html"
     }
   ]
 }

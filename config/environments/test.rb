@@ -42,8 +42,13 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
-  # Raises error for missing translations.
-  # config.i18n.raise_on_missing_translations = true
+  # Raises error for missing translations. On in this repository because the UI
+  # is bilingual and `fallbacks = [:en]` hides half the failures: a key missing
+  # from Thai renders English, and a key missing from both renders "translation
+  # missing" to everybody. `LocaleParityTest` checks the two files against each
+  # other and against every key named literally in the code; this is what covers
+  # the interpolated keys, wherever a test renders the screen that asks for one.
+  config.i18n.raise_on_missing_translations = true
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true

@@ -3162,6 +3162,7 @@ en:
       blank: "can't be blank"
       taken: "has already been taken"
       invalid: "is invalid"
+      not_student: "is not a student, and only students are enrolled in a section"
       invalid_transition: "is not an allowed transition"
       stale_transition: "has changed since this page was loaded"
       confirmation: "doesn't match %{attribute}"
