@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T18:56:00+07:00",
+  "updated_at": "2026-08-12T19:14:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2938,6 +2938,32 @@
         }
       ],
       "updated_at": "2026-08-12T18:56:00+07:00"
+    },
+    {
+      "id": "DEV-019",
+      "title": "Say First slice where the roadmap said Complete, and teach the gate the difference",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-005"
+      ],
+      "evidence": [
+        {
+          "label": "Unified roadmap — ordered delivery plan",
+          "url": "roadmap.html#unified-roadmap--ordered-delivery-plan"
+        },
+        {
+          "label": "AI recruitment platform roadmap",
+          "url": "roadmap.html#ai-recruitment-platform-roadmap"
+        },
+        {
+          "label": "Documentation lifecycle and gates",
+          "url": "mdlc.html"
+        }
+      ],
+      "updated_at": "2026-08-12T19:14:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4905,6 +4931,14 @@
       "to": "complete",
       "summary": "Increment 1 paged the nine lists inside ADR-0050-s touches and named six more that grow and were not reached. Five of them page now: a company-s incoming internship requests, the published programmes and a company-s own, a programme-s applicants, the placements screen, and the organization index - fifteen screens and seventeen lists in total, and SPEC-0051-s table is the register of both increments. Nothing new was decided; the rule was always lists that grow with the institution, and these are in four controllers the decision did not happen to name. The placements screen forced the one rule increment 1 had no need of. It holds three lists that grow - what a company hosts, what an account supervises, and for an administrator every placement there is - and a single ?page= would have moved all three at once, so a reader paging into the hosting list would have found the supervising one had jumped too. Page now carries the name of the param it owns, page_url replaces that one and carries every other param through including the other lists- pages, and the three are hosting_page, supervising_page and administering_page. The student-s own placements stay a relation rather than a page: they are bounded by a degree, and a control on a list of two is the noise decision 8 refused. What is left is the notification bell, and it is left deliberately. It is capped at eight with no route to the ninth, which is the audit log-s defect in miniature, but the fix is a screen rather than a page - a dropdown in the header has nowhere to put a control, and a notification history needs a route, a place in the navigation and a rule about what a read notification does. That is a new surface and therefore an ADR, so the cap stays and both the decision and the specification now say why rather than leaving it to be rediscovered.",
       "evidence_url": "specs/spec-paged-lists.html"
+    },
+    {
+      "at": "2026-08-12T19:14:00+07:00",
+      "item_id": "DEV-019",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Three roadmap tables disagreed with the backlog and with each other. The AI recruitment track called all fifteen of its milestones Proposed while every one of them had a complete backlog item behind an accepted specification and ADR; the ecosystem track called M11 increments 1 to 3 after increment 4 shipped, and M13 Proposed after increment 1 delivered the same morning. DEV-005 built a gate for exactly this and it caught none of them, because it only reads the consolidated table, the UTCC summary table and the UTCC section status lines - the two track tables are outside it. The deeper problem was the gate-s rule rather than its reach. It held that a milestone whose backlog items are all complete must say Complete, and six AI milestones have one complete item each whose specification calls the shipped increment narrower than the milestone: an advisory next-action panel rather than a recruiter agent, preparation prompts rather than a candidate or internship agent, one organization-scoped workflow report rather than analytics, an in-app conversation rather than notifications, and a reviewable control contract rather than an integration. The rule therefore demanded the word Complete against outcome text describing capabilities nobody built, and the consolidated table duly said it. First slice is now the second delivered label, meaning the tracked work is finished and the milestone-s own description is larger - the only part a file can testify to is item status, and scope is a human judgement. Both directions of the original check survive: a milestone with open items may claim neither label, and a milestone with none open must claim one. Ecosystem M13 is now mapped and checked, which it never was, and test/scripts/validate_backlog_roadmap_test.rb is the gate on the gate, including that a word merely starting like the label does not pass for it. The outcome columns keep the destination rather than being rewritten to what shipped, because the ordering exists to describe where the platform is going; the Status cell carries what exists, and a new table under the AI roadmap names for each of the six what shipped, what did not, and which specification says so.",
+      "evidence_url": "roadmap.html#unified-roadmap--ordered-delivery-plan"
     }
   ]
 }

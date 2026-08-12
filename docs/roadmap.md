@@ -27,9 +27,19 @@ this file. Product Owner and Engineering Manager decisions may reorder items
 when evidence, capacity, risk, or learning value changes; the opportunity cost
 must be recorded when that happens.
 
-Statuses mirror `backlog.json`: **Complete** items carry recorded owner
-approval, **In review** items are defined and awaiting verification, and the
-remaining labels are planning states.
+Statuses mirror `backlog.json`, which is the source of truth when this file and
+it disagree: **Complete** items are implemented and available with recorded
+owner approval, **First slice** items shipped one approved increment and the
+rest of the milestone is still a proposal, **In review** items are defined and
+awaiting verification, and the remaining labels are planning states.
+
+**First slice is not Complete**, and the difference is the reason the label
+exists. Six of the AI milestones below carry an accepted specification and a
+shipped increment that is deliberately narrower than the milestone's own
+description — an advisory panel rather than a recruiter agent, one report rather
+than analytics, a control contract rather than an integration. Every one of
+those specifications says so in its first paragraph. Reading "Complete" against
+the outcome column would credit the platform with capabilities nobody built.
 
 ### Ordering principles
 
@@ -51,7 +61,7 @@ remaining labels are planning states.
 | 0 | UTCC M0 | Successful Platform Baseline | The end-to-end academy workflow is operational | None | Complete |
 | 1 | UTCC M1 | Reliable Account Recovery | Students can recover access in production | UTCC M0 | Now |
 | 2 | AI M1 | Foundation | Recruitment users, organizations, profiles, permissions, consent, and audit boundaries exist | UTCC M1, shared identity | Complete |
-| 3 | Ecosystem M13 | Public Feature Request and Core Team Development Platform | Public users can submit proposals and receive traceable product decisions | Existing proposal intake, roadmap governance | Proposed |
+| 3 | Ecosystem M13 | Public Feature Request and Core Team Development Platform | Public users can submit proposals and receive traceable product decisions | Existing proposal intake, roadmap governance | First slice — an administrator answers a proposal; no public surface |
 | 4 | Ecosystem M14 | Core Team Internal Work Dashboard | Core team work is privately managed through Markdown records linked to governed Slack collaboration | Ecosystem M13, repository lifecycle, Slack policy | Proposed |
 | 5 | UTCC M2 | First Real Topic | One production-quality bilingual topic proves the content model | UTCC M0, M1 | Complete |
 | 6 | UTCC M3 | Complete Foundation Course | Every topic in the first course has unique approved learning content | UTCC M2 | Complete |
@@ -72,12 +82,12 @@ remaining labels are planning states.
 | 21 | AI M7 | Job Discovery | Candidates can find relevant opportunities | AI M2, M5 | Complete |
 | 22 | AI M8 | AI Matching Engine | Candidates and opportunities receive explainable matching recommendations | AI M6, M7 | Complete |
 | 23 | AI M9 | Recruitment Workflow | Applications move through interview and offer stages | AI M2, M5 | Complete |
-| 24 | AI M10 | AI Recruiter Agent | Recruiters receive governed assistance across screening and coordination | AI M8, M9 | Complete |
-| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | Complete |
-| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | Complete |
-| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | Complete |
-| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | Complete |
-| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | Complete |
+| 24 | AI M10 | AI Recruiter Agent | Recruiters receive governed assistance across screening and coordination | AI M8, M9 | First slice — an advisory next-action panel, no screening or contact |
+| 25 | AI M11 | AI Candidate Agent | Candidates receive governed assistance with search, preparation, and growth | AI M6, M7 | First slice — preparation prompts, nothing acting for the candidate |
+| 26 | AI M12 | AI Internship Agent | Students and mentors receive governed matching, progress, and evaluation assistance | AI M4, M6, M8 | First slice — preparation prompts, no matching or evaluation |
+| 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | First slice — one workflow report, no outcome or fairness measure |
+| 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | First slice — an in-app conversation, no external delivery |
+| 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | First slice — a control contract, no provider implementation |
 
 ### Cross-cutting lane
 
@@ -489,7 +499,11 @@ A roadmap item is complete only when:
 
 **Tags:** [#product](tags.md#product) [#roadmap](tags.md#roadmap) [#planning](tags.md#planning)
 
-**Status:** Draft for Product Owner, legal, security, and domain-owner review
+**Status:** M1 to M9 implemented (2026-08-08 and 2026-08-09), each against an
+accepted specification and ADR. M10 to M15 have shipped a first slice each and
+the rest of every one of them remains a proposal for Product Owner, legal,
+security, and domain-owner review. The vision, capability lists, and success
+criteria below are the destination, not a description of the application.
 
 **Accountable decision:** A human Product Owner must confirm the target market,
 priority, capacity, and milestone order before any milestone becomes execution
@@ -602,21 +616,34 @@ the milestone enters delivery.
 
 | ID | Milestone | Objective | Status | Main dependency |
 | --- | --- | --- | --- | --- |
-| M1 | Foundation | Establish identity, organizations, profiles, and permissions | Proposed | None |
-| M2 | Job Management | Enable companies to manage and publish jobs | Proposed | M1 |
-| M3 | AI Job Creation | Reduce the effort required to produce a quality job specification | Proposed | M2 |
-| M4 | Internship Management | Support internship programs, applications, mentorship, and evaluation | Proposed | M1, M2 |
-| M5 | Candidate Profile | Build structured, consented, searchable candidate profiles | Proposed | M1 |
-| M6 | AI Resume Analysis | Extract candidate data and identify skills and gaps | Proposed | M5 |
-| M7 | Job Discovery | Help candidates find relevant opportunities | Proposed | M2, M5 |
-| M8 | AI Matching Engine | Match candidates and jobs with explainable recommendations | Proposed | M6, M7 |
-| M9 | Recruitment Workflow | Manage applications through interview and offer stages | Proposed | M2, M5 |
-| M10 | AI Recruiter Agent | Assist recruiters across screening and hiring coordination | Proposed | M8, M9 |
-| M11 | AI Candidate Agent | Assist candidates with search, preparation, and career growth | Proposed | M6, M7 |
-| M12 | AI Internship Agent | Assist student matching, mentorship, progress, and evaluation | Proposed | M4, M6, M8 |
-| M13 | Analytics and Reporting | Provide recruitment, internship, and AI-effectiveness insight | Proposed | M8, M9 |
-| M14 | Notifications and Communication | Coordinate timely, consented communication | Proposed | M9 |
-| M15 | Enterprise and Integration | Prepare for enterprise adoption and governed integrations | Proposed | M1, M9, M13, M14 |
+| M1 | Foundation | Establish identity, organizations, profiles, and permissions | Complete (REC-001, REC-002) | None |
+| M2 | Job Management | Enable companies to manage and publish jobs | Complete (REC-003) | M1 |
+| M3 | AI Job Creation | Reduce the effort required to produce a quality job specification | Complete (REC-004) | M2 |
+| M4 | Internship Management | Support internship programs, applications, mentorship, and evaluation | Complete (REC-005) | M1, M2 |
+| M5 | Candidate Profile | Build structured, consented, searchable candidate profiles | Complete (REC-006) | M1 |
+| M6 | AI Resume Analysis | Extract candidate data and identify skills and gaps | Complete (REC-007) | M5 |
+| M7 | Job Discovery | Help candidates find relevant opportunities | Complete (REC-008) | M2, M5 |
+| M8 | AI Matching Engine | Match candidates and jobs with explainable recommendations | Complete (REC-009) | M6, M7 |
+| M9 | Recruitment Workflow | Manage applications through interview and offer stages | Complete (REC-010) | M2, M5 |
+| M10 | AI Recruiter Agent | Assist recruiters across screening and hiring coordination | First slice (REC-011) | M8, M9 |
+| M11 | AI Candidate Agent | Assist candidates with search, preparation, and career growth | First slice (REC-012) | M6, M7 |
+| M12 | AI Internship Agent | Assist student matching, mentorship, progress, and evaluation | First slice (REC-013) | M4, M6, M8 |
+| M13 | Analytics and Reporting | Provide recruitment, internship, and AI-effectiveness insight | First slice (REC-014) | M8, M9 |
+| M14 | Notifications and Communication | Coordinate timely, consented communication | First slice (REC-015) | M9 |
+| M15 | Enterprise and Integration | Prepare for enterprise adoption and governed integrations | First slice (REC-016) | M1, M9, M13, M14 |
+
+**What the six first slices actually are.** Each is deliberately narrower than
+the objective beside it, and each specification says so in its own first
+paragraph. Read this column before quoting a milestone as delivered.
+
+| ID | What shipped | What did not | Specification |
+| --- | --- | --- | --- |
+| M10 | An advisory panel naming the next manual review step on an application | Screening, ranking, interview generation, scheduling, summarizing, contact | [SPEC-0034](specs/spec-recruiter-advisory-assistance.md) |
+| M11 | Preparation prompts a candidate owns, on their own application | Anything acting on the candidate's behalf, and any private recruiter information | [SPEC-0035](specs/spec-candidate-application-assistance.md) |
+| M12 | Preparation prompts around a programme's learning outcomes | Matching, placement decisions, academic decisions, mentor evaluation | [SPEC-0036](specs/spec-internship-application-assistance.md) |
+| M13 | One organization-scoped workflow report with its lineage and disclosure limits on the page | Hiring outcomes, fairness measures, AI-effectiveness claims, internship analytics | [SPEC-0037](specs/spec-recruitment-reporting.md) |
+| M14 | An in-app conversation on one application, scoped to its participants | External delivery of any kind, consent preferences, notification history | [SPEC-0038](specs/spec-recruitment-application-conversations.md) |
+| M15 | A reviewable control contract: integration registry, adapter shape, secret custody, field-level data map, failure policy | SSO, HRIS, calendar, partner API — no provider implementation exists | [SPEC-0039](specs/spec-recruitment-enterprise-integrations.md) |
 
 The dependency order is directional. The Product Owner and Tech Lead may reorder
 milestones when discovery evidence, risk, or learning value justifies it, but
@@ -1127,9 +1154,12 @@ decisions.
 
 ## Company Business Case Platform Roadmap
 
-**Status:** Phase 1 implemented (2026-08-09) — invitation-only, text-only
-collaboration slice per SPEC-0040/ADR-0040; uploads, email, reporting, and
-later milestones remain proposals
+**Status:** M10 phase 1 implemented (2026-08-09) — the invitation-only,
+text-only collaboration slice per SPEC-0040/ADR-0040; uploads, email, and
+administrator reporting remain proposals. M11 has shipped increments 1 to 4 and
+M13 its first increment; M12 and M14 have not been started. Each milestone's
+own status is in the table below and in its section, and `backlog.json` is the
+source of truth when they disagree with this line.
 
 **Version:** 1.0
 **Platform:** Ruby on Rails
@@ -1142,9 +1172,9 @@ later milestones remain proposals
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
 | M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
-| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–3 implemented | M10 company boundary, shared identity, and institutional internship policy |
+| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–4 implemented (INT-001 to INT-006) | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
-| M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | Proposed | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
+| M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | First slice — increment 1 delivered 2026-08-12 (M13-001): an administrator answers a proposal with a recorded decision and a reason its author reads. No public surface | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
 | M14 | Core Team Internal Work Dashboard | Core team members can manage private Markdown work records and connect them to governed Slack collaboration | Proposed | Core-team identity, repository lifecycle records, Slack policy, and M13 proposal decisions |
 
 #### Milestone M10 — Company Business Case Platform

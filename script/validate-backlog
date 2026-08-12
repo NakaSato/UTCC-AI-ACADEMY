@@ -116,13 +116,37 @@ end
 # check demand the roadmap call an unstarted milestone Complete.
 DONE = "Complete"
 
+# The other sharp edge, found on 2026-08-12 when this check was pointed at the
+# recruitment track: finishing every item a milestone tracks is not the same as
+# delivering the milestone as the roadmap describes it. Six AI milestones had
+# one complete item each, and each item shipped a first slice its own
+# specification calls narrower than the milestone — an advisory panel rather
+# than a recruiter agent, one report rather than analytics, a control contract
+# rather than an integration. This check demanded the word "Complete" against
+# every one of them, which is how the roadmap came to credit the platform with
+# capabilities nobody built.
+#
+# So "delivered" is two labels, not one. Both assert that the tracked work is
+# finished, which is the only thing the backlog can testify to; "First slice"
+# adds that the milestone's own description is larger, which is a scope
+# judgement no file can make. What is still caught in both directions is the
+# drift that matters: a milestone with open items may claim neither label, and a
+# milestone with none open must claim one of them.
+DELIVERED = /\A(#{DONE}|First slice)\b/
+
 # Track IDs are namespaced in the roadmap so `UTCC M10`, `AI M10`, and
 # `Ecosystem M10` cannot be confused. The backlog names the same milestones
 # differently, so the two vocabularies are mapped rather than matched.
+#
+# `Ecosystem M13` is the one the backlog files under a bare `M13`, because it
+# was the only M13 in delivery when the item was written. It is mapped here
+# rather than renamed so the check covers it; a UTCC M13 arriving later is the
+# moment to rename both.
 def backlog_milestone(track_id)
   case track_id
   when "Ecosystem M10" then "M10-CBP"
   when "Ecosystem M11" then "M11-SIR"
+  when "Ecosystem M13" then "M13"
   when /\AUTCC (M\d+)\z/ then Regexp.last_match(1)
   when /\AAI (M\d+)\z/ then "AI-#{Regexp.last_match(1)}"
   end
@@ -134,10 +158,11 @@ def disagreement(milestone, label, items)
 
   open = owned.reject { |item| item["status"] == "complete" }
 
-  if open.empty? && label != DONE
-    "says #{label.inspect}, but all #{owned.length} of its backlog items are complete"
-  elsif open.any? && label == DONE
-    "says #{DONE.inspect}, but #{open.length} backlog item(s) are open: " \
+  if open.empty? && !label.match?(DELIVERED)
+    "says #{label.inspect}, but all #{owned.length} of its backlog items are complete — " \
+      "say #{DONE.inspect}, or #{'First slice'.inspect} if the milestone is larger than what shipped"
+  elsif open.any? && label.match?(DELIVERED)
+    "says #{label.inspect}, but #{open.length} backlog item(s) are open: " \
       "#{open.map { |item| "#{item['id']} (#{item['status']})" }.join(', ')}"
   end
 end
