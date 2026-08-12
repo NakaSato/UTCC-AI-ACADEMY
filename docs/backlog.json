@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T21:52:00+07:00",
+  "updated_at": "2026-08-12T22:14:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2988,6 +2988,28 @@
         }
       ],
       "updated_at": "2026-08-12T21:52:00+07:00"
+    },
+    {
+      "id": "DEV-020",
+      "title": "Read the two track tables the roadmap gate was skipping",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-019"
+      ],
+      "evidence": [
+        {
+          "label": "AI recruitment platform roadmap",
+          "url": "roadmap.html#ai-recruitment-platform-roadmap"
+        },
+        {
+          "label": "Company business case platform roadmap",
+          "url": "roadmap.html#company-business-case-platform-roadmap"
+        }
+      ],
+      "updated_at": "2026-08-12T22:14:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4971,6 +4993,14 @@
       "to": "complete",
       "summary": "The user asked for Vue to be available to the frontend for some code, was shown the constraints, and reaffirmed. The coding standard admits a JavaScript package only behind an accepted ADR naming the capability, the alternatives including no dependency, maintenance and security ownership, failure and removal paths, and the licence position, so ADR-0051 and SPEC-0052 are what the library arrived with. Three facts about this application decided its shape. The CSP is script-src self with a nonce and no unsafe-eval, and bin/importmap pin vue fetches the full build, which compiles templates with Function() - blocked in production, silently, on a screen that passes every test that never loaded the header. So the runtime-only build is vendored instead, islands render with h rather than templates, and test/operations/vue_build_test.rb asserts the vendored bytes carry no compiler, because re-running the pin command after an upgrade is exactly how this regresses. There is no JavaScript build step, so single-file components are not available and adding a bundler was refused as a larger decision than this one. Turbo replaces the body on navigation and any node on a stream, so createApp is called in exactly one file - a Stimulus bridge whose connect and disconnect Turbo already drives - and that is asserted too. An island is named through a registry rather than imported by markup, which is the whitelist-or-default rule the console params already run on; its copy arrives as props already translated, so the bilingual invariant keeps one home; and it enhances markup that works without it, so a failed mount costs the enhancement and not the screen. Alpine was rejected for needing unsafe-eval, React and Preact on weak evidence that would be the first to revisit, and plain Stimulus stays the default for everything not state-shaped - the seventeen existing controllers are not rewritten. The first island is the character counter on the proposal decision reason, the text an author reads under a thousand-character limit: small, reversible, and it exercises the whole path from pin to both locales. What a browser proves is not covered here - islands are visible only to system tests - so the server-side half is asserted instead: the island names a field that exists on the page, its limit equals the maxlength that field enforces, and its template still carries the interpolation the island fills.",
       "evidence_url": "decisions/adr-0051-vue-islands.html"
+    },
+    {
+      "at": "2026-08-12T22:14:00+07:00",
+      "item_id": "DEV-020",
+      "from": "queued",
+      "to": "complete",
+      "summary": "DEV-019 corrected three roadmap tables by hand and left two of them outside the gate, which is how they drifted in the first place: the check read the consolidated table, the UTCC summary table and the UTCC section status lines, and neither track table. It reads all five now. The obstacle was that a track table names a bare M10 and there are three different M10s in the file, so the enclosing section heading is tracked and the bare ID resolved through it - AI Recruitment Platform Roadmap to AI-M10, Company Business Case Platform Roadmap to M10-CBP, M11-SIR and M13. A row under a section with no mapping is nobody-s milestone and is left alone rather than guessed at. One bug fell out of turning it on: status is the fourth column in a track table and the last in the two planning tables, so reading the last cell in all three reported every AI row as saying whatever its dependency column held, which is why the first run complained that AI-M8 says M6, M7. Both facts are now asserted in the gate-s own test. Turning the check on also forced two ecosystem rows into the two-label vocabulary. M10 is First slice - phase 1 is invitation-only and text-only, and uploads, email and reporting remain proposals. M11 is Complete, because its own section says every authorized increment of SPEC-0041 has shipped and the remainder - interviews, an academic gate, rubric evaluation, email, REST APIs, academic credit - is unauthorized rather than pending, and is enforced absent by a boundary test.",
+      "evidence_url": "roadmap.html#ai-recruitment-platform-roadmap"
     }
   ]
 }

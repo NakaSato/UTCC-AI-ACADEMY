@@ -56,7 +56,44 @@ class ValidateBacklogRoadmapTest < ActiveSupport::TestCase
     assert_invalid roadmap("Firstly"), backlog("complete")
   end
 
+  # The two track tables name a bare `M1`, and there are three different M10s in
+  # the file. The `##` section they sit under is what disambiguates them, and
+  # reading them at all is what the gate did not do for four days while the AI
+  # track called fifteen finished milestones Proposed.
+  test "a track table is read, and its section decides which milestone a bare ID means" do
+    assert_valid track_roadmap("AI Recruitment Platform Roadmap", "M1", "Complete"), backlog("complete")
+    assert_invalid track_roadmap("AI Recruitment Platform Roadmap", "M1", "Proposed"), backlog("complete")
+
+    # The same row under a section with no track mapping is nobody's milestone,
+    # so it is left alone rather than guessed at.
+    assert_valid track_roadmap("UTCC Academy Roadmap", "M1", "Proposed"), backlog("complete")
+  end
+
+  # Status is the fourth column in a track table and the last in the two
+  # planning tables. Reading the last cell in both reported every track row as
+  # saying whatever its dependency column held.
+  test "the status column is read, not the dependency beside it" do
+    error = assert_invalid track_roadmap("AI Recruitment Platform Roadmap", "M1", "Proposed"), backlog("complete")
+
+    assert_match(/says "Proposed"/, error)
+    assert_no_match(/says "None"/, error, "that is the dependency column")
+  end
+
   private
+    def track_roadmap(section, id, label)
+      <<~MARKDOWN
+        # Product Roadmap
+
+        ## #{section}
+
+        ### Roadmap summary
+
+        | ID | Milestone | Objective | Status | Main dependency |
+        | --- | --- | --- | --- | --- |
+        | #{id} | Foundation | Something smaller than this row claims | #{label} | None |
+      MARKDOWN
+    end
+
     def assert_valid(roadmap, backlog)
       output, status = run_validator(roadmap, backlog)
 

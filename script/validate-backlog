@@ -167,18 +167,36 @@ def disagreement(milestone, label, items)
   end
 end
 
+# The two track tables name their milestones by a bare `M10`, and there are
+# three different M10s in this file. What disambiguates them is the `##` section
+# they sit under, so the section is tracked and the bare ID resolved through it.
+#
+# Without this the check read three tables out of five, which is how the AI
+# track came to call all fifteen of its milestones Proposed while every one of
+# them had a complete backlog item, for four days, under a gate built to catch
+# exactly that.
+TRACK_SECTIONS = {
+  "AI Recruitment Platform Roadmap" => ->(id) { "AI-#{id}" },
+  "Company Business Case Platform Roadmap" =>
+    ->(id) { { "M10" => "M10-CBP", "M11" => "M11-SIR", "M13" => "M13" }[id] }
+}.freeze
+
 def roadmap_statuses(lines)
   found = []
   table = nil
   milestone = nil
+  section = nil
 
   lines.each_with_index do |raw, index|
     line = raw.chomp
     location = "roadmap.md:#{index + 1}"
 
+    section = Regexp.last_match(1) if line =~ /\A## (.+?)\s*\z/
+
     case line
     when /\A\|\s*Order\s*\|\s*Track ID\s*\|/ then table = :consolidated
     when /\A\|\s*Order\s*\|\s*Milestone\s*\|/ then table = :summary
+    when /\A\|\s*ID\s*\|\s*Milestone\s*\|/ then table = :track
     when /\A\s*\z/ then table = nil
     end
 
@@ -193,12 +211,20 @@ def roadmap_statuses(lines)
     next unless table && line.start_with?("|")
 
     cells = line.split("|").map(&:strip)
-    next unless cells[1]&.match?(/\A\d+\z/)
 
-    id = table == :consolidated ? backlog_milestone(cells[2]) : "M#{cells[1]}"
+    id = case table
+    in :track then cells[1]&.match?(/\AM\d+\z/) ? TRACK_SECTIONS[section]&.call(cells[1]) : nil
+    in :consolidated then cells[1]&.match?(/\A\d+\z/) ? backlog_milestone(cells[2]) : nil
+    in :summary then cells[1]&.match?(/\A\d+\z/) ? "M#{cells[1]}" : nil
+    end
     next if id.nil?
 
-    found << { milestone: id, label: cells.last, where: "#{location} (#{table} table, #{cells[2]})" }
+    # Status is the last column in the two planning tables and the fourth in the
+    # track tables, which end with the dependency. Reading the last cell in all
+    # three reported every track row as saying "M6, M7".
+    label = table == :track ? cells[4].to_s : cells.last
+
+    found << { milestone: id, label: label, where: "#{location} (#{table} table, #{cells[2]})" }
   end
 
   found

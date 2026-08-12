@@ -1171,8 +1171,8 @@ source of truth when they disagree with this line.
 
 | ID | Milestone | Outcome | Status | Main dependency |
 | --- | --- | --- | --- | --- |
-| M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | Phase 1 implemented | Existing identity and platform services |
-| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Increments 1–4 implemented (INT-001 to INT-006) | M10 company boundary, shared identity, and institutional internship policy |
+| M10 | Company Business Case Platform | Companies and invited students can collaborate on real business challenges | First slice — phase 1: invitation-only, text-only; uploads, email and reporting remain proposals | Existing identity and platform services |
+| M11 | Student Internship Request Platform | Students can request internships from partner companies and complete a supported learning cycle | Complete — increments 1 to 4 (INT-001 to INT-006); every authorized increment of SPEC-0041 has shipped | M10 company boundary, shared identity, and institutional internship policy |
 | M12 | Technical Blog Translation Platform | Technical writers and reviewers can publish accurate, multilingual technical knowledge | Proposed | Shared identity, content model, editorial policy, and translation-provider decision |
 | M13 | Public Feature Request and Core Team Development Platform | Public users can submit, follow, discuss, and trace product proposals through review and release | First slice — increment 1 delivered 2026-08-12 (M13-001): an administrator answers a proposal with a recorded decision and a reason its author reads. No public surface | Existing proposal intake, moderation policy, roadmap traceability, and core-team ownership |
 | M14 | Core Team Internal Work Dashboard | Core team members can manage private Markdown work records and connect them to governed Slack collaboration | Proposed | Core-team identity, repository lifecycle records, Slack policy, and M13 proposal decisions |
