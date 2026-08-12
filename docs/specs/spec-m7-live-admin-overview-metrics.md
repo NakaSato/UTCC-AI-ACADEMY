@@ -2,11 +2,11 @@
 id: SPEC-0012
 type: spec
 title: Live admin Overview metrics
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
-review_by: 2026-08-10
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0012, SPEC-0008]
@@ -27,10 +27,13 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Live admin Overview metrics
 
-> **Review state:** The baseline slice was approved on 2026-08-03. This
-> specification authorizes the four aggregate counts below; future adoption,
-> activity, and health metrics remain subject to their own source and privacy
-> review.
+> **Review state:** Accepted. The baseline slice was approved on 2026-08-03 and
+> M7-001 shipped against it; the status was recorded here on 2026-08-12, when a
+> review of overdue documents found this file still saying draft while its own
+> text, the backlog's recorded approval, and the tests in `enforced_by` all said
+> otherwise. This specification authorizes the four aggregate counts below;
+> future adoption, activity, and health metrics remain subject to their own
+> source and privacy review.
 
 > [Executable Specifications](README.md) ·
 > [M7 architecture decision](../decisions/adr-0012-live-admin-overview-metrics.md) ·

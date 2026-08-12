@@ -2,11 +2,11 @@
 id: ADR-0012
 type: adr
 title: Replace fabricated admin Overview metrics with defined live metrics
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-03
-review_by: 2026-08-10
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [SPEC-0008]
@@ -25,10 +25,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Replace fabricated admin Overview metrics with defined live metrics
 
-> **Decision state:** The user approved the baseline implementation on
-> 2026-08-03. The Product Owner and Tech Lead still own any future metric
-> definitions, while the Privacy Owner must approve whether any activity or
-> breakdown view exposes identifiable information.
+> **Decision state:** Accepted. The user approved the baseline implementation on
+> 2026-08-03 and M7-001 shipped against it; the status was recorded here on
+> 2026-08-12, when a review of overdue documents found this file still saying
+> draft while its own text, the backlog's recorded approval, and the tests in
+> `enforced_by` all said otherwise. The Product Owner and Tech Lead still own any
+> future metric definitions, while the Privacy Owner must approve whether any
+> activity or breakdown view exposes identifiable information.
 
 > [Decision Records](README.md) ·
 > [M7 Overview specification](../specs/spec-m7-live-admin-overview-metrics.md) ·

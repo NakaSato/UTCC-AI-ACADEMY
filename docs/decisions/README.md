@@ -21,8 +21,8 @@ deprecate it.
 - [ADR-0009 — Define the course syllabus PDF document boundary](adr-0009-course-syllabus-pdf.md) — accepted and implemented
 - [ADR-0010 — Define the UTCC SSO and account-linking boundary](adr-0010-utcc-sso-account-linking.md) — draft; institutional identity decisions pending
 - [ADR-0011 — Define course-completion certificate policy](adr-0011-course-completion-certificates.md) — accepted; academic credential policy pending
-- [ADR-0012 — Replace fabricated admin Overview metrics with defined live metrics](adr-0012-live-admin-overview-metrics.md) — draft; baseline approved, future metric definitions and privacy review pending
-- [ADR-0013 — Define the admin course lifecycle and catalog boundary](adr-0013-admin-course-lifecycle.md) — draft; baseline approved and implemented, future academic workflow pending
+- [ADR-0012 — Replace fabricated admin Overview metrics with defined live metrics](adr-0012-live-admin-overview-metrics.md) — accepted; baseline approved, future metric definitions and privacy review pending
+- [ADR-0013 — Define the admin course lifecycle and catalog boundary](adr-0013-admin-course-lifecycle.md) — accepted; baseline approved and implemented, future academic workflow pending
 - [ADR-0014 — Define approval queue records and decision history](adr-0014-approval-queue-records.md) — accepted; request and authority policy pending
 - [ADR-0015 — Define which admin feature flags are real and how settings persist](adr-0015-feature-flag-boundary.md) — accepted; supported-flag and runtime policy pending
 - [ADR-0016 — Define the learner hearts attempt and refill policy](adr-0016-hearts-attempt-policy.md) — accepted; academic and product policy pending

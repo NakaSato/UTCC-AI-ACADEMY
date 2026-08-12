@@ -2566,6 +2566,36 @@
         }
       ],
       "updated_at": "2026-08-12T11:05:00+07:00"
+    },
+    {
+      "id": "DOCS-014",
+      "title": "Record the M7 acceptances the documents already described",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DOCS-013"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0012 - live admin Overview metrics",
+          "url": "decisions/adr-0012-live-admin-overview-metrics.html"
+        },
+        {
+          "label": "ADR-0013 - admin course lifecycle and catalog boundary",
+          "url": "decisions/adr-0013-admin-course-lifecycle.html"
+        },
+        {
+          "label": "SPEC-0012 - live admin Overview metrics",
+          "url": "specs/spec-m7-live-admin-overview-metrics.html"
+        },
+        {
+          "label": "SPEC-0013 - real admin course catalog and lifecycle states",
+          "url": "specs/spec-m7-admin-course-lifecycle.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:40:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4381,6 +4411,14 @@
       "to": "complete",
       "summary": "Writing SPEC-0049 showed that the proposal intake's two refusals were the two things no test touched: one contributor reading another's proposal, and an incomplete submission re-rendering the form. Each is one line of controller, which is exactly how they get lost. Both hold, and are now asserted along with a staff account being turned away from the form. That third test is where the draft specification turned out to be wrong: a signed-in account with the wrong role is redirected to root with the forbidden flash, not refused outright, because Authorization#authorize_role lands both of its denials there. The specification now says so. The one gap left open is deliberate: that no code path changes status cannot be usefully asserted until ADR-0049 decision 6 settles the status vocabulary, since either form of the assertion would be deleted by the change that answers it.",
       "evidence_url": "specs/spec-proposal-request-intake.html"
+    },
+    {
+      "at": "2026-08-12T11:40:00+07:00",
+      "item_id": "DOCS-014",
+      "from": "queued",
+      "to": "complete",
+      "summary": "bin/docs warned about 28 documents past review_by on every run, which is how a warning stops being read. Most of it was not debt: 19 are accepted documents past a mechanical created-plus-seven stamp, and 4 are correctly draft because their work is genuinely blocked - ADR-0010 and SPEC-0010 for UTCC SSO, ADR-0022 and SPEC-0022 for production deployment, which the backlog already records as M6-002 and M9-004. The real finding was 4 documents whose frontmatter contradicted their own bodies. M7-001 and M7-002 shipped on 2026-08-03 with the approval recorded in this file in the user's own words, their specs carry enforced_by lists pointing at tests that exist and pass, and their review-state blockquotes say the user approved them - while status still said draft, and the README index said draft too, so nothing could catch it. ADR-0012, ADR-0013, SPEC-0012, and SPEC-0013 now record the acceptance that happened, with the date it was recorded kept distinct from the date it was given. SPEC-0015 was deliberately left as draft: its work is complete and its tests pass too, but its own text says it remains blocked on the unreviewed supported-flag rows, scopes, runtime consumers, and academic policy, so any rule that swept it up with the others would have been wrong.",
+      "evidence_url": "specs/spec-m7-admin-course-lifecycle.html"
     }
   ]
 }

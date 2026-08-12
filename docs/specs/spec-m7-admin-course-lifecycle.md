@@ -2,11 +2,11 @@
 id: SPEC-0013
 type: spec
 title: Real admin course catalog and lifecycle states
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
-updated: 2026-08-03
-review_by: 2026-08-10
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0013, ADR-0008, SPEC-0008]
@@ -31,10 +31,13 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-TEST-001]
 
 # Real admin course catalog and lifecycle states
 
-> **Review state:** The baseline was approved on 2026-08-03. The specification
-> separates the real-row read model from the approved lifecycle mutations;
-> future scheduling, ownership metadata, and academic workflow can extend it
-> only through a new decision.
+> **Review state:** Accepted. The baseline was approved on 2026-08-03 and M7-002
+> shipped against it; the status was recorded here on 2026-08-12, when a review
+> of overdue documents found this file still saying draft while its own text,
+> the backlog's recorded approval, and the tests in `enforced_by` all said
+> otherwise. The specification separates the real-row read model from the
+> approved lifecycle mutations; future scheduling, ownership metadata, and
+> academic workflow can extend it only through a new decision.
 
 > [Executable Specifications](README.md) ·
 > [M7 course lifecycle decision](../decisions/adr-0013-admin-course-lifecycle.md) ·

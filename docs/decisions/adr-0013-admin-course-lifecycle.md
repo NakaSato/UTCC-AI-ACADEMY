@@ -2,11 +2,11 @@
 id: ADR-0013
 type: adr
 title: Define the admin course lifecycle and catalog boundary
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-03
-updated: 2026-08-03
-review_by: 2026-08-10
+updated: 2026-08-12
+review_by: 2026-08-26
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0008, SPEC-0008]
@@ -27,9 +27,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Define the admin course lifecycle and catalog boundary
 
-> **Decision state:** The user approved the baseline implementation on
-> 2026-08-03. The implementation policy below keeps existing learner records
-> available while making lifecycle visibility and mutations explicit.
+> **Decision state:** Accepted. The user approved the baseline implementation on
+> 2026-08-03 and M7-002 shipped against it; the status was recorded here on
+> 2026-08-12, when a review of overdue documents found this file still saying
+> draft while its own text, the backlog's recorded approval, and the tests in
+> `enforced_by` all said otherwise. The implementation policy below keeps
+> existing learner records available while making lifecycle visibility and
+> mutations explicit.
 
 > [Decision Records](README.md) ·
 > [M7 course administration specification](../specs/spec-m7-admin-course-lifecycle.md) ·

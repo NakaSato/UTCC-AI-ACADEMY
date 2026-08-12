@@ -20,8 +20,8 @@ owner.
 - [SPEC-0009 — Downloadable localized course syllabus PDF](spec-m6-course-syllabus-pdf.md) — accepted and implemented
 - [SPEC-0010 — UTCC SSO and safe account linking](spec-m6-utcc-sso-account-linking.md) — draft; institutional identity decisions pending
 - [SPEC-0011 — Course-completion certificate policy and artifact](spec-m6-course-completion-certificates.md) — accepted; academic credential policy pending
-- [SPEC-0012 — Live admin Overview metrics](spec-m7-live-admin-overview-metrics.md) — draft; baseline approved, future metric definitions and privacy review pending
-- [SPEC-0013 — Real admin course catalog and lifecycle states](spec-m7-admin-course-lifecycle.md) — draft; baseline approved and implemented, future academic workflow pending
+- [SPEC-0012 — Live admin Overview metrics](spec-m7-live-admin-overview-metrics.md) — accepted; baseline approved, future metric definitions and privacy review pending
+- [SPEC-0013 — Real admin course catalog and lifecycle states](spec-m7-admin-course-lifecycle.md) — accepted; baseline approved and implemented, future academic workflow pending
 - [SPEC-0014 — Persisted admin approval queue and decisions](spec-m7-approval-queue.md) — accepted; request and authority policy pending
 - [SPEC-0015 — Persisted admin feature-flag settings](spec-m7-feature-flag-settings.md) — draft; supported-flag and runtime policy pending
 - [SPEC-0016 — Learner hearts attempt, refill, and support policy](spec-m8-hearts-attempt-policy.md) — accepted; academic and product policy pending
