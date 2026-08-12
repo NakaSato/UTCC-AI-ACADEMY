@@ -25,23 +25,45 @@ module Recruitment
       organization_id = @organization.id
       applications = Recruitment::JobApplication.joins(:job_post)
                                                  .where(recruitment_job_posts: { organization_id: })
-      total = applications.count
-      suppressed = total < MIN_REPORTING_CELL_SIZE
+      counts = applications.group(:status).count
+      total = counts.values.sum
+      thin = total < MIN_REPORTING_CELL_SIZE
+
+      # ADR-0037 suppresses totals *and* status cells below five. Deciding that
+      # on the total alone published cells of one: six applications, five
+      # submitted and one screening, cleared the gate and named the one person
+      # who had reached screening to a reporter who can see who applied.
+      cells = Recruitment::JobApplication::STATUSES.map do |status|
+        count = counts.fetch(status, 0)
+        suppressed = thin || small?(count)
+        ApplicationStatusCell.new(status, suppressed ? nil : count, suppressed)
+      end
+
+      # The total goes with them. A single suppressed cell beside a published
+      # total is not suppressed at all — it is the total minus the cells that
+      # were published, which is arithmetic anybody can do on one screen. With
+      # the total withheld a suppressed cell is known only to be between one and
+      # four, which is what a threshold is allowed to leak.
+      hidden = thin || cells.any?(&:suppressed)
+
       Summary.new(
         Recruitment::JobPost::STATUSES.map do |status|
           JobStatus.new(status, Recruitment::JobPost.where(organization_id:, status:).count)
         end,
-        suppressed ? nil : total,
-        suppressed,
-        Recruitment::JobApplication::STATUSES.map do |status|
-          ApplicationStatusCell.new(status, suppressed ? nil : applications.where(status:).count, suppressed)
-        end,
+        hidden ? nil : total,
+        hidden,
+        cells,
         I18n.t("recruitment.reporting.source_label"),
         I18n.t("recruitment.reporting.uncertainty", minimum: MIN_REPORTING_CELL_SIZE)
       )
     end
 
     private
+      # A cell of zero names nobody. Suppressing it would redact most of a
+      # normal report — six of seven statuses are usually empty — and protect
+      # no one, so zero is published and only a real small population hides.
+      def small?(count) = count.positive? && count < MIN_REPORTING_CELL_SIZE
+
       def reporter?
         organization_id = @organization&.id
         return false unless organization_id.present? && Organization.active.where(id: organization_id).exists?
