@@ -94,4 +94,54 @@ class ContributorsTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_proposal_request_path
   end
+
+  # SPEC-0049 records the intake as built, and recording it showed that its two
+  # refusals were the two things nothing asserted. Both are one line of
+  # controller each, which is exactly how they would be lost.
+  test "an author cannot read another contributor's proposal" do
+    proposal = ProposalRequest.create!(
+      user: users(:one),
+      title: "Weekly project clinic",
+      category: "feature",
+      problem: "Learners need a place to unblock their projects.",
+      idea: "Add a weekly session with a contributor and a shared queue.",
+      impact: "Projects move forward with less waiting."
+    )
+
+    sign_in_as users(:two)
+    get proposal_request_path(proposal)
+
+    assert_response :not_found
+  end
+
+  test "an incomplete proposal re-renders the form and writes nothing" do
+    sign_in_as users(:one)
+
+    assert_no_difference "ProposalRequest.count" do
+      post proposal_requests_path, params: {
+        proposal_request: {
+          title: "   ",
+          category: "feature",
+          problem: "Learners need a place to unblock their projects.",
+          idea: "Add a weekly session with a contributor and a shared queue.",
+          impact: "Projects move forward with less waiting."
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "form[action=?]", proposal_requests_path, 1
+  end
+
+  # The model refuses a non-contributor and so does the controller. The model
+  # rule is the one with a test; this is the door. A signed-in account with the
+  # wrong role is sent to root with the forbidden flash rather than refused
+  # outright — see Authorization#authorize_role, where both denials land there.
+  test "a staff account cannot reach the proposal form" do
+    sign_in_as users(:admin)
+    get new_proposal_request_path
+
+    assert_redirected_to root_path
+    assert_equal I18n.t("flash.forbidden"), flash[:alert]
+  end
 end

@@ -66,7 +66,7 @@ remaining labels are planning states.
 | 15 | AI M2 | Job Management | Companies can manage and publish structured jobs and programs | AI M1 | Complete |
 | 16 | AI M3 | AI Job Creation | AI helps produce quality job specifications with human approval | AI M2 | Complete |
 | 17 | AI M4 | Internship Management | Internship programs, applications, mentorship, and evaluation are supported | AI M1, M2 | Complete |
-| 18 | Ecosystem M11 | Student Internship Request Platform | Students can request internships and complete a supported learning cycle | Ecosystem M10, AI M1, institutional internship policy | Increments 1–3 implemented |
+| 18 | Ecosystem M11 | Student Internship Request Platform | Students can request internships and complete a supported learning cycle | Ecosystem M10, AI M1, institutional internship policy | Complete |
 | 19 | AI M5 | Candidate Profile | Candidates have structured, consented, searchable profiles | AI M1 | Complete |
 | 20 | AI M6 | AI Resume Analysis | Candidate data, skills, and gaps can be extracted with reviewable AI assistance | AI M5 | Complete |
 | 21 | AI M7 | Job Discovery | Candidates can find relevant opportunities | AI M2, M5 | Complete |
@@ -116,15 +116,15 @@ track-level decisions below.
 | --- | --- | --- | --- |
 | 0 | Successful platform baseline | The end-to-end academy workflow is operational | Complete |
 | 1 | Reliable account recovery | Students can recover access in production | Now |
-| 2 | First real topic | One complete bilingual topic proves the content model | Next |
-| 3 | Complete foundation course | Every topic in the first course has unique learning content | Next |
-| 4 | Course-specific curricula | Courses can have different modules, topics, and requirements | Next |
-| 5 | Real knowledge map | The map reflects actual curriculum and learner progress | Next |
+| 2 | First real topic | One complete bilingual topic proves the content model | Complete |
+| 3 | Complete foundation course | Every topic in the first course has unique learning content | Complete |
+| 4 | Course-specific curricula | Courses can have different modules, topics, and requirements | Complete |
+| 5 | Real knowledge map | The map reflects actual curriculum and learner progress | Complete |
 | 6 | Institutional access and documents | UTCC SSO and syllabus downloads work end to end | Later |
-| 7 | Operational admin controls | Placeholder admin screens become real management tools | Later |
-| 8 | Community and pedagogy decisions | Social awards and heart behavior have real rules | Later |
+| 7 | Operational admin controls | Placeholder admin screens become real management tools | Complete |
+| 8 | Community and pedagogy decisions | Social awards and heart behavior have real rules | Complete |
 | 9 | Production hardening | Session control, delivery monitoring, and deployment are strengthened | Continuous |
-| 10 | Academic writing | Students and teachers can create, review, and collaboratively publish academic posts | Next |
+| 10 | Academic writing | Students and teachers can create, review, and collaboratively publish academic posts | Complete |
 
 ## Milestone 0 — Successful platform baseline
 
@@ -1575,14 +1575,19 @@ boundaries established by M10; it does not replace UTCC Academy M10 Academic
 Writing, AI Recruitment Platform M4 Internship Management, or AI Recruitment
 Platform M11 AI Candidate Agent.
 
-**Status:** Increments 1 to 3 implemented (2026-08-09 and 2026-08-12) —
+**Status:** Increments 1 to 4 implemented (2026-08-09 and 2026-08-12) —
 student-initiated, position-less internship requests to companies that opt in, a
-recorded company decision, placements with weekly progress reports, and faculty
-oversight. A placement originates from either an approved request or an accepted
-recruitment application. A supervisor is an administrator-granted assignment of
-one staff account to one placement, who reads it and acknowledges its weeks and
-holds no gate over the company or the student. Documents, an academic gate,
-rubric evaluation, and academic credit remain proposals.
+recorded company decision, placements with weekly progress reports, faculty
+oversight, and the document contract. A placement originates from either an
+approved request or an accepted recruitment application. A supervisor is an
+administrator-granted assignment of one staff account to one placement, who
+reads it and acknowledges its weeks and holds no gate over the company or the
+student. A request shares the résumé already on the candidate profile rather
+than storing a second copy, and a placement carries the student's deliverables.
+Every authorized increment of [SPEC-0041](specs/spec-student-internship-requests.md)
+has shipped; interviews, an academic gate, rubric evaluation, email, REST APIs,
+and academic credit remain unauthorized and are enforced absent by
+`test/operations/internship_request_boundary_test.rb`.
 
 Corrected 2026-08-09: company internship **positions and evaluations already
 exist** and ship under

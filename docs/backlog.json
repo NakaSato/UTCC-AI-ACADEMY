@@ -2496,6 +2496,76 @@
         }
       ],
       "updated_at": "2026-08-12T13:15:00+07:00"
+    },
+    {
+      "id": "DEV-005",
+      "title": "Make the roadmap answer to the backlog, and keep it that way",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "DEV-002"
+      ],
+      "evidence": [
+        {
+          "label": "Unified roadmap — ordered delivery plan",
+          "url": "roadmap.html#unified-roadmap--ordered-delivery-plan"
+        },
+        {
+          "label": "Documentation lifecycle and gates",
+          "url": "mdlc.html"
+        }
+      ],
+      "updated_at": "2026-08-12T10:15:00+07:00"
+    },
+    {
+      "id": "DOCS-013",
+      "title": "Write the M13 gate documents: what the public proposal platform must decide first",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DOCS-005"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0049 - proposal triage before a public platform",
+          "url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+        },
+        {
+          "label": "SPEC-0049 - the proposal request intake as built",
+          "url": "specs/spec-proposal-request-intake.html"
+        },
+        {
+          "label": "M13 roadmap section",
+          "url": "roadmap.html#milestone-m13--public-feature-request-and-core-team-development-platform"
+        }
+      ],
+      "updated_at": "2026-08-12T10:40:00+07:00"
+    },
+    {
+      "id": "DEV-006",
+      "title": "Close the two proposal refusals nothing was asserting",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DOCS-013"
+      ],
+      "evidence": [
+        {
+          "label": "SPEC-0049 - the proposal request intake as built",
+          "url": "specs/spec-proposal-request-intake.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:05:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4287,6 +4357,30 @@
       "to": "complete",
       "summary": "A defect introduced this morning by INT-006 and caught by measuring rather than by reading: the placement screen filtered deliverables with a per-record readable_by?, and the company half of that rule is two membership lookups, so the screen cost two queries per file. Measured at seven queries for one deliverable and fifteen for five - it grew with the pile, which is exactly what test/models/query_budget_test.rb and the agent-flow invariant table already forbid for a cohort. InternshipPlacement#deliverables_readable_by asks the company question once and returns a scope: the whole list for a decider while the placement is open, and the author's own otherwise, which is the same rule readable_by? states for one record. The budget test now covers it, and the regression was planted and confirmed failing at seven versus twenty-five queries before the fix was kept. Seeding the internship exposed a second, older trap the repository had already documented in test/fixtures/organizations.yml: a table the seeds write and the fixtures do not name is never cleared between them, so a seeded row outlives the users it points at and the next fixture load dies on a foreign key. Eight tables needed the same deliberately-empty file - the five internship tables, candidate profiles, and both Active Storage tables - and the note in each says why it is empty.",
       "evidence_url": "performance.html"
+    },
+    {
+      "at": "2026-08-12T10:15:00+07:00",
+      "item_id": "DEV-005",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The roadmap and the backlog disagreed in both directions at once, and nothing read both files. The UTCC summary table still called five finished milestones Next or Later, and the consolidated table still described the Student Internship Request Platform as increments 1 to 3 after increment 4 had shipped. The roadmap is what a person opens to decide what to build next, so a stale cell sends somebody to build what already exists or to leave alone what nobody has started. script/validate-backlog, already a gate through bin/docs, now reads docs/roadmap.md as well: a milestone the backlog tracks is Complete on the roadmap exactly when every one of its items is complete, checked in the consolidated table, the summary table, and each milestone section status line. Milestones with no backlog items — the M0 baseline and the unaccepted proposals M12, M13, M14 — have nothing to compare and are left alone.",
+      "evidence_url": "roadmap.html#unified-roadmap--ordered-delivery-plan"
+    },
+    {
+      "at": "2026-08-12T10:40:00+07:00",
+      "item_id": "DOCS-013",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Ecosystem M13 is order 3 in the unified plan and had no ADR and no specification, so the roadmap gate had nothing to confirm or refuse. Writing them turned up why: the proposal intake it proposes to extend has no governing document either, and three of its four statuses are unreachable. Nothing in app/ assigns status, there is no index or review screen, and the author-facing page renders a status that can never change. M13's stated outcome is the proportion of proposals receiving an auditable decision and an author-visible explanation; that proportion is zero by construction, so the baseline the roadmap defers to discovery is already known. ADR-0049 is proposed, not accepted: record the existing boundary first, make the first increment triage rather than participation, keep the audience as it is, and keep the explanation in-app because ADR-0004 still defers production email. SPEC-0049 is a draft record of the shipped intake, naming the dead statuses as a defect rather than a design. No code changed and no M13 delivery item exists.",
+      "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+    },
+    {
+      "at": "2026-08-12T11:05:00+07:00",
+      "item_id": "DEV-006",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Writing SPEC-0049 showed that the proposal intake's two refusals were the two things no test touched: one contributor reading another's proposal, and an incomplete submission re-rendering the form. Each is one line of controller, which is exactly how they get lost. Both hold, and are now asserted along with a staff account being turned away from the form. That third test is where the draft specification turned out to be wrong: a signed-in account with the wrong role is redirected to root with the forbidden flash, not refused outright, because Authorization#authorize_role lands both of its denials there. The specification now says so. The one gap left open is deliberate: that no code path changes status cannot be usefully asserted until ADR-0049 decision 6 settles the status vocabulary, since either form of the assertion would be deleted by the change that answers it.",
+      "evidence_url": "specs/spec-proposal-request-intake.html"
     }
   ]
 }

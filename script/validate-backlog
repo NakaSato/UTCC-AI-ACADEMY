@@ -61,6 +61,99 @@ if allowed_statuses.is_a?(Array) && items.is_a?(Array)
   end
 end
 
+# The roadmap's status columns and the backlog disagreed on 2026-08-12, in both
+# directions at once. The UTCC summary table still called five finished
+# milestones "Next" or "Later", and the consolidated table still described the
+# Student Internship Request Platform as "Increments 1–3 implemented" after
+# increment 4 had shipped. Nothing caught either one, because until now nothing
+# read both files.
+#
+# The roadmap is what a person opens to decide what to build next, so a stale
+# cell sends somebody to build what already exists, or to leave alone what
+# nobody has started. Only the comparable part is compared: a milestone the
+# backlog tracks is finished exactly when every one of its items is complete.
+# Milestones with no backlog items — the M0 baseline, and proposals not yet
+# accepted into delivery — have nothing to compare against and are left alone.
+#
+# One sharp edge to know about: a milestone whose only items are documentation
+# would be read here as delivered. Discovery and gate documents are therefore
+# filed under the current milestone, the way every DOCS item already is, and not
+# under the milestone they describe. Filing them the other way would have this
+# check demand the roadmap call an unstarted milestone Complete.
+DONE = "Complete"
+
+# Track IDs are namespaced in the roadmap so `UTCC M10`, `AI M10`, and
+# `Ecosystem M10` cannot be confused. The backlog names the same milestones
+# differently, so the two vocabularies are mapped rather than matched.
+def backlog_milestone(track_id)
+  case track_id
+  when "Ecosystem M10" then "M10-CBP"
+  when "Ecosystem M11" then "M11-SIR"
+  when /\AUTCC (M\d+)\z/ then Regexp.last_match(1)
+  when /\AAI (M\d+)\z/ then "AI-#{Regexp.last_match(1)}"
+  end
+end
+
+def disagreement(milestone, label, items)
+  owned = items.select { |item| item["milestone"] == milestone }
+  return if owned.empty?
+
+  open = owned.reject { |item| item["status"] == "complete" }
+
+  if open.empty? && label != DONE
+    "says #{label.inspect}, but all #{owned.length} of its backlog items are complete"
+  elsif open.any? && label == DONE
+    "says #{DONE.inspect}, but #{open.length} backlog item(s) are open: " \
+      "#{open.map { |item| "#{item['id']} (#{item['status']})" }.join(', ')}"
+  end
+end
+
+def roadmap_statuses(lines)
+  found = []
+  table = nil
+  milestone = nil
+
+  lines.each_with_index do |raw, index|
+    line = raw.chomp
+    location = "roadmap.md:#{index + 1}"
+
+    case line
+    when /\A\|\s*Order\s*\|\s*Track ID\s*\|/ then table = :consolidated
+    when /\A\|\s*Order\s*\|\s*Milestone\s*\|/ then table = :summary
+    when /\A\s*\z/ then table = nil
+    end
+
+    # The per-milestone heading and its own status line, which is a second
+    # place the same fact is written down.
+    milestone = "M#{Regexp.last_match(1)}" if line =~ /\A## Milestone (\d+) /
+    if milestone && line =~ /\A\*\*Status: (.+)\*\*\s*\z/
+      found << { milestone: milestone, label: Regexp.last_match(1), where: "#{location} (#{milestone} section)" }
+      milestone = nil
+    end
+
+    next unless table && line.start_with?("|")
+
+    cells = line.split("|").map(&:strip)
+    next unless cells[1]&.match?(/\A\d+\z/)
+
+    id = table == :consolidated ? backlog_milestone(cells[2]) : "M#{cells[1]}"
+    next if id.nil?
+
+    found << { milestone: id, label: cells.last, where: "#{location} (#{table} table, #{cells[2]})" }
+  end
+
+  found
+end
+
+roadmap_path = File.join(File.dirname(path), "roadmap.md")
+
+if items.is_a?(Array) && File.exist?(roadmap_path)
+  roadmap_statuses(File.readlines(roadmap_path, encoding: Encoding::UTF_8)).each do |row|
+    problem = disagreement(row[:milestone], row[:label], items)
+    errors << "#{row[:where]}: #{row[:milestone]} #{problem}" if problem
+  end
+end
+
 if updates.is_a?(Array)
   updates.each_with_index do |update, index|
     %w[at item_id summary].each do |field|
