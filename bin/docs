@@ -66,6 +66,7 @@ REFERENCE_FIELDS = %w[depends_on supersedes superseded_by includes].freeze
 
 errors = []
 warnings = []
+stalled = []
 documents = []
 
 unless system(ROOT.join("script/validate-backlog").to_s)
@@ -167,9 +168,32 @@ TYPE_CONFIG.each do |type, config|
       errors << "#{relative_path}: accepted specs require at least one enforced_by path"
     end
 
-    if metadata["review_by"] && Date.iso8601(metadata["review_by"].to_s) < Date.today &&
+    # A draft past its review date and an accepted document past its review date
+    # are not the same problem, and one shared warning made both unreadable. On
+    # 2026-08-12 this printed 28 identical lines on every run. Nineteen were
+    # accepted documents a week past a mechanical `created + 7` stamp — nothing
+    # was wrong with them. Four were drafts whose work had genuinely stalled and
+    # which the backlog already recorded as blocked. Four more were documents
+    # whose work had shipped nine days earlier and whose own text said the user
+    # had approved them, while `status` still said draft. Reading 28 identical
+    # lines is how the third group hid behind the first.
+    #
+    # So the two are counted and phrased apart. A stalled draft names its owners,
+    # because it is waiting on a person; an overdue accepted document does not,
+    # because it is waiting on the calendar. Neither aborts: a decision nobody
+    # has made yet is a fact about the project, not a broken build.
+    if metadata["review_by"] &&
         !%w[superseded deprecated rejected rolled_back].include?(metadata["status"])
-      warnings << "#{relative_path}: review_by is past due"
+      days = (Date.today - Date.iso8601(metadata["review_by"].to_s)).to_i
+
+      if days.positive?
+        if %w[draft proposed].include?(metadata["status"])
+          owners = Array(metadata["owners"]).join(", ")
+          stalled << "#{relative_path}: #{metadata['status']}, #{days} days past review_by — #{owners}"
+        else
+          warnings << "#{relative_path}: #{days} days past review_by, due for re-review"
+        end
+      end
     end
 
     documents << {
@@ -247,7 +271,9 @@ documents.each do |document|
   end
 end
 
-warnings.each { |warning| warn("warning: #{warning}") }
+stalled.sort.each { |entry| warn("stalled: #{entry}") }
+warnings.sort.each { |warning| warn("warning: #{warning}") }
 abort(errors.join("\n")) unless errors.empty?
 
-puts "Lifecycle documents are valid (#{documents.length} checked, #{warnings.length} warnings)."
+puts "Lifecycle documents are valid (#{documents.length} checked, " \
+     "#{stalled.length} stalled, #{warnings.length} due for re-review)."

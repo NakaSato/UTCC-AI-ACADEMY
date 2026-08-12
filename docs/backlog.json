@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T13:15:00+07:00",
+  "updated_at": "2026-08-12T11:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2565,7 +2565,7 @@
           "url": "test-strategy.html"
         }
       ],
-      "updated_at": "2026-08-12T11:05:00+07:00"
+      "updated_at": "2026-08-12T10:25:00+07:00"
     },
     {
       "id": "DOCS-014",
@@ -2595,7 +2595,51 @@
           "url": "specs/spec-m7-admin-course-lifecycle.html"
         }
       ],
-      "updated_at": "2026-08-12T11:40:00+07:00"
+      "updated_at": "2026-08-12T10:45:00+07:00"
+    },
+    {
+      "id": "DEV-007",
+      "title": "Split the review warning: a stalled decision is not an overdue calendar entry",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DOCS-014"
+      ],
+      "evidence": [
+        {
+          "label": "Documentation lifecycle and gates",
+          "url": "mdlc.html"
+        },
+        {
+          "label": "Development flow",
+          "url": "development-flow.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:00:00+07:00"
+    },
+    {
+      "id": "DEV-008",
+      "title": "Stop the backlog recording work as done before it is",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-005"
+      ],
+      "evidence": [
+        {
+          "label": "Documentation lifecycle and gates",
+          "url": "mdlc.html"
+        },
+        {
+          "label": "Process",
+          "url": "process.html"
+        }
+      ],
+      "updated_at": "2026-08-12T11:15:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4405,7 +4449,7 @@
       "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
     },
     {
-      "at": "2026-08-12T11:05:00+07:00",
+      "at": "2026-08-12T10:25:00+07:00",
       "item_id": "DEV-006",
       "from": "queued",
       "to": "complete",
@@ -4413,12 +4457,28 @@
       "evidence_url": "specs/spec-proposal-request-intake.html"
     },
     {
-      "at": "2026-08-12T11:40:00+07:00",
+      "at": "2026-08-12T10:45:00+07:00",
       "item_id": "DOCS-014",
       "from": "queued",
       "to": "complete",
       "summary": "bin/docs warned about 28 documents past review_by on every run, which is how a warning stops being read. Most of it was not debt: 19 are accepted documents past a mechanical created-plus-seven stamp, and 4 are correctly draft because their work is genuinely blocked - ADR-0010 and SPEC-0010 for UTCC SSO, ADR-0022 and SPEC-0022 for production deployment, which the backlog already records as M6-002 and M9-004. The real finding was 4 documents whose frontmatter contradicted their own bodies. M7-001 and M7-002 shipped on 2026-08-03 with the approval recorded in this file in the user's own words, their specs carry enforced_by lists pointing at tests that exist and pass, and their review-state blockquotes say the user approved them - while status still said draft, and the README index said draft too, so nothing could catch it. ADR-0012, ADR-0013, SPEC-0012, and SPEC-0013 now record the acceptance that happened, with the date it was recorded kept distinct from the date it was given. SPEC-0015 was deliberately left as draft: its work is complete and its tests pass too, but its own text says it remains blocked on the unreviewed supported-flag rows, scopes, runtime consumers, and academic policy, so any rule that swept it up with the others would have been wrong.",
       "evidence_url": "specs/spec-m7-admin-course-lifecycle.html"
+    },
+    {
+      "at": "2026-08-12T11:00:00+07:00",
+      "item_id": "DEV-007",
+      "from": "queued",
+      "to": "complete",
+      "summary": "bin/docs printed 28 identical review_by lines on every run, and reading 28 identical lines is how DOCS-014's finding stayed hidden: four documents whose work had shipped nine days earlier, sitting in the same undifferentiated list as nineteen accepted documents a week past a mechanical stamp. The two are now counted and phrased apart. A draft or proposed document past its review date is stalled and names its owners, because it is waiting on a person. Anything else past its date is due for re-review, because it is waiting on the calendar. Neither aborts the build; a decision nobody has made yet is a fact about the project, not a broken gate. The output went from 28 undifferentiated warnings to 5 stalled and 19 due for re-review, and the 5 are a clean cross-check on the backlog: ADR-0010 and SPEC-0010 are M6-002, ADR-0022 and SPEC-0022 are M9-004, and SPEC-0015 is the feature-flag specification deliberately left draft by DOCS-014. Run before today's flip it would have listed 9, and the 4 extra would have been the ones nobody had noticed.",
+      "evidence_url": "mdlc.html"
+    },
+    {
+      "at": "2026-08-12T11:15:00+07:00",
+      "item_id": "DEV-008",
+      "from": "queued",
+      "to": "complete",
+      "summary": "A timestamp in the future is how this file stops being a record and starts being a plan, and it was introduced here by hand today: writing several entries in one sitting and spacing them half an hour apart to keep them ordered walked DEV-006, DOCS-014, and DEV-007 past the clock, so each claimed to be finished before it was. Those three are corrected to 10:25, 10:45, and 11:00, and the top-level updated_at with them. The ordering instinct was right and the method was wrong: updates is not sorted and does not need to be, so an entry never has to be dated later than the one above it. script/validate-backlog now warns on any item or update timestamp in the future and errors on one that will not parse at all. It warns rather than aborts because 19 timestamps across 8 items from earlier sessions are still ahead of the clock, by an hour for DEV-002 through OPS-002 and by up to twenty for INT-005, OPS-001, and UX-007. Whether those clocks were wrong or the entries were deliberately post-dated is for whoever wrote them; the check asks on every run instead of nobody asking.",
+      "evidence_url": "mdlc.html"
     }
   ]
 }
