@@ -213,6 +213,18 @@ statement in SPEC-0049 or its successor, and decision 1's is due immediately:
 - Decision 7 is enforced by the absence of any write path from application code
   to `docs/` or `docs/backlog.json`, which no test asserts today.
 
+  **Corrected 2026-08-12.** It does now:
+  `test/operations/documentation_write_boundary_test.rb` holds the property one
+  step stronger than this sentence asks for — nothing under `app/` or `lib/`
+  writes a file at all, so the guarantee does not depend on anybody remembering
+  which paths are documents. Writing it turned up one thing this paragraph did
+  not know: a generated file *does* live under `docs/`. `ErrorPages` writes the
+  hosted 503 that Render's maintenance mode serves, because that URL must not
+  sit on the service that is down (RB-0006). The exception is named and pinned
+  to exactly that path; no specification, decision, runbook, or the backlog is
+  inside the generated set. `script/` is deliberately outside the scan, being
+  tooling a person runs rather than anything a request can reach.
+
 ## Human decisions still required
 
 Five of the twelve in roadmap §15 are answered by this decision. **Seven remain
