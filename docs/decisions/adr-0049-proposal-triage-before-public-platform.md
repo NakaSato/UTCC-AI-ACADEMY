@@ -2,7 +2,7 @@
 id: ADR-0049
 type: adr
 title: Give a proposal an answer before giving the public a platform
-status: proposed
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@data-owner", "@qa-owner"]
 created: 2026-08-12
 updated: 2026-08-12
@@ -20,13 +20,21 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Give a Proposal an Answer Before Giving the Public a Platform
 
-> **Decision state:** Proposed on 2026-08-12 for the Product Owner, Tech Lead,
-> Security owner, Privacy owner, Data owner, and QA owner. **Nothing here is
-> accepted, and no code moves on it.** Ecosystem M13 is order 3 in the unified
-> delivery plan and has never entered execution; the roadmap gate requires an
-> ADR to confirm or refuse, and this is that document. Roadmap §15 lists twelve
-> product decisions required before scheduling. This narrows which of them have
-> to be answered first, and proposes answers to five.
+> **Decision state:** **Accepted by the user on 2026-08-12**, the same day it was
+> proposed, for the Product Owner, Tech Lead, Security owner, Privacy owner, Data
+> owner, and QA owner. Ecosystem M13 is order 3 in the unified delivery plan and
+> has never entered execution; the roadmap gate required an ADR to confirm or
+> refuse, and this is that document.
+>
+> The seven decisions below are now the boundary. Roadmap §15 lists twelve
+> product decisions required before scheduling; this answers five of them and
+> **the other seven remain open and out of the first increment** — field
+> visibility, voting, comments and moderation, role mapping, the private
+> security-report path, search and attachments and notifications, and AI data
+> use. Accepting this does not schedule M13, and it authorizes no public
+> surface. What it authorizes is decision 1 immediately, and increment 1 —
+> triage, at the existing audience, explained in-app — once a backlog item
+> carries it.
 
 > [Decision Records](README.md) ·
 > [Proposal request intake specification](../specs/spec-proposal-request-intake.md) ·
@@ -87,7 +95,7 @@ must do so without sending mail, or it inherits M1's blocker and ships nothing.
 
 ## Decision
 
-The proposed policy, in the order the questions should be answered:
+The accepted policy, in the order the questions should be answered:
 
 1. **Record the boundary that exists before extending it.** SPEC-0049 describes
    the shipped intake as built — fields, constraints, audience, reachability,
@@ -192,8 +200,8 @@ scheduling the milestone.
 
 ## Fitness Functions
 
-None yet — this ADR is proposed and implements nothing. On acceptance, each
-decision above becomes a checkable statement in SPEC-0049 or its successor:
+This ADR implements nothing itself; each decision above becomes a checkable
+statement in SPEC-0049 or its successor, and decision 1's is due immediately:
 
 - Decision 1 is satisfied when `docs/specs/spec-proposal-request-intake.md` is
   accepted and carries a non-empty `enforced_by`, which `bin/docs` gates.
@@ -207,10 +215,10 @@ decision above becomes a checkable statement in SPEC-0049 or its successor:
 
 ## Human decisions still required
 
-All twelve in roadmap §15 remain open. This ADR proposes answers to five of
-them and defers the rest untouched:
+Five of the twelve in roadmap §15 are answered by this decision. **Seven remain
+open**, and no work may assume an answer to them:
 
-| §15 | Question | Proposed here |
+| §15 | Question | Settled here |
 | --- | --- | --- |
 | 1 | Anonymous or registered-only submission | Registered-only for increment 1 (decision 3) |
 | 2 | How `proposal_requests` evolves | Evolve, do not replace (decisions 1 and 6) |
@@ -229,5 +237,12 @@ Two questions this ADR raises that §15 does not:
 ## Decision owner
 
 Product Owner, with Tech Lead, Security owner, Privacy owner, Data owner, and
-QA owner. **Not accepted.** No implementation may begin, and no backlog item
-should be created for M13 delivery until this is accepted or replaced.
+QA owner. **Accepted by the user on 2026-08-12.**
+
+Decision 1 is authorized now and is documentation only. Increment 1 — the
+triage screen, the decision record, the author-visible reason, and the status
+vocabulary settled with its check constraint — is authorized in scope but still
+needs a backlog item and the roadmap gate before it is scheduled; acceptance of
+a boundary is not a delivery commitment. Everything outside those seven
+decisions remains unauthorized and is refused by the same rule that refused it
+yesterday.

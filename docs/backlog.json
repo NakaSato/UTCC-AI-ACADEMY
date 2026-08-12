@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T14:30:00+07:00",
+  "updated_at": "2026-08-12T15:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4697,6 +4697,14 @@
       "to": "complete",
       "summary": "ADR-0048 decision 7 said an inactive organization is not reachable, the same way its other screens are not. The second clause was untrue when written: the work surface and the reporting page both refused a suspended company, while /company/:slug served a member its record normally, so the screen the decision was about was the strictest of the three rather than one of a set. The record refuses a member now. Administrators are a deliberate exception and a load-bearing one - /admin lists only active organizations and every membership action redirects back to this page, so refusing them too would let somebody suspend a company and leave no screen anywhere that could manage it. Decision 7 is amended rather than rewritten, keeping the original sentence with the correction underneath. This came out of an audit finding that was first reported backwards and withdrawn; reading the caller to withdraw it is what turned up that visible_to? has no status check at all.",
       "evidence_url": "decisions/adr-0048-company-work-surface.html"
+    },
+    {
+      "at": "2026-08-12T15:00:00+07:00",
+      "item_id": "DOCS-013",
+      "from": "complete",
+      "to": "complete",
+      "summary": "The user accepted ADR-0049 on 2026-08-12, the day it was proposed, so Ecosystem M13 now has a boundary rather than a nine-hundred-line description. Five of roadmap section 15's twelve product decisions are settled: registered-only intake for the first increment, evolve the existing proposal_requests rather than replace it, a triage-only lifecycle with recorded transitions, human-recorded references to the roadmap and backlog rather than generated ones, and a baseline of zero that is measurable today rather than deferred to discovery. Seven remain open and no work may assume an answer to them - field visibility, voting, comments and moderation, role mapping, the private security-report path, search and attachments and notifications, and AI data use. Two consequences worth separating. Decision 1 is authorized immediately and is documentation only: SPEC-0049 records the shipped intake, and the ADR's own fitness function is not satisfied until that specification is accepted rather than draft. Increment 1 - a triage screen, a decision record, an author-visible reason, and the status vocabulary settled with its check constraint so no status exists that the code cannot reach - is authorized in scope but not scheduled. Accepting a boundary is not a delivery commitment, and M13 stays Proposed on the roadmap until a backlog item and the roadmap gate carry it into execution.",
+      "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
     }
   ]
 }
