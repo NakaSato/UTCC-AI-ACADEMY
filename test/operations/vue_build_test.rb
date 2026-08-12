@@ -76,6 +76,21 @@ class VueBuildTest < ActiveSupport::TestCase
       "the vendored Vue is what Vite replaced; two copies is the bug this test exists for"
   end
 
+  # A source map is nine times the size of what it explains, and nothing here
+  # consumes one: no error tracker, no upload step, and no other bundle ships a
+  # map, because Propshaft serves the import map's files as they were written.
+  # So production gets none, and every other mode keeps it.
+  #
+  # Asserted against the configuration rather than a production build, which is
+  # the same shape as the importmap assertion above: this test builds in test
+  # mode, where the map is deliberately present.
+  test "the production build ships no source map" do
+    config = ROOT.join("vite.config.mts").read
+
+    assert_match(/sourcemap:\s*mode\s*!==\s*["']production["']/, config,
+      "production would serve the island sources beside the bundle — see ADR-0053")
+  end
+
   test "Vite builds only the island layer" do
     entrypoints = FRONTEND.glob("entrypoints/*").map { it.basename.to_s }
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T05:52:00+07:00",
+  "updated_at": "2026-08-13T06:08:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3192,6 +3192,24 @@
         }
       ],
       "updated_at": "2026-08-13T05:52:00+07:00"
+    },
+    {
+      "id": "DEV-026",
+      "title": "Stop serving the island sources beside the island bundle",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Security Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-012"
+      ],
+      "evidence": [
+        {
+          "label": "Vite island build decision",
+          "url": "decisions/adr-0053-vite-island-build.html"
+        }
+      ],
+      "updated_at": "2026-08-13T06:08:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5255,6 +5273,14 @@
       "to": "complete",
       "summary": "The KaTeX defect hid behind a comment claiming a limitation that had stopped being true, so the same class was swept for rather than the instance being called done. Numeric claims are the checkable part of it, and every one checked was wrong. The style policy said nineteen inline style attributes across ten templates; there are thirty across fifteen. Three documents and CLAUDE.md said seventeen Stimulus controllers; there are thirteen, and the number was probably absorbed from Organization#from_param!, whose own seventeen is correct - seventeen Rails controllers really do look an organization up. ADR-0053 said sixty pins where there are sixty-three, and carried a consequence that autoBuild covers test, which the race fix had already made false the same night. The substance under the count matters more than the count. unsafe-inline is in style-src because every inline style is a value Ruby worked out - a progress width, a stagger delay, a toast offset, one background-image URL - and a utility class cannot express those. That was true of twenty-nine of the thirty. The thirtieth was style=animation-delay: 60ms on the catalogue subtitle, which a utility could express and which nothing would have noticed a second or a tenth of. It is [animation-delay:60ms] now, and inline_style_boundary_test.rb holds the rule from both sides: an inline style must carry a computed value, and the computed ones must still be there - so the policy cannot be satisfied by quietly deleting the feature it exists for.",
       "evidence_url": "coding-standard.html"
+    },
+    {
+      "at": "2026-08-13T06:08:00+07:00",
+      "item_id": "DEV-026",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The Vite build shipped a source map to production - 535KB beside a 61KB bundle, served publicly, holding the island sources - on the argument that a bundle nobody can read cannot be reviewed after an incident. It was flagged when it went in and left for a decision; the decision is that the argument needs somewhere for the map to go and there is nowhere. Nothing in this application consumes source maps: no error tracker, no upload step, and no other bundle ships one, because Propshaft serves the import map-s files as they were written. It would have been the only map in production, nine times the size of what it explains, and the only thing reading it would have been whoever wanted the sources. Off in production, on in every other mode, verified by running a production assets:precompile and finding the bundle alone. If an error tracker ever arrives the answer is to upload the map to it rather than serve it from the origin, and the ADR says so. The rule is asserted against the configuration rather than a production build, in the same shape as the importmap assertion beside it, because the suite builds in test mode where the map is deliberately present.",
+      "evidence_url": "decisions/adr-0053-vite-island-build.html"
     }
   ]
 }

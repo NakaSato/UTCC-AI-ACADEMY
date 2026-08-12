@@ -150,6 +150,14 @@ the dev-server ergonomics are the thing being bought.
   every build.
 - The island bundle is 61KB (24KB gzipped), against 110KB for the vendored
   runtime build it replaces — Vite tree-shakes what the islands do not use.
+- **No source map in production.** The first build shipped one: 535KB beside a
+  61KB bundle, served publicly, holding the island sources. The argument for it
+  was that a bundle nobody can read cannot be reviewed after an incident, and
+  that argument needs somewhere for the map to go. There is nowhere — no error
+  tracker, no upload step, and no other bundle ships a map, because Propshaft
+  serves the import map’s files as they were written. Maps stay on in every
+  other mode. If an error tracker arrives, it should be given the map rather
+  than the origin serving it.
 - Two toolchains is a real maintenance surface: two lockfiles, two audits, two
   upgrade paths. The boundary in decision 2 is what keeps it from becoming
   worse than one.
