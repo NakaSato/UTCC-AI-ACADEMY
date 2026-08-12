@@ -120,6 +120,22 @@ The accepted policy is:
 7. **An inactive organization has no work surface.** It is not reachable, the
    same way its other screens are not.
 
+   **Amended 2026-08-12.** That second sentence was not true when it was
+   written. The work surface and the reporting page both refused a suspended
+   company; `/company/:slug` — its record — served a member normally, so this
+   screen was the strictest rather than one of a set. The record screen now
+   refuses a member too, which is what makes the sentence describe the system.
+
+   Administrators are the deliberate exception, and `index` on the same
+   controller already drew it: they see every organization while a member sees
+   only active ones. It is not deference. `/admin` lists only active
+   organizations and every membership action on the record screen redirects
+   back to it, so refusing administrators as well would leave a suspended
+   company with no screen anywhere that could manage it. An administrator
+   therefore reaches the record and still does not reach the work surface —
+   one screen manages a company, the other reports what is waiting on it, and
+   there is nothing waiting on a company that is not operating.
+
 ## Alternatives
 
 ### A work section added to `/company/:slug`

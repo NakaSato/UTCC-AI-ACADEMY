@@ -109,8 +109,22 @@ module Recruitment
       def find_visible_organization
         organization = Organization.from_param!(params[:id])
         raise ActiveRecord::RecordNotFound unless organization.visible_to?(Current.user)
+        raise ActiveRecord::RecordNotFound unless reachable?(organization)
 
         organization
       end
+
+      # A suspended company is not operating, so its members have no screens for
+      # it — the answer its work surface and its reporting page already give, and
+      # the one ADR-0048 decision 7 says the rest of it gives. This was the
+      # screen that did not: a member of a suspended company still read its
+      # record while every sibling refused.
+      #
+      # An administrator keeps reaching it, which is the same asymmetry `index`
+      # above already draws. It is not deference — /admin lists only active
+      # organizations, and every membership action here redirects back to this
+      # page, so refusing administrators too would leave a suspended company
+      # with no screen anywhere that can manage it.
+      def reachable?(organization) = organization.active? || Current.user.admin?
   end
 end

@@ -60,7 +60,9 @@ class CompanyWorkTest < ActionDispatch::IntegrationTest
   end
 
   # Invariant 4: a suspended company is not operating, so there is no board for
-  # it — the same answer its other screens give.
+  # it — the same answer its other screens give a member. That was aspirational
+  # when it was written: the record screen served one until 2026-08-12. See
+  # ADR-0048 decision 7, where the administrator exception is recorded too.
   test "a suspended company has no work surface" do
     @organization.update!(status: "suspended")
 

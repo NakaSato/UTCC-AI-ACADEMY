@@ -58,6 +58,38 @@ class Recruitment::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  # ADR-0048 decision 7 says an inactive company is unreachable "the same way its
+  # other screens are not". Its work surface and its reporting page both refused;
+  # this screen did not, so a member of a suspended company still read its record
+  # while every sibling turned them away.
+  test "a member of a suspended company cannot view its record" do
+    organization = Organization.create!(name: "Paused Org", creator: users(:admin))
+    organization.memberships.create!(user: users(:one), role: "owner")
+
+    sign_out
+    sign_in_as users(:one)
+    get company_path(organization)
+    assert_response :success
+
+    organization.update!(status: "suspended")
+    get company_path(organization)
+    assert_response :not_found
+  end
+
+  # The asymmetry `index` already draws, and a necessary one: /admin lists only
+  # active organizations and every membership action redirects back to this page,
+  # so refusing administrators would leave a suspended company unmanageable.
+  test "an administrator still reaches a suspended company to manage it" do
+    organization = Organization.create!(name: "Paused Org", creator: users(:admin))
+    organization.memberships.create!(user: users(:one), role: "owner")
+    organization.update!(status: "suspended")
+
+    get company_path(organization)
+
+    assert_response :success
+    assert_select "h1", "Paused Org"
+  end
+
   test "admin grants and revokes a non-owner membership" do
     organization = Organization.create!(name: "Grant Org", creator: users(:admin))
     organization.memberships.create!(user: users(:one), role: "owner")
