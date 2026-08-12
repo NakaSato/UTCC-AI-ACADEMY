@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T04:52:00+07:00",
+  "updated_at": "2026-08-13T05:26:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3150,6 +3150,26 @@
         }
       ],
       "updated_at": "2026-08-13T04:52:00+07:00"
+    },
+    {
+      "id": "UX-013",
+      "title": "Typeset the lesson equation that was being shown as its own source",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and Academic Owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Tiptap and KaTeX decision",
+          "url": "decisions/adr-0007-integrate-tiptap-with-stimulus-importmap.html"
+        },
+        {
+          "label": "Design system",
+          "url": "design-system.html"
+        }
+      ],
+      "updated_at": "2026-08-13T05:26:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5197,6 +5217,14 @@
       "to": "complete",
       "summary": "config/ci.rb gained two steps today and had never been run end to end, so it was - and it caught two things, one of them mine. Brakeman was failing the gate and had been since 8.0.6 shipped: bin/brakeman prepends --ensure-latest, so a release anybody makes turns the step red without a line of this repository changing. It was reported as passing several times during the day because the command was read through a pipe, which returns grep-s exit status and not Brakeman-s; the scan itself found nothing then and finds nothing now, but the step was red and was called green. The gem is bumped and the reading corrected. The second was a race introduced with Vite. autoBuild builds the island bundle on the first request for an asset, which in a parallel suite is eight processes discovering a stale bundle at the same moment - several build at once and one reads public/vite-test while another is part-way through rewriting it. The symptom is a template error saying the entrypoint is not in the manifests, on whichever few tests rendered a layout inside the window, which reads exactly like a flake. It is not one: it passed on the first gate run and failed on the next two, and passed every standalone run because the bundle was already warm. autoBuild is off in test now and test_helper builds once in the parent process before parallelize forks, so every worker inherits a manifest that is already correct. Verified from a cold start with public/vite-test deleted, and the whole gate is green in 1m18s: setup, docs, RuboCop, three audits, Brakeman, the Vite build, 1318 unit tests, the seed replant, and 31 system tests.",
       "evidence_url": "decisions/adr-0053-vite-island-build.html"
+    },
+    {
+      "at": "2026-08-13T05:26:00+07:00",
+      "item_id": "UX-013",
+      "from": "queued",
+      "to": "complete",
+      "summary": "A comment in the lesson view said KaTeX was unavailable because the app vendored no CSS or fonts, and offered the monospace branch as the fallback it expects. Both halves were stale. katex.js, katex.css and twenty font files have been vendored since the academic-post editor took Tiptap, the stylesheet is in shared/_head, and the editor typesets with them - so math was already rendered in this application, in the one place authors write LaTeX. The first reading of this was wrong in the other direction: the twelve real topics carry prose formulas, not LaTeX, and running a typesetter over input + model to output to evaluation would italicise every word and choke on the arrows, so monospace is the right rendering for them. The guard written to hold that line failed on its first run and found the actual defect. The generic placeholder copy, which the three topics outside REAL_TOPIC_KEYS fall back to, is genuine LaTeX - n_{train} = \\lceil 0.8\\,N \\rceil, \\quad n_{test} = N - n_{train} - in both locales, and every learner reaching 5-2, 6-1 or 6-2 was shown that string as monospace source. Block#latex? now decides per block: a backslash command or a $ pair means maths and gets a Stimulus controller that calls katex.render, anything else is printed as written. Subscript braces alone are deliberately not enough, because w_{new} = w_{old} - learning rate is a sentence. Stimulus rather than a Vue island, since this is behavior attached to server-rendered markup and holds no state - ADR-0051 decision 7. The source is in the markup either way, so a reader without JavaScript sees the expression rather than an empty plate. Three tests: the split asserted from both sides in both locales, the server handing the controller only to the LaTeX block, and a browser walk proving it is typeset rather than merely wrapped, with MathML present for a screen reader. The walk was mutation-checked - stub the render call and it fails.",
+      "evidence_url": "decisions/adr-0007-integrate-tiptap-with-stimulus-importmap.html"
     }
   ]
 }

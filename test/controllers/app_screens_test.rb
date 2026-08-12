@@ -122,6 +122,35 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", content.blocks.find { it.type == :link }.extra
   end
 
+  # An equation block is typeset when it is LaTeX and printed when it is not, and
+  # the server is what decides — the browser only carries it out. Topic 5-2 falls
+  # back to the placeholder copy, whose equation really is LaTeX and was rendered
+  # to learners as `\lceil 0.8\,N \rceil` until KaTeX was wired up; topic 1-1
+  # carries a prose formula that typesetting would ruin.
+  #
+  # The source is in the markup either way, so a reader with no JavaScript sees
+  # the expression rather than an empty plate.
+  test "a LaTeX equation block is handed to KaTeX and a prose one is not" do
+    # 5-2 is behind the progression gate, and this test is about what it renders
+    # rather than about reaching it.
+    complete_topics(users(:one), "AI1101", Syllabus.topic_keys.take_while { it != "5-2" })
+
+    get lesson_url(course: "AI1101", topic: "5-2")
+
+    assert_response :success
+    latex = LessonContent.for("5-2").blocks.find(&:latex?)
+    assert_not_nil latex, "topic 5-2 is the placeholder copy, whose equation block is LaTeX"
+    assert_select "[data-controller=katex][data-katex-source-value=?]", latex.value
+    assert_select "[data-controller=katex]", text: latex.value,
+      message: "the source stays on the page for a reader without JavaScript"
+
+    get lesson_url(course: "AI1101", topic: "1-1")
+
+    assert_response :success
+    assert_select "[data-controller=katex]", count: 0,
+      message: "a prose formula must not be typeset — KaTeX would italicise every word in it"
+  end
+
   test "student proctoring is on without a lesson-page switch and staff are exempt" do
     get lesson_url
 

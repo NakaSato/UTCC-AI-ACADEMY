@@ -2,11 +2,22 @@
   One free-form theory block. The design has seven types; which one renders is
   the block's `type`, and every type reads its prose from the same `value`.
 
-  The equation type renders its LaTeX source in monospace. The design upgrades
-  that to typeset maths with KaTeX and falls back to exactly this when KaTeX is
-  unavailable — which it is here, since the app vendors no CSS or fonts beyond
-  Tailwind. Wiring KaTeX up means vendoring katex.min.css and its font files
-  into app/assets; the markup below is already the fallback branch it expects.
+  The equation type renders its copy in monospace, and that is the rendering
+  rather than a fallback: none of the twelve equation blocks is LaTeX. They are
+  plain-text formulas in the reader's own language — "input + model → output →
+  evaluation", "MAE = mean(|actual - predicted|)", and their Thai counterparts —
+  and typesetting them would make them worse, not better. KaTeX would italicise
+  every word as a variable and choke on → and ×.
+
+  This comment used to say KaTeX was unavailable because the app vendored no CSS
+  or fonts. That has been untrue for a while: katex.js, katex.css and twenty
+  font files are vendored, the stylesheet is in shared/_head, and the
+  academic-post editor typesets with them through @tiptap/extension-mathematics.
+  Math is rendered in this application — in the one place authors write LaTeX.
+
+  So the day an equation block *is* LaTeX, this branch needs wiring up rather
+  than the library needing installing. `placeholder_content_test.rb` fails on
+  that day and says so.
 %>
 <% case block.type %>
 <% when :heading %>
@@ -23,7 +34,12 @@
 
 <% when :equation %>
   <div class="overflow-x-auto rounded-xl border border-surface-3 bg-surface-4 px-6 py-5 text-center">
-    <span class="font-mono text-14 text-ink-4"><%= block.value %></span>
+    <%# Typeset when the copy is LaTeX, printed when it is not — `Block#latex?`
+        decides, and the source is what the server sends either way. KaTeX
+        replaces it in place, so a reader with no JavaScript sees the
+        expression rather than an empty plate. %>
+    <span class="font-mono text-14 text-ink-4"
+          <% if block.latex? %>data-controller="katex" data-katex-source-value="<%= block.value %>"<% end %>><%= block.value %></span>
   </div>
 
 <% when :code %>

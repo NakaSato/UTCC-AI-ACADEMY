@@ -198,8 +198,24 @@ module LessonContent
     { type: :link, extra: "https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html" }
   ].freeze
 
+  # A backslash command or a `$…$` pair. Nothing else counts: `w_{new}` is TeX
+  # syntax and is also just how somebody writes a subscript in a sentence, and
+  # twelve of the thirteen equation blocks are prose formulas that would be
+  # ruined by a typesetter — "input + model → output → evaluation" rendered as
+  # maths is a row of italic variables.
+  LATEX = /\\[a-zA-Z]+|\$[^$]+\$/
+
   Block = Data.define(:type, :extra, :position, :definition) do
     def value = definition.translate("theory.blocks")[position]
+
+    # Whether this block is typeset or printed. The lesson view asks; a block
+    # that is LaTeX gets KaTeX, and one that is not is left exactly as written.
+    #
+    # The alternative was to make the *type* decide, which would have meant a
+    # second block type and a migration of copy that is already correct. The
+    # content is the honest signal here: an author writing `\lceil` means maths,
+    # and an author writing an arrow means a sentence.
+    def latex? = type == :equation && LessonContent::LATEX.match?(value.to_s)
 
     # An image block only renders once its `extra` is a real URL, matching the
     # design — a caption with no source would otherwise draw an empty plate.

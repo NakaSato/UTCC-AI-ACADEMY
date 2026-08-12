@@ -73,6 +73,48 @@ class PlaceholderContentTest < ActiveSupport::TestCase
     end
   end
 
+  # An equation block is typeset when it is LaTeX and printed when it is not,
+  # and both cases are real. Twelve topics carry prose formulas — "input + model
+  # → output → evaluation", the same sentence in Thai — which a typesetter would
+  # ruin into a row of italic variables. The placeholder copy the other three
+  # topics fall back to is genuine LaTeX, and was rendered to learners as its
+  # own source until KaTeX was wired up.
+  #
+  # This is the split, asserted from both sides, because getting either wrong is
+  # invisible on the page: raw \lceil on a lesson, or a Thai sentence italicised
+  # into nonsense.
+  test "an equation block is LaTeX or it is prose, and the view is told which" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        equations = Syllabus.topic_keys.flat_map do |topic_key|
+          LessonContent.for(topic_key).blocks.select { it.type == :equation }
+        end
+        prose, typeset = equations.partition { !it.latex? }
+
+        assert_operator prose.length, :>, 0, "no prose equation blocks in #{locale}"
+        assert_operator typeset.length, :>, 0, "no LaTeX equation blocks in #{locale}"
+
+        prose.each do |block|
+          assert_no_match LessonContent::LATEX, block.value,
+            "a block the view prints as text contains LaTeX (#{locale})"
+        end
+
+        typeset.each do |block|
+          assert_match LessonContent::LATEX, block.value,
+            "a block the view hands to KaTeX is not LaTeX (#{locale})"
+        end
+      end
+    end
+  end
+
+  # Subscript braces are how somebody writes a subscript in a sentence, and
+  # `w_{new} = w_{old} - learning rate × gradient` is a sentence. Typesetting it
+  # would italicise every word in it.
+  test "subscript braces alone are not LaTeX" do
+    assert_not LessonContent::LATEX.match?("w_{new} = w_{old} - learning rate × gradient")
+    assert LessonContent::LATEX.match?('n_{train} = \lceil 0.8\,N \rceil')
+  end
+
   test "the integrity band follows the score" do
     assert_equal :clean, Proctoring.band_for(Proctoring::START_SCORE)
     assert_equal :clean, Proctoring.band_for(85)
