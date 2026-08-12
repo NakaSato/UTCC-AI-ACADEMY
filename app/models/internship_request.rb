@@ -83,6 +83,51 @@ class InternshipRequest < ApplicationRecord
     student_id == user.id || decidable_by?(user)
   end
 
+  # ---- The shared résumé (ADR-0041 decision 5) -----------------------------
+  #
+  # Sharing records a choice, not a file. The résumé lives on the student's
+  # candidate profile under SPEC-0029, and a second copy here would mean two
+  # retention clocks and two deletions for the one document the platform is
+  # least entitled to duplicate. Deleting it there removes it from every request
+  # that pointed at it, which is the behaviour a student expects and the reason
+  # this is a timestamp.
+  def resume_shared? = resume_shared_at.present?
+
+  def shareable_resume = student.candidate_profile&.resume
+
+  # Written with `update_columns`, like a report acknowledgement and for the
+  # same reason: this is a stamp, not a lifecycle change, and it must not be
+  # made to look like one. `transition!` leaves the record dirty on `status`
+  # after it syncs, so a plain `update!` here would re-submit that status change
+  # without a transition context and be refused by the guard that exists to
+  # catch exactly that.
+  def share_resume!(actor:)
+    raise ActiveRecord::RecordInvalid, self unless actor == student && open?
+    raise ActiveRecord::RecordInvalid, self unless shareable_resume&.attached?
+
+    update_columns(resume_shared_at: Time.current, updated_at: Time.current)
+    AuditEvent.record("internship_request_resume_shared", organization: organization.name)
+    self
+  end
+
+  def unshare_resume!(actor:)
+    raise ActiveRecord::RecordInvalid, self unless actor == student && resume_shared?
+
+    update_columns(resume_shared_at: nil, updated_at: Time.current)
+    AuditEvent.record("internship_request_resume_unshared", organization: organization.name)
+    self
+  end
+
+  # The company reads it while they are deciding, and while the internship it
+  # produced is running. A rejected request closes the door with it: nobody
+  # keeps a student's résumé because they once considered them.
+  def resume_readable_by?(user)
+    return false if user.blank? || !resume_shared? || !shareable_resume&.attached?
+    return true if student_id == user.id
+
+    (open? || placement&.open?) && decidable_by?(user)
+  end
+
   def submit!(actor:)
     raise ActiveRecord::RecordInvalid, self unless actor == student && draft?
 

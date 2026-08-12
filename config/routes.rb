@@ -248,6 +248,12 @@ Rails.application.routes.draw do
   resources :internship_requests, path: "internship-requests", only: %i[index new create edit update show] do
     post :submit, on: :member
     post :withdraw, on: :member
+    # The shared résumé (SPEC-0041, increment 4). No upload here: the file is
+    # the one already on the student's candidate profile, and these three say
+    # who shared it, who unshared it, and who may read it.
+    post :resume, on: :member, to: "internship_request_resumes#create"
+    delete :resume, on: :member, to: "internship_request_resumes#destroy", as: :unshare_resume
+    get :resume, on: :member, to: "internship_request_resumes#show", as: :download_resume
   end
   post "internship-requests/:id/review", to: "internship_request_decisions#review", as: :review_internship_request
   post "internship-requests/:id/approve", to: "internship_request_decisions#approve", as: :approve_internship_request
@@ -272,6 +278,14 @@ Rails.application.routes.draw do
            to: "internship_faculty_assignments#destroy", as: :revoke_faculty
     post "reports/:report_id/faculty-acknowledge", on: :member,
          to: "internship_progress_reports#faculty_acknowledge", as: :faculty_acknowledge_report
+    # Deliverables (SPEC-0041, increment 4). The download is an app route rather
+    # than a blob URL on purpose: a signed blob URL authorizes the link and
+    # outlives both the placement and the membership that justified it.
+    post :deliverables, on: :member, to: "internship_deliverables#create"
+    delete "deliverables/:deliverable_id", on: :member,
+           to: "internship_deliverables#destroy", as: :deliverable
+    get "deliverables/:deliverable_id/download", on: :member,
+        to: "internship_deliverables#download", as: :download_deliverable
   end
   # End internship requests
 

@@ -28,6 +28,13 @@ class InternshipPlacement < ApplicationRecord
   has_many :faculty_assignments, class_name: "InternshipFacultyAssignment",
                                  foreign_key: :internship_placement_id,
                                  dependent: :restrict_with_exception, inverse_of: :placement
+  # Destroyed with the placement, unlike reports and assignments: a deliverable
+  # is the student's file rather than evidence of what anyone decided, and they
+  # may remove it themselves at any time anyway.
+  has_many :deliverables, class_name: "InternshipDeliverable", foreign_key: :internship_placement_id,
+                          dependent: :destroy, inverse_of: :placement
+
+  def open? = OPEN_STATUSES.include?(status)
 
   attr_accessor :status_transition_context
 

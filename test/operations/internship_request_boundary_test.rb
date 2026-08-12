@@ -47,6 +47,38 @@ class InternshipRequestBoundaryTest < ActiveSupport::TestCase
       "the faculty increment ships only against a recorded decision"
   end
 
+  # Documents stopped being deferred on 2026-08-12, when decision 5 was
+  # answered. What the boundary protects now is the shape of that answer: a
+  # request stores no second copy of a résumé, and a file one person uploaded is
+  # never handed to another person's browser to interpret.
+  test "the document contract stores no second résumé and serves nothing inline" do
+    request = code_of("app/models/internship_request.rb")
+
+    refute_match(/has_one_attached|has_many_attached/, request,
+      "a request shares the profile résumé; a copy here would mean two retention clocks")
+    assert_includes InternshipRequest.column_names, "resume_shared_at",
+      "sharing is recorded as a choice, not as a file"
+
+    %w[
+      app/controllers/internship_deliverables_controller.rb
+      app/controllers/internship_request_resumes_controller.rb
+    ].each do |path|
+      served = code_of(path)
+      assert_match(/disposition: "attachment"/, served,
+        "#{path} must never render somebody else's upload inline")
+      refute_match(/rails_blob|url_for\(.*file|service_url/, served,
+        "#{path} must not hand out a signed blob URL: it outlives the authorization that justified it")
+    end
+
+    deliverable = code_of("app/models/internship_deliverable.rb")
+    assert_match(/CONTENT_TYPES\.include\?/, deliverable, "the allowlist is enforced, not advisory")
+    assert_match(/MAX_BYTES/, deliverable)
+    %w[credit grade score].each do |word|
+      assert_not_includes InternshipDeliverable.column_names, word,
+        "decision 8 still holds: a deliverable records no #{word}"
+    end
+  end
+
   # The whole of the authority ADR-0041 decision 2 granted: read the placement,
   # acknowledge the week. A supervisor who could approve a request, advance a
   # placement, or complete one would be a different decision than the one taken.
@@ -87,17 +119,12 @@ class InternshipRequestBoundaryTest < ActiveSupport::TestCase
       "hours are evidence for a supervisor, never converted to credit or a grade")
   end
 
-  test "no document, mailer, api, or academic-credit surface exists" do
+  test "no mailer, api, or academic-credit surface exists" do
     routes = internship_request_routes
-    %w[attachment document upload resume portfolio].each do |word|
-      refute_includes routes, word,
-        "an internship-request #{word} route implies uploads before the document contract exists"
-    end
     refute_includes routes, "namespace :api"
     refute_includes routes, "format: :json"
 
     model = code_of("app/models/internship_request.rb")
-    refute_match(/has_one_attached|has_many_attached/, model)
     %w[credit grade hours].each do |word|
       assert_not_includes InternshipRequest.column_names, word,
         "increment 1 holds no #{word} column; academic consequences are an institutional decision"

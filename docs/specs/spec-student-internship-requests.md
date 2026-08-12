@@ -20,11 +20,15 @@ implemented_by:
   - app/controllers/internship_placements_controller.rb
   - app/controllers/internship_progress_reports_controller.rb
   - app/models/internship_faculty_assignment.rb
+  - app/models/internship_deliverable.rb
   - app/controllers/internship_faculty_assignments_controller.rb
+  - app/controllers/internship_deliverables_controller.rb
+  - app/controllers/internship_request_resumes_controller.rb
   - app/helpers/application_helper.rb
   - db/migrate/20260809160000_create_internship_requests.rb
   - db/migrate/20260809180000_create_internship_placements.rb
   - db/migrate/20260812210000_create_internship_faculty_assignments.rb
+  - db/migrate/20260812220000_create_internship_deliverables.rb
 enforced_by:
   - test/models/internship_request_test.rb
   - test/models/internship_placement_test.rb
@@ -38,6 +42,8 @@ enforced_by:
   - test/controllers/student_internship_door_test.rb
   - test/models/internship_faculty_assignment_test.rb
   - test/controllers/internship_faculty_assignments_controller_test.rb
+  - test/models/internship_document_test.rb
+  - test/controllers/internship_documents_controller_test.rb
 touches:
   - app/models
   - app/services
@@ -74,6 +80,13 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002, SKILL-ARCH-003]
 > assignment lets them read the placement and acknowledge its weeks, and grants
 > nothing else. Documents, an academic gate, rubric evaluation, email, REST
 > APIs, and academic credit remain unauthorized.
+>
+> **Increment 4 recorded and implemented 2026-08-12:** decision 5 is answered.
+> A request shares the résumé already on the candidate profile instead of
+> storing a second one, a placement carries the student's deliverables, and a
+> file one person uploaded is never rendered for another person's browser.
+> Interviews, rubric evaluation, email, REST APIs, and academic credit remain
+> unauthorized.
 
 > [Executable Specifications](README.md) ·
 > [Student internship request ADR](../decisions/adr-0041-student-internship-request-boundary.md) ·
@@ -157,6 +170,25 @@ internship request models.
   Reading the weeks means assigning yourself, which is audited and notifies
   the student.
 
+### Included in increment 4 (implemented)
+
+- A shared résumé: `internship_requests.resume_shared_at` records that a student
+  chose to let one company read the résumé already on their `CandidateProfile`.
+  No second copy is stored, so deleting it at the profile removes it from every
+  request that pointed at it.
+- Sharing and unsharing are the student's, on an open request, audited both ways.
+- An `InternshipDeliverable`: the work a student hands over during a placement,
+  with an author, a title, one attachment, and an audit row naming the file and
+  never its contents.
+- The SPEC-0029 safety envelope, reused rather than reinvented: the portfolio
+  content-type allowlist plus plain text, and the same ten-megabyte ceiling.
+- Every download served by an application route as an attachment, never inline,
+  never through a signed blob URL, with authorization re-derived per request.
+- Access that ends with its record: a company reads a shared résumé while the
+  request is open and while the internship it produced runs; it reads
+  deliverables while the placement is open; the student reads and deletes their
+  own for as long as they exist.
+
 ### Deferred to later increments (unauthorized, enforced absent)
 
 - Any faculty gate: approval of a request before the company sees it, of a
@@ -165,9 +197,14 @@ internship request models.
 - Faculty reading of the *request* behind a placement — its motivation text and
   the company's decision reason.
 - An academic review record, a score, a rubric, or any assessment output.
-- Résumé, portfolio, and deliverable uploads.
 - Rubric evaluation dimensions, interviews, email, REST APIs, and any field
   holding academic credit or converting hours to credit.
+- Virus scanning, in this context and in every other: no upload anywhere in
+  the application is scanned, which is why nothing uploaded is ever rendered
+  inline. Adding a scanner is its own decision and would start with the
+  candidate profile.
+- A retention clock. Nothing expires on a timer; a student deletes their own
+  work, and no duration is claimed that nobody is accountable for.
 
 ### Excluded
 
@@ -176,7 +213,10 @@ internship request models.
   specification adds no second model for any of them.
 - Résumé, portfolio, deliverable, and any other file or document upload, until
   ADR-0041 decision 5 records the document contract. Requests carry structured
-  text only, and the interface states this.
+  text only, and the interface states this. **Superseded by increment 4:** a
+  request now carries a shared reference to the résumé on the student's
+  candidate profile, and a placement carries deliverables. Nothing is
+  uploaded to a request itself.
 - Academic credit, hours-to-credit conversion, grades, transcript entries, and
   any field that implies them.
 - Interview scheduling and external calendar or meeting integration.
@@ -330,8 +370,24 @@ moves beyond draft.
 - [ ] Academic review authority — whether faculty gate a request, a transition,
       or completion — is recorded by the academic owner. Deliberately not taken
       on 2026-08-12; see ADR-0041 decision 4.
-- [ ] The document contract for résumés, portfolios, and deliverables is
-      recorded before any upload route is designed — deferred.
+- [x] A shared résumé stores no second copy, and unsharing or deleting it at the
+      profile closes every request that pointed at it
+      (`test/models/internship_document_test.rb`).
+- [x] A company reads a shared résumé while the request is open and while the
+      internship it produced runs, and not after a rejection or a completion
+      (`test/models/internship_document_test.rb`).
+- [x] A deliverable is authored only by the placed student, only while the
+      placement is open, within the SPEC-0029 allowlist and ceiling, and a
+      declared content type cannot talk its way past it
+      (`test/models/internship_document_test.rb`).
+- [x] Every download is an attachment under `nosniff`, served by a route that
+      re-derives authorization, and no signed blob URL is handed out
+      (`test/controllers/internship_documents_controller_test.rb`,
+      `test/operations/internship_request_boundary_test.rb`).
+- [x] The faculty supervisor cannot read a deliverable
+      (`test/controllers/internship_documents_controller_test.rb`).
+- [x] The student removes their own work and the company cannot
+      (`test/models/internship_document_test.rb`).
 - [x] The audit and privacy contract covers redaction and cross-domain
       non-mutation for increment 1; retention is append-only with export and
       deletion routed to the policy owner
@@ -356,7 +412,8 @@ moves beyond draft.
 | Progress reporting | `test/models/internship_progress_report_test.rb` |
 | Student navigation and cross-links | `test/controllers/student_internship_door_test.rb` |
 | Faculty assignment, its boundary, and its absence of a gate | `test/models/internship_faculty_assignment_test.rb`, `test/controllers/internship_faculty_assignments_controller_test.rb`, `test/operations/internship_request_boundary_test.rb` |
-| Academic gate · document contract · rubric evaluation | Later increments; not yet authorized, absence enforced by `test/operations/internship_request_boundary_test.rb` |
+| Documents: sharing, uploads, and every download | `test/models/internship_document_test.rb`, `test/controllers/internship_documents_controller_test.rb`, `test/operations/internship_request_boundary_test.rb` |
+| Academic gate · rubric evaluation | Later increments; not yet authorized, absence enforced by `test/operations/internship_request_boundary_test.rb` |
 
 ## Error and boundary cases
 
@@ -424,6 +481,8 @@ bin/rails test test/models/internship_placement_test.rb \
   test/controllers/internship_placements_controller_test.rb
 bin/rails test test/system/internship_request_walk_test.rb test/system/internship_placement_walk_test.rb
 bin/rails test test/controllers/student_internship_door_test.rb
+bin/rails test test/models/internship_document_test.rb \
+  test/controllers/internship_documents_controller_test.rb
 bin/rails test test/models/internship_faculty_assignment_test.rb \
   test/controllers/internship_faculty_assignments_controller_test.rb
 bin/docs

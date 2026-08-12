@@ -85,6 +85,62 @@
     </section>
   <% end %>
 
+  <%# The student's work. Uploaded by them, removable by them, readable by the
+      company while the internship is open — and served as a download, because
+      nothing here is scanned. SPEC-0041 increment 4. %>
+  <% if @is_student || @deliverables.any? %>
+    <section class="mb-8 rounded-card border border-hairline bg-surface-1 p-6">
+      <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.deliverables_heading") %></h2>
+      <p class="mt-2 text-13 leading-[1.65] text-muted"><%= t("internship_placements.deliverables_notice") %></p>
+
+      <% if @is_student && @placement.open? %>
+        <%= form_with url: deliverables_internship_placement_path(@placement), scope: :internship_deliverable,
+              class: "mt-4 flex flex-wrap items-end gap-3 border-b border-hairline pb-6" do |form| %>
+          <div>
+            <%= form.label :title, t("internship_placements.fields.deliverable_title"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+            <%= form.text_field :title, required: true, maxlength: 160, size: nil,
+                  class: "w-[280px] rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
+          </div>
+          <div>
+            <%= form.label :file, t("internship_placements.fields.deliverable_file"), class: "mb-1.5 block text-12 font-semibold text-ink" %>
+            <%= form.file_field :file, required: true, class: "text-12 text-muted" %>
+          </div>
+          <%= form.submit t("internship_placements.add_deliverable"),
+                class: "rounded-full bg-brand px-4 py-2 text-12 font-semibold text-white transition hover:bg-brand-dark" %>
+        <% end %>
+      <% end %>
+
+      <% if @deliverables.empty? %>
+        <p class="mt-4 text-13 text-muted"><%= t("internship_placements.deliverables_empty") %></p>
+      <% end %>
+
+      <ul class="mt-5 space-y-3">
+        <% @deliverables.each do |deliverable| %>
+          <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline p-4">
+            <div>
+              <p class="text-13 font-semibold text-ink"><%= deliverable.title %></p>
+              <p class="mt-0.5 font-mono text-11 text-muted">
+                <%= deliverable.file.filename %> · <%= number_to_human_size(deliverable.file.byte_size) %>
+                · <%= l(deliverable.created_at, format: :short) %>
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <%= link_to t("internship_placements.download_deliverable"),
+                    download_deliverable_internship_placement_path(@placement, deliverable_id: deliverable.id),
+                    class: "text-12 font-semibold text-brand-ink hover:underline" %>
+              <% if deliverable.deletable_by?(Current.user) %>
+                <%= button_to t("internship_placements.remove_deliverable"),
+                      deliverable_internship_placement_path(@placement, deliverable_id: deliverable.id),
+                      method: :delete,
+                      class: "text-12 font-semibold text-red-700 hover:underline" %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
   <section class="rounded-card border border-hairline bg-surface-1 p-6">
     <h2 class="text-16 font-semibold text-ink"><%= t("internship_placements.reports_heading") %></h2>
 

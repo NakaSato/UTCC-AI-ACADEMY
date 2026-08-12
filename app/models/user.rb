@@ -112,6 +112,10 @@ class User < ApplicationRecord
                                                      inverse_of: :assigned_by
   has_many :supervised_internship_placements, through: :internship_faculty_assignments,
                                               source: :placement
+  # The student's own work, which they may remove at any time — so it goes with
+  # them if the account does.
+  has_many :internship_deliverables, class_name: "InternshipDeliverable", foreign_key: :author_id,
+                                     dependent: :destroy, inverse_of: :author
 
   has_many :enrollments, dependent: :destroy
   has_many :sections, through: :enrollments

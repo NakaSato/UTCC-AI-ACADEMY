@@ -55,6 +55,19 @@
                 <dt class="font-semibold text-ink"><%= t("internship_requests.fields.learning_goals") %></dt>
                 <dd class="mt-1 leading-[1.65] whitespace-pre-line text-muted"><%= internship_request.learning_goals %></dd>
               </div>
+              <%# Only when the student shared it, and only while this request or
+                  the internship it produced is open. A download, never a
+                  preview. SPEC-0041 increment 4. %>
+              <% if internship_request.resume_readable_by?(Current.user) %>
+                <div>
+                  <dt class="font-semibold text-ink"><%= t("internship_requests.resume_heading") %></dt>
+                  <dd class="mt-1">
+                    <%= link_to t("internship_requests.resume_download"),
+                          download_resume_internship_request_path(internship_request),
+                          class: "text-13 font-semibold text-brand-ink hover:underline" %>
+                  </dd>
+                </div>
+              <% end %>
             </dl>
           <% end %>
 

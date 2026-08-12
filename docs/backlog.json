@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T06:50:00+07:00",
+  "updated_at": "2026-08-12T09:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2371,6 +2371,28 @@
         }
       ],
       "updated_at": "2026-08-13T06:50:00+07:00"
+    },
+    {
+      "id": "INT-006",
+      "title": "Implement increment 4: the internship document contract",
+      "status": "complete",
+      "priority": 1,
+      "owner": "Product Owner, Privacy Owner, and Security Owner",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-005"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship request boundary",
+          "url": "decisions/adr-0041-student-internship-request-boundary.html"
+        },
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        }
+      ],
+      "updated_at": "2026-08-12T09:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4114,6 +4136,14 @@
       "to": "complete",
       "summary": "The user asked for the menubar to become a dropdown menu. The header had carried the destinations twice: a horizontal rail above 1180px and a burger panel below it, with a test whose job was to prove the two agreed. They are now one list in one dropdown at every width, so a destination sits in the same place on a phone and on a desk and adding one cannot quietly overflow a rail that had run out of room - which it nearly had, at nine entries for a student after today's Internships addition. The panel and its Stimulus controller already existed and were reused unchanged, so the change is mostly subtraction: the rail markup is gone, the panel carries the nav landmark and its label rather than being a second one, and the button gained a visible Menu label from the sm breakpoint up because a lone burger on a wide header reads as an afterthought rather than as the way in. The nav: breakpoint stays - the admin two-column screens fold there - but its comment no longer claims the header reads it. Two system walks clicked a nav link directly and now open the menu first through a navigate_to helper, which is the honest cost of the change: reaching a destination is two clicks rather than one. The user then moved it after the brand icon and asked for categories. The button now sits immediately after the shield, where the mark and the way into the app read as one gesture and the rail on the right stays what it is - preferences, notifications, and the account; the panel opens left-aligned under it. app_nav_groups replaces app_nav_items as the source, with app_nav_items kept as its flattening so every check that a nav entry is a door its workspace can open still reads one list and grouping can reorder destinations without adding or dropping one. A learner reads Learn, Track, and Beyond the course; an instructor Teaching and University; an administrator Administration and University; a company member Your company and Students. The headings match how the footer already sorts the same screens. Moving the control left also shortened the keyboard path to it: it is the third tab stop from the top now - skip link, brand, menu - where it had been at the end of the utility rail, and Enter opens it, Tab walks into the panel, Escape closes it and returns focus to the button. Then the categories themselves became the menubar, which is where this ends up: Learn, Track and Beyond the course sit after the brand, each its own dropdown, rather than three headings inside one panel. Each category is a separate dropdown controller, which is what makes opening one close the others - a click on another button is outside the first, and closeOnOutsideClick already handled that with no shared state. The category holding the current screen is marked on the bar, so the section is legible without opening anything. Two things came out of driving it rather than testing it. The bar had overflow-x-auto so it could scroll when tight, and a scrolling row is a clipping container: the panels opened and were invisible, clipped by the bar they hung from. And three category buttons plus the utility rail do not fit a phone at all. So the bar never scrolls, and below md it becomes one button carrying every category as a heading - two renderings again, but both read app_nav_groups and a shared item partial, so they cannot disagree about what exists or how the current page is marked, only about how many buttons carry it.",
       "evidence_url": "specs/spec-role-aware-workspaces.html"
+    },
+    {
+      "at": "2026-08-12T09:30:00+07:00",
+      "item_id": "INT-006",
+      "from": "queued",
+      "to": "complete",
+      "summary": "ADR-0041 decision 5, and the finding that reframed it: the platform was never document-free. CandidateProfile has accepted a resume and portfolio files since SPEC-0029, under a content-type allowlist, a ten-megabyte ceiling, candidate-owned export, and a delete that removes attachments before the row. So the question was not what a document contract should say - most of it was already written - but what internship records may attach and what that contract did not cover: scanning, a retention clock, and post-internship access. The user answered all four questions. A request shares the resume rather than storing one: resume_shared_at is a timestamp, not a blob, because a second copy would mean two retention clocks and two deletions for the one document the platform is least entitled to duplicate, and it would break the promise that deleting a resume from a profile deletes it everywhere - which a test now pins. A deliverable is a new record because the work a student produces during a placement had no home anywhere. The safety envelope is SPEC-0029's, reused rather than reinvented, and nothing is scanned - which is exactly why the other half matters more: this is the first path in the application by which one person reads a file another person uploaded, so every download is served by an app route as an attachment under nosniff, with the content type re-identified by Active Storage rather than trusted from the uploader, and never through a signed blob URL, because a signed URL authorizes the link rather than the reader and outlives both the placement and the membership that justified it. Access ends with its record: a company reads a shared resume while the request is open and while the internship it produced runs, never after a rejection or completion, and reads deliverables only while the placement is open. The faculty supervisor was offered a reader's seat and the user declined it - the assignment grants the placement and its weekly reports, not the student's files. The student deletes their own work and nothing expires on a timer. Two things came out of building it rather than specifying it: the model's transition! leaves a record dirty on status after it syncs, so a plain update! for the sharing stamp was refused by the guard that catches untracked status changes - it uses update_columns now, the same idiom acknowledgement already used - and opening the screen showed the request notice still promising no resume or file uploads, which the same page now disproved. That copy is corrected in both locales, and the two places the ADR and spec still said text only are marked superseded rather than quietly edited.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
     }
   ]
 }

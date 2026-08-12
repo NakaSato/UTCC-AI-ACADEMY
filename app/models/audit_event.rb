@@ -65,6 +65,8 @@ class AuditEvent < ApplicationRecord
     internship_progress_report_submitted internship_progress_report_acknowledged
     internship_progress_report_faculty_acknowledged
     internship_faculty_assignment_created internship_faculty_assignment_revoked
+    internship_request_resume_shared internship_request_resume_unshared
+    internship_deliverable_added internship_deliverable_removed
   ].freeze
 
   # The ones worth noticing: a privilege change, or something that cannot be

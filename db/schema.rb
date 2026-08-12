@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -322,6 +322,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_210000) do
     t.index ["key", "scope"], name: "index_feature_settings_on_key_and_scope", unique: true
   end
 
+  create_table "internship_deliverables", force: :cascade do |t|
+    t.bigint "author_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "internship_placement_id", null: false
+    t.string "title", limit: 160, null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_internship_deliverables_on_author_id"
+    t.index ["internship_placement_id", "created_at"], name: "idx_on_internship_placement_id_created_at_c22f9fd067"
+  end
+
   create_table "internship_faculty_assignments", force: :cascade do |t|
     t.bigint "assigned_by_id", null: false
     t.datetime "created_at", null: false
@@ -391,6 +401,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_210000) do
     t.integer "lock_version", default: 0, null: false
     t.text "motivation", null: false
     t.bigint "organization_id", null: false
+    t.datetime "resume_shared_at"
     t.datetime "reviewed_at"
     t.string "status", default: "draft", null: false
     t.bigint "student_id", null: false
@@ -1077,6 +1088,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_210000) do
   add_foreign_key "course_modules", "courses"
   add_foreign_key "enrollments", "sections"
   add_foreign_key "enrollments", "users"
+  add_foreign_key "internship_deliverables", "internship_placements"
+  add_foreign_key "internship_deliverables", "users", column: "author_id"
   add_foreign_key "internship_faculty_assignments", "internship_placements"
   add_foreign_key "internship_faculty_assignments", "users", column: "assigned_by_id"
   add_foreign_key "internship_faculty_assignments", "users", column: "faculty_id"

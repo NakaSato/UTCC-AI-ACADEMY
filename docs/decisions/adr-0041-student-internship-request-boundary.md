@@ -49,6 +49,12 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-ARCH-003, SKILL-SPEC-002]
 > Faculty oversight, documents, interviews, rubric evaluation, email, REST APIs,
 > and academic credit remain unauthorized.
 >
+> **Increment 4 recorded 2026-08-12:** decision 5 is answered, so documents
+> exist. A request shares the résumé already on the candidate profile rather
+> than storing a second copy, a placement carries the student's deliverables,
+> and both close when the thing they belong to closes. Interviews, rubric
+> evaluation, email, REST APIs, and academic credit remain unauthorized.
+>
 > **Increment 3 recorded 2026-08-12:** decisions 2 and 7 are answered. Faculty
 > oversight is an administrator-granted assignment of one staff account to one
 > placement, carrying the authority to read that placement and acknowledge its
@@ -159,7 +165,9 @@ What genuinely does not exist is narrower and clearer:
    payload and the platform has no upload surface for them. Private storage,
    authorization-rechecked expiring access, type and size limits, scanning,
    retention, export, deletion, and consent must all be recorded first. Until
-   then requests carry structured text only.
+   then requests carry structured text only. (Decision 5 was answered on
+   2026-08-12; see the increment 4 record below for what documents exist and
+   under whose contract.)
 
 7. **Progress reports are evidence, not assessment.** A report records what the
    student did and what a supervisor acknowledged. It produces no score, no
@@ -332,7 +340,9 @@ the four that shape increment 1. Everything else in the list below stays open.
      outside until decisions 2 and 7 are recorded.
 7. **Documents stay excluded (decision 5 unchanged).** No résumé, portfolio, or
    deliverable upload surface exists. Requests carry structured text, and the
-   interface says so.
+   interface says so. **Amended by increment 4:** a request shares the résumé
+   that already exists on the candidate profile, and a placement carries the
+   student's deliverables. No file is uploaded to a request.
 8. **No academic credit (decision 8: none).** No field in this context holds
    credit or hours, inheriting SPEC-0028's exclusion.
 9. **In-app notification only (decision 10).** The existing bell notifies
@@ -394,10 +404,53 @@ university is accountable for.
    supervise none, so the screen that grants supervision would otherwise be
    one they could open and never find.
 
+## Recorded decisions (2026-08-12, increment 4)
+
+The user answered decision 5. The finding that shaped every part of it: the
+platform was never document-free. `CandidateProfile` has accepted a résumé and
+portfolio files since SPEC-0029, under an allowlist, a ten-megabyte ceiling,
+candidate-owned export, and a delete that removes attachments before the row.
+So this is not a document contract written from nothing; it is what internship
+records may attach, and what that existing contract did not yet cover.
+
+1. **A request shares a résumé; it never stores one.** `resume_shared_at` is a
+   timestamp, not a blob. A second copy would mean two retention clocks and two
+   deletions for the one document the platform is least entitled to duplicate,
+   and it would break the promise that removing a résumé from a profile removes
+   it everywhere. Sharing is per request, made and unmade by the student.
+2. **A deliverable is a new record**, because the work a student produces during
+   a placement has no home anywhere in the repository. It carries an author, a
+   title, one attachment, and an audit row naming the file and never its
+   contents.
+3. **The safety envelope is the one SPEC-0029 already enforces** — the portfolio
+   allowlist plus plain text, and the same ten-megabyte ceiling. Nothing in this
+   application is virus-scanned and this decision does not pretend otherwise,
+   which is why the second half matters more: a file one person uploaded is
+   never rendered for another person's browser. Every download is served by an
+   application route, as an attachment, with the content type re-identified by
+   Active Storage rather than trusted from the uploader, under `nosniff`.
+4. **Downloads do not use signed blob URLs.** A signed URL authorizes the link
+   rather than the reader, and it keeps working after a placement ends and after
+   a membership is revoked — exactly what this decision's access rule says must
+   stop. Authorization is re-derived on every request.
+5. **Access follows the record and ends with it.** The company reads a shared
+   résumé while the request is open and while the internship it produced is
+   running, and never after a rejection or a completion; it reads deliverables
+   while the placement is open. The student reads and deletes their own, always.
+6. **The faculty supervisor was offered a reader's seat and did not take one.**
+   Decision 7 grants them the placement and its weekly reports. A student's
+   files are a different thing, and extending the assignment to them was
+   considered and declined.
+7. **The student deletes; nothing expires on a timer.** They own their work, as
+   SPEC-0040 already says of business-case submissions. No background job
+   removes anything, so nothing disappears without a person acting, and no
+   retention duration is claimed that nobody is accountable for.
+
 ## Human decisions still required
 
 The agent can draft models and controls but cannot decide these. Decisions 1, 2,
-and 7 have been answered; the rest remain open and gate their own increments.
+and 7 have been answered, as have 2, 5, and 7; the rest remain open and gate their own
+increments.
 
 1. ~~Whether a student may direct a request at a company with no published
    position.~~ **Answered yes on 2026-08-09; the request layer is built.**
@@ -414,9 +467,14 @@ and 7 have been answered; the rest remain open and gate their own increments.
    company, which the shipped one-application-per-program index forbids today.
 4. Company verification: which organizations may receive requests, and whether
    faculty or administrator approval precedes that.
-5. The document contract for résumés, portfolios, and deliverables — formats,
-   scanning, size limits, private storage, retention, export, deletion,
-   post-internship access, and consent — before any upload exists.
+5. ~~The document contract for résumés, portfolios, and deliverables —
+   formats, scanning, size limits, private storage, retention, export,
+   deletion, post-internship access, and consent — before any upload
+   exists.~~ **Answered on 2026-08-12: the SPEC-0029 envelope, a shared résumé
+   rather than a copied one, deliverables owned and deleted by the student,
+   and access that ends with the record.** Virus scanning remains absent here
+   and everywhere else in the application; if that is unacceptable it is its
+   own decision, and it would apply to the candidate profile first.
 6. Report cadence, required fields, whether hours are recorded, who
    acknowledges a report, and what happens when reports are missed.
 7. ~~Visibility: which reports, deliverables, evaluations, and scores each of

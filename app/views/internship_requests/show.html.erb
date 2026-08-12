@@ -41,6 +41,34 @@
         <p class="mt-3 text-14 leading-[1.7] whitespace-pre-line text-muted"><%= @internship_request.learning_goals %></p>
       </section>
 
+      <%# The résumé is not uploaded here and not copied here: it is the one on
+          the candidate profile, and this is the student saying one company may
+          read it. Deleting it there removes it from every request at once. %>
+      <section class="rounded-card border border-hairline bg-surface-1 p-6">
+        <h2 class="text-16 font-semibold text-ink"><%= t("internship_requests.resume_heading") %></h2>
+        <p class="mt-2 text-13 leading-[1.65] text-muted"><%= t("internship_requests.resume_notice") %></p>
+
+        <% if @internship_request.resume_shared? %>
+          <p class="mt-4 text-13 font-semibold text-ink"><%= t("internship_requests.resume_shared") %></p>
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <%= link_to t("internship_requests.resume_download"),
+                  download_resume_internship_request_path(@internship_request),
+                  class: "text-13 font-semibold text-brand-ink hover:underline" %>
+            <%= button_to t("internship_requests.resume_unshare"),
+                  unshare_resume_internship_request_path(@internship_request), method: :delete,
+                  class: "text-13 font-semibold text-red-700 hover:underline" %>
+          </div>
+        <% elsif @internship_request.shareable_resume&.attached? && @internship_request.open? %>
+          <%= button_to t("internship_requests.resume_share"),
+                resume_internship_request_path(@internship_request),
+                class: "mt-4 rounded-full border border-hairline px-4 py-2 text-13 font-semibold text-brand-ink transition hover:border-brand-ink" %>
+        <% else %>
+          <p class="mt-4 text-13 text-muted">
+            <%= @internship_request.open? ? t("internship_requests.resume_missing") : t("internship_requests.resume_closed") %>
+          </p>
+        <% end %>
+      </section>
+
       <% if @internship_request.decided? %>
         <section class="rounded-card border border-hairline bg-surface-1 p-6">
           <h2 class="text-16 font-semibold text-ink"><%= t("internship_requests.decision_heading") %></h2>
