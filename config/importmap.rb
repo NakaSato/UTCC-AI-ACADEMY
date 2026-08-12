@@ -63,3 +63,10 @@ pin "orderedmap", to: "orderedmap.js" # @2.1.1
 pin "rope-sequence", to: "rope-sequence.js" # @1.3.4
 pin "w3c-keyname", to: "w3c-keyname.js" # @2.2.8
 pin "@tiptap/starter-kit", to: "@tiptap--starter-kit.js" # @3.22.4
+# The runtime-only build, deliberately and permanently. `bin/importmap pin vue`
+# fetches `vue.esm-browser.prod.js`, which carries the template compiler and
+# builds render functions with `Function(…)` — and `script-src :self` with no
+# `unsafe-eval` blocks exactly that. An island is therefore a render function,
+# never a template string; ADR-0051 and `test/operations/vue_build_test.rb`.
+pin "vue", to: "vue.js" # @3.5.41
+pin_all_from "app/javascript/islands", under: "islands"

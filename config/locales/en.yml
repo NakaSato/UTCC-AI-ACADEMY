@@ -358,6 +358,9 @@ en:
     topics_learned: "%{done} / %{total} topics learned"
     section: "Section %{name}"
 
+  forms:
+    characters_left: "%{count} characters left"
+
   pagination:
     label: "Pages"
     previous: "Previous"

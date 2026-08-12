@@ -365,6 +365,9 @@ th:
     topics_learned: "%{done} / %{total} หัวข้อที่เรียนแล้ว"
     section: "หมู่เรียน %{name}"
 
+  forms:
+    characters_left: "เหลือ %{count} ตัวอักษร"
+
   pagination:
     label: "หน้า"
     previous: "ก่อนหน้า"

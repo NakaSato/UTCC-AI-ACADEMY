@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T19:14:00+07:00",
+  "updated_at": "2026-08-12T21:52:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2964,6 +2964,30 @@
         }
       ],
       "updated_at": "2026-08-12T19:14:00+07:00"
+    },
+    {
+      "id": "UX-010",
+      "title": "Take Vue for islands, behind one bridge and a runtime-only build",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and Security Owner",
+      "milestone": "M1",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Vue islands decision",
+          "url": "decisions/adr-0051-vue-islands.html"
+        },
+        {
+          "label": "Vue islands specification",
+          "url": "specs/spec-vue-islands.html"
+        },
+        {
+          "label": "Coding standard — dependencies",
+          "url": "coding-standard.html"
+        }
+      ],
+      "updated_at": "2026-08-12T21:52:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4939,6 +4963,14 @@
       "to": "complete",
       "summary": "Three roadmap tables disagreed with the backlog and with each other. The AI recruitment track called all fifteen of its milestones Proposed while every one of them had a complete backlog item behind an accepted specification and ADR; the ecosystem track called M11 increments 1 to 3 after increment 4 shipped, and M13 Proposed after increment 1 delivered the same morning. DEV-005 built a gate for exactly this and it caught none of them, because it only reads the consolidated table, the UTCC summary table and the UTCC section status lines - the two track tables are outside it. The deeper problem was the gate-s rule rather than its reach. It held that a milestone whose backlog items are all complete must say Complete, and six AI milestones have one complete item each whose specification calls the shipped increment narrower than the milestone: an advisory next-action panel rather than a recruiter agent, preparation prompts rather than a candidate or internship agent, one organization-scoped workflow report rather than analytics, an in-app conversation rather than notifications, and a reviewable control contract rather than an integration. The rule therefore demanded the word Complete against outcome text describing capabilities nobody built, and the consolidated table duly said it. First slice is now the second delivered label, meaning the tracked work is finished and the milestone-s own description is larger - the only part a file can testify to is item status, and scope is a human judgement. Both directions of the original check survive: a milestone with open items may claim neither label, and a milestone with none open must claim one. Ecosystem M13 is now mapped and checked, which it never was, and test/scripts/validate_backlog_roadmap_test.rb is the gate on the gate, including that a word merely starting like the label does not pass for it. The outcome columns keep the destination rather than being rewritten to what shipped, because the ordering exists to describe where the platform is going; the Status cell carries what exists, and a new table under the AI roadmap names for each of the six what shipped, what did not, and which specification says so.",
       "evidence_url": "roadmap.html#unified-roadmap--ordered-delivery-plan"
+    },
+    {
+      "at": "2026-08-12T21:52:00+07:00",
+      "item_id": "UX-010",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The user asked for Vue to be available to the frontend for some code, was shown the constraints, and reaffirmed. The coding standard admits a JavaScript package only behind an accepted ADR naming the capability, the alternatives including no dependency, maintenance and security ownership, failure and removal paths, and the licence position, so ADR-0051 and SPEC-0052 are what the library arrived with. Three facts about this application decided its shape. The CSP is script-src self with a nonce and no unsafe-eval, and bin/importmap pin vue fetches the full build, which compiles templates with Function() - blocked in production, silently, on a screen that passes every test that never loaded the header. So the runtime-only build is vendored instead, islands render with h rather than templates, and test/operations/vue_build_test.rb asserts the vendored bytes carry no compiler, because re-running the pin command after an upgrade is exactly how this regresses. There is no JavaScript build step, so single-file components are not available and adding a bundler was refused as a larger decision than this one. Turbo replaces the body on navigation and any node on a stream, so createApp is called in exactly one file - a Stimulus bridge whose connect and disconnect Turbo already drives - and that is asserted too. An island is named through a registry rather than imported by markup, which is the whitelist-or-default rule the console params already run on; its copy arrives as props already translated, so the bilingual invariant keeps one home; and it enhances markup that works without it, so a failed mount costs the enhancement and not the screen. Alpine was rejected for needing unsafe-eval, React and Preact on weak evidence that would be the first to revisit, and plain Stimulus stays the default for everything not state-shaped - the seventeen existing controllers are not rewritten. The first island is the character counter on the proposal decision reason, the text an author reads under a thousand-character limit: small, reversible, and it exercises the whole path from pin to both locales. What a browser proves is not covered here - islands are visible only to system tests - so the server-side half is asserted instead: the island names a field that exists on the page, its limit equals the maxlength that field enforces, and its template still carries the interpolation the island fills.",
+      "evidence_url": "decisions/adr-0051-vue-islands.html"
     }
   ]
 }

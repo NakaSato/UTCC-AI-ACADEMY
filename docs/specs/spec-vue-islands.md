@@ -1,0 +1,154 @@
+---
+id: SPEC-0052
+type: spec
+title: Vue islands — the mount contract, the registry, and what an island may not do
+status: accepted
+owners: ["@tech-lead", "@security-owner", "@qa-owner"]
+created: 2026-08-12
+updated: 2026-08-12
+review_by: 2026-08-26
+supersedes: []
+superseded_by: []
+depends_on: [ADR-0051, ADR-0007]
+implemented_by:
+  - config/importmap.rb
+  - vendor/javascript/vue.js
+  - app/javascript/controllers/vue_island_controller.js
+  - app/javascript/islands/registry.js
+  - app/javascript/islands/character_counter.js
+  - app/views/admin/_proposals.html.erb
+enforced_by:
+  - test/operations/vue_build_test.rb
+  - test/controllers/admin_proposals_test.rb
+  - test/operations/locale_parity_test.rb
+touches:
+  - app/javascript
+  - app/views
+  - config/importmap.rb
+  - config/locales/en.yml
+  - config/locales/th.yml
+  - vendor/javascript
+  - test
+agent_writable: true
+requires_skills: [SKILL-SPEC-001, SKILL-ARCH-002]
+min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002]
+---
+
+# Vue Islands — the Mount Contract, the Registry, and What an Island May Not Do
+
+> **Review state:** Accepted on 2026-08-12 on the authority of
+> [ADR-0051](../decisions/adr-0051-vue-islands.md), which the user accepted the
+> same day. This adds no product decision: it is the contract the decision
+> implies, written down so the second island does not have to guess.
+
+> [Executable Specifications](README.md) ·
+> [Vue islands decision](../decisions/adr-0051-vue-islands.md) ·
+> [Tiptap bridge](../decisions/adr-0007-integrate-tiptap-with-stimulus-importmap.md) ·
+> [Design system](../design-system.md)
+
+## Problem
+
+Vue is now available (ADR-0051) to an application whose CSP forbids the build
+most Vue documentation assumes, whose asset pipeline has no compiler, and whose
+DOM is replaced under it by Turbo. Each of those is a way to write Vue that
+works locally and fails in production — a `template:` string that renders in a
+test and is blocked by the header, an app mounted on a node Turbo later swaps, a
+translated word typed into JavaScript.
+
+The library is one line of `importmap.rb`. The contract is this document.
+
+## The build
+
+`vendor/javascript/vue.js` is `vue.runtime.esm-browser.prod.js`, vendored with
+the URL it came from on its first line and pinned as `vue`.
+
+**Upgrading is two steps, not one.** `bin/importmap pin vue` fetches
+`vue.esm-browser.prod.js` — the full build, with the compiler — so the vendored
+file must be replaced with the runtime build from the same version afterwards.
+`test/operations/vue_build_test.rb` fails on the compiler's `Function(` call,
+which is what makes the second step non-optional rather than remembered.
+
+## The mount contract
+
+| Rule | Why |
+| --- | --- |
+| `createApp` is called in `vue_island_controller.js` and nowhere else | An app mounted outside the bridge is one nothing unmounts |
+| Mount on Stimulus `connect`, unmount on `disconnect` | Turbo drives both, for navigation and for Streams |
+| `unmount()` empties the element | So the snapshot Turbo caches holds the server's markup, not Vue's output |
+| The element is a `div` the server rendered, and the island replaces its contents | The island has a home in the layout before it exists |
+| An island is named by `data-vue-island-island-value` | Markup selects from an allow-list; it does not import code |
+| Props arrive as JSON in `data-vue-island-props-value` | One place, typed by Stimulus, escaped by ERB |
+
+## The registry
+
+`app/javascript/islands/registry.js` maps a name to a component, and
+`pin_all_from "app/javascript/islands", under: "islands"` makes each file
+importable. A name the registry does not answer to warns in the console and
+mounts nothing; the screen is unchanged, because of the next section.
+
+Registered today:
+
+| Name | Island | Used on |
+| --- | --- | --- |
+| `character-counter` | How much of a limited field is left, as somebody types | The proposal decision reason (`/admin?tab=proposals`) |
+
+## What an island may not do
+
+1. **Own a page or a route.** No router, no client-side navigation, no view that
+   is the whole screen.
+2. **Fetch the data a page is made of.** The server renders the page. An island
+   may react to what is already on it.
+3. **Be the only way something works.** Every island enhances markup that
+   already functions with JavaScript off. The counter's limit is `maxlength` and
+   the model's validation; the island only says how much is left.
+4. **Carry a `template:` string, or any in-DOM template.** The runtime build has
+   no compiler and the CSP would block one. Islands render with `h`.
+5. **Hold translated copy.** Words come from `config/locales` as props, already
+   translated, with only computed values left to interpolate.
+6. **Carry appearance of its own.** Classes come from the Tailwind token system,
+   like every other template — the same rule that took Tiptap for behavior and
+   refused its styling.
+7. **Duplicate a Stimulus controller.** Stimulus stays the default for behavior
+   attached to markup; Vue is for state-shaped UI. Neither is rewritten into the
+   other for its own sake.
+
+## Invariants
+
+1. The vendored Vue build contains no template compiler.
+2. `createApp` appears in exactly one file in `app/javascript`.
+3. Every name in the registry resolves to a file, and that directory is pinned.
+4. An island's props name a field that exists on the same page, and any limit it
+   displays equals the limit that field actually enforces.
+5. Island copy exists in both locale files.
+6. A screen renders and functions with every island removed.
+
+## Acceptance Criteria
+
+- `vendor/javascript/vue.js` matches neither `new Function(` nor `Function(\`` nor
+  `compileToFunction`, and its first line records the runtime build's URL.
+- `config/importmap.rb` pins `vue` to `vue.js` and pins the islands directory.
+- Exactly one file under `app/javascript` calls `createApp`.
+- On `/admin?tab=proposals`, the reason field has the id the island's `fieldId`
+  prop names, the island's `max` equals the field's `maxlength`, and its
+  `template` is `forms.characters_left` with `%{count}` still unresolved.
+- `forms.characters_left` exists in `en.yml` and `th.yml`.
+
+## Verification
+
+- `test/operations/vue_build_test.rb` — the build, the pins, the registry, and
+  the single caller of `createApp`.
+- `test/controllers/admin_proposals_test.rb` — the island's props against the
+  field they describe.
+- `test/operations/locale_parity_test.rb` — the copy exists in both languages.
+- **Behavior in a browser is not covered by any of the above.** An island's
+  counting, mounting and unmounting are visible only to `bin/rails test:system`,
+  and a system test for the first island is the open item this document carries.
+
+## Consequences
+
+- One dependency, one bridge, one registry, and a list of what islands may not
+  do that is shorter to read than the first island.
+- The second island costs a file and a registry line. The first cost this
+  document, which is the point at which the boundary is cheapest to set.
+- If SFCs are ever needed, this specification is what the bundler ADR argues
+  against, with a real island to measure the argument on.

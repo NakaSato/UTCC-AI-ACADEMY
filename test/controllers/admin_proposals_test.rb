@@ -35,6 +35,31 @@ class AdminProposalsTest < ActionDispatch::IntegrationTest
     assert_equal 0, AdminConsole.badge_for(:proposals)
   end
 
+  # The counter is a Vue island (ADR-0051) and the browser is what proves it
+  # counts. What the server owns is the half a browser cannot fix: the island
+  # names a field id that exists on this page, its limit matches the field's own
+  # `maxlength`, and the copy comes from the locale files with `%{count}` still
+  # in it for the island to fill. A drift in any of those is a counter that
+  # silently counts nothing.
+  test "the reason field carries a counter island bound to itself" do
+    sign_in_as users(:admin)
+    get admin_url(tab: :proposals)
+
+    field = css_select("input#proposal_#{@proposal.id}_reason").first
+
+    assert_not_nil field, "the reason field must carry the id the island is given"
+    assert_equal "1000", field["maxlength"]
+
+    island = css_select("[data-controller=vue-island]").first
+    props = JSON.parse(island["data-vue-island-props-value"])
+
+    assert_equal "character-counter", island["data-vue-island-island-value"]
+    assert_equal field["id"], props["fieldId"]
+    assert_equal field["maxlength"].to_i, props["max"]
+    assert_equal I18n.t("forms.characters_left"), props["template"]
+    assert_includes props["template"], "%{count}", "the island interpolates the number the server does not have"
+  end
+
   test "an administrator answers a proposal and the reason is recorded with it" do
     sign_in_as users(:admin)
 

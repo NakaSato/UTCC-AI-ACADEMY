@@ -11,6 +11,8 @@ Follow the [System Development Flow Master](docs/system-development-flow-master.
 
 Rails 8.1 · PostgreSQL · Hotwire (Turbo + Stimulus, import maps, Propshaft) · Tailwind CSS 4 · Minitest/Capybara.
 
+Two JavaScript libraries, both taken for behavior and refused for styling: **Tiptap** for the academic-post editor (ADR-0007) and **Vue 3** for islands (ADR-0051) — the runtime-only build, render functions rather than templates because the CSP blocks the compiler, mounted only by `vue_island_controller.js`. Stimulus stays the default; read [SPEC-0052](docs/specs/spec-vue-islands.md) before writing an island, and note that upgrading Vue is two steps.
+
 ## Commands
 
 - `bin/setup` — install dependencies and prepare the database
