@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T15:00:00+07:00",
+  "updated_at": "2026-08-12T15:25:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4705,6 +4705,14 @@
       "to": "complete",
       "summary": "The user accepted ADR-0049 on 2026-08-12, the day it was proposed, so Ecosystem M13 now has a boundary rather than a nine-hundred-line description. Five of roadmap section 15's twelve product decisions are settled: registered-only intake for the first increment, evolve the existing proposal_requests rather than replace it, a triage-only lifecycle with recorded transitions, human-recorded references to the roadmap and backlog rather than generated ones, and a baseline of zero that is measurable today rather than deferred to discovery. Seven remain open and no work may assume an answer to them - field visibility, voting, comments and moderation, role mapping, the private security-report path, search and attachments and notifications, and AI data use. Two consequences worth separating. Decision 1 is authorized immediately and is documentation only: SPEC-0049 records the shipped intake, and the ADR's own fitness function is not satisfied until that specification is accepted rather than draft. Increment 1 - a triage screen, a decision record, an author-visible reason, and the status vocabulary settled with its check constraint so no status exists that the code cannot reach - is authorized in scope but not scheduled. Accepting a boundary is not a delivery commitment, and M13 stays Proposed on the roadmap until a backlog item and the roadmap gate carry it into execution.",
       "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+    },
+    {
+      "at": "2026-08-12T15:25:00+07:00",
+      "item_id": "DOCS-013",
+      "from": "complete",
+      "to": "complete",
+      "summary": "The user accepted SPEC-0049 on 2026-08-12, which satisfies ADR-0049 decision 1 and closes the gap that had blocked any change to proposals: the intake shipped without an ADR or a specification, so there was no recorded statement of who may submit, what is stored, who may read it, or what happens next, and nothing to keep consistent with. The confirmation the document was waiting on was specifically invariant 4, that three of the four statuses cannot be reached and the author-facing page displays one of them as though it were live. Accepting the specification settles what the boundary is, not that all of it is desirable - the defect is now recorded rather than unknown, and ADR-0049 decision 6 still governs whether those statuses gain a code path or are removed. Acceptance authorizes nothing else. Ecosystem M13 stays Proposed on the roadmap with no backlog item, and increment 1 remains unscheduled.",
+      "evidence_url": "specs/spec-proposal-request-intake.html"
     }
   ]
 }

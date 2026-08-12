@@ -2,7 +2,7 @@
 id: SPEC-0049
 type: spec
 title: The proposal request intake as built
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@qa-owner"]
 created: 2026-08-12
 updated: 2026-08-12
@@ -34,12 +34,18 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002]
 
 # The Proposal Request Intake As Built
 
-> **Review state:** Draft, written 2026-08-12. This specification adds no
-> behavior and proposes none. It records what already ships, because nothing
-> did, and because [ADR-0049](../decisions/adr-0049-proposal-triage-before-public-platform.md)
-> decision 1 makes that the prerequisite for any change to proposals — including
-> Ecosystem M13. Where the shipped behavior is incomplete, this document says so
-> rather than describing what it ought to be.
+> **Review state:** **Accepted by the user on 2026-08-12**, which satisfies
+> [ADR-0049](../decisions/adr-0049-proposal-triage-before-public-platform.md)
+> decision 1 — the prerequisite for any change to proposals, including Ecosystem
+> M13. This specification adds no behavior and proposes none; it records what
+> already ships, because nothing did.
+>
+> Accepting it settles what the boundary **is**, not that all of it is desirable.
+> Invariant 4 in particular is a recorded defect rather than an endorsement: three
+> of the four statuses cannot be reached, and the author-facing page displays one
+> of them as though it were live. It is written down so a change to it has a
+> baseline to be measured against, and ADR-0049 decision 6 governs whether those
+> statuses gain a code path or are removed.
 
 > [Executable Specifications](README.md) ·
 > [Proposal triage decision](../decisions/adr-0049-proposal-triage-before-public-platform.md) ·
@@ -201,8 +207,13 @@ to root, not refused, which the access contract above now says.
 
 ## Human review handoff
 
-This specification is **draft** and describes existing behavior only. It becomes
-accepted when the Product Owner and Tech Lead confirm the recorded boundary is
-the intended one — in particular invariant 4, which records a defect rather than
-a design. Accepting it does not schedule Ecosystem M13 and does not authorize
-any part of ADR-0049 beyond its decision 1.
+**Accepted by the user on 2026-08-12**, describing existing behavior only. The
+confirmation this was waiting on — that the recorded boundary is the intended
+one, invariant 4 included — has been given, and invariant 4 remains a defect
+that is now recorded rather than one that was unknown.
+
+Acceptance satisfies ADR-0049 decision 1 and nothing further. It does not
+schedule Ecosystem M13, does not authorize increment 1, and does not endorse the
+three unreachable statuses; ADR-0049 decision 6 still governs whether they gain a
+code path or are removed, and that change now has this document to be measured
+against.
