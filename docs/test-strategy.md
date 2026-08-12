@@ -51,14 +51,37 @@ percentage does not replace explicit invariant tests.
 - Do not add automatic retries to hide flakiness.
 - Fix or replace the test before restoring it to the required gate.
 
+## Run Tests Feature by Feature
+
+**While building, run the tests for the feature you are building — not the whole
+suite after every edit.** The files to run are not a guess: every specification
+lists them in `enforced_by`, and its Verification section carries the command
+ready to paste. That is what those fields are for.
+
+```bash
+# The feature: what the spec you are changing says enforces it.
+bin/rails test test/models/internship_request_test.rb \
+  test/controllers/internship_requests_controller_test.rb \
+  test/operations/internship_request_boundary_test.rb
+```
+
+The full suite is the **gate**, not the loop. Run `bin/verify` before pushing,
+when a change touches shared chrome — navigation, layout, the header, session
+handling — and when a feature-scoped run passes but the change altered anything
+another feature reads. Those are the moments the whole suite earns its time; a
+per-file run does not see a landing redirect three features away.
+
+A feature-scoped run that passes is not permission to skip the gate. It is
+permission to keep working.
+
 ## Commands
 
 ```bash
-bin/rails test
-bin/rails test test/models/example_test.rb
-bin/rails test test/models/example_test.rb:42
-bin/rails test:system
-bin/verify
+bin/rails test test/models/example_test.rb        # the loop: this feature
+bin/rails test test/models/example_test.rb:42     # one case, while fixing it
+bin/rails test                                    # every Rails test, before the gate
+bin/rails test:system                             # slowest; browser journeys
+bin/verify                                        # the gate: docs, lint, security, all tests
 ```
 
 The invariant-to-test registry remains in `docs/agent-flow.md` and
