@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T16:30:00+07:00",
+  "updated_at": "2026-08-12T17:10:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2838,6 +2838,28 @@
         }
       ],
       "updated_at": "2026-08-12T16:30:00+07:00"
+    },
+    {
+      "id": "DEV-018",
+      "title": "Assert the write path ADR-0049 forbids",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-017"
+      ],
+      "evidence": [
+        {
+          "label": "ADR-0049 proposal triage before a public platform",
+          "url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-12T17:10:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4773,6 +4795,14 @@
       "to": "complete",
       "summary": "Close the class rather than the instance. Two checks join locale parity and one flag is turned on. The first reads every key the code names literally - 1135 of them across app/ and lib/ - and fails on any that is defined nowhere, naming the file and line rather than the key alone; run against the tree before DEV-016 it reports all twenty references by name. The second fails on any locale key that is not a String after YAML parses it, which is five lines and the only thing that makes the yes:/no: trap visible, since the file reads correctly and the lookup is what is wrong; it names twelve keys on the old tree. Neither can see an interpolated key, and there are 177 of those, so raise_on_missing_translations is on in the test environment for the half that is only observable at render time. Turning it on immediately found a twentieth string neither static check could reach: enrollment validates that a section holds students and adds :not_student, a message defined in neither locale, so an administrator who tried to enrol a staff account was refused in words the reader could not read. That is the argument for the flag in one example - the static check reads what the code asks for by name, and this key is never named by the code at all. A green run over files that already agree proves nothing, so both checks were run against the pre-fix tree first and each fired with the offending keys spelled out.",
       "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-12T17:10:00+07:00",
+      "item_id": "DEV-018",
+      "from": "queued",
+      "to": "complete",
+      "summary": "ADR-0049 decision 7 says no proposal writes to docs/ or docs/backlog.json automatically, because the backlog is the source of truth for delivery and its updates carry recorded human approval - a queue that can append to it is a queue that can approve work. The ADR's own fitness function said the decision is enforced by the absence of any write path from application code, which no test asserts today. This is that test, written for the class rather than for proposals: nothing under app/ or lib/ writes a file at all, which is stronger than any per-feature check and needs no revisiting when the triage screen arrives. Two writers are named with the sentence saying what each writes, in the shape the route reachability list already uses, and a second test fails when a named writer stops writing so the list cannot quietly become fiction. The carve-out found while reading the code is that one generated file does live under docs/: lib/error_pages.rb writes the hosted 503 that Render's maintenance mode serves from the documentation origin, and the test pins it to exactly that path and asserts every other generated page belongs in public/. A fourth check states the point in the ADR's own terms - no specification, decision, runbook, or the backlog itself is inside the set of files any code generates. Three injections confirmed it fails: a File.write to the backlog from a service was named with its file and line, the generator repointed at docs/backlog.json failed two checks at once, and a writer that writes nothing was reported as stale. Note what this does not do - script/ writes the dashboard and is deliberately out of scope, because it is tooling a person runs rather than something a request can reach.",
+      "evidence_url": "decisions/adr-0049-proposal-triage-before-public-platform.html"
     }
   ]
 }
