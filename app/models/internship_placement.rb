@@ -121,6 +121,20 @@ class InternshipPlacement < ApplicationRecord
 
   def supervisor = faculty_assignments.active.first&.faculty
 
+  # The same rule as `InternshipDeliverable#readable_by?`, asked once for the
+  # whole list instead of once per file. The company half of that rule is two
+  # membership lookups, so filtering row by row cost two queries a deliverable
+  # and grew with the pile — the one thing `test/models/query_budget_test.rb`
+  # exists to stop.
+  def deliverables_readable_by(user)
+    return InternshipDeliverable.none if user.blank?
+
+    readable = deliverables.newest_first.with_attached_file
+    return readable if open? && manageable_by?(user)
+
+    readable.where(author_id: user.id)
+  end
+
   # An administrator assigns the supervisor, so they must be able to open the
   # placement — but ADR-0041 holds them to support scope and no unbounded
   # browsing of student content. So this is deliberately *not* `visible_to?`:

@@ -1,0 +1,8 @@
+# Deliberately empty, for the reason organizations.yml gives: the seeds write
+# this table and fixtures that do not name it never clear it, so a seeded row
+# outlives the users it points at and the next fixture load fails on a foreign
+# key. Every test that needs one of these builds its own.
+#
+# Added when db/seeds.rb learned to walk a whole internship — request, shared
+# résumé, placement, weekly report, supervisor, deliverable — and the first
+# `bin/rails test` after a replant died loading fixtures.

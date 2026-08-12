@@ -49,11 +49,10 @@ class InternshipPlacementsController < ApplicationController
     @reads_reports = @placement.visible_to?(Current.user)
     @reports = @reads_reports ? @placement.progress_reports.newest_first
                                           .includes(:acknowledged_by, :faculty_acknowledged_by) : []
-    # A deliverable's reader is re-derived per file rather than per screen: the
-    # student always, the hosting company while the placement is open, and the
-    # faculty supervisor deliberately not — ADR-0041 decision 5.
-    @deliverables = @placement.deliverables.newest_first.with_attached_file
-                              .select { it.readable_by?(Current.user) }
+    # The student always, the hosting company while the placement is open, and
+    # the faculty supervisor deliberately not — ADR-0041 decision 5, asked once
+    # for the list rather than once per file.
+    @deliverables = @placement.deliverables_readable_by(Current.user)
   end
 
   # One entry point, two origins: an approved request or an accepted recruitment

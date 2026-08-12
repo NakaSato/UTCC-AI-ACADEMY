@@ -106,4 +106,46 @@ class QueryBudgetTest < ActiveSupport::TestCase
     assert_equal 2, count_queries { LearnerProgress.standings },
       "a new completion changes the ranking, so the memo must be dropped"
   end
+
+  # A deliverable's reader is a membership lookup, so asking per file cost two
+  # queries a file and grew with the pile. The company sees the whole list, so
+  # this is the reader who pays for it.
+  test "reading an internship's deliverables costs the same however many there are" do
+    placement = active_placement
+    decider = placement.organization.memberships.active.first.user
+
+    add_deliverables(placement, 1)
+    placement.deliverables_readable_by(decider).to_a
+    small = count_queries { placement.deliverables_readable_by(decider).to_a }
+
+    add_deliverables(placement, 9)
+    large = count_queries { placement.deliverables_readable_by(decider).to_a }
+
+    assert_equal small, large,
+      "deliverables went from #{small} to #{large} queries when the pile grew — a per-file check is back"
+  end
+
+  private
+    def active_placement
+      organization = Organization.create!(name: "Budget Org", creator: users(:admin),
+                                          accepts_internship_requests: true)
+      organization.memberships.create!(user: users(:one), role: "owner")
+      request = organization.internship_requests.create!(student: users(:student),
+                                                         motivation: "Routing", learning_goals: "Measuring")
+      request.submit!(actor: users(:student))
+      request.approve!(actor: users(:one))
+      placement = InternshipPlacement.from_request!(request, actor: users(:one))
+      placement.activate!(actor: users(:one))
+      placement
+    end
+
+    def add_deliverables(placement, count)
+      count.times do |index|
+        deliverable = placement.deliverables.new(title: "Work #{placement.deliverables.count + index}",
+                                                 author: placement.student)
+        deliverable.file.attach(io: StringIO.new("%PDF-1.4 x"), filename: "work.pdf",
+                                content_type: "application/pdf")
+        deliverable.save!
+      end
+    end
 end

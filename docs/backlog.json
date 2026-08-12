@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T12:00:00+07:00",
+  "updated_at": "2026-08-12T13:15:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2473,6 +2473,29 @@
         }
       ],
       "updated_at": "2026-08-12T12:00:00+07:00"
+    },
+    {
+      "id": "DEV-004",
+      "title": "Stop the deliverable list growing a query per file",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-006",
+        "DEV-003"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Performance budgets",
+          "url": "performance.html"
+        }
+      ],
+      "updated_at": "2026-08-12T13:15:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4256,6 +4279,14 @@
       "to": "complete",
       "summary": "SPEC-0041 ships four increments and a fresh database showed none of them: no request to decide, no placement to advance, no week to acknowledge, no supervisor, no file. Every screen built over the last two days was an empty state, which is the one thing a demo cannot demonstrate. The seeds now walk one internship the whole way - a student's request, a shared resume, the company's approval, an active placement, a weekly report, an administrator-assigned supervisor, and a deliverable - through the real APIs rather than written straight into the tables, so the seeded rows are the ones the app itself would produce, guards and all. The replant caught the ordering error immediately: sharing a resume is only allowed while a request is open, and the first version shared it after approval. It had passed in development because the flag was already set there by hand, which is exactly the kind of thing a wiped database is for. Two replants in a row produce the same single set of rows.",
       "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-12T13:15:00+07:00",
+      "item_id": "DEV-004",
+      "from": "queued",
+      "to": "complete",
+      "summary": "A defect introduced this morning by INT-006 and caught by measuring rather than by reading: the placement screen filtered deliverables with a per-record readable_by?, and the company half of that rule is two membership lookups, so the screen cost two queries per file. Measured at seven queries for one deliverable and fifteen for five - it grew with the pile, which is exactly what test/models/query_budget_test.rb and the agent-flow invariant table already forbid for a cohort. InternshipPlacement#deliverables_readable_by asks the company question once and returns a scope: the whole list for a decider while the placement is open, and the author's own otherwise, which is the same rule readable_by? states for one record. The budget test now covers it, and the regression was planted and confirmed failing at seven versus twenty-five queries before the fix was kept. Seeding the internship exposed a second, older trap the repository had already documented in test/fixtures/organizations.yml: a table the seeds write and the fixtures do not name is never cleared between them, so a seeded row outlives the users it points at and the next fixture load dies on a foreign key. Eight tables needed the same deliberately-empty file - the five internship tables, candidate profiles, and both Active Storage tables - and the note in each says why it is empty.",
+      "evidence_url": "performance.html"
     }
   ]
 }
