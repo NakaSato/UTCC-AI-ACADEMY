@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T00:41:00+07:00",
+  "updated_at": "2026-08-13T04:52:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3128,6 +3128,28 @@
         }
       ],
       "updated_at": "2026-08-13T00:41:00+07:00"
+    },
+    {
+      "id": "DEV-024",
+      "title": "Run the gate that was changed, and fix the two things it caught",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-012"
+      ],
+      "evidence": [
+        {
+          "label": "Vite island build decision",
+          "url": "decisions/adr-0053-vite-island-build.html"
+        },
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-13T04:52:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5167,6 +5189,14 @@
       "to": "complete",
       "summary": "The bridge moved from Stimulus to a MutationObserver when Vite arrived, and the path that replaced Stimulus-s connect had no test: an island mounted on first load and nothing proved it mounted again after Turbo replaced or restored the DOM. The walk now navigates away through Turbo Drive, comes back, and asserts one counter - not two, not none - that is still live rather than a leftover string, by typing into the field and watching the number move. Both halves of the bridge were then mutated to see what the test is worth. Deleting the observer-s mount of added nodes fails it: the restored page has an empty div. Deleting the turbo:before-cache unmount does not fail it, because Turbo clones the snapshot and the observer mounts a fresh app over whatever it held - so the comment claiming that failure was corrected rather than left standing. The unmount is defensive and stays: it keeps Vue-s output out of the cached HTML, so what a reader sees during the restore flash is the server-s markup rather than a stale render. That is written down as what this test is not evidence for. The same observer path is what a Turbo Stream takes when it replaces a node, which is still undriven by any test and is named as such.",
       "evidence_url": "specs/spec-vue-islands.html"
+    },
+    {
+      "at": "2026-08-13T04:52:00+07:00",
+      "item_id": "DEV-024",
+      "from": "queued",
+      "to": "complete",
+      "summary": "config/ci.rb gained two steps today and had never been run end to end, so it was - and it caught two things, one of them mine. Brakeman was failing the gate and had been since 8.0.6 shipped: bin/brakeman prepends --ensure-latest, so a release anybody makes turns the step red without a line of this repository changing. It was reported as passing several times during the day because the command was read through a pipe, which returns grep-s exit status and not Brakeman-s; the scan itself found nothing then and finds nothing now, but the step was red and was called green. The gem is bumped and the reading corrected. The second was a race introduced with Vite. autoBuild builds the island bundle on the first request for an asset, which in a parallel suite is eight processes discovering a stale bundle at the same moment - several build at once and one reads public/vite-test while another is part-way through rewriting it. The symptom is a template error saying the entrypoint is not in the manifests, on whichever few tests rendered a layout inside the window, which reads exactly like a flake. It is not one: it passed on the first gate run and failed on the next two, and passed every standalone run because the bundle was already warm. autoBuild is off in test now and test_helper builds once in the parent process before parallelize forks, so every worker inherits a manifest that is already correct. Verified from a cold start with public/vite-test deleted, and the whole gate is green in 1m18s: setup, docs, RuboCop, three audits, Brakeman, the Vite build, 1318 unit tests, the seed replant, and 31 system tests.",
+      "evidence_url": "decisions/adr-0053-vite-island-build.html"
     }
   ]
 }
