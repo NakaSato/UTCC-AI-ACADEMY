@@ -3,11 +3,12 @@ module Recruitment
     allow_only :admin, only: %i[ new create create_membership revoke_membership ]
 
     def index
-      @organizations = if Current.user.admin?
+      readable = if Current.user.admin?
         Organization.order(:name)
       else
         Current.user.organizations.merge(Organization.active).order(:name)
       end
+      @organizations = Page.new(readable, params[:page])
     end
 
     def new

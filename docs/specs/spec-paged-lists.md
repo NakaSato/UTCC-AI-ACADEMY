@@ -20,6 +20,10 @@ implemented_by:
   - app/controllers/academic_posts_controller.rb
   - app/controllers/recruitment/job_posts_controller.rb
   - app/controllers/recruitment/job_applications_controller.rb
+  - app/controllers/recruitment/internship_programs_controller.rb
+  - app/controllers/recruitment/organizations_controller.rb
+  - app/controllers/internship_request_decisions_controller.rb
+  - app/controllers/internship_placements_controller.rb
 enforced_by:
   - test/models/page_test.rb
   - test/controllers/paged_lists_test.rb
@@ -44,10 +48,20 @@ min_reviewer_skills: [SKILL-SPEC-002, SKILL-ARCH-002]
 > [ADR-0050](../decisions/adr-0050-paged-lists.md), which the user accepted the
 > same day. Every product question this specification answers was answered
 > there — the page size, the URL, the clamping rule, which lists page, and the
-> removal of `AuditEvent::RECENT`. It adds **one correction and one deferral**,
-> both recorded below and both flagged for the user: the enumeration produces
-> **nine paged screens rather than the seven ADR-0050's consequences predicted**,
-> and five lists that grow are named as a follow-up rather than paged here.
+> removal of `AuditEvent::RECENT`. It corrects the decision's count: the
+> enumeration produces **nine paged screens rather than the seven ADR-0050's
+> consequences predicted**.
+>
+> **Two increments, both shipped on 2026-08-12.** Increment 1 (UX-008) is the
+> nine screens inside ADR-0050's `touches`. Increment 2 (UX-009) is the six the
+> first one named as growing and did not reach — the internship queues, the
+> programs, a program's applications, the placements screen, and the
+> organization index — which took the total to **fifteen screens and seventeen
+> lists** and added the one rule increment 1 had no need of: a screen with more
+> than one paged list gives each list its own param.
+>
+> One list from that group is deliberately still not paged, and is the only
+> thing this document leaves open: **the notification bell**. See the end.
 
 > [Executable Specifications](README.md) ·
 > [Paged lists decision](../decisions/adr-0050-paged-lists.md) ·
@@ -90,8 +104,8 @@ per-page selector, and any new dependency. ADR-0050 rejected the first two on
 linkability and the back button, the third as a different object for a scale
 nothing here reaches, and Kaminari and Pagy as more than this needs.
 
-**Deferred, and named rather than left implicit:** the lists under "Grows, and
-not paged in this increment" below.
+**Deferred, and named rather than left implicit:** the notification bell, under
+"Grows, and still not paged" below.
 
 ## The page object
 
@@ -102,6 +116,7 @@ dependencies, and has no opinion about markup.
 | Member | Rule |
 | --- | --- |
 | `Page::SIZE` | `25`. One constant, one place. A screen may pass `size:` with a sentence saying why; none does |
+| `#param` | the name this page reads and writes in the URL, `"page"` unless a screen holds more than one paged list |
 | `#records` | at most `size` rows, taken in SQL with `LIMIT`/`OFFSET`, never by loading the list and discarding most of it |
 | `#count` | the rows in the whole relation, counted with `except(:order, :limit, :offset)` |
 | `#number` | the clamped page — see below |
@@ -135,6 +150,14 @@ the first page of a list has one address rather than two.
 no page, so submitting one drops it. Anything else shows a reader an empty
 screen for a page that exists under a filter they are no longer using.
 
+**One screen, more than one paged list: one param each.** The placements screen
+holds three lists that grow, and a single `?page=` would move all three at once
+— a reader paging into the hosting list would find the supervising one had
+jumped too. Each page therefore names the param it owns (`hosting_page`,
+`supervising_page`, `administering_page`), and `page_url` replaces that one and
+carries every other param through, pages included. A screen with a single paged
+list uses `page` and says nothing.
+
 ## The control
 
 `app/views/shared/_pagination.html.erb`, rendered with `page:`, and nothing else
@@ -154,7 +177,8 @@ about it is per-screen.
 
 ## Which lists page
 
-Nine screens, across the four controllers ADR-0050 named.
+Fifteen screens and seventeen lists. The first nine are increment 1, inside the
+four controllers ADR-0050 named; the rest are increment 2.
 
 | Screen | List | Why it grows |
 | --- | --- | --- |
@@ -167,8 +191,16 @@ Nine screens, across the four controllers ADR-0050 named.
 | `/company/:slug/job_posts` | a company's postings | every posting it ever wrote |
 | `/company/:slug/job_posts/:id/applications` | a posting's applicants | one row per applicant |
 | `/recruitment/job-applications` | a candidate's applications | one row per application they send |
+| `/company/:slug/internship` | a company's incoming internship requests | one row per student per term, forever |
+| `/recruitment/internships` | every published programme | one row per programme per partner |
+| `/company/:slug/internship_programs` | a company's programmes | every programme it ever wrote |
+| `/company/:slug/internship_programs/:id` | a programme's applicants | one row per applicant |
+| `/internships/placements` | placements this company hosts (`hosting_page`) | its whole hosting history |
+| `/internships/placements` | placements this account supervises (`supervising_page`) | a career of assignments |
+| `/internships/placements` | every placement, for an administrator (`administering_page`) | the institution's whole history |
+| `/company` | organizations this account can see | every partner ever created |
 
-**This is nine, and ADR-0050's consequences predicted seven.** The prediction
+**Increment 1 is nine, and ADR-0050's consequences predicted seven.** The prediction
 was made from the four lists its context names plus the audit log; the
 enumeration adds the approval queue, which is every course-lifecycle request
 ever raised, and the public job search, which is the most-read list in the
@@ -207,20 +239,20 @@ by something real, and leaving it alone is a decision rather than an oversight.
 | A student's own internship requests and open placements | one student's own |
 | `/contributors` | four editorial entries |
 
-## Grows, and not paged in this increment
+## Grows, and still not paged
 
-Named, because the honest half of decision 8 is the half that admits what is
-left. Each of these grows with the institution and is out of ADR-0050's
-`touches`; each needs its own screen work rather than one more `Page.new`.
+One list, and it is the only thing this document leaves open.
 
-| List | What it needs |
-| --- | --- |
-| A company's incoming internship requests | the same treatment, in `internship_request_decisions_controller` |
-| `/internships/programs`, public and per company | as above, in `recruitment/internship_programs_controller` |
-| A program's applications | as above |
-| Internship placements — a company's, a supervisor's | three lists on one screen, so three controls |
-| `/recruitment/organizations` for an administrator | every partner ever created |
-| The notification bell | capped at `Notification::RECENT`, which is the audit log's problem in miniature: there is no screen on which older notifications are reachable. A bell is not a log, so the fix is a screen, not a page |
+**The notification bell** is capped at `Notification::RECENT` — eight rows — and
+nothing reaches the ninth. That is the audit log's defect in miniature: a bound
+with no route past it, on a screen that does not say so. It is deliberately not
+fixed here, because **the fix is a screen, not a page**. There is nowhere to add
+a control: the bell is a dropdown in the header, and paging a dropdown is not
+what a reader of it wants. Somebody's notification history needs a route, a
+place in the workspace navigation, and a decision about whether a read
+notification stays visible — a new surface, and therefore an ADR rather than one
+more `Page.new`. Until that decision exists the cap stays, and this paragraph is
+the record that it is known rather than missed.
 
 ## Invariants
 
@@ -230,8 +262,10 @@ left. Each of these grows with the institution and is out of ADR-0050's
    an empty list, never a raised exception.
 3. A paged screen's query count does not change when its row count grows, and a
    page costs exactly one query more than the unpaged list did.
-4. A page link carries the current query parameters with only the page replaced;
-   a filter control carries no page at all.
+4. A page link carries the current query parameters with only its own page
+   param replaced; a filter control carries no page at all.
+   4a. Where a screen holds more than one paged list, each list owns a distinct
+   param, and a link into one leaves the others where the reader left them.
 5. `Page::SIZE` is 25, in one place.
 6. A list that fits on one page renders no control.
 7. The control is a named `nav` of links, with the current page marked
@@ -257,6 +291,10 @@ left. Each of these grows with the institution and is out of ADR-0050's
 - Given one post, no `nav[aria-label="Pages"]` is rendered.
 - On page 2 of a paged list, the control contains `a[aria-current=page]` reading
   "2", an `a[rel=prev]`, and no `button`.
+- Given 26 placements a company hosts, `/internships/placements` renders 25 and
+  `?hosting_page=2` renders 1, while `?supervising_page=2` leaves the hosting
+  list on page 1 — and on `?supervising_page=3` the hosting control's links
+  still carry `supervising_page=3`.
 - `AuditEvent.const_defined?(:RECENT)` is false.
 
 ## Verification
@@ -275,8 +313,8 @@ left. Each of these grows with the institution and is out of ADR-0050's
 
 ## Consequences
 
-- Nine screens gain a page and a control; every other list is unchanged and this
-  document records why.
+- Fifteen screens gain a page and a control across the two increments; every
+  other list is unchanged and this document records why.
 - The audit log gains reachable history and loses `RECENT`.
 - Each paged screen costs one more query, and the approval queue costs one
   fewer; `docs/performance.md` carries the figures.

@@ -34,7 +34,8 @@
   <% else %>
     <ul class="space-y-4">
       <% @requests.each do |internship_request| %>
-        <li class="rounded-card border border-hairline bg-surface-1 p-6">
+        <li class="rounded-card border border-hairline bg-surface-1 p-6"
+            data-internship-request-id="<%= internship_request.id %>">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 class="text-18 font-semibold text-ink"><%= internship_request.student.name %></h2>
@@ -100,5 +101,7 @@
         </li>
       <% end %>
     </ul>
+
+    <%= render "shared/pagination", page: @requests %>
   <% end %>
 </main>

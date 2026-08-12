@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T18:28:00+07:00",
+  "updated_at": "2026-08-12T18:56:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -2919,8 +2919,8 @@
     },
     {
       "id": "UX-009",
-      "title": "Page the six lists SPEC-0051 named and did not reach",
-      "status": "queued",
+      "title": "Page the lists SPEC-0051 named and increment 1 did not reach",
+      "status": "complete",
       "priority": 3,
       "owner": "Tech Lead",
       "milestone": "M1",
@@ -2931,9 +2931,13 @@
         {
           "label": "Paged lists specification",
           "url": "specs/spec-paged-lists.html"
+        },
+        {
+          "label": "Paged lists decision",
+          "url": "decisions/adr-0050-paged-lists.html"
         }
       ],
-      "updated_at": "2026-08-12T18:28:00+07:00"
+      "updated_at": "2026-08-12T18:56:00+07:00"
     }
   ],
   "recently_completed": [
@@ -4892,6 +4896,14 @@
       "from": "queued",
       "to": "complete",
       "summary": "Twenty-five list screens loaded every row they could see, and the per-screen query budget could not see it: the budget counts queries, not rows, so every one of them was constant-cost while the result set, the HTML and the transfer grew with the institution. One list had a bound and its bound was worse than none - the audit tab took AuditEvent::RECENT, the most recent fifty after the level filter, and no route reached the rest, on a log the model says cannot be cleared. The user chose paging over a frontend library, and ADR-0050 settled the rest: one Page object of about forty lines rather than Kaminari or Pagy, whose view helpers would have been fought back into the token system the way ADR-0007 refused Tiptap-s styling; ?page= beside the tab, role, q, level and search params, so a page is linkable, survives the back button and needs no JavaScript; twenty-five rows in one constant; an impossible page clamping to the nearest real one, which is the whitelist-or-default rule tab_for and role_filter already run; and a filter change landing on page 1 while a page link keeps the filter. The consequence paragraph predicted seven screens and the enumeration produced nine - the approval queue, which is every course-lifecycle request ever raised, and the public job search, which is the most-read list in the application - both inside controllers the decision already named, and both corrected in the ADR rather than rounded to. The queue came out one query cheaper than it went in, because its template asked AdminConsole.queue twice, once to test for empty and once to render. Every other list is named in SPEC-0051 as either bounded by construction - a cohort, a term, a company-s staff - or growing and deferred, which is the honest half of decision 8: the internship queues, the programs, the placements, the organization index and the notification bell grow with the institution, are outside the decision-s touches, and are UX-009 rather than an omission nobody wrote down.",
+      "evidence_url": "specs/spec-paged-lists.html"
+    },
+    {
+      "at": "2026-08-12T18:56:00+07:00",
+      "item_id": "UX-009",
+      "from": "queued",
+      "to": "complete",
+      "summary": "Increment 1 paged the nine lists inside ADR-0050-s touches and named six more that grow and were not reached. Five of them page now: a company-s incoming internship requests, the published programmes and a company-s own, a programme-s applicants, the placements screen, and the organization index - fifteen screens and seventeen lists in total, and SPEC-0051-s table is the register of both increments. Nothing new was decided; the rule was always lists that grow with the institution, and these are in four controllers the decision did not happen to name. The placements screen forced the one rule increment 1 had no need of. It holds three lists that grow - what a company hosts, what an account supervises, and for an administrator every placement there is - and a single ?page= would have moved all three at once, so a reader paging into the hosting list would have found the supervising one had jumped too. Page now carries the name of the param it owns, page_url replaces that one and carries every other param through including the other lists- pages, and the three are hosting_page, supervising_page and administering_page. The student-s own placements stay a relation rather than a page: they are bounded by a degree, and a control on a list of two is the noise decision 8 refused. What is left is the notification bell, and it is left deliberately. It is capped at eight with no route to the ninth, which is the audit log-s defect in miniature, but the fix is a screen rather than a page - a dropdown in the header has nowhere to put a control, and a notification history needs a route, a place in the navigation and a rule about what a read notification does. That is a new surface and therefore an ADR, so the cap stays and both the decision and the specification now say why rather than leaving it to be rediscovered.",
       "evidence_url": "specs/spec-paged-lists.html"
     }
   ]

@@ -21,13 +21,15 @@ module ApplicationHelper
   # A page link keeps the filter (ADR-0050 decision 6). The reader is on
   # `?tab=audit&level=warn` or a job search five fields deep, and a link that
   # replaced all of that with `?page=2` would answer a question nobody asked.
+  # It keeps the other lists' pages for the same reason: `page.param` is the one
+  # thing this replaces.
   #
   # Built from `request.path` and the query string rather than `url_for`, which
   # carries route segments but drops the params these screens keep their state
   # in. Page 1 is the bare URL, so the first page of a list has one address.
-  def page_url(number)
-    query = request.query_parameters.merge("page" => number.to_s)
-    query.delete("page") if number == 1
+  def page_url(page, number)
+    query = request.query_parameters.merge(page.param => number.to_s)
+    query.delete(page.param) if number == 1
 
     query.empty? ? request.path : "#{request.path}?#{query.to_query}"
   end

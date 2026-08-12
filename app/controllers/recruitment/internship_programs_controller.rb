@@ -3,12 +3,12 @@ module Recruitment
     def index
       if params[:company_id]
         @organization = readable_organization
-        @programs = @organization.internship_programs.order(updated_at: :desc, id: :desc)
+        @programs = Page.new(@organization.internship_programs.order(updated_at: :desc, id: :desc), params[:page])
         @public = false
         @can_create = author_member?
       else
-        @programs = InternshipProgram.published_for_candidates.includes(:organization, :mentor)
-                                      .order(published_at: :desc, id: :desc)
+        @programs = Page.new(InternshipProgram.published_for_candidates.includes(:organization, :mentor)
+                                              .order(published_at: :desc, id: :desc), params[:page])
         @public = true
       end
     end
@@ -38,7 +38,7 @@ module Recruitment
         @program = @organization.internship_programs.find(params[:id])
         @public = false
         assign_permissions
-        @applications = @program.applications.includes(:student, :evaluation).newest_first
+        @applications = Page.new(@program.applications.includes(:student, :evaluation).newest_first, params[:page])
         @suggestions = @program.suggestions.newest_first
       else
         @program = InternshipProgram.published_for_candidates.find(params[:id])

@@ -18,11 +18,16 @@ class Page
   # and says why.
   SIZE = 25
 
-  attr_reader :number, :size, :count
+  attr_reader :number, :size, :count, :param
 
-  def initialize(scope, number, size: SIZE)
+  # `param` is the name this page reads and writes in the URL. One screen can
+  # hold more than one list that grows — the placements screen holds three — and
+  # a single `?page=` would move all of them at once, so each names its own and
+  # a link to one keeps the others where the reader left them.
+  def initialize(scope, number, size: SIZE, param: "page")
     @scope = scope
     @size = size
+    @param = param.to_s
     # `except(:order)` because a count does not need the sort and Postgres would
     # do the work anyway; `except(:limit, :offset)` so a scope that already
     # narrowed itself is counted as it stands rather than as this page.

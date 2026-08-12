@@ -12,7 +12,7 @@
       <span class="rounded-full border border-hairline px-3.5 py-1.75 text-13 font-medium text-muted-3"
             aria-hidden="true"><%= t("pagination.previous") %></span>
     <% else %>
-      <%= link_to t("pagination.previous"), page_url(page.previous), rel: "prev",
+      <%= link_to t("pagination.previous"), page_url(page, page.previous), rel: "prev",
             class: "rounded-full border border-hairline bg-surface px-3.5 py-1.75 text-13 font-medium
                     text-ink-2 transition-colors hover:border-muted-3" %>
     <% end %>
@@ -21,7 +21,7 @@
       <% if number.nil? %>
         <span class="px-1 text-13 text-muted-3" aria-hidden="true">…</span>
       <% else %>
-        <%= link_to number, page_url(number),
+        <%= link_to number, page_url(page, number),
               "aria-label": t("pagination.go_to", number: number),
               "aria-current": ("page" if number == page.number),
               class: class_names(
@@ -36,7 +36,7 @@
       <span class="rounded-full border border-hairline px-3.5 py-1.75 text-13 font-medium text-muted-3"
             aria-hidden="true"><%= t("pagination.next") %></span>
     <% else %>
-      <%= link_to t("pagination.next"), page_url(page.next), rel: "next",
+      <%= link_to t("pagination.next"), page_url(page, page.next), rel: "next",
             class: "rounded-full border border-hairline bg-surface px-3.5 py-1.75 text-13 font-medium
                     text-ink-2 transition-colors hover:border-muted-3" %>
     <% end %>

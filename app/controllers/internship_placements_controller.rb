@@ -4,32 +4,36 @@ class InternshipPlacementsController < ApplicationController
   def index
     @student_placements = Current.user.internship_placements.includes(:organization).newest_first
     @weeks_reported = reported_weeks_by_placement
-    @company_placements = InternshipPlacement.joins(organization: :memberships)
+    # Three lists on one screen, so three page params: a link into the hosting
+    # list must not move the supervising one out from under the reader. The
+    # student's own placements are bounded by a degree and stay unpaged.
+    @company_placements = Page.new(InternshipPlacement.joins(organization: :memberships)
                                              .merge(Organization.active)
                                              .where(organization_memberships: {
                                                       user_id: Current.user.id, status: "active",
                                                       role: InternshipPlacement::DECIDER_ROLES
                                                     })
                                              .includes(:organization, :student)
-                                             .newest_first
+                                             .newest_first, params[:hosting_page], param: :hosting_page)
     # What this account supervises for the university. Assigned placements only:
     # the assignment is the consent and therefore the boundary, so a staff
     # member sees no internship they were not given — ADR-0041 decision 7.
-    @supervised_placements = InternshipPlacement.joins(:faculty_assignments)
+    @supervised_placements = Page.new(InternshipPlacement.joins(:faculty_assignments)
                                                 .where(internship_faculty_assignments: {
                                                          faculty_id: Current.user.id, status: "active"
                                                        })
                                                 .includes(:organization, :student)
-                                                .newest_first
+                                                .newest_first, params[:supervising_page], param: :supervising_page)
     # An administrator supervises nothing and hosts nothing, so every list above
     # is empty for them — and assigning a supervisor happens on a placement they
     # would have had no way to reach. This is that way. It carries the same
     # reach `administrable_by?` grants: the record, never a weekly report.
-    @administered_placements = if Current.user.admin?
+    administered = if Current.user.admin?
       InternshipPlacement.includes(:organization, :student, faculty_assignments: :faculty).newest_first
     else
       InternshipPlacement.none
     end
+    @administered_placements = Page.new(administered, params[:administering_page], param: :administering_page)
     @placeable_requests = placeable_requests
     @placeable_applications = placeable_applications
   end

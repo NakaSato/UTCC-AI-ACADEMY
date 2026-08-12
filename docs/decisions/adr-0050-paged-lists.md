@@ -123,11 +123,19 @@ somebody will discover the hard way.
    pagination control on a list of four is noise. The specification names them,
    so leaving them alone stays a decision rather than an oversight.
 
-   It also names the lists that are **neither** — the internship queues, the
-   programs, the placements, the organization index, and the notification bell,
-   which grow with the institution and are outside this decision's `touches`.
-   Calling those bounded would have been untrue, and leaving them unlisted would
-   have made the omission invisible; they are named as the follow-up they are.
+   It also names the lists that are **neither** — which grow with the
+   institution and were outside this decision's `touches`. Calling those bounded
+   would have been untrue, and leaving them unlisted would have made the
+   omission invisible, so they were named as the follow-up they were. UX-009
+   shipped that follow-up the same day: the internship queues, the programmes, a
+   programme's applicants, the placements screen and the organization index all
+   page now, and the specification's table is the register of both increments.
+
+   One is still open, and deliberately: **the notification bell**, capped at
+   eight with no route to the ninth. That is this decision's own defect in
+   miniature, and the fix is a screen rather than a page — a route, a place in
+   the navigation, and a rule about what a read notification does. A new surface
+   is an ADR, not one more `Page.new`.
 
 9. **The control is a `nav` a keyboard can use.** Links, not buttons; an
    accessible name; the current page marked with `aria-current="page"`; both
@@ -175,6 +183,11 @@ the institution", and the specification names which those are.
   with the institution, which is the rule this decision gave — but the number
   was wrong, and a consequence that predicts a count is worth correcting rather
   than rounding to.
+
+  The follow-up increment took it to **fifteen screens and seventeen lists**, in
+  four controllers this decision did not name. That is this decision applied
+  rather than extended — the rule was always "lists that grow with the
+  institution" — and SPEC-0051's table is the register of which are which.
 - The audit log gains reachable history and loses `RECENT`; the constant and its
   test go with it.
 - Each paged screen adds exactly one query. The per-screen figures in

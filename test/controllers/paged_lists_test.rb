@@ -183,6 +183,111 @@ class PagedListsTest < ActionDispatch::IntegrationTest
     assert_select "[data-application-id]", 1
   end
 
+  # ---- Internships ----------------------------------------------------------
+
+  test "a company's incoming internship requests page" do
+    organization = create_organization(accepts_internship_requests: true)
+    decider = organization.memberships.active.first.user
+    (SIZE + 1).times { submit_internship_request(organization) }
+    sign_in_as decider
+
+    get company_internship_requests_url(organization)
+    assert_response :success
+    assert_select "[data-internship-request-id]", SIZE
+
+    get company_internship_requests_url(organization, page: 2)
+    assert_select "[data-internship-request-id]", 1
+  end
+
+  test "the published internship programs page, and a company's own page" do
+    organization = create_organization
+    (SIZE + 1).times { |index| publish_program(organization, "Programme #{index}") }
+    sign_in_as users(:student)
+
+    get recruitment_internships_url
+    assert_response :success
+    assert_select "[data-program-id]", SIZE
+
+    get recruitment_internships_url(page: 2)
+    assert_select "[data-program-id]", 1
+
+    sign_in_as organization.memberships.active.first.user
+    get company_internship_programs_url(organization)
+    assert_response :success
+    assert_select "[data-program-id]", SIZE
+  end
+
+  test "a program's applications page" do
+    organization = create_organization
+    reviewer = organization.memberships.active.first.user
+    program = publish_program(organization, "Applied programme")
+    (SIZE + 1).times { program.applications.create!(student: create_learner, statement: "Ready") }
+    sign_in_as reviewer
+
+    get company_internship_program_url(organization, program)
+    assert_response :success
+    assert_select "[data-internship-application-id]", SIZE
+
+    get company_internship_program_url(organization, program, page: 2)
+    assert_select "[data-internship-application-id]", 1
+  end
+
+  test "the organizations an administrator can see page" do
+    (SIZE + 1).times { |index| Organization.create!(name: "Partner #{index}", creator: users(:admin)) }
+    sign_in_as users(:admin)
+
+    get companies_url
+    assert_response :success
+    assert_select "[data-organization-id]", SIZE
+
+    get companies_url(page: 2)
+    assert_select "[data-organization-id]", Organization.count - SIZE
+  end
+
+  # Three lists on one screen. A page param each, or a link into one moves the
+  # others out from under the reader.
+  test "the placements screen pages its three lists independently" do
+    organization = create_organization(accepts_internship_requests: true)
+    decider = organization.memberships.active.first.user
+    supervisor = users(:instructor)
+    placements = Array.new(SIZE + 1) { create_placement(organization, decider) }
+    placements.each { it.faculty_assignments.create!(faculty: supervisor, assigned_by: users(:admin)) }
+
+    sign_in_as decider
+    get internship_placements_url
+    assert_response :success
+    assert_select "[data-placement-id]", SIZE
+
+    get internship_placements_url(hosting_page: 2)
+    assert_select "[data-placement-id]", 1
+
+    # The supervising list has its own param, and the hosting one is untouched
+    # by it — this reader has no supervising list at all.
+    get internship_placements_url(supervising_page: 2)
+    assert_select "[data-placement-id]", SIZE
+
+    sign_in_as supervisor
+    get internship_placements_url
+    assert_response :success
+    assert_select "[data-placement-id]", SIZE
+
+    get internship_placements_url(supervising_page: 2)
+    assert_select "[data-placement-id]", 1
+  end
+
+  test "a page link on one list keeps the other lists' pages" do
+    organization = create_organization(accepts_internship_requests: true)
+    decider = organization.memberships.active.first.user
+    (SIZE + 1).times { create_placement(organization, decider) }
+    sign_in_as decider
+
+    get internship_placements_url(supervising_page: 3)
+
+    assert_response :success
+    assert_select "nav[aria-label=?] a[href*=?]", I18n.t("pagination.label"), "supervising_page=3"
+    assert_select "nav[aria-label=?] a[href*=?]", I18n.t("pagination.label"), "hosting_page=2"
+  end
+
   # ---- The URL a person edited ----------------------------------------------
 
   test "an impossible page renders the nearest real page rather than a 404 or an empty screen" do
@@ -246,10 +351,37 @@ class PagedListsTest < ActionDispatch::IntegrationTest
       ApprovalRequest.create_course_lifecycle!(course:, requester: users(:admin), to_state: "published")
     end
 
-    def create_organization
-      organization = Organization.create!(name: "Paged Org", creator: users(:admin))
+    def create_organization(accepts_internship_requests: false)
+      organization = Organization.create!(name: "Paged Org", creator: users(:admin),
+                                          accepts_internship_requests:)
       organization.memberships.create!(user: users(:console_company), role: "owner")
       organization
+    end
+
+    def submit_internship_request(organization)
+      request = organization.internship_requests.create!(student: create_learner, motivation: "Learning",
+                                                          learning_goals: "Measuring")
+      request.submit!(actor: request.student)
+      request
+    end
+
+    def create_placement(organization, decider)
+      request = submit_internship_request(organization)
+      request.approve!(actor: decider)
+      InternshipPlacement.from_request!(request, actor: decider)
+    end
+
+    def publish_program(organization, name)
+      author = organization.memberships.active.first.user
+      program = organization.internship_programs.create!(creator: author, mentor: author, name:,
+                                                          department: "Ops", description: "Work with the team.",
+                                                          required_skills: "Spreadsheets",
+                                                          learning_outcomes: "Cost analysis",
+                                                          working_days: "Mon-Fri",
+                                                          certificate_policy: "On completion")
+      program.transition_to!("review")
+      program.transition_to!("published")
+      program
     end
 
     def publish_job(organization, title)

@@ -6,7 +6,7 @@
 class InternshipRequestDecisionsController < ApplicationController
   def index
     @organization = decidable_organization
-    @requests = @organization.internship_requests.includes(:student).newest_first
+    @requests = Page.new(@organization.internship_requests.includes(:student).newest_first, params[:page])
     @awaiting = @organization.internship_requests.awaiting_company.count
     @can_change_settings = settings_manageable?(@organization)
   end

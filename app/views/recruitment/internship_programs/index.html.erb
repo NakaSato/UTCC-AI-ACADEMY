@@ -21,7 +21,7 @@
   <% else %>
     <div class="grid gap-4 md:grid-cols-2">
       <% @programs.each do |program| %>
-        <article class="rounded-card border border-hairline bg-surface-1 p-6">
+        <article class="rounded-card border border-hairline bg-surface-1 p-6" data-program-id="<%= program.id %>">
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-12 text-muted"><%= @public ? program.organization.name : program.department %></p>
@@ -40,5 +40,7 @@
         </article>
       <% end %>
     </div>
+
+    <%= render "shared/pagination", page: @programs %>
   <% end %>
 </main>
