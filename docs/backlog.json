@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-12T22:31:00+07:00",
+  "updated_at": "2026-08-12T22:44:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3032,6 +3032,28 @@
         }
       ],
       "updated_at": "2026-08-12T22:31:00+07:00"
+    },
+    {
+      "id": "UX-011",
+      "title": "Decide whether a notification gets somewhere to be read after the ninth",
+      "status": "queued",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-009"
+      ],
+      "evidence": [
+        {
+          "label": "Notification history decision (proposed)",
+          "url": "decisions/adr-0052-notification-history.html"
+        },
+        {
+          "label": "Paged lists decision",
+          "url": "decisions/adr-0050-paged-lists.html"
+        }
+      ],
+      "updated_at": "2026-08-12T22:44:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5031,6 +5053,14 @@
       "to": "complete",
       "summary": "UX-010 shipped the first Vue island with its server-side half asserted and its browser half not, and said so in both documents: the island names a field that exists with the limit that field enforces and the copy from both locale files, none of which proves it mounts. Three failures are visible nowhere else - a CSP that blocks the build, which is exactly what the full Vue build would have done and what the vendored-bytes test exists to prevent; a bridge or registry that never mounts; and an island bound to the wrong field, which counts nothing while looking correct. The walk covers all three: the counter reads a thousand on an empty field, counts down as an administrator types, changes tone within a hundred of the limit, and the decision still records with the island on the page - which is the enhancement rule from the other side, since the form owes the island nothing. The full system suite was run first and passed at 28, then at 30 with these two. The spec and the decision no longer carry this as an open item.",
       "evidence_url": "specs/spec-vue-islands.html"
+    },
+    {
+      "at": "2026-08-12T22:44:00+07:00",
+      "item_id": "UX-011",
+      "from": "queued",
+      "to": "queued",
+      "summary": "ADR-0052 is proposed and not accepted, and no work is authorized by it. Notification::RECENT is eight and no route reaches the ninth, which is the defect ADR-0050 took out of the audit log with one difference that matters: the audit log is a screen and the bell is a dropdown in the header, so a pagination control inside a menu that closes on outside-click is worse than the cap. The fix is a screen, which is a new surface and therefore a decision. It matters more than the row count suggests because ADR-0004 defers production email, so the bell is the only channel there is - a student invited to a business case, a company told a request arrived, a supervisor assigned to a placement each learn about it there or not at all, and eight is one busy week. Five questions carry recommendations and need a human answer: whether the reader-facing URL takes /notifications while the bell-s frame endpoint moves under it, whether read rows stay so the screen answers what was I told rather than what is waiting, whether opening the screen marks everything read - recommended no, because a dot that clears by being looked at means you have not visited rather than something happened, whether the bell keeps its eight and gains a link, and whether a notification can be deleted. The last has a real counter-argument recorded with it: these are personal rows rather than an institutional record, and a screen built on nothing is deleted differs from one built on the reader owns their list in more than a button. Doing nothing is listed as an alternative and is defensible today, which is why this is proposed rather than assumed.",
+      "evidence_url": "decisions/adr-0052-notification-history.html"
     }
   ]
 }
