@@ -11,19 +11,44 @@ Read it before changing how any screen loads its data. Nothing here is a rule on
 
 ## The per-screen query budget
 
-Measured per render against the seeds:
+Measured per render against the seeds, by `script/measure-screens` — signed in,
+second request, memoisation warm. Re-run it rather than reasoning about it:
 
 | Screen | Queries |
 | --- | --- |
-| landing | 2 |
-| map, profile | 6 |
-| leaderboard shell | 6 |
-| leaderboard board frame | 6 again (10 in one response before the frame existed) |
-| course, lesson, My Learning | 12 |
-| catalog | 13 |
-| progress | 14 |
-| instructor | 16 |
-| admin | 12–21 (13–21 on a paged tab; the queue tab lost one and every paged tab gained one) |
+| companies (organization index), company job posts | 8 |
+| academic posts | 11 |
+| notifications history | 12 |
+| company work surface | 18 |
+| recruitment jobs (public search) | 19 |
+| internship placements | 20 |
+| admin: perms | 23 |
+| admin: proposals, landing | 25 |
+| admin: audit | 26 |
+| admin: overview, courses, integrity | 28 |
+| admin: queue | 29 |
+| admin: sections | 31 |
+| my learning | 32 |
+| catalog (root) | 33 |
+| progress | 34 |
+| admin: users | 36 |
+| knowledge map | 38 |
+| admin: features | 59 |
+
+**These figures replaced a table that was wrong by two to three times.** It said
+catalog 13 and admin 12–20, and it had said so through several increments that
+each added a query or four — the notification bell, the workspace nav, dark
+mode, the paged lists. Nobody had rendered a screen to check since it was
+written, and one of the last edits to it was made by reasoning about a change
+rather than by measuring one, which is how a stale number came to look freshly
+maintained. The script exists so the next correction is a command rather than
+an argument.
+
+Two of these want a look rather than a shrug. **admin: features at 59** is the
+outlier by a distance and reads like a query per flag; **admin: users at 36**
+is high for a paged list. Neither is a regression this file can prove — there
+is no earlier honest figure to compare against — and both are recorded here as
+the open questions they are.
 
 **Every screen is constant-cost in the size of the data it folds**, and `test/models/query_budget_test.rb` is what keeps it that way — it grows a section and asserts the roster's query count does not move. The figures above are a snapshot; the test is the guarantee. If you change a screen's loading and the count moves, that is the thing to explain, not to update quietly.
 

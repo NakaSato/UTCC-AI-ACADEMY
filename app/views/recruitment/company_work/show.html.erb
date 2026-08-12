@@ -1,6 +1,11 @@
 <% content_for :title, "#{t('recruitment.company_work.title')} — #{@organization.name}" %>
 
-<% waiting = @dashboard[:queues].select(&:any?) %>
+<%# What is waiting on a member, which is not every queue: an open placement
+    is under way rather than outstanding, and it has its own card below. It sat
+    in this grid whenever the count was non-zero and asked for a note nobody had
+    written, so a company with a running internship met a missing translation on
+    its own front door. `Queue#waiting?` decides now. %>
+<% waiting = @dashboard[:queues].select { it.waiting? && it.any? } %>
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <div class="mb-8">

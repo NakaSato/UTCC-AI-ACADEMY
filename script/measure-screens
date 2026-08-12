@@ -1,0 +1,92 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# The per-screen query counts in docs/performance.md, measured rather than
+# remembered.
+#
+#   RAILS_ENV=test bin/rails db:seed:replant
+#   RAILS_ENV=test bin/rails runner script/measure-screens
+#   bin/rails db:test:prepare        # <- put the fixtures back
+#
+# That last line is not optional. Replanting the seeds leaves rows the fixtures
+# do not know how to clear, and the next `bin/rails test` fails with foreign key
+# violations that look nothing like their cause.
+#
+# The table in that document says "measured per render against the seeds", and
+# for a while it was not: a figure was edited by reasoning about a change rather
+# than by rendering anything, which is how "admin 12–20" survived the screen
+# growing to more than twice that. A number nobody can reproduce is a number
+# nobody can correct, so this is the reproduction.
+#
+# Each screen is fetched twice and the second is counted. The first warms what
+# is memoised for the length of a request — `Current.syllabus`, the landing
+# copy, the standings — because counting a cold request measures the memo rather
+# than the screen.
+#
+# What this is *not*: a budget. The property that matters is that a screen costs
+# the same however much data it folds, and `test/models/query_budget_test.rb`
+# is what holds that. These figures are a snapshot for reading, and they move
+# when the app does.
+
+def count_queries
+  count = 0
+  subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+    next if payload[:name].in?([ "SCHEMA", "TRANSACTION" ])
+    next if payload[:sql] =~ /\A\s*(BEGIN|COMMIT|RELEASE|SAVEPOINT)/i
+
+    count += 1
+  end
+  yield
+  count
+ensure
+  ActiveSupport::Notifications.unsubscribe(subscription)
+end
+
+def measure(session, label, path)
+  session.get path
+  unless session.response.ok?
+    puts format("%-40s  %s", label, "#{session.response.status} — not measured")
+    return
+  end
+
+  puts format("%-40s %4d", label, count_queries { session.get path })
+end
+
+def session_for(path, params)
+  session = ActionDispatch::Integration::Session.new(Rails.application)
+  session.post path, params: params
+  session.follow_redirect! if session.response.redirect?
+  session
+end
+
+student = User.find_by(student_id: "2011071730001") or abort("seeds missing: run db:seed:replant")
+organization = Organization.first
+
+puts "\nQueries per render, against the seeds (second request, memoisation warm)"
+puts "-" * 46
+
+learner = session_for("/login", { student_id: student.student_id, password: "utcc2026" })
+{
+  "catalog (root)" => "/",
+  "my learning" => "/my-learning",
+  "progress" => "/progress",
+  "knowledge map" => "/map",
+  "academic posts" => "/academic",
+  "notifications history" => "/notifications",
+  "recruitment jobs (public search)" => "/recruitment/jobs",
+  "internship placements" => "/internships/placements"
+}.each { |label, path| measure(learner, label, path) }
+
+console = session_for("/console", { identifier: "utcc-admin", password: "utcc2026" })
+%w[overview users courses queue proposals audit sections integrity perms features landing].each do |tab|
+  measure(console, "admin: #{tab}", "/admin?tab=#{tab}")
+end
+measure(console, "companies (organization index)", "/company")
+
+if organization
+  measure(console, "company job posts", "/company/#{organization.slug}/job_posts")
+  measure(console, "company internship requests", "/company/#{organization.slug}/internship")
+  measure(console, "company work surface", "/company/#{organization.slug}/work")
+end
+
+puts "-" * 46

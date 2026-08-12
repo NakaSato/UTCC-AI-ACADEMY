@@ -17,8 +17,16 @@ module Recruitment
   # student has been waiting since Tuesday. Whether they may act is settled by
   # the controller that owns the action, which refuses today and keeps refusing.
   class CompanyDashboard
-    Queue = Data.define(:key, :count, :path) do
+    # `waiting` is whether this belongs in "what is waiting on you" or in "what
+    # is running" — the screen has both sections, and a placement that is under
+    # way is not a queue anybody empties. The distinction lived only in the view
+    # until an open placement rendered in the waiting grid and asked for copy
+    # that was never written for it, because whoever wrote the copy wrote notes
+    # for the two real queues and stopped.
+    Queue = Data.define(:key, :count, :path, :waiting) do
       def any? = count.positive?
+
+      def waiting? = waiting
     end
 
     Posting = Data.define(:key, :published, :in_review)
@@ -51,10 +59,10 @@ module Recruitment
       def queues
         [
           Queue.new(:internship_requests, @organization.internship_requests.awaiting_company.count,
-                    company_internship_requests_path),
-          Queue.new(:progress_reports, unacknowledged_reports, internship_placements_path),
+                    company_internship_requests_path, true),
+          Queue.new(:progress_reports, unacknowledged_reports, internship_placements_path, true),
           Queue.new(:active_placements, @organization.internship_placements.open_placements.count,
-                    internship_placements_path)
+                    internship_placements_path, false)
         ]
       end
 

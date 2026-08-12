@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T06:08:00+07:00",
+  "updated_at": "2026-08-13T06:40:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3210,6 +3210,28 @@
         }
       ],
       "updated_at": "2026-08-13T06:08:00+07:00"
+    },
+    {
+      "id": "DEV-027",
+      "title": "Measure the screens the performance table claims to have measured",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-009"
+      ],
+      "evidence": [
+        {
+          "label": "Performance evidence",
+          "url": "performance.html"
+        },
+        {
+          "label": "Company work surface specification",
+          "url": "specs/spec-company-work-surface.html"
+        }
+      ],
+      "updated_at": "2026-08-13T06:40:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5281,6 +5303,14 @@
       "to": "complete",
       "summary": "The Vite build shipped a source map to production - 535KB beside a 61KB bundle, served publicly, holding the island sources - on the argument that a bundle nobody can read cannot be reviewed after an incident. It was flagged when it went in and left for a decision; the decision is that the argument needs somewhere for the map to go and there is nowhere. Nothing in this application consumes source maps: no error tracker, no upload step, and no other bundle ships one, because Propshaft serves the import map-s files as they were written. It would have been the only map in production, nine times the size of what it explains, and the only thing reading it would have been whoever wanted the sources. Off in production, on in every other mode, verified by running a production assets:precompile and finding the bundle alone. If an error tracker ever arrives the answer is to upload the map to it rather than serve it from the origin, and the ADR says so. The rule is asserted against the configuration rather than a production build, in the same shape as the importmap assertion beside it, because the suite builds in test mode where the map is deliberately present.",
       "evidence_url": "decisions/adr-0053-vite-island-build.html"
+    },
+    {
+      "at": "2026-08-13T06:40:00+07:00",
+      "item_id": "DEV-027",
+      "from": "queued",
+      "to": "complete",
+      "summary": "docs/performance.md said its table was measured per render against the seeds, and one of the last edits to it - mine, earlier the same night - was made by reasoning about a change rather than by rendering anything. Measuring it found the table wrong by two to three times across the board: catalog said 13 and measures 33, admin said 12 to 20 and measures 23 to 59. It had drifted through several increments that each added a query or four, and nobody had rendered a screen to check. script/measure-screens is the reproduction, so the next correction is a command rather than an argument, and it carries the warning that replanting the seeds into the test database leaves rows the fixtures cannot clear - the next bin/rails test fails with foreign key violations that look nothing like their cause. The script found a live defect before its numbers were used. The company work surface raised Translation missing for recruitment.company_work.queues.active_placements_note. Every queue in the waiting grid renders a note; active_placements has none, in either locale, because whoever wrote the copy wrote notes for the two real queues and stopped. It only appears there when the count is non-zero, so a company hosting a running internship met a missing translation on its own front door while every test ran against a company that had none - and locale parity could not see it, since the key is missing from both files and is interpolated rather than literal. A running placement is not work waiting on anybody and already has its own card under what is running, so Queue carries a waiting flag now and the grid selects on it. The regression test renders the surface with an active placement in both locales and was mutation-checked: restore the old select and it fails with the same missing key. Two figures are recorded as open questions rather than fixed: admin features at 59 reads like a query per flag, and admin users at 36 is high for a paged list.",
+      "evidence_url": "performance.html"
     }
   ]
 }

@@ -96,6 +96,33 @@ class CompanyWorkTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # A running internship is not work waiting on anybody, and it has its own card
+  # under "what is running". It was in the waiting grid too, whenever the count
+  # was non-zero, asking for a note nobody had written for it — so a company with
+  # an active placement met "translation missing" on its own front door, in both
+  # languages, while every test here ran against a company that had none.
+  #
+  # Rendered in both locales because that is where it showed: `t` falls back to
+  # English, and the key was missing from English as well.
+  test "an active placement is counted as running rather than waiting" do
+    placement = active_placement
+
+    I18n.available_locales.each do |locale|
+      sign_in_as @owner
+      get work_company_path(@organization, lang: locale)
+
+      assert_response :success
+      assert_select "body" do |body|
+        assert_no_match(/translation missing/i, body.first.to_s, "#{locale} is missing copy this screen asks for")
+      end
+      assert_select "h2", text: I18n.t("recruitment.company_work.running.title", locale: locale)
+      # One card for it, under "running" — not a second one in the waiting grid.
+      assert_select "a[href=?]", internship_placements_path, minimum: 1
+    end
+
+    assert_predicate placement, :active?
+  end
+
   test "a company with nothing waiting says so rather than showing zeroes" do
     sign_in_as @owner
     get work_company_path(@organization)
@@ -125,4 +152,15 @@ class CompanyWorkTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a", text: I18n.t("chrome.nav.work")
   end
+
+  private
+    # A placement the company is actually hosting: a request, approved, turned
+    # into a placement and activated — the same route the seeds take.
+    def active_placement
+      request = @organization.internship_requests.create!(student: users(:student),
+                                                          motivation: "Routing", learning_goals: "Measuring")
+      request.submit!(actor: users(:student))
+      request.approve!(actor: @owner)
+      InternshipPlacement.from_request!(request, actor: @owner).tap { it.activate!(actor: @owner) }
+    end
 end
