@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T08:05:00+07:00",
+  "updated_at": "2026-08-13T08:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3302,6 +3302,24 @@
         }
       ],
       "updated_at": "2026-08-13T08:05:00+07:00"
+    },
+    {
+      "id": "DEV-030",
+      "title": "Make the link crawl a gate that cannot pass vacuously",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead and QA Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-029"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-13T08:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5404,6 +5422,14 @@
       "from": "queued",
       "to": "complete",
       "summary": "route_reachability_test holds one half of every route leads somewhere - the action exists, and a GET that renders no template says why. The reader-s half was unheld: a screen may link to a place the person looking at it is refused, which is how the work surface came to hand a mentor and an administrator a link to a 404. script/crawl-links follows every rendered anchor as each of the four readers, GET only because a button_to is a form and following those would decide proposals on the way past. It found two more, both live. New internship programme raised a 500 for everybody allowed to open it, from the day it shipped: the form said form_with model: [ organization, program ], which asks Rails for organization_recruitment_internship_programs_path while the routes are named company_. Every test posted straight to the create action, so nothing had ever rendered the screen a person has to use to get there. It takes form_url and form_method now, the way its sibling job-post form already did. And six of the eight courses offered a syllabus download that answers 404 - they carry no module rows, so the PDF correctly refuses, and the syllabus a learner reads on those pages is the default taxonomy standing in until a real curriculum lands. Course#syllabus? decides, one query, only on the page that uses it. Both tests were checked by putting the old code back. All four readers now crawl clean: 280, 132, 154 and 139 pages, every link leading somewhere.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-13T08:30:00+07:00",
+      "item_id": "DEV-030",
+      "from": "queued",
+      "to": "complete",
+      "summary": "script/crawl-links exits non-zero when a link leads somewhere its reader cannot go, and says how many pages it stopped short of rather than implying it cleared them. The first run after it became a gate passed with every reader crawling nine public pages: the seeds had been replaced by fixtures, all four sign-ins failed silently, and every link led somewhere was true and worthless. A gate that cannot tell clean from never got in is worse than no gate, so each reader now proves it is signed in by opening a page only an authenticated one gets, and the script aborts naming the reader and telling you to replant the seeds. Verified both ways: exit 1 without seeds, exit 0 with them.",
       "evidence_url": "test-strategy.html"
     }
   ]

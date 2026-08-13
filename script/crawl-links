@@ -63,27 +63,55 @@ def crawl(label, session, start)
   end
 
   puts "\n#{label}: #{seen.size} pages"
+  # No silent cap: a crawl that stopped early has not cleared what it did not
+  # reach, and saying so is cheaper than believing it did.
+  puts "  stopped at the #{MAX_PAGES}-page cap — #{queue.size} still queued" if seen.size >= MAX_PAGES
+
   if findings.empty?
     puts "  every link led somewhere"
   else
-    findings.uniq.sort_by(&:first).each { |path, status| puts format("  %-58s %s", path, status) }
+    findings.uniq.sort_by(&:first).each { |dead, status| puts format("  %-58s %s", dead, status) }
   end
+
+  findings.uniq
 end
 
-def sign_in(path, params)
+# Signed in, and proved so. A failed sign-in leaves an anonymous session that
+# crawls nine public pages and reports that every link led somewhere — true,
+# and worthless. This gate cannot tell "clean" from "never got in" unless it
+# checks, and the first run after it became a gate did exactly that: the seeds
+# had been replaced by fixtures and all four readers passed vacuously.
+def sign_in(label, path, params)
   session = ActionDispatch::Integration::Session.new(Rails.application)
   session.post path, params: params
   session.follow_redirect! if session.response.redirect?
+
+  session.get "/profile"
+  unless session.response.status == 200
+    abort("#{label} could not sign in (/profile answered #{session.response.status}). " "Run RAILS_ENV=test bin/rails db:seed:replant first.")
+  end
+
   session
 end
 
 student = User.find_by(student_id: "2011071730001") or abort("seeds missing")
 
 readers = {
-  "student" => sign_in("/login", { student_id: student.student_id, password: "utcc2026" }),
-  "instructor" => sign_in("/console", { identifier: "wichai", password: "utcc2026" }),
-  "administrator" => sign_in("/console", { identifier: "utcc-admin", password: "utcc2026" }),
-  "company member" => sign_in("/console", { identifier: "northstar", password: "utcc2026" })
+  "student" => sign_in("student", "/login", { student_id: student.student_id, password: "utcc2026" }),
+  "instructor" => sign_in("instructor", "/console", { identifier: "wichai", password: "utcc2026" }),
+  "administrator" => sign_in("administrator", "/console", { identifier: "utcc-admin", password: "utcc2026" }),
+  "company member" => sign_in("company member", "/console", { identifier: "northstar", password: "utcc2026" })
 }
 
-readers.each { |label, session| crawl(label, session, "/") }
+dead = readers.sum { |label, session| crawl(label, session, "/").length }
+
+# CI runs this after the seed replant, so a link that leads nowhere fails the
+# build rather than waiting to be noticed. Three defects were found this way
+# before it was a gate: a link to a queue its reader is refused, a form whose
+# route helper does not exist, and a download offered by six courses that have
+# nothing to download.
+if dead.positive?
+  abort("\n#{dead} link(s) led somewhere their reader cannot go.")
+else
+  puts "\nEvery link leads somewhere, for every reader."
+end
