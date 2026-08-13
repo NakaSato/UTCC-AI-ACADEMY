@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T07:30:00+07:00",
+  "updated_at": "2026-08-13T08:05:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3280,6 +3280,28 @@
         }
       ],
       "updated_at": "2026-08-13T07:30:00+07:00"
+    },
+    {
+      "id": "DEV-029",
+      "title": "Follow every link as every reader, and fix the two that led nowhere",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and QA Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-014"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        },
+        {
+          "label": "Recruitment internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        }
+      ],
+      "updated_at": "2026-08-13T08:05:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5375,6 +5397,14 @@
       "to": "complete",
       "summary": "The measurement script could not open a company-s internship request queue as an administrator, which turned out to be correct and to point at something that was not. SPEC-0041-s access matrix gives an administrator a placement record to assign or revoke a supervisor and nothing wider - no unbounded browsing of student documents - so the queue answering 404 is the specified behaviour. ADR-0048 decision 4 puts the whole board in front of every active member, deliberately, because a mentor who cannot decide a request is still better off knowing a student has been waiting since Tuesday. Both rules are right. What was wrong was the link between them: a mentor and an administrator each saw a card on the work surface linking to a queue that answered them 404, on a screen they are meant to be on, and mentor is a member role that is not a decider. The count stays and the link goes, for exactly the readers who are refused - Queue#openable? is whether this viewer may open where the card points, and the card renders as a plain div when they cannot. It costs one membership check, which the query budget caught immediately as 13 becoming 14; the ceiling moved by exactly that with the reason recorded, and the assertion still names the per-status regression it is really watching for. SPEC-0048 invariant 5 said every figure is a count with a link to the queue it counts, which is no longer true and should not be; it now carries the qualifier and the reason two rules meet there. ADR-0048 records the correction in its consequences.",
       "evidence_url": "specs/spec-company-work-surface.html"
+    },
+    {
+      "at": "2026-08-13T08:05:00+07:00",
+      "item_id": "DEV-029",
+      "from": "queued",
+      "to": "complete",
+      "summary": "route_reachability_test holds one half of every route leads somewhere - the action exists, and a GET that renders no template says why. The reader-s half was unheld: a screen may link to a place the person looking at it is refused, which is how the work surface came to hand a mentor and an administrator a link to a 404. script/crawl-links follows every rendered anchor as each of the four readers, GET only because a button_to is a form and following those would decide proposals on the way past. It found two more, both live. New internship programme raised a 500 for everybody allowed to open it, from the day it shipped: the form said form_with model: [ organization, program ], which asks Rails for organization_recruitment_internship_programs_path while the routes are named company_. Every test posted straight to the create action, so nothing had ever rendered the screen a person has to use to get there. It takes form_url and form_method now, the way its sibling job-post form already did. And six of the eight courses offered a syllabus download that answers 404 - they carry no module rows, so the PDF correctly refuses, and the syllabus a learner reads on those pages is the default taxonomy standing in until a real curriculum lands. Course#syllabus? decides, one query, only on the page that uses it. Both tests were checked by putting the old code back. All four readers now crawl clean: 280, 132, 154 and 139 pages, every link leading somewhere.",
+      "evidence_url": "test-strategy.html"
     }
   ]
 }

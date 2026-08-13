@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Follow every link the app renders, as each kind of reader, and report the ones
+# that lead somewhere they cannot go.
+#
+#   RAILS_ENV=test bin/rails db:seed:replant
+#   RAILS_ENV=test bin/rails runner script/crawl-links
+#   bin/rails db:test:prepare        # <- put the fixtures back
+#
+# `route_reachability_test.rb` holds the other half of "every route leads
+# somewhere": a route's action exists, and a GET that renders no template says
+# why. What nothing held is the reader's half — a screen may link to a place the
+# person looking at it is refused, and the refusal is correct while the link is
+# not. The company work surface did exactly that, to a mentor and to an
+# administrator, and it took a query-count script noticing a 404 to find it.
+#
+# GET anchors only. A `button_to` is a form, and following those would decide
+# proposals and revoke memberships on the way past.
+require "set"
+
+MAX_PAGES = 400
+SKIP = %r{\A/(logout|session|console/session)\b}
+
+def crawl(label, session, start)
+  seen = Set.new
+  queue = [ start ]
+  findings = []
+
+  while (path = queue.shift) && seen.size < MAX_PAGES
+    next if seen.include?(path) || path.match?(SKIP)
+
+    seen << path
+    begin
+      session.get path
+    rescue StandardError => error
+      findings << [ path, error.class.name ]
+      next
+    end
+
+    status = session.response.status
+    findings << [ path, status ] unless [ 200, 302 ].include?(status)
+
+    # A redirect is where the reader actually ends up, and three of the four
+    # workspaces answer `/` with one. Not following it crawled a single page and
+    # reported that every link led somewhere, which was true and useless.
+    if status == 302
+      location = URI.parse(session.response.location).path rescue nil
+      queue << location if location&.start_with?("/")
+      next
+    end
+
+    next unless status == 200
+
+    session.html_document.css("a[href]").each do |anchor|
+      href = anchor["href"].to_s
+      # Internal, GET, and not a fragment or a mailto.
+      next unless href.start_with?("/")
+      next if anchor["data-turbo-method"] || anchor["data-method"]
+
+      queue << href.split("#").first
+    end
+  end
+
+  puts "\n#{label}: #{seen.size} pages"
+  if findings.empty?
+    puts "  every link led somewhere"
+  else
+    findings.uniq.sort_by(&:first).each { |path, status| puts format("  %-58s %s", path, status) }
+  end
+end
+
+def sign_in(path, params)
+  session = ActionDispatch::Integration::Session.new(Rails.application)
+  session.post path, params: params
+  session.follow_redirect! if session.response.redirect?
+  session
+end
+
+student = User.find_by(student_id: "2011071730001") or abort("seeds missing")
+
+readers = {
+  "student" => sign_in("/login", { student_id: student.student_id, password: "utcc2026" }),
+  "instructor" => sign_in("/console", { identifier: "wichai", password: "utcc2026" }),
+  "administrator" => sign_in("/console", { identifier: "utcc-admin", password: "utcc2026" }),
+  "company member" => sign_in("/console", { identifier: "northstar", password: "utcc2026" })
+}
+
+readers.each { |label, session| crawl(label, session, "/") }

@@ -1,4 +1,10 @@
-<%= form_with model: [ @organization, @program ], class: "space-y-6" do |form| %>
+<%# The URL is passed in rather than inferred. `model: [ @organization, @program ]`
+    asks Rails for `organization_recruitment_internship_program(s)_path`, and the
+    routes are named `company_…` — so this screen raised on every render, for
+    everybody allowed to open it, from the day it shipped. Its sibling form for
+    job posts takes `form_url` and `form_method` for the same reason. %>
+<%= form_with model: @program, scope: :recruitment_internship_program, url: form_url,
+      method: form_method, class: "space-y-6" do |form| %>
   <% if @program.errors.any? %>
     <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-13 text-red-800">
       <%= @program.errors.full_messages.to_sentence %>

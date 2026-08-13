@@ -18,6 +18,30 @@ class Recruitment::InternshipProgramsControllerTest < ActionDispatch::Integratio
     }
   end
 
+  # The form raised on every render, for everybody allowed to open it, from the
+  # day it shipped: `form_with model: [ @organization, @program ]` asks Rails for
+  # `organization_recruitment_internship_program_path`, and these routes are
+  # named `company_…`. Every test here posted straight to the create action, so
+  # nothing ever rendered the screen a person has to use to get there. A link
+  # crawl found it as a 500 on `/company/:slug/internship_programs/new`.
+  test "the screens that carry the form render, and post where the routes are" do
+    get new_company_internship_program_path(@organization)
+
+    assert_response :success
+    assert_select "form[action=?][method=post]", company_internship_programs_path(@organization)
+
+    program = @organization.internship_programs.create!(creator: users(:two), mentor: users(:instructor),
+                                                        name: "Rendered", department: "Ops",
+                                                        description: "d", required_skills: "s",
+                                                        learning_outcomes: "o", working_days: "Mon",
+                                                        certificate_policy: "c")
+    get edit_company_internship_program_path(@organization, program)
+
+    assert_response :success
+    assert_select "form[action=?]", company_internship_program_path(@organization, program)
+    assert_select "input[name=?][value=?]", "_method", "patch"
+  end
+
   test "an authorized recruiter creates and submits an internship program" do
     assert_difference [ "Recruitment::InternshipProgram.count", "AuditEvent.count" ], 1 do
       post company_internship_programs_path(@organization), params: {

@@ -51,4 +51,19 @@ class CourseSyllabusDocumentsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href=?]", course_syllabus_path("AI1102"), text: I18n.t("course.download_syllabus")
   end
+
+  # The other side of the same link, and the reason this test exists: six of the
+  # eight courses carry no module rows, so the document answers 404 — correctly,
+  # because the syllabus a learner reads on those pages is the default taxonomy
+  # standing in until a real curriculum lands. Every one of them offered the
+  # download anyway, and a link crawl over the whole app found it.
+  test "a course with no curriculum offers no download" do
+    assert_not ::Course.find_by!(code: "AI2402").syllabus?
+
+    get course_url("AI2402")
+
+    assert_response :success
+    assert_select "a[href=?]", course_syllabus_path("AI2402"), count: 0,
+      message: "a button that answers 404 is worse than no button"
+  end
 end

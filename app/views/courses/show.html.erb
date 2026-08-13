@@ -112,11 +112,16 @@
         <%= link_to t("course.continue"), lesson_path(course: @course.code),
               class: "mb-2.5 block rounded-field bg-brand py-3.25 text-center text-15 font-semibold text-white
                       transition-colors hover:bg-brand-deep" %>
-        <%= link_to course_syllabus_path(@course.code),
-              class: "block w-full rounded-field border-[1.5px] border-hairline-2 py-2.75 text-center text-14 font-medium text-ink-4
-                      transition-colors hover:border-muted-3",
-              data: { turbo: false } do %>
-          <%= t("course.download_syllabus") %>
+        <%# Only when there is one to download. Six of the eight courses have no
+            module rows, so the PDF answers 404 — the screen above them is the
+            default taxonomy standing in until a real curriculum lands. %>
+        <% if @syllabus_available %>
+          <%= link_to course_syllabus_path(@course.code),
+                class: "block w-full rounded-field border-[1.5px] border-hairline-2 py-2.75 text-center text-14 font-medium text-ink-4
+                        transition-colors hover:border-muted-3",
+                data: { turbo: false } do %>
+            <%= t("course.download_syllabus") %>
+          <% end %>
         <% end %>
       </div>
 

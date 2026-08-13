@@ -31,6 +31,13 @@ class Course < ApplicationRecord
   scope :in_catalog_order, -> { order(:position) }
   scope :published_for_catalog, -> { where(lifecycle_state: :published) }
 
+  # Whether there is a syllabus to render. Six of the eight courses carry no
+  # module rows at all — the screen shows them the default taxonomy, which is
+  # placeholder content, and the PDF reads the database and correctly refuses.
+  # The course page asks this before offering the download, because a button
+  # that answers 404 is worse than no button.
+  def syllabus? = course_modules.exists?
+
   def available_transitions = TRANSITIONS.fetch(lifecycle_state.to_sym, [])
 
   def transition_to!(target, expected_from: nil)
