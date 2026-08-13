@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T08:30:00+07:00",
+  "updated_at": "2026-08-13T09:15:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3320,6 +3320,30 @@
         }
       ],
       "updated_at": "2026-08-13T08:30:00+07:00"
+    },
+    {
+      "id": "M7-005",
+      "title": "Give a teacher the course they teach, through the queue that already decides it",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Product Owner, Academic Owner and Tech Lead",
+      "milestone": "M7",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Teaching course authority decision",
+          "url": "decisions/adr-0054-teaching-course-authority.html"
+        },
+        {
+          "label": "Teaching course authority specification",
+          "url": "specs/spec-teaching-course-authority.html"
+        },
+        {
+          "label": "Admin course lifecycle",
+          "url": "decisions/adr-0013-admin-course-lifecycle.html"
+        }
+      ],
+      "updated_at": "2026-08-13T09:15:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5431,6 +5455,14 @@
       "to": "complete",
       "summary": "script/crawl-links exits non-zero when a link leads somewhere its reader cannot go, and says how many pages it stopped short of rather than implying it cleared them. The first run after it became a gate passed with every reader crawling nine public pages: the seeds had been replaced by fixtures, all four sign-ins failed silently, and every link led somewhere was true and worthless. A gate that cannot tell clean from never got in is worse than no gate, so each reader now proves it is signed in by opening a page only an authenticated one gets, and the script aborts naming the reader and telling you to replant the seeds. Verified both ways: exit 1 without seeds, exit 0 with them.",
       "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-13T09:15:00+07:00",
+      "item_id": "M7-005",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The teaching dashboard was one screen and three routes - a roster, a grades CSV, a proctoring switch - and every course control lived behind allow_only :admin. The user asked for a teacher who can create, update, enable, disable and approve certificates, then asked for recommendations on the four questions that scope it, and took all four. Two of the four are refusals with their blockers named. A course-s words are catalog.courses.code in two locale files and the table carries identity, taxonomy and numbers only, so a course created through a form would render translation missing on every screen naming it; moving that copy into the database is its own decision with LandingText as the precedent. And ADR-0011 deferred certificate issuance - no artifact, no rule, no identity, no route - so an approval button would approve nothing while looking like it certified somebody. What shipped is the other two. A teacher edits the numbers of the course their section teaches while it is unpublished: level, credits, projects, hours, core, certificate. Not the code, which every locale key and completion row is joined by; not the lifecycle state, which belongs to the queue; not learners or rating, which are measured rather than set - and a form made to post them changes none of them. Enable and disable are the existing lifecycle rather than a second switch that would answer can a learner see this twice. A transition is requested, never made: ApprovalRequest widened by exactly one rule, that a requester may be an approver or the course-s teacher, and approvable_by? is untouched, so a teacher cannot decide their own request and neither can the administrator who raised one. That refusal is what ADR-0013 bought and it was checked by removing the new rule, which fails the test. An administrator holds the staff role, teaches nothing, and is offered no course panel; their authority stays the console.",
+      "evidence_url": "specs/spec-teaching-course-authority.html"
     }
   ]
 }

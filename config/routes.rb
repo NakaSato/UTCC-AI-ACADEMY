@@ -211,6 +211,12 @@ Rails.application.routes.draw do
   get "instructor/grades", to: "instructor#grades", as: :instructor_grades
   patch "instructor/integrity/:topic_key", to: "instructor#update_integrity_setting",
         as: :instructor_integrity_setting
+  # A teacher’s two writes over the course they teach (ADR-0054): its numbers,
+  # while it is a draft, and a request to move its lifecycle — which an
+  # administrator decides in the queue, exactly as one of their own.
+  patch "instructor/course", to: "instructor#update_course", as: :instructor_course
+  post "instructor/course/transition", to: "instructor#request_course_transition",
+       as: :instructor_course_transition
 
   # Public surface is /academic. Keep the internal resource name and helpers
   # stable so AcademicPost records, associations, and existing callers do not

@@ -19,7 +19,7 @@ class AuditEvent < ApplicationRecord
   ACTIONS = %w[
     console_account_created console_password_reissued
     role_changed
-    course_state_changed
+    course_state_changed course_updated
     approval_decided
     proposal_decided
     feature_setting_changed

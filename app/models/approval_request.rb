@@ -60,8 +60,16 @@ class ApprovalRequest < ApplicationRecord
   private
     def approver?(actor) = actor.present? && APPROVER_ROLES.include?(actor.role)
 
+    # Who may raise a request: an approver, or the teacher of the course it is
+    # about (ADR-0054 decision 3). The queue widened by exactly this one rule and
+    # nothing else — `approvable_by?` above is untouched, so a teacher cannot
+    # decide their own request and neither can the administrator who raised one.
+    # That refusal is the whole reason the queue exists (ADR-0013).
     def requester_is_approver
-      errors.add(:requester, :invalid) unless approver?(requester)
+      return if approver?(requester)
+      return if course && requester && course.taught_by?(requester)
+
+      errors.add(:requester, :invalid)
     end
 
     def course_transition_is_allowed

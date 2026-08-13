@@ -34,6 +34,8 @@
       <% end %>
     </div>
 
+    <%= render "course", course: @course if @course %>
+
     <section class="mb-5 rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
       <div class="mb-5">
         <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.integrity_settings_title") %></h2>

@@ -31,6 +31,12 @@ class Course < ApplicationRecord
   scope :in_catalog_order, -> { order(:position) }
   scope :published_for_catalog, -> { where(lifecycle_state: :published) }
 
+  # The staff account that teaches this course, by way of its sections. A
+  # teacher reaches the course their section teaches and no other (ADR-0054
+  # decision 4) — the same scoping `/instructor` already uses, asked from the
+  # other end.
+  def taught_by?(user) = user.present? && sections.exists?(instructor_id: user.id)
+
   # Whether there is a syllabus to render. Six of the eight courses carry no
   # module rows at all — the screen shows them the default taxonomy, which is
   # placeholder content, and the PDF reads the database and correctly refuses.
