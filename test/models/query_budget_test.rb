@@ -169,6 +169,62 @@ class QueryBudgetTest < ActiveSupport::TestCase
       "the page's query count moved when the list grew"
   end
 
+  # Nearly every screen asks whether a flag is on — the header, the footer, the
+  # nav, the bell, two admin tabs — and each ask used to be its own `find_by`.
+  # The feature-control tab ran forty-six identical single-row queries in one
+  # render, because `admin_rows` asked once per key inside a loop that ran once
+  # per flag, and the chrome asked again on the way past.
+  #
+  # Three rows. One query, then none, for the length of a request.
+  test "the feature flags are read once however often they are asked for" do
+    Current.feature_settings = nil
+
+    first = count_queries { FeatureSetting.enabled?(:search) }
+    again = count_queries do
+      20.times { FeatureSetting.enabled?(:notifications) }
+      AdminConsole.flags
+      AdminConsole.flags_off
+    end
+
+    assert_equal 1, first, "the first ask reads the table"
+    assert_equal 0, again, "and nothing after it does"
+  end
+
+  # The same contract the standings memo carries: a write invalidates it, so the
+  # screen that flipped a flag does not render the value it flipped away from.
+  # Held by a model callback rather than by the writer remembering, because a
+  # console session and a test both write without asking the class method.
+  test "changing a flag invalidates the memo, however it was changed" do
+    FeatureSetting.enabled?(:leaderboard) # warm
+    FeatureSetting.find_by!(key: "leaderboard").update!(enabled: true)
+
+    # Counted around the assertion rather than after it: the ask that proves the
+    # value is also the ask that refills the memo, so measuring afterwards would
+    # measure the refill and report zero however stale the answer was.
+    reads = count_queries { assert FeatureSetting.enabled?(:leaderboard), "the memo outlived the write" }
+
+    assert_equal 1, reads, "the write left the memo in place, so the table was never re-read"
+  end
+
+  # The roster prints a control per row that asks whether the account has console
+  # access, and that question is a membership lookup. It was one query per row —
+  # twenty-five on a full page — because `.active` on an association builds a
+  # fresh relation and goes back to the database however loaded the rows are.
+  #
+  # Folded in Ruby now, so a screen that preloads pays once for everybody. The
+  # cohort is loaded once, never once per member.
+  test "asking a preloaded account about company membership costs nothing" do
+    organization = Organization.create!(name: "Preload Co", creator: users(:admin))
+    organization.memberships.create!(user: users(:console_company), role: "owner")
+
+    accounts = User.includes(:organization_memberships).order(:id).to_a
+
+    assert_equal 0, count_queries { accounts.each(&:console_access?) },
+      "a preloaded roster went back to the database per row"
+    assert accounts.find { it == users(:console_company) }.company_member?
+    assert_not accounts.find { it == users(:two) }.company_member?
+  end
+
   private
     def record_events(count)
       count.times do

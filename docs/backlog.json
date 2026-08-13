@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T06:40:00+07:00",
+  "updated_at": "2026-08-13T07:05:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3232,6 +3232,28 @@
         }
       ],
       "updated_at": "2026-08-13T06:40:00+07:00"
+    },
+    {
+      "id": "DEV-028",
+      "title": "Read the feature flags once, and the roster memberships once",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-027"
+      ],
+      "evidence": [
+        {
+          "label": "Performance evidence",
+          "url": "performance.html"
+        },
+        {
+          "label": "Feature flag boundary",
+          "url": "decisions/adr-0015-feature-flag-boundary.html"
+        }
+      ],
+      "updated_at": "2026-08-13T07:05:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5310,6 +5332,14 @@
       "from": "queued",
       "to": "complete",
       "summary": "docs/performance.md said its table was measured per render against the seeds, and one of the last edits to it - mine, earlier the same night - was made by reasoning about a change rather than by rendering anything. Measuring it found the table wrong by two to three times across the board: catalog said 13 and measures 33, admin said 12 to 20 and measures 23 to 59. It had drifted through several increments that each added a query or four, and nobody had rendered a screen to check. script/measure-screens is the reproduction, so the next correction is a command rather than an argument, and it carries the warning that replanting the seeds into the test database leaves rows the fixtures cannot clear - the next bin/rails test fails with foreign key violations that look nothing like their cause. The script found a live defect before its numbers were used. The company work surface raised Translation missing for recruitment.company_work.queues.active_placements_note. Every queue in the waiting grid renders a note; active_placements has none, in either locale, because whoever wrote the copy wrote notes for the two real queues and stopped. It only appears there when the count is non-zero, so a company hosting a running internship met a missing translation on its own front door while every test ran against a company that had none - and locale parity could not see it, since the key is missing from both files and is interpolated rather than literal. A running placement is not work waiting on anybody and already has its own card under what is running, so Queue carries a waiting flag now and the grid selects on it. The regression test renders the surface with an active placement in both locales and was mutation-checked: restore the old select and it fails with the same missing key. Two figures are recorded as open questions rather than fixed: admin features at 59 reads like a query per flag, and admin users at 36 is high for a paged list.",
+      "evidence_url": "performance.html"
+    },
+    {
+      "at": "2026-08-13T07:05:00+07:00",
+      "item_id": "DEV-028",
+      "from": "queued",
+      "to": "complete",
+      "summary": "DEV-027 recorded two figures as open questions rather than fixing them, and both had an answer. The feature-control tab ran 59 queries and 46 were the same single-row find_by on feature_settings: nearly every screen asks whether a flag is on - the header, the footer, the nav, the bell, two admin tabs - and each ask went to the database, while admin_rows asked once per key inside a loop that ran once per flag. Three rows are read once on Current now, the same bargain as the syllabus and the landing copy and held there for the same reason, that a module-level memo outlives the database it was read from when the parallel runner forks. The tab is 14 and every other screen came down with it: the catalogue lost two, the overview nine, the roster the rest. Invalidation is a model callback rather than the writer remembering, because the first test to fail was one that wrote a row directly instead of through the approved class method - a console session would do the same. The roster ran 36 queries with one membership existence check per row, because .active on an association builds a fresh relation and returns to the database however loaded the rows already are. company_member? folds in Ruby now and the roster preloads, so a full page of twenty-five asks once for everybody; the screen is 18. Both are held by query_budget_test.rb and both tests were checked by putting the old code back. The measured table in performance.md is updated from the same script.",
       "evidence_url": "performance.html"
     }
   ]

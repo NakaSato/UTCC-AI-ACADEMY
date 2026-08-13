@@ -200,7 +200,13 @@ class User < ApplicationRecord
 
   # A revoked membership is not a membership — `active` is what keeps a former
   # recruiter out of the company screens their organization still owns.
-  def company_member? = organization_memberships.active.exists?
+  # Folded in Ruby rather than asked in SQL, so a screen that preloads the
+  # association pays nothing per row. The admin roster asked this once per
+  # account — twenty-five existence checks on a full page — because `.active` on
+  # an association builds a fresh relation and goes back to the database however
+  # loaded the rows already are. Unpreloaded it still costs one query, which is
+  # what it cost before.
+  def company_member? = organization_memberships.any?(&:active?)
 
   # Who /console is for: an account with work outside the student experience,
   # either because an admin granted it a staff role or because a company added

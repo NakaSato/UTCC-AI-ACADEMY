@@ -11,7 +11,10 @@ class AdminController < ApplicationController
       @role = AdminConsole.role_filter(params[:role])
       @query = FeatureSetting.enabled?(:search) ? params[:q].to_s.strip : ""
 
-      @users = User.order(:role, :name)
+      # The roster prints a control per row that asks whether the account has
+      # console access, and that question is a membership lookup. Preloaded, the
+      # page asks once for everybody rather than once each.
+      @users = User.includes(:organization_memberships).order(:role, :name)
       @users = @users.where(role: @role) unless @role == :all
       if @query.present?
         needle = "%#{User.sanitize_sql_like(@query)}%"

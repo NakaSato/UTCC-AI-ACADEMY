@@ -17,23 +17,19 @@ second request, memoisation warm. Re-run it rather than reasoning about it:
 | Screen | Queries |
 | --- | --- |
 | companies (organization index), company job posts | 8 |
-| academic posts | 11 |
-| notifications history | 12 |
-| company work surface | 18 |
-| recruitment jobs (public search) | 19 |
-| internship placements | 20 |
-| admin: perms | 23 |
-| admin: proposals, landing | 25 |
-| admin: audit | 26 |
-| admin: overview, courses, integrity | 28 |
-| admin: queue | 29 |
-| admin: sections | 31 |
-| my learning | 32 |
-| catalog (root) | 33 |
-| progress | 34 |
-| admin: users | 36 |
-| knowledge map | 38 |
-| admin: features | 59 |
+| academic posts | 9 |
+| notifications history | 10 |
+| admin: perms, features | 14 |
+| admin: proposals, landing | 16 |
+| admin: courses, audit, recruitment jobs (public search) | 17 |
+| admin: users, internship placements, company work surface | 18 |
+| admin: overview, integrity | 19 |
+| admin: queue | 20 |
+| admin: sections | 22 |
+| my learning | 30 |
+| catalog (root) | 31 |
+| progress | 32 |
+| knowledge map | 36 |
 
 **These figures replaced a table that was wrong by two to three times.** It said
 catalog 13 and admin 12–20, and it had said so through several increments that
@@ -44,11 +40,19 @@ rather than by measuring one, which is how a stale number came to look freshly
 maintained. The script exists so the next correction is a command rather than
 an argument.
 
-Two of these want a look rather than a shrug. **admin: features at 59** is the
-outlier by a distance and reads like a query per flag; **admin: users at 36**
-is high for a paged list. Neither is a regression this file can prove — there
-is no earlier honest figure to compare against — and both are recorded here as
-the open questions they are.
+Two of these were open questions when they were first measured, and both had an
+answer. **admin: features was 59** — forty-six of them the same single-row
+`find_by` on `feature_settings`, because nearly every screen asks whether a flag
+is on and each ask went to the database: the header, the footer, the nav, the
+bell, and `admin_rows` once per key inside a loop that ran once per flag. Three
+rows, read once on `Current` now, which took that screen to 14 and every other
+screen down with it — the catalogue lost two, the overview nine.
+
+**admin: users was 36**, one membership existence check per row, because
+`.active` on an association builds a fresh relation and goes back to the
+database however loaded the rows already are. Folded in Ruby and preloaded by
+the roster, it is 18. Both are held by `query_budget_test.rb`, and both tests
+were checked by putting the old code back.
 
 **Every screen is constant-cost in the size of the data it folds**, and `test/models/query_budget_test.rb` is what keeps it that way — it grows a section and asserts the roster's query count does not move. The figures above are a snapshot; the test is the guarantee. If you change a screen's loading and the count moves, that is the thing to explain, not to update quietly.
 

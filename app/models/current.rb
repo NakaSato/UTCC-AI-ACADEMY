@@ -25,6 +25,16 @@ class Current < ActiveSupport::CurrentAttributes
   # collections the page renders. See Landing.cards.
   attribute :landing_cards
 
+  # The approved feature flags, read once. Nearly every screen asks whether
+  # search, notifications or the leaderboard are on — the header, the footer,
+  # the nav, two admin tabs, the bell — and each ask was its own `find_by`,
+  # which is how the feature-control tab came to run forty-six identical
+  # single-row queries in one render. Three rows, read once, folded in Ruby.
+  #
+  # `FeatureSetting.update!` clears it, the way `LandingText.forget` does: the
+  # request that changes a flag has to see what it changed.
+  attribute :feature_settings
+
   # Every student's XP, ranked. Two grouped counts over the whole of
   # topic_completions, and /progress asks for a rank more than once per render —
   # so without this the most expensive query pair in the app ran twice for one
