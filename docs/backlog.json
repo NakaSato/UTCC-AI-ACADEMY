@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T07:05:00+07:00",
+  "updated_at": "2026-08-13T07:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3254,6 +3254,32 @@
         }
       ],
       "updated_at": "2026-08-13T07:05:00+07:00"
+    },
+    {
+      "id": "UX-014",
+      "title": "Stop handing a reader a link to a queue that refuses them",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and Product Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-006"
+      ],
+      "evidence": [
+        {
+          "label": "Company work surface specification",
+          "url": "specs/spec-company-work-surface.html"
+        },
+        {
+          "label": "Company work surface decision",
+          "url": "decisions/adr-0048-company-work-surface.html"
+        },
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        }
+      ],
+      "updated_at": "2026-08-13T07:30:00+07:00"
     }
   ],
   "recently_completed": [
@@ -5341,6 +5367,14 @@
       "to": "complete",
       "summary": "DEV-027 recorded two figures as open questions rather than fixing them, and both had an answer. The feature-control tab ran 59 queries and 46 were the same single-row find_by on feature_settings: nearly every screen asks whether a flag is on - the header, the footer, the nav, the bell, two admin tabs - and each ask went to the database, while admin_rows asked once per key inside a loop that ran once per flag. Three rows are read once on Current now, the same bargain as the syllabus and the landing copy and held there for the same reason, that a module-level memo outlives the database it was read from when the parallel runner forks. The tab is 14 and every other screen came down with it: the catalogue lost two, the overview nine, the roster the rest. Invalidation is a model callback rather than the writer remembering, because the first test to fail was one that wrote a row directly instead of through the approved class method - a console session would do the same. The roster ran 36 queries with one membership existence check per row, because .active on an association builds a fresh relation and returns to the database however loaded the rows already are. company_member? folds in Ruby now and the roster preloads, so a full page of twenty-five asks once for everybody; the screen is 18. Both are held by query_budget_test.rb and both tests were checked by putting the old code back. The measured table in performance.md is updated from the same script.",
       "evidence_url": "performance.html"
+    },
+    {
+      "at": "2026-08-13T07:30:00+07:00",
+      "item_id": "UX-014",
+      "from": "queued",
+      "to": "complete",
+      "summary": "The measurement script could not open a company-s internship request queue as an administrator, which turned out to be correct and to point at something that was not. SPEC-0041-s access matrix gives an administrator a placement record to assign or revoke a supervisor and nothing wider - no unbounded browsing of student documents - so the queue answering 404 is the specified behaviour. ADR-0048 decision 4 puts the whole board in front of every active member, deliberately, because a mentor who cannot decide a request is still better off knowing a student has been waiting since Tuesday. Both rules are right. What was wrong was the link between them: a mentor and an administrator each saw a card on the work surface linking to a queue that answered them 404, on a screen they are meant to be on, and mentor is a member role that is not a decider. The count stays and the link goes, for exactly the readers who are refused - Queue#openable? is whether this viewer may open where the card points, and the card renders as a plain div when they cannot. It costs one membership check, which the query budget caught immediately as 13 becoming 14; the ceiling moved by exactly that with the reason recorded, and the assertion still names the per-status regression it is really watching for. SPEC-0048 invariant 5 said every figure is a count with a link to the queue it counts, which is no longer true and should not be; it now carries the qualifier and the reason two rules meet there. ADR-0048 records the correction in its consequences.",
+      "evidence_url": "specs/spec-company-work-surface.html"
     }
   ]
 }

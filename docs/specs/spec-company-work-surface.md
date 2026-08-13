@@ -73,8 +73,18 @@ outside the decider roles, which is the opposite of the rule ADR-0048 records.
    administrator. A signed-in user who is neither gets the same
    `ActiveRecord::RecordNotFound` the company's other screens give them.
 4. An organization that is not active has no work surface.
-5. Every figure on the screen is a count with a link to the queue it counts.
-   No student name, no request or report text, and no row-level record appears.
+5. Every figure on the screen is a count, and it carries a link to the queue it
+   counts **when the reader may open that queue**. No student name, no request
+   or report text, and no row-level record appears.
+
+   The qualifier is not a softening; it is where two rules meet. Decision 4 puts
+   the whole board in front of every active member, and
+   [SPEC-0041](spec-student-internship-requests.md) gives the internship request
+   queue to deciders alone — an administrator included, whose read there is a
+   placement record and nothing wider. A mentor and an administrator were each
+   shown a card linking to a queue that answered them 404. The count is what
+   decision 4 is for and it stays; the link is what SPEC-0041 refuses and it
+   goes, for exactly those readers.
 6. The three internship figures — requests awaiting a company decision, submitted
    progress reports with no acknowledgement, and open placements — are the same
    for every active member. Acting on any of them is authorized where it is

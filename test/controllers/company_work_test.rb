@@ -123,6 +123,42 @@ class CompanyWorkTest < ActionDispatch::IntegrationTest
     assert_predicate placement, :active?
   end
 
+  # ADR-0048 decision 4 shows every active member the whole board, and SPEC-0041
+  # gives the request queue to deciders alone — an administrator included, whose
+  # read there is "a placement record, to assign or revoke its supervisor" and
+  # nothing wider. Both rules are right; the link between them was not. A mentor
+  # and an administrator each saw a card linking to a queue that answered them
+  # 404, on a screen they are meant to be on.
+  #
+  # So the count stays and the link goes, for exactly the readers who are refused.
+  test "a queue nobody may open is counted without a link to it" do
+    request = @organization.internship_requests.create!(student: users(:student),
+                                                        motivation: "Routing", learning_goals: "Measuring")
+    request.submit!(actor: users(:student))
+    mentor = users(:instructor)
+    @organization.memberships.create!(user: mentor, role: "mentor")
+
+    [ mentor, users(:admin) ].each do |refused|
+      sign_in_as refused
+      get work_company_path(@organization)
+
+      assert_response :success
+      assert_select "main", text: /#{I18n.t("recruitment.company_work.queues.internship_requests")}/,
+        message: "the count is the point of the board — it must still be there"
+      assert_select "a[href=?]", company_internship_requests_path(@organization), count: 0,
+        message: "a link this reader is answered 404 at"
+
+      get company_internship_requests_path(@organization)
+      assert_response :not_found, "and the queue itself still refuses them"
+    end
+
+    sign_in_as @owner
+    get work_company_path(@organization)
+
+    assert_select "a[href=?]", company_internship_requests_path(@organization),
+      message: "a decider must still be able to open it"
+  end
+
   test "a company with nothing waiting says so rather than showing zeroes" do
     sign_in_as @owner
     get work_company_path(@organization)

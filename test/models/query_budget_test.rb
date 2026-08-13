@@ -145,8 +145,14 @@ class QueryBudgetTest < ActiveSupport::TestCase
 
     assert_equal small, large,
       "the work surface went from #{small} to #{large} queries as applications arrived"
-    assert_operator large, :<=, 13,
-      "the work surface now costs #{large} queries, up from 13; a per-status count is probably back"
+    # 14 since 2026-08-13: one membership check, so the board can tell whether
+    # this reader may open the request queue it is about to link to. A mentor
+    # and an administrator were both being handed a link to a 404. One query
+    # for an authorization fact is the cheapest honest answer, so the ceiling
+    # moved by exactly that — and the sentence below still names the thing it
+    # is really watching for.
+    assert_operator large, :<=, 14,
+      "the work surface now costs #{large} queries, up from 14; a per-status count is probably back"
   end
 
   # The budget counts queries, not rows, which is why every screen here could

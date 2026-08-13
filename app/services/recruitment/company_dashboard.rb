@@ -27,6 +27,14 @@ module Recruitment
       def any? = count.positive?
 
       def waiting? = waiting
+
+      # A count this viewer can act on, or only read. ADR-0048 decision 4 shows
+      # every active member the whole board — a mentor who cannot decide a
+      # request is still better off knowing a student has been waiting since
+      # Tuesday — and SPEC-0041 gives the request queue to deciders alone. Both
+      # hold; what cannot is a link the reader is refused at. The count stays,
+      # the link goes.
+      def openable? = path.present?
     end
 
     Posting = Data.define(:key, :published, :in_review)
@@ -59,7 +67,7 @@ module Recruitment
       def queues
         [
           Queue.new(:internship_requests, @organization.internship_requests.awaiting_company.count,
-                    company_internship_requests_path, true),
+                    (company_internship_requests_path if decider?), true),
           Queue.new(:progress_reports, unacknowledged_reports, internship_placements_path, true),
           Queue.new(:active_placements, @organization.internship_placements.open_placements.count,
                     internship_placements_path, false)
@@ -95,6 +103,15 @@ module Recruitment
       # screen asks for two states of each and would happily grow a third; a
       # query apiece is how a board of counts quietly becomes the slowest page
       # in the workspace.
+      # Who may open the request queue, which is who may decide one —
+      # `InternshipRequestDecisionsController` asks exactly this and answers a
+      # not-found to everybody else, including an administrator. One query, so
+      # that the board does not hand a reader a door they are refused at.
+      def decider?
+        @organization.memberships.active.exists?(user_id: @viewer&.id,
+                                                 role: InternshipRequest::DECIDER_ROLES)
+      end
+
       def by_status(relation) = relation.group(:status).count
 
       def unacknowledged_reports

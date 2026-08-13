@@ -169,6 +169,13 @@ is waiting — which a feed does not.
 
 ## Consequences
 
+- A figure a reader cannot act on is still shown to them and is no longer
+  linked. Decision 4 puts the whole board in front of every active member, and
+  SPEC-0041 gives the internship request queue to deciders alone — so a mentor
+  and an administrator were each handed a card leading to a 404 on a screen they
+  are meant to be on. Corrected 2026-08-13: the count stays, the link is
+  rendered only for a reader who may open where it points.
+
 - A company member's front door changes. `/company/:slug` is still one click
   away and keeps its address, so any link to it is unaffected.
 - `Recruitment::CompanyDashboard` stops being dead code, loses its

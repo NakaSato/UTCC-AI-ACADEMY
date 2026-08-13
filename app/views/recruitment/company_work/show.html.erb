@@ -21,12 +21,21 @@
 
     <% if waiting.any? %>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <%# A card, linked only for a reader who may open where it points. A
+            mentor and an administrator both see this board by design and are
+            both refused the request queue by SPEC-0041, so the count stays and
+            the link goes rather than either rule bending. %>
         <% waiting.each do |queue| %>
-          <%= link_to queue.path,
-                class: "rounded-card border border-hairline bg-surface-1 p-6 hover:border-brand-ink" do %>
+          <% card = "rounded-card border border-hairline bg-surface-1 p-6" %>
+          <% body = capture do %>
             <div class="text-30 leading-none font-bold tracking-[-0.03em] text-ink"><%= queue.count %></div>
             <div class="mt-2 text-13 font-semibold text-ink"><%= t("recruitment.company_work.queues.#{queue.key}") %></div>
             <div class="mt-1 text-12-5 text-muted-2"><%= t("recruitment.company_work.queues.#{queue.key}_note") %></div>
+          <% end %>
+          <% if queue.openable? %>
+            <%= link_to body, queue.path, class: "#{card} hover:border-brand-ink" %>
+          <% else %>
+            <div class="<%= card %>"><%= body %></div>
           <% end %>
         <% end %>
       </div>
