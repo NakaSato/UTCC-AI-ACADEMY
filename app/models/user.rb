@@ -154,6 +154,12 @@ class User < ApplicationRecord
   # is what RegistrationsController saves in — and optional everywhere else,
   # because an instructor, an administrator, or a company member has no student
   # card and is created by an admin rather than by signing up.
+  # Suspension keeps the row and takes the access. A suspended account's
+  # completions still count for their section and on the board — the work was
+  # done — which is the same call ADR-0055 made for a retired lesson.
+  scope :suspended, -> { where.not(suspended_at: nil) }
+  scope :unsuspended, -> { where(suspended_at: nil) }
+
   STUDENT_ID_FORMAT = /\A\d{13}\z/
   # 3–30 characters of lowercase letters, digits, dot, dash, and underscore,
   # starting and ending with a letter or digit. The lookahead requires at least
@@ -197,6 +203,7 @@ class User < ApplicationRecord
   # The instructor dashboard is staff-wide: admin is a superset of instructor, so
   # a gate written against this predicate needs no second rule for admins.
   def staff? = instructor? || admin?
+  def suspended? = suspended_at.present?
 
   # A revoked membership is not a membership — `active` is what keeps a former
   # recruiter out of the company screens their organization still owns.

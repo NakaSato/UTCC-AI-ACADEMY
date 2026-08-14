@@ -21,6 +21,8 @@ class ConsoleSessionsController < ApplicationController
 
   def create
     if user = authenticate_console_user
+      return redirect_to console_path, alert: t("flash.account_suspended") if user.suspended?
+
       start_new_session_for user, remember: params[:remember_me] == "1"
       redirect_to after_console_authentication_url(user)
     else

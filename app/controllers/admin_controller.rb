@@ -61,6 +61,26 @@ class AdminController < ApplicationController
                                              type: "text/csv; charset=utf-8", disposition: "attachment"
   end
 
+  # Suspend or restore a selection. The roster's only bulk write.
+  #
+  # An administrator cannot suspend themselves — the same refusal `#update` makes
+  # for a self role change, and for the same reason: the last administrator
+  # locking themselves out is not a state the app should let them reach by
+  # ticking a box.
+  def update_suspension
+    ids = Array(params[:user_ids]).map(&:to_i).reject(&:zero?)
+    restoring = params[:restore].present?
+    return redirect_to admin_path(tab: :users), alert: t("flash.accounts_none_selected") if ids.empty?
+
+    if !restoring && ids.include?(Current.user.id)
+      return redirect_to admin_path(tab: :users), alert: t("flash.account_self_suspend")
+    end
+
+    changed = Suspension.apply(User.where(id: ids), restoring:)
+    redirect_to admin_path(tab: :users),
+                notice: t(restoring ? "flash.accounts_restored" : "flash.accounts_suspended", count: changed)
+  end
+
   def update_course_state
     course = Course.find(params[:id])
     ApprovalRequest.create_course_lifecycle!(course:, requester: Current.user,

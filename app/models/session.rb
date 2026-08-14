@@ -18,6 +18,12 @@ class Session < ApplicationRecord
   # `live` is the only way a session should ever be looked up — see
   # Authentication#find_session_by_cookie and ApplicationCable::Connection.
   scope :live,    -> { where(created_at: MAX_AGE.ago..) }
+  # What authentication resolves a cookie through. `live` is about the session's
+  # age; this is about whether the account behind it may still be used at all, so
+  # suspending somebody ends the sessions they already had open rather than only
+  # refusing the next sign-in. Authentication#find_session_by_cookie and
+  # ApplicationCable::Connection both read through here and have to match.
+  scope :usable,  -> { live.joins(:user).where(users: { suspended_at: nil }) }
   scope :expired, -> { where(created_at: ...MAX_AGE.ago) }
 
   # The profile page receives this signed value instead of the database ID, so

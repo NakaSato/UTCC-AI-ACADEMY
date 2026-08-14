@@ -13,7 +13,7 @@ module ApplicationCable
       # signed-in page subscribes the notification bell, so a dead session's
       # cookie is offered here on every screen.
       def set_current_user
-        if session = Session.live.find_by(id: cookies.signed[:session_id])
+        if session = Session.usable.find_by(id: cookies.signed[:session_id])
           self.current_user = session.user
         end
       rescue ActiveRecord::ActiveRecordError => error

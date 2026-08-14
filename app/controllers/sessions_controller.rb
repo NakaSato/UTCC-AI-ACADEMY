@@ -27,6 +27,12 @@ class SessionsController < ApplicationController
   # Students sign in with their student ID; most accounts have no email at all.
   def create
     if user = User.authenticate_by(params.permit(:student_id, :password))
+      # Refused here rather than signed in and then quietly unauthenticated on
+      # the next request: `Session.usable` would resolve the cookie to nobody,
+      # and a login that appears to work and then does not is worse than a
+      # refusal that says why. Same shape as the console's access check below.
+      return redirect_to login_path, alert: t("flash.account_suspended") if user.suspended?
+
       start_new_session_for user, remember: params[:remember_me] == "1"
       redirect_to after_authentication_url
     else

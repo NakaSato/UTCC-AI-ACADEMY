@@ -25,11 +25,13 @@ module Authentication
       Current.session ||= find_session_by_cookie
     end
 
-    # `live`, never a bare `find_by` — a session past Session::MAX_AGE is not a
-    # session, and a cookie that outlives its row must resolve to nobody.
-    # ApplicationCable::Connection does the same lookup and has to match.
+    # `usable`, never a bare `find_by` — a session past Session::MAX_AGE is not a
+    # session, a cookie that outlives its row must resolve to nobody, and an
+    # account that has been suspended must stop being signed in rather than stay
+    # signed in until its cookie ages out. ApplicationCable::Connection does the
+    # same lookup and has to match.
     def find_session_by_cookie
-      Session.live.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      Session.usable.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
 
     # Denial sends a visitor to the front door, not to the form — `/` is the

@@ -325,6 +325,10 @@ Rails.application.routes.draw do
   # the Authorization concern and each controller's `allow_only`.
   get "admin", to: "admin#show", as: :admin
   patch "admin/users/:id", to: "admin#update", as: :admin_user
+  # Suspending keeps the account and takes its access, so it is one write over a
+  # selection rather than a delete. One audit event per account, because the log
+  # answers "what happened to this person" and a batch id would not.
+  post "admin/users/suspension", to: "admin#update_suspension", as: :admin_user_suspension
   # Where a console account comes from. Sign-up produces learners only, so an
   # instructor, an administrator, or a company member is made here or nowhere.
   post "admin/console-accounts", to: "admin#create_console_account", as: :admin_console_accounts
