@@ -127,9 +127,13 @@ mistake case only, and it would still leave "retire a taught lesson" unanswered.
    The numerator is their completions, which are untouched; the denominator has
    lost the lesson. 12 of 11 is therefore reachable, and the three `percent`
    helpers clamp to 100 rather than printing 109%.
-3. **Undoing a retirement is not built.** `retired_at` is nullable and nothing
-   sets it back; when somebody needs it, it is a second request kind and not a
-   button. Recorded here so its absence is a decision rather than an oversight.
+3. **Undoing a retirement is a second request kind, not a button.** Recorded
+   first as an absence, then built to that description on 2026-08-15:
+   `syllabus_lesson_restored` goes through the same queue, and retiring and
+   restoring share one pending request per lesson so a lesson cannot have both
+   waiting on it. Building it also fixed a defect it exposed — a retired lesson
+   used to sit in the teacher's outline looking exactly like a live one,
+   offering an "ask to retire" the validation would then refuse.
 4. **A retired lesson stays nameable.** `Syllabus.topic_name` deliberately does
    not filter retired lessons — keeping the row and then refusing to name it
    would be the delete this app does not do.

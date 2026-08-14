@@ -178,6 +178,75 @@ class LessonRetirementTest < ActionDispatch::IntegrationTest
     assert_not_includes Syllabus.topic_keys(@course.code), Syllabus.topic_after(@topic.key, @course.code)
   end
 
+  # ---- Putting one back -----------------------------------------------------
+
+  # ADR-0055 left restoration out and named what it would be when somebody
+  # wanted it: a second request kind, not a button. This is that, not a reversal.
+  test "a teacher asks to bring a lesson back, and an administrator decides it" do
+    retire!
+
+    assert_difference "ApprovalRequest.count", 1 do
+      post instructor_syllabus_restore_path(@topic.key)
+    end
+    request = ApprovalRequest.newest_first.first
+    assert_predicate request, :syllabus_lesson_restored?
+    assert_predicate @topic.reload, :retired?, "asking must not restore"
+    assert_not request.approvable_by?(@teacher)
+
+    request.decide!(actor: users(:admin), outcome: "approved")
+    Syllabus.reload!
+
+    assert_not_predicate @topic.reload, :retired?
+    assert_includes Syllabus.topic_keys(@course.code), @topic.key
+    assert_equal "lesson_restoration_decided", AuditEvent.newest_first.first.action
+  end
+
+  test "a lesson that never left cannot be brought back" do
+    sign_in_as @teacher
+
+    assert_no_difference "ApprovalRequest.count" do
+      post instructor_syllabus_restore_path(@topic.key)
+    end
+    assert_equal I18n.t("flash.restoration_request_invalid"), flash[:alert]
+  end
+
+  # Retiring and restoring share the one-pending-per-lesson rule, so a lesson
+  # cannot have a retirement and a restoration waiting on it at once.
+  test "one pending request per lesson, whichever direction it points" do
+    retire!
+    post instructor_syllabus_restore_path(@topic.key)
+
+    assert_no_difference "ApprovalRequest.count" do
+      post instructor_syllabus_restore_path(@topic.key)
+    end
+    assert_equal I18n.t("flash.restoration_request_invalid"), flash[:alert]
+  end
+
+  test "a student cannot ask for either direction" do
+    retire!
+    sign_in_as @student
+
+    assert_no_difference "ApprovalRequest.count" do
+      post instructor_syllabus_restore_path(@topic.key)
+    end
+  end
+
+  # The bug this feature was built on top of: a retired lesson used to sit in the
+  # teacher's outline looking exactly like a live one, offering an "ask to
+  # retire" the validation would then refuse.
+  test "the outline says which lessons have left, and offers the other direction" do
+    retire!
+    get instructor_url(tab: :syllabus)
+
+    assert_response :success
+    assert_select "main", text: /#{I18n.t("instructor.syllabus_retired_badge")}/
+    assert_select "form[action=?]", instructor_syllabus_restore_path(@topic.key)
+    assert_select "form[action=?]", instructor_syllabus_retire_path(@topic.key), count: 0
+    # No reordering a lesson that is not in the order, and no renaming one
+    # nothing offers.
+    assert_select "form[action=?]", instructor_syllabus_move_path(@topic.key), count: 0
+  end
+
   test "no route destroys a topic" do
     sources = Dir[Rails.root.join("app/{controllers,models}/**/*.rb")]
     offenders = sources.select { File.read(it).match?(/\.destroy\b/) && File.read(it).include?("Topic") }

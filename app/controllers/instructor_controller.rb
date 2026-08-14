@@ -208,6 +208,20 @@ rescue ActiveRecord::RecordInvalid
   redirect_to instructor_path(tab: :syllabus), alert: t("flash.retirement_request_invalid")
 end
 
+# And putting one back. ADR-0055 left restoration out and said what it would be
+# when somebody wanted it: a second request kind, not a button. This is that.
+def request_restoration
+  course = teachable_course
+  return redirect_to instructor_path, alert: t("flash.course_not_yours") unless course
+
+  ApprovalRequest.create_lesson_restoration!(course:, requester: Current.user,
+                                             topic_key: params[:topic_key], note: params[:note])
+
+  redirect_to instructor_path(tab: :syllabus), notice: t("flash.restoration_requested")
+rescue ActiveRecord::RecordInvalid
+  redirect_to instructor_path(tab: :syllabus), alert: t("flash.restoration_request_invalid")
+end
+
   # The export the screen's button points at. Same gate as the screen; staff
   # with no section have nothing to download and go back to the notice that
   # says so.

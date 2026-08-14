@@ -61,9 +61,9 @@ that makes a retired lesson stop being offered.
 
 **Out:**
 
-- **Un-retiring.** `retired_at` is nullable and nothing sets it back. When it is
-  wanted it is a second request kind, not a button — recorded so its absence is a
-  decision rather than an oversight.
+- ~~**Un-retiring.**~~ **In, since 2026-08-15**, built to the description this
+  bullet carried: a second request kind rather than a button. See "Bringing one
+  back" below.
 - **Deleting a topic.** No route does, and none may.
 
 ## The rule
@@ -92,6 +92,27 @@ then sees one retired has 12 completions and 11 lessons. That is the accepted
 semantics, not a bug — so the three `percent` helpers clamp to 100 rather than
 printing 109%.
 
+## Bringing one back
+
+`syllabus_lesson_restored`, through the same queue and with the same refusals:
+a teacher asks, an administrator decides, nobody decides their own, and the
+decision is audited as `lesson_restoration_decided`. `restore_lesson!` refuses a
+lesson that never left, the mirror of `retire_lesson!` refusing one that already
+has.
+
+**One pending request per lesson, whichever direction it points.** Retiring and
+restoring share the rule, so a lesson cannot have a retirement and a restoration
+waiting on it at once — the second decision would be an administrator approving a
+change that had already been undone.
+
+**The outline says which lessons have left.** Building this exposed a defect in
+the retirement that shipped before it: a retired lesson sat in the teacher's
+syllabus panel looking exactly like a live one, with move controls, an editable
+name, and an "ask to retire" button the request validation would then refuse. A
+retired row now carries a badge, offers restoration instead, and drops the
+controls that only make sense for a lesson still in the order — its name stays
+visible, because a completion and an integrity case still point at it.
+
 ## Invariants
 
 1. No route destroys a `Topic`.
@@ -106,6 +127,8 @@ printing 109%.
 8. A learner's percentage never exceeds 100 and never falls because a lesson was
    retired.
 9. Both locales carry every string.
+10. A lesson has at most one pending syllabus request, retirement or restoration.
+11. A retired lesson is never offered a retirement, a move, or a rename.
 
 ## Acceptance Criteria
 
@@ -138,5 +161,5 @@ printing 109%.
   without rewriting what past cohorts were measured against, which is what
   ADR-0055 set out to make possible.
 - `percent` clamping is now load-bearing rather than defensive, in three models.
-- Un-retiring is the next thing somebody will want, and it is deliberately not
-  here.
+- Un-retiring, which this spec first recorded as deliberately absent, is here —
+  built to the shape the absence described rather than as a reversal of it.

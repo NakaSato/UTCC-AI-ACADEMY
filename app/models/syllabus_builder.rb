@@ -95,6 +95,18 @@ class SyllabusBuilder
     topic
   end
 
+  # Putting one back. ADR-0055 left this out and said what it would be when
+  # somebody wanted it — a second request kind, not a button — so this is that
+  # rather than a reversal of it.
+  def restore_lesson!(topic_key)
+    topic = topic_for(topic_key)
+    return false if topic.nil? || !topic.retired?
+
+    topic.update!(retired_at: nil)
+    Syllabus.reload!
+    true
+  end
+
   # The other half of the same decision, and it destroys nothing.
   #
   # Called from `ApprovalRequest#apply!` inside the decision's transaction and
@@ -167,6 +179,7 @@ class SyllabusBuilder
       key = SyllabusText.topic_key(topic.key)
 
       { key: topic.key, kind: topic.kind, minutes: topic.minutes, position: topic.position,
+        retired: topic.retired?,
         names: I18n.available_locales.to_h do |locale|
           [ locale.to_s, I18n.with_locale(locale) { Syllabus.topic_name(topic.key, course.code) } ]
         end,

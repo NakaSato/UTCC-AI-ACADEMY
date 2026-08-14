@@ -34,7 +34,7 @@
                   not a control. %>
               <div class="flex flex-none flex-col gap-1 pt-0.5">
                 <% [ [ "up", index.positive? ], [ "down", index < mod[:topics].size - 1 ] ].each do |direction, shown| %>
-                  <% if shown && @course.draft? %>
+                  <% if shown && @course.draft? && !topic[:retired] %>
                     <%= form_with url: instructor_syllabus_move_path(topic[:key]), method: :patch, class: "contents" do %>
                       <%= hidden_field_tag :direction, direction %>
                       <%= submit_tag t("instructor.syllabus_move.#{direction}"),
@@ -56,13 +56,16 @@
                       <span class="text-12-5 font-semibold text-muted-2">
                         <%= t("instructor.syllabus_name", language: t("language_name", locale: locale)) %>
                       </span>
+                      <%# A retired lesson keeps its name — a completion and an
+                          integrity case still point at it — but editing a name
+                          nothing offers is a control with no reader. %>
                       <%= text_field_tag "names[#{locale}]", topic[:names][locale.to_s], size: 24,
-                            disabled: !@course.draft?, required: true,
+                            disabled: !@course.draft? || topic[:retired], required: true,
                             class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
                                     disabled:text-muted-2" %>
                     </label>
                   <% end %>
-                  <% if @course.draft? %>
+                  <% if @course.draft? && !topic[:retired] %>
                     <%= submit_tag t("instructor.syllabus_save"),
                           class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
                                   text-13-5 font-medium text-ink-4 transition-colors hover:border-brand-ink
@@ -85,12 +88,25 @@
                   <%# Retiring takes the lesson out of the syllabus and out of
                       every denominator, and leaves it counting for whoever has
                       already finished it (ADR-0055). Nothing is destroyed, which
-                      is why this is a request rather than a delete. %>
-                  <%= button_to t("instructor.syllabus_retire"), instructor_syllabus_retire_path(topic[:key]),
-                        form: { data: { turbo_confirm: t("instructor.syllabus_retire_confirm") },
-                                class: "contents" },
-                        class: "cursor-pointer font-sans text-11-5 text-muted-2 underline-offset-2
-                                transition-colors hover:text-brand-ink hover:underline" %>
+                      is why both directions are requests rather than writes — and
+                      why a lesson that has left says so rather than sitting here
+                      looking like one that has not. %>
+                  <% if topic[:retired] %>
+                    <span class="rounded-full bg-brand-tint px-2 py-0.5 font-sans text-11-5 font-semibold text-brand-ink-deep">
+                      <%= t("instructor.syllabus_retired_badge") %>
+                    </span>
+                    <%= button_to t("instructor.syllabus_restore"), instructor_syllabus_restore_path(topic[:key]),
+                          form: { data: { turbo_confirm: t("instructor.syllabus_restore_confirm") },
+                                  class: "contents" },
+                          class: "cursor-pointer font-sans text-11-5 text-muted-2 underline-offset-2
+                                  transition-colors hover:text-brand-ink hover:underline" %>
+                  <% else %>
+                    <%= button_to t("instructor.syllabus_retire"), instructor_syllabus_retire_path(topic[:key]),
+                          form: { data: { turbo_confirm: t("instructor.syllabus_retire_confirm") },
+                                  class: "contents" },
+                          class: "cursor-pointer font-sans text-11-5 text-muted-2 underline-offset-2
+                                  transition-colors hover:text-brand-ink hover:underline" %>
+                  <% end %>
                 </div>
               </div>
             </div>

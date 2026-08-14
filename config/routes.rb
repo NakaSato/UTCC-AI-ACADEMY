@@ -238,6 +238,8 @@ Rails.application.routes.draw do
   # goes through the same queue.
   post "instructor/syllabus/retire/:topic_key", to: "instructor#request_retirement",
        as: :instructor_syllabus_retire
+  post "instructor/syllabus/restore/:topic_key", to: "instructor#request_restoration",
+       as: :instructor_syllabus_restore
 
   # Public surface is /academic. Keep the internal resource name and helpers
   # stable so AcademicPost records, associations, and existing callers do not

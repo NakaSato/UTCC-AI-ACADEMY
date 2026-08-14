@@ -7,7 +7,10 @@ class ApprovalRequest < ApplicationRecord
   # the row stays and stops being offered, so a completion and an integrity case
   # can still say which lesson they were about.
   SYLLABUS_LESSON_RETIRED = "syllabus_lesson_retired".freeze
-  SYLLABUS_KINDS = [ SYLLABUS_LESSON_ADDED, SYLLABUS_LESSON_RETIRED ].freeze
+  # And putting one back, which ADR-0055 said would be a second request kind
+  # rather than a button when somebody wanted it.
+  SYLLABUS_LESSON_RESTORED = "syllabus_lesson_restored".freeze
+  SYLLABUS_KINDS = [ SYLLABUS_LESSON_ADDED, SYLLABUS_LESSON_RETIRED, SYLLABUS_LESSON_RESTORED ].freeze
   KINDS = [ COURSE_LIFECYCLE_TRANSITION, *SYLLABUS_KINDS ].freeze
   STATUSES = %w[ pending approved rejected ].freeze
   APPROVER_ROLES = %w[ admin ].freeze
@@ -30,7 +33,8 @@ class ApprovalRequest < ApplicationRecord
   validate :pending_request_is_unique, on: :create
   validate :lesson_payload_is_complete, on: :create, if: :syllabus_lesson_added?
   validate :retirement_names_a_live_lesson, on: :create, if: :syllabus_lesson_retired?
-  validate :pending_lesson_is_unique, on: :create, if: :syllabus_lesson_retired?
+  validate :restoration_names_a_retired_lesson, on: :create, if: :syllabus_lesson_restored?
+  validate :pending_lesson_is_unique, on: :create, if: :names_one_lesson?
 
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
   scope :oldest_first, -> { order(created_at: :asc, id: :asc) }
@@ -59,9 +63,19 @@ class ApprovalRequest < ApplicationRecord
       .tap(&:save!)
   end
 
+  def self.create_lesson_restoration!(course:, requester:, topic_key:, note: nil)
+    new(course:, requester:, kind: SYLLABUS_LESSON_RESTORED, note:,
+        payload: { "topic_key" => topic_key.to_s })
+      .tap(&:save!)
+  end
+
   def course_lifecycle_transition? = kind == COURSE_LIFECYCLE_TRANSITION
   def syllabus_lesson_added? = kind == SYLLABUS_LESSON_ADDED
   def syllabus_lesson_retired? = kind == SYLLABUS_LESSON_RETIRED
+  def syllabus_lesson_restored? = kind == SYLLABUS_LESSON_RESTORED
+  # The two kinds whose payload is one lesson, and which therefore share the
+  # one-pending-request-per-lesson rule.
+  def names_one_lesson? = syllabus_lesson_retired? || syllabus_lesson_restored?
 
   def approvable_by?(actor)
     pending? && approver?(actor) && requester_id != actor.id
@@ -100,6 +114,8 @@ class ApprovalRequest < ApplicationRecord
              module_number: payload["module_number"], lesson: lesson_name)
     in SYLLABUS_LESSON_RETIRED
       I18n.t("admin.queue.lesson_retirement_title", course: course.code, lesson: lesson_name)
+    in SYLLABUS_LESSON_RESTORED
+      I18n.t("admin.queue.lesson_restoration_title", course: course.code, lesson: lesson_name)
     end
   end
 
@@ -107,7 +123,7 @@ class ApprovalRequest < ApplicationRecord
   # already exists and reads its name off the syllabus — retired lessons
   # included, which is why `Syllabus.topic_name` does not filter them.
   def lesson_name
-    return Syllabus.topic_name(payload["topic_key"], course.code) if syllabus_lesson_retired?
+    return Syllabus.topic_name(payload["topic_key"], course.code) if names_one_lesson?
 
     names = payload["names"].to_h
     names[I18n.locale.to_s].presence || names.values.compact_blank.first.to_s
@@ -143,7 +159,11 @@ class ApprovalRequest < ApplicationRecord
         AuditEvent.record("approval_decided", request_id: id, course: course.code, outcome:,
                           from: from_state, to: course.lifecycle_state, reason: note.presence)
       else
-        action = syllabus_lesson_added? ? "lesson_addition_decided" : "lesson_retirement_decided"
+        action = case kind
+        in SYLLABUS_LESSON_ADDED    then "lesson_addition_decided"
+        in SYLLABUS_LESSON_RETIRED  then "lesson_retirement_decided"
+        in SYLLABUS_LESSON_RESTORED then "lesson_restoration_decided"
+        end
         AuditEvent.record(action, request_id: id, course: course.code, outcome:,
                           lesson: lesson_name, reason: note.presence)
       end
@@ -162,6 +182,8 @@ class ApprovalRequest < ApplicationRecord
         )
       in SYLLABUS_LESSON_RETIRED
         SyllabusBuilder.new(course).retire_lesson!(payload["topic_key"])
+      in SYLLABUS_LESSON_RESTORED
+        SyllabusBuilder.new(course).restore_lesson!(payload["topic_key"])
       end
     end
 
@@ -194,9 +216,19 @@ class ApprovalRequest < ApplicationRecord
     def pending_lesson_is_unique
       return if payload["topic_key"].blank?
 
-      duplicate = self.class.pending.where(course_id:, kind: SYLLABUS_LESSON_RETIRED)
+      duplicate = self.class.pending.where(course_id:, kind: SYLLABUS_KINDS - [ SYLLABUS_LESSON_ADDED ])
                       .where("payload ->> 'topic_key' = ?", payload["topic_key"]).exists?
       errors.add(:payload, :taken) if duplicate
+    end
+
+    # The mirror of `retirement_names_a_live_lesson`: you can only put back a
+    # lesson that has actually left.
+    def restoration_names_a_retired_lesson
+      return errors.add(:payload, :blank) if payload["topic_key"].blank?
+
+      retired = course && Topic.where.not(retired_at: nil).joins(:course_module)
+                              .exists?(key: payload["topic_key"], course_modules: { course_id: course.id })
+      errors.add(:payload, :invalid) unless retired
     end
 
     def approver?(actor) = actor.present? && APPROVER_ROLES.include?(actor.role)
