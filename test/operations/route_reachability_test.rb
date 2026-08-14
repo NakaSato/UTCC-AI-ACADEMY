@@ -21,6 +21,7 @@ class RouteReachabilityTest < ActiveSupport::TestCase
     "notifications#bell" => "renders the bell partial the header frame comes back for, not a page",
     "course_documents#syllabus" => "send_data: the syllabus PDF",
     "instructor#grades" => "send_data: the section's grades as CSV",
+    "admin#report" => "send_data: one of the console Overview's three CSV reports",
     "academic_posts#export" => "send_data: the post as a standalone HTML document",
     "recruitment/candidate_profiles#export" => "send_data: the candidate's own profile as JSON",
     "internship_request_resumes#show" => "send_data: a shared résumé, always as an attachment (SPEC-0041)",

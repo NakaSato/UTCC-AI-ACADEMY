@@ -66,6 +66,13 @@ th:
     course_updated: "อัปเดต %{course} แล้ว"
     course_not_yours: "คุณไม่ได้สอนวิชานี้"
     course_not_editable: "วิชาที่เผยแพร่แล้วต้องเปลี่ยนผ่านคิวอนุมัติ ไม่ใช่ที่นี่"
+    topic_renamed: "เปลี่ยนชื่อบทเรียนแล้ว"
+    topic_moved: "ย้ายบทเรียนแล้ว"
+    topic_not_yours: "บทเรียนนั้นไม่ได้อยู่ในวิชาที่คุณสอน"
+    topic_not_moved: "บทเรียนนั้นอยู่สุดโมดูลแล้ว"
+    topic_name_blank: "บทเรียนต้องมีชื่อทั้งสองภาษา"
+    lesson_requested: "ส่งคำขอเพิ่มบทเรียนของ %{course} แล้ว ผู้ดูแลจะเป็นผู้ตัดสิน"
+    lesson_request_invalid: "บทเรียนต้องระบุโมดูล ประเภท ระยะเวลา และชื่อทั้งสองภาษา"
     approval_requested: "คำขอเปลี่ยนวงจรของ %{course} กำลังรอตรวจสอบ"
     approval_decided: "บันทึกผลการอนุมัติแล้ว"
     proposal_decided: "ตอบ %{reference} แล้ว และผู้เสนออ่านเหตุผลได้"
@@ -1439,6 +1446,32 @@ th:
       certificate: "มีใบรับรอง"
     title: "มุมอาจารย์ · %{course}"
     subtitle: "หมู่เรียน %{section} · นักศึกษา %{count} คน · ภาค %{term}"
+    tabs:
+      roster: "รายชื่อ"
+      topics: "หัวข้อ"
+      course: "รายวิชา"
+      syllabus: "โครงสร้างรายวิชา"
+      integrity: "ความซื่อสัตย์"
+    syllabus_title: "โครงสร้างรายวิชาของคุณ"
+    syllabus_sub: "ชื่อของแต่ละบทเรียน และลำดับของบทเรียน การเพิ่มหรือลบบทเรียนต้องผ่านคิวอนุมัติ เพราะบทเรียนหนึ่งมีงานของนักศึกษาผูกอยู่"
+    syllabus_locked: "วิชานี้เผยแพร่แล้ว การแก้โครงสร้างต้องผ่านคิวอนุมัติ ไม่ใช่ที่นี่"
+    syllabus_module: "โมดูล %{number}"
+    syllabus_name: "ชื่อ (%{language})"
+    syllabus_save: "บันทึกชื่อ"
+    syllabus_renamed: "เปลี่ยนชื่อแล้ว"
+    lesson_request_title: "ขอเพิ่มบทเรียนใหม่"
+    lesson_request_sub: "บทเรียนคือสิ่งที่มีอยู่จริง การเพิ่มจึงเป็นคำขอ ผู้ดูแลเป็นผู้ตัดสินในคิวเดียวกับการเผยแพร่ และไม่มีใครตัดสินคำขอของตนเอง"
+    lesson_request_submit: "ส่งคำขอ"
+    lesson_field:
+      module: "โมดูล"
+      kind: "ประเภท"
+      minutes: "นาที"
+    syllabus_move:
+      up: "↑"
+      down: "↓"
+    syllabus_move_label:
+      up: "เลื่อน %{lesson} ขึ้น"
+      down: "เลื่อน %{lesson} ลง"
     export_csv: "ส่งออกคะแนน (CSV)"
     hardest_title: "หัวข้อที่นักศึกษาติดมากที่สุด"
     on_time_note: "ส่งแล้ว %{done} จาก %{total} ชิ้น"
@@ -1555,6 +1588,7 @@ th:
     course_state_changed: "เปลี่ยนสถานะ %{course} จาก%{from}เป็น%{to}"
     course_updated: "อัปเดต %{course}"
     approval_decided: "%{outcome}คำขอเปลี่ยนวงจรของ %{course} จาก%{from}เป็น%{to}"
+    lesson_addition_decided: "%{outcome}บทเรียนใหม่ของ %{course} · %{lesson}"
     proposal_decided: "ตอบข้อเสนอ %{reference} เป็น%{status}"
     feature_setting_changed: "เปลี่ยน %{key} จาก%{from_state}เป็น%{to_state}"
     section_created: "สร้างหมู่เรียน %{label}"
@@ -1726,6 +1760,12 @@ th:
     users_search_ph: "ค้นหาชื่อ รหัส ชื่อผู้ใช้ หรืออีเมล"
     courses_search_ph: "ค้นหารหัสหรือชื่อวิชา"
     filter_all: "ทั้งหมด"
+    sort_label: "เรียงตาม"
+    sorts:
+      role: "สิทธิ์"
+      name: "ชื่อ"
+      joined: "ใหม่ล่าสุด"
+      faculty: "คณะ"
     features:
       impact_title: "ฟีเจอร์ที่เปิดอยู่"
       impact_note: "การตั้งค่าที่ได้รับอนุมัติและเปิดใช้ในระบบ"
@@ -1761,7 +1801,43 @@ th:
               scope: "เมนู “ผู้นำ”"
               desc: "กำหนดการมองเห็นกระดานผู้นำของผู้เรียน"
     overview:
-      live_note: "ตัวเลขเหล่านี้นับจากข้อมูลปัจจุบันในฐานข้อมูล ส่วนมุมมองการปฏิบัติงานอื่นจะแสดงเมื่อมีแหล่งข้อมูลที่กำหนดชัดเจน"
+      live_note: "ทุกตัวเลขและทุกแผงด้านล่างนับจากข้อมูลจริงในฐานข้อมูล"
+      adoption_title: "การใช้งานแยกตามหน่วยงาน"
+      adoption_sub: "สัดส่วนบัญชีที่เข้าใช้ภายใน 7 วันที่ผ่านมา"
+      adoption:
+        meta: "ใช้งาน %{active} จาก %{total}"
+        no_unit: "ไม่ได้ระบุคณะ"
+      activity_title: "ความเคลื่อนไหวล่าสุด"
+      activity_empty: "ยังไม่มีรายการ"
+      duplicates_title: "บัญชีที่อาจเป็นคนเดียวกัน"
+      duplicates_sub: "รหัสนักศึกษา ชื่อผู้ใช้ และอีเมลไม่ซ้ำกันอยู่แล้ว บัญชีที่สองของคนเดียวกันจึงปรากฏเป็นชื่อซ้ำเท่านั้น และนักศึกษาสองคนก็ชื่อซ้ำกันได้ นี่คือข้อสังเกต ไม่ใช่ข้อสรุป"
+      duplicates_empty: "ไม่มีบัญชีที่ชื่อซ้ำกัน"
+      duplicates_count: "มีชื่อซ้ำ %{names} ชื่อ รวม %{accounts} บัญชี"
+      duplicates_open: "เปิดรายชื่อผู้ใช้"
+      health:
+        title: "สถานะระบบ"
+        sub: "ตรวจเมื่อเปิดหน้านี้ ไม่ได้ตรวจตามเวลา"
+        checks:
+          database: "ฐานข้อมูล"
+          jobs: "งานเบื้องหลัง"
+          cache: "แคช"
+          storage: "ที่เก็บไฟล์"
+        state:
+          ok: "ปกติ"
+          warn: "ทำงานไม่เต็มที่"
+          down: "ใช้งานไม่ได้"
+          unknown: "ไม่ทราบ"
+        workers: "มีตัวประมวลผลทำงานอยู่ %{count}"
+      reports_title: "รายงาน"
+      reports:
+        accounts: "บัญชีทั้งหมด"
+        courses: "รายวิชา หมู่เรียน และการลงทะเบียน"
+        audit: "บันทึกการใช้งานระบบ"
+      report_download: "ดาวน์โหลด"
+      columns:
+        accounts: [ "รหัส", "ชื่อ", "สิทธิ์", "คณะ", "เข้าร่วมเมื่อ" ]
+        courses: [ "รหัสวิชา", "รายวิชา", "การเผยแพร่", "หมู่เรียน", "นักศึกษา" ]
+        audit: [ "เมื่อ", "โดย", "ระดับ", "รายการ" ]
       stats:
         - label: "บัญชีผู้ใช้ทั้งหมด"
           note: "ข้อมูลปัจจุบันในฐานข้อมูล"
@@ -1798,6 +1874,8 @@ th:
         rejected: "ไม่อนุมัติ"
       course_transition_title: "เปลี่ยนวงจรรายวิชา · %{course}"
       request_meta: "%{role} · %{from} → %{to}"
+      lesson_addition_title: "บทเรียนใหม่ · %{course} โมดูล %{module_number} · %{lesson}"
+      lesson_meta: "%{role} · %{kind} · %{minutes}"
       sla_title: "คำขอที่ค้างอยู่"
       sla_note: "รายการที่รอการอนุมัติจากผู้ดูแล"
       sla:

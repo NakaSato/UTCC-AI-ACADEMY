@@ -5,7 +5,8 @@
   <% AdminConsole::ROLE_FILTERS.each do |chip| %>
     <% current = chip == @role %>
     <%= link_to chip == :all ? t("admin.filter_all") : t("admin.roles.#{chip}"),
-          admin_path(tab: :users, role: (chip unless chip == :all), q: @query.presence),
+          admin_path(tab: :users, role: (chip unless chip == :all), q: @query.presence,
+                     sort: (@sort unless @sort == AdminConsole::DEFAULT_SORT)),
           class: class_names(
             "rounded-full border-[1.5px] px-3.75 py-1.75 text-13-5 font-medium transition-colors",
             "border-brand-ink bg-brand-tint text-brand-ink-deep" => current,
@@ -17,11 +18,32 @@
     <%= form_with url: admin_path, method: :get, class: "ml-auto flex min-w-[240px] flex-1 sm:flex-none" do %>
       <%= hidden_field_tag :tab, :users %>
       <%= hidden_field_tag :role, @role unless @role == :all %>
+      <%# Searching keeps the order you chose, the way it already keeps the chip. %>
+      <%= hidden_field_tag :sort, @sort unless @sort == AdminConsole::DEFAULT_SORT %>
       <%= search_field_tag :q, @query, placeholder: t("admin.users_search_ph"),
             "aria-label": t("admin.users_search_ph"),
             class: "w-full rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2.25 text-14
                     text-ink transition-colors outline-none placeholder:text-muted-3 focus:border-brand-ink" %>
     <% end %>
+  <% end %>
+</div>
+
+<%# The order, beside the filters and spelled the same way: query-string state,
+    a whitelist AdminConsole owns, applied in SQL before the page is taken. A
+    sort that ran after paging would sort one page of an unsorted roster. %>
+<div class="mb-4 flex flex-wrap items-center gap-2">
+  <span class="text-12 text-muted-3"><%= t("admin.sort_label") %></span>
+  <% AdminConsole::SORTS.each_key do |option| %>
+    <% current = option == @sort %>
+    <%= link_to t("admin.sorts.#{option}"),
+          admin_path(tab: :users, role: (@role unless @role == :all), q: @query.presence,
+                     sort: (option unless option == AdminConsole::DEFAULT_SORT)),
+          "aria-current": ("true" if current),
+          class: class_names(
+            "rounded-full border px-3.25 py-1.5 text-12-5 transition-colors",
+            "border-brand-ink bg-brand-tint font-semibold text-brand-ink-deep" => current,
+            "border-hairline bg-surface text-ink-2 hover:border-muted-3" => !current
+          ) %>
   <% end %>
 </div>
 

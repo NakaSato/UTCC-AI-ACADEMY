@@ -78,6 +78,10 @@ class InstructorReport
 
   def inactive_count = roster.count { it.seen.nil? || it.seen > INACTIVE_AFTER }
 
+  # The pill on the roster tab: who is under the BEHIND line, which is the one
+  # figure on this screen that names people to go and find.
+  def behind_count = roster.count(&:behind?)
+
   # Each learner's best attempt at each graded step, averaged over the section.
   # Best rather than first, for two reasons: a gradebook reports what a student
   # achieved rather than what they first guessed, and first attempts are what the

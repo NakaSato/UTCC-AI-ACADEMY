@@ -35,6 +35,10 @@ module Syllabus
     def reload!
       Current.syllabus = nil
       Current.syllabi = nil
+      # The names are part of the syllabus read path now, so they go stale with
+      # it. Forgetting the records but keeping their copy is how a reorder ends
+      # up rendering the previous arrangement's names.
+      SyllabusText.forget
     end
 
     def topics(course = DEFAULT_COURSE) = entries(course).flat_map(&:topics)
@@ -69,7 +73,7 @@ module Syllabus
 
     def topic_name(key, course = DEFAULT_COURSE)
       topic = topic(key, course) or return ""
-      curriculum(course).dig(topic.course_module.number - 1, :topics, topic.position - 1).to_s
+      named_topic(topic, curriculum(course)[topic.course_module.number - 1] || {})
     end
 
     def current_module_number(done_keys, course = DEFAULT_COURSE)
@@ -86,20 +90,22 @@ module Syllabus
       copy = curriculum(course)
       current = current_module_number(done_keys, course)
 
+      code = course_code(course)
+
       entries(course).map do |mod|
         definition = copy[mod.number - 1] || {}
         Module_.new(
           number: mod.number,
           units: mod.units,
           status: module_status(mod.number, current),
-          title: definition[:title].to_s,
-          desc: definition[:desc].to_s,
+          title: named_module(code, mod.number, :title, definition),
+          desc: named_module(code, mod.number, :desc, definition),
           topics: mod.topics.map do |record|
             Topic_.new(
               key: record.key,
               kind: record.kind.to_sym,
               minutes: record.minutes,
-              name: definition.dig(:topics, record.position - 1).to_s,
+              name: named_topic(record, definition),
               done: done_keys.include?(record.key)
             )
           end
@@ -129,6 +135,34 @@ module Syllabus
 
     private
       def course_code(course) = course.respond_to?(:code) ? course.code.to_s : course.to_s
+
+      # A name in three tries: the override written against this topic's own key,
+      # then the copy the curriculum shipped with at this position, then whatever
+      # language the name was written in.
+      #
+      # The order is what makes a reorder safe. Position is the *fallback* now,
+      # not the identity: a shipped topic that has never been touched still reads
+      # out of the locale file, and the moment a builder moves one, the row keyed
+      # on `topics.key` is what answers — so the lesson keeps its name instead of
+      # inheriting its new neighbour's.
+      def named_topic(record, definition)
+        key = SyllabusText.topic_key(record.key)
+
+        SyllabusText.for(key).presence ||
+          definition.dig(:topics, record.position - 1).to_s.presence ||
+          SyllabusText.any(key).to_s
+      end
+
+      # The same three tries for a module's title and description, keyed on the
+      # module number, which a builder does not renumber.
+      def named_module(code, number, field, definition)
+        key = field == :title ? SyllabusText.module_title_key(code, number)
+                              : SyllabusText.module_desc_key(code, number)
+
+        SyllabusText.for(key).presence ||
+          definition[field].to_s.presence ||
+          SyllabusText.any(key).to_s
+      end
 
       def curriculum(course)
         code = course_code(course)

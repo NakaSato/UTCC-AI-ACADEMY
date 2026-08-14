@@ -3,7 +3,7 @@ require "test_helper"
 class InstructorIntegritySettingsTest < ActionDispatch::IntegrationTest
   test "an instructor can hide a lesson log for the assigned course" do
     sign_in_as users(:instructor)
-    get instructor_url
+    get instructor_url(tab: :integrity)
 
     assert_response :success
     assert_select "form[action=?]", instructor_integrity_setting_path("1-1")
@@ -12,7 +12,7 @@ class InstructorIntegritySettingsTest < ActionDispatch::IntegrationTest
     patch instructor_integrity_setting_url("1-1"),
           params: { enabled: "false", lock_version: 0 }
 
-    assert_redirected_to instructor_path
+    assert_redirected_to instructor_path(tab: :integrity)
     assert_not LessonIntegritySetting.enabled?(course: courses(:ai1101), topic_key: "1-1")
     assert_equal "lesson_integrity_setting_changed", AuditEvent.sole.action
     assert_equal :warn, AuditEvent.sole.level
@@ -41,7 +41,7 @@ class InstructorIntegritySettingsTest < ActionDispatch::IntegrationTest
     patch instructor_integrity_setting_url("AI1102-1-1"),
           params: { enabled: "false", lock_version: 0 }
 
-    assert_redirected_to instructor_path
+    assert_redirected_to instructor_path(tab: :integrity)
     assert_equal I18n.t("flash.integrity_setting_forbidden"), flash[:alert]
     assert_empty LessonIntegritySetting.all
     assert_empty AuditEvent.all

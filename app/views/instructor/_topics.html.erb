@@ -1,0 +1,30 @@
+<%# The topics students fail first time. It used to be a 400px rail beside the
+    roster, where a Thai topic name wrapped to three lines; with the tab to
+    itself the bar gets a length worth reading against, and the name gets a line. %>
+<section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+  <div class="mb-5">
+    <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("instructor.hardest_title") %></h2>
+    <p class="text-13 text-balance text-muted-2"><%= t("instructor.hardest_sub") %></p>
+  </div>
+
+  <%# Spelled out rather than interpolated so Tailwind's scanner sees them. %>
+  <% severity = { alarm: "bg-brand", warn: "bg-brand-alert", notice: "bg-gold" } %>
+
+  <div class="flex flex-col gap-4.5">
+    <% @report.hard_topics.each do |topic| %>
+      <%# Narrow: name and share on one line, bar spanning underneath. Wide: the
+          three sit in a row, which is the design's arrangement given the width. %>
+      <div class="grid grid-cols-[minmax(0,1fr)_52px] items-center gap-x-4 gap-y-2
+                  sm:grid-cols-[minmax(0,1fr)_minmax(160px,420px)_52px]">
+        <span class="text-13-5 text-ink-2"><%= topic[:name] %></span>
+        <span class="order-1 text-right text-13-5 font-semibold text-muted-2 sm:order-3">
+          <%= topic[:percent] %>%
+        </span>
+        <div class="order-2 col-span-2 h-1.75 overflow-hidden rounded-full bg-surface-2 sm:col-span-1">
+          <div class="h-full rounded-full <%= severity[topic[:severity]] %>"
+               style="width: <%= topic[:percent] %>%"></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

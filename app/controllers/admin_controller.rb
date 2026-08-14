@@ -14,7 +14,8 @@ class AdminController < ApplicationController
       # The roster prints a control per row that asks whether the account has
       # console access, and that question is a membership lookup. Preloaded, the
       # page asks once for everybody rather than once each.
-      @users = User.includes(:organization_memberships).order(:role, :name)
+      @sort = AdminConsole.sort_filter(params[:sort])
+      @users = User.includes(:organization_memberships).order(*AdminConsole::SORTS.fetch(@sort))
       @users = @users.where(role: @role) unless @role == :all
       if @query.present?
         needle = "%#{User.sanitize_sql_like(@query)}%"
@@ -48,6 +49,16 @@ class AdminController < ApplicationController
     in :proposals then @proposals = Page.new(AdminConsole.proposals, params[:page])
     else nil
     end
+  end
+
+  # The Overview tab's three downloads. A whitelist rather than a parameter that
+  # names a method, and the same admin gate as the screen that links to them.
+  def report
+    return redirect_to admin_path(tab: :overview) unless AdminOverview.report?(params[:report])
+
+    key = params[:report].to_s
+    send_data AdminOverview.report_csv(key), filename: AdminOverview::Report.new(key:).filename,
+                                             type: "text/csv; charset=utf-8", disposition: "attachment"
   end
 
   def update_course_state

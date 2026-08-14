@@ -217,6 +217,18 @@ Rails.application.routes.draw do
   patch "instructor/course", to: "instructor#update_course", as: :instructor_course
   post "instructor/course/transition", to: "instructor#request_course_transition",
        as: :instructor_course_transition
+  # And the two edits to the syllabus itself: what a lesson is called, and what
+  # order the lessons come in. Both draft-only and both their own course's, like
+  # the numbers above. Adding and removing a lesson is not here — that is a
+  # request, and it goes through the queue.
+  patch "instructor/syllabus/topic/:topic_key", to: "instructor#rename_topic",
+        as: :instructor_syllabus_topic
+  patch "instructor/syllabus/move/:topic_key", to: "instructor#move_topic",
+        as: :instructor_syllabus_move
+  # Adding one changes what exists, so it is a request rather than a write — the
+  # same queue, the same second pair of eyes, as publishing the course.
+  post "instructor/syllabus/lesson", to: "instructor#request_lesson",
+       as: :instructor_syllabus_lesson
 
   # Public surface is /academic. Keep the internal resource name and helpers
   # stable so AcademicPost records, associations, and existing callers do not
@@ -322,6 +334,9 @@ Rails.application.routes.draw do
   # ADR-0049 decision 5 and SPEC-0050.
   post "admin/proposals/:id/decision", to: "admin#decide_proposal", as: :admin_proposal_decision
   patch "admin/features/:key", to: "admin#update_feature_setting", as: :admin_feature_setting
+  # The Overview tab's downloads. A whitelist of three, each counted off the same
+  # tables the screens above them read.
+  get "admin/reports/:report", to: "admin#report", as: :admin_report
   # Closing an integrity case stamps a learner's unreviewed proctor events.
   post "admin/integrity/:user_id/close", to: "admin#close_case", as: :close_integrity_case
   # The other two case actions write a notification — to the student, and to

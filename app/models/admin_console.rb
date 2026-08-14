@@ -80,6 +80,21 @@ module AdminConsole
   ROLE_FILTERS = [ :all, *User::ROLES.map(&:to_sym) ].freeze
   LEVEL_FILTERS = %i[ all info warn ].freeze
 
+  # How the roster may be ordered. A whitelist mapping to an ORDER BY this module
+  # owns, never a column name off the query string — and applied before the page
+  # is taken, or the second page would be the second page of a different order
+  # (ADR-0050).
+  #
+  # `role` keeps its secondary sort by name, because a roster grouped by role and
+  # then by nothing is a roster you still cannot find anybody in.
+  SORTS = {
+    role: [ :role, :name ],
+    name: [ :name ],
+    joined: [ { created_at: :desc }, :name ],
+    faculty: [ { faculty: :asc }, :name ]
+  }.freeze
+  DEFAULT_SORT = :role
+
   # What an admin can create a console account as. Two of the three are roles on
   # the user; "company" is not, and never becomes one — a company account is an
   # ordinary account plus an active organization membership. See ADR-0024.
@@ -178,6 +193,10 @@ module AdminConsole
 
     def level_filter(param)
       LEVEL_FILTERS.include?(param.to_s.to_sym) ? param.to_s.to_sym : :all
+    end
+
+    def sort_filter(param)
+      SORTS.key?(param.to_s.to_sym) ? param.to_s.to_sym : DEFAULT_SORT
     end
 
     # Only the tabs with something waiting carry a badge; the rest would show a

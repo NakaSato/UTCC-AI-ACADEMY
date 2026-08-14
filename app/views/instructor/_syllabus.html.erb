@@ -1,0 +1,139 @@
+<%# The outline a teacher may shape: what each lesson is called, and what order
+    the lessons come in. Both languages on every row, because saving a form that
+    carried only one would pin that one and leave the other to be read off a
+    position — the thing SyllabusText exists to stop.
+
+    Adding and removing a lesson is not here. A lesson has completions and
+    submissions pointing at it, and taking one away is a lifecycle-shaped change:
+    it goes through the queue, like publishing. %>
+<section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
+  <div class="mb-5">
+    <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.syllabus_title") %></h2>
+    <p class="text-13 text-balance text-muted-2"><%= t("instructor.syllabus_sub") %></p>
+  </div>
+
+  <% unless @course.draft? %>
+    <p class="mb-5 rounded-field border border-hairline bg-surface-4 px-4 py-3 text-13-5 text-muted-2">
+      <%= t("instructor.syllabus_locked") %>
+    </p>
+  <% end %>
+
+  <div class="flex flex-col gap-6">
+    <% @outline.each do |mod| %>
+      <div>
+        <div class="mb-2.5 flex items-baseline gap-2.5">
+          <span class="font-mono text-12 text-muted-2"><%= t("instructor.syllabus_module", number: mod[:number]) %></span>
+          <h3 class="text-15-5 font-semibold text-ink-2"><%= mod[:title] %></h3>
+        </div>
+
+        <div class="flex flex-col divide-y divide-surface-3 rounded-[14px] border border-hairline">
+          <% mod[:topics].each_with_index do |topic, index| %>
+            <div class="flex flex-wrap items-start gap-3 px-4 py-3.5" data-topic-key="<%= topic[:key] %>">
+              <%# The order controls. Up on the first row and down on the last
+                  are absent rather than disabled — a control that cannot act is
+                  not a control. %>
+              <div class="flex flex-none flex-col gap-1 pt-0.5">
+                <% [ [ "up", index.positive? ], [ "down", index < mod[:topics].size - 1 ] ].each do |direction, shown| %>
+                  <% if shown && @course.draft? %>
+                    <%= form_with url: instructor_syllabus_move_path(topic[:key]), method: :patch, class: "contents" do %>
+                      <%= hidden_field_tag :direction, direction %>
+                      <%= submit_tag t("instructor.syllabus_move.#{direction}"),
+                            "aria-label": t("instructor.syllabus_move_label.#{direction}", lesson: topic[:names][I18n.locale.to_s]),
+                            class: "w-7 cursor-pointer rounded-[8px] border-[1.5px] border-hairline-2 bg-surface
+                                    py-0.5 text-12 text-muted transition-colors hover:border-brand-ink hover:text-brand-ink" %>
+                    <% end %>
+                  <% else %>
+                    <span class="block w-7 py-0.5 text-center text-12 text-muted-4" aria-hidden="true">·</span>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <%= form_with url: instructor_syllabus_topic_path(topic[:key]), method: :patch,
+                      class: "flex flex-wrap items-end gap-3" do %>
+                  <% I18n.available_locales.each do |locale| %>
+                    <label class="flex min-w-[180px] flex-1 flex-col gap-1.5">
+                      <span class="text-12-5 font-semibold text-muted-2">
+                        <%= t("instructor.syllabus_name", language: t("language_name", locale: locale)) %>
+                      </span>
+                      <%= text_field_tag "names[#{locale}]", topic[:names][locale.to_s], size: 24,
+                            disabled: !@course.draft?, required: true,
+                            class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink
+                                    disabled:text-muted-2" %>
+                    </label>
+                  <% end %>
+                  <% if @course.draft? %>
+                    <%= submit_tag t("instructor.syllabus_save"),
+                          class: "cursor-pointer rounded-field border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
+                                  text-13-5 font-medium text-ink-4 transition-colors hover:border-brand-ink
+                                  hover:text-brand-ink" %>
+                  <% end %>
+                <% end %>
+
+                <div class="mt-1.5 flex flex-wrap items-center gap-2 font-mono text-12 text-muted-2">
+                  <span><%= topic[:key] %></span>
+                  <span aria-hidden="true">·</span>
+                  <span><%= t("course.kind.#{topic[:kind]}") %></span>
+                  <span aria-hidden="true">·</span>
+                  <span><%= t("units.minutes", count: topic[:minutes]) %></span>
+                  <% if topic[:overridden] %>
+                    <span class="rounded-full bg-surface-2 px-2 py-0.5 font-sans text-11-5 font-semibold text-muted-2">
+                      <%= t("instructor.syllabus_renamed") %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Adding one is a request, not a write: a lesson is something that exists,
+      and an administrator decides it in the same queue that decides publishing.
+      Available whatever the course's state, because asking is reasonable in both
+      — the decision is the check, not the form. %>
+  <div class="mt-7 border-t border-surface-3 pt-6">
+    <h3 class="mb-1.5 text-15-5 font-semibold"><%= t("instructor.lesson_request_title") %></h3>
+    <p class="mb-4 text-13 text-balance text-muted-2"><%= t("instructor.lesson_request_sub") %></p>
+
+    <%= form_with url: instructor_syllabus_lesson_path, class: "grid gap-4 sm:grid-cols-2" do %>
+      <label class="flex flex-col gap-1.5">
+        <span class="text-12-5 font-semibold text-muted-2"><%= t("instructor.lesson_field.module") %></span>
+        <%= select_tag :module_number,
+              options_for_select(@outline.map { [ t("instructor.syllabus_module", number: it[:number]), it[:number] ] }),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink" %>
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="text-12-5 font-semibold text-muted-2"><%= t("instructor.lesson_field.kind") %></span>
+        <%= select_tag :topic_kind,
+              options_for_select(Topic::KINDS.map { [ t("course.kind.#{it}"), it ] }),
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink" %>
+      </label>
+
+      <% I18n.available_locales.each do |locale| %>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-12-5 font-semibold text-muted-2">
+            <%= t("instructor.syllabus_name", language: t("language_name", locale: locale)) %>
+          </span>
+          <%= text_field_tag "names[#{locale}]", nil, size: 24, required: true,
+                class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink" %>
+        </label>
+      <% end %>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="text-12-5 font-semibold text-muted-2"><%= t("instructor.lesson_field.minutes") %></span>
+        <%= number_field_tag :minutes, 15, min: 1, required: true,
+              class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink" %>
+      </label>
+
+      <div class="flex items-end sm:col-span-2">
+        <%= submit_tag t("instructor.lesson_request_submit"),
+              class: "cursor-pointer rounded-field bg-brand px-4 py-2 text-14 font-semibold text-white
+                      transition-colors hover:bg-brand-deep" %>
+      </div>
+    <% end %>
+  </div>
+</section>

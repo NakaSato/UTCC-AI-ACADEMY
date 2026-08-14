@@ -1,0 +1,40 @@
+<%# Five columns at every width, and the card scrolls sideways rather than
+    dropping the three a narrow screen has no room for. A roster read on a phone
+    is still a roster: the ID a teacher looks a student up by, and the last-seen
+    date that says who to chase, are the two the old breakpoint hid. tabindex 0
+    so the scroll is reachable without a pointer, labelled because a focusable
+    region needs a name. %>
+<section class="overflow-x-auto rounded-card border border-hairline bg-surface"
+         tabindex="0" role="group" aria-label="<%= t("instructor.roster_title") %>">
+  <div class="px-6.5 pt-5.5 pb-4">
+    <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("instructor.roster_title") %></h2>
+  </div>
+
+  <div class="grid min-w-[680px] grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] gap-2 border-y
+              border-surface-3 bg-surface-4 px-6.5 py-3 text-12 font-semibold tracking-[0.05em]
+              text-muted-2 uppercase">
+    <span><%= t("instructor.th_id") %></span>
+    <span><%= t("instructor.th_name") %></span>
+    <span class="text-right"><%= t("instructor.th_progress") %></span>
+    <span class="text-right"><%= t("instructor.th_projects") %></span>
+    <span class="text-right"><%= t("instructor.th_seen") %></span>
+  </div>
+
+  <% @report.roster.each do |student| %>
+    <div class="grid min-w-[680px] grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] items-center gap-2
+                border-b border-surface-5 px-6.5 py-3.5">
+      <span class="font-mono text-12-5 text-muted"><%= student.id %></span>
+      <span class="truncate text-14-5"><%= student.name %></span>
+      <span class="text-right text-14 font-semibold
+                   <%= class_names(
+                         "text-success" => student.on_track?,
+                         "text-brand-ink" => student.behind?,
+                         "text-ink-2" => !student.on_track? && !student.behind?
+                       ) %>">
+        <%= student.percent %>%
+      </span>
+      <span class="text-right text-14 text-muted"><%= student.projects_text %></span>
+      <span class="text-right text-13-5 text-muted-2"><%= student.seen_text %></span>
+    </div>
+  <% end %>
+</section>

@@ -22,7 +22,7 @@ class TeachingCourseAuthorityTest < ActionDispatch::IntegrationTest
       patch instructor_course_path, params: { course: { credits: 4, projects: 2, hours: 42, level: "advanced" } }
     end
 
-    assert_redirected_to instructor_path
+    assert_redirected_to instructor_path(tab: :course)
     @course.reload
     assert_equal 4, @course.credits
     assert_equal "advanced", @course.level
@@ -93,6 +93,15 @@ class TeachingCourseAuthorityTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-course-code]", count: 0
+    # Not merely closed — absent. The tab is not in the bar, and asking for it by
+    # hand opens the roster rather than a panel about somebody else's course.
+    assert_select "main nav a", text: /#{I18n.t("instructor.tabs.course")}/, count: 0
+
+    get instructor_url(tab: :course)
+
+    assert_response :success
+    assert_select "[data-course-code]", count: 0
+    assert_select "main nav a[aria-current=page]", text: /#{I18n.t("instructor.tabs.roster")}/
 
     assert_no_difference "ApprovalRequest.count" do
       post instructor_course_transition_path, params: { state: "published" }
@@ -112,7 +121,7 @@ class TeachingCourseAuthorityTest < ActionDispatch::IntegrationTest
 
   test "the screen shows the course panel to the teacher who teaches it" do
     sign_in_as @teacher
-    get instructor_url
+    get instructor_url(tab: :course)
 
     assert_response :success
     assert_select "[data-course-code=?]", @course.code

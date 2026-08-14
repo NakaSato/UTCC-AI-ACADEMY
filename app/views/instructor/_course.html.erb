@@ -5,28 +5,28 @@
     Nothing here publishes. The queue is the second pair of eyes ADR-0013 bought,
     and a teacher's request enters it exactly as an administrator's does — which
     is also why `approvable_by?` still refuses anybody their own request. %>
-<section class="mb-5 rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7"
-         data-course-code="<%= course.code %>">
+<section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7"
+         data-course-code="<%= @course.code %>">
   <div class="mb-5 flex flex-wrap items-baseline justify-between gap-3">
     <div>
       <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.course_title") %></h2>
       <p class="text-13 text-balance text-muted-2"><%= t("instructor.course_sub") %></p>
     </div>
     <span class="rounded-full bg-surface-2 px-3 py-1 text-12-5 font-semibold text-muted-2">
-      <%= t("admin.courses.state.#{course.lifecycle_state}") %>
+      <%= t("admin.courses.state.#{@course.lifecycle_state}") %>
     </span>
   </div>
 
-  <% if course.draft? %>
+  <% if @course.draft? %>
     <%= form_with url: instructor_course_path, method: :patch, scope: :course,
           class: "grid gap-4 sm:grid-cols-2" do |form| %>
       <label class="flex flex-col gap-1.5">
         <span class="text-12-5 font-semibold text-muted-2"><%= t("instructor.course_fields.level") %></span>
-        <%= form.select :level, Course::LEVELS.map { [ t("levels.#{it}"), it ] }, { selected: course.level },
+        <%= form.select :level, Course::LEVELS.map { [ t("levels.#{it}"), it ] }, { selected: @course.level },
               class: "rounded-field border-[1.5px] border-hairline-2 bg-surface px-3 py-2 text-14 text-ink" %>
       </label>
 
-      <% { credits: course.credits, projects: course.projects, hours: course.hours }.each do |field, value| %>
+      <% { credits: @course.credits, projects: @course.projects, hours: @course.hours }.each do |field, value| %>
         <label class="flex flex-col gap-1.5">
           <span class="text-12-5 font-semibold text-muted-2"><%= t("instructor.course_fields.#{field}") %></span>
           <%= form.number_field field, value: value, min: 1, required: true,
@@ -35,12 +35,12 @@
       <% end %>
 
       <label class="flex items-center gap-2.5 text-14">
-        <%= form.check_box :core, checked: course.core %>
+        <%= form.check_box :core, checked: @course.core %>
         <%= t("instructor.course_fields.core") %>
       </label>
 
       <label class="flex items-center gap-2.5 text-14">
-        <%= form.check_box :certificate, checked: course.certificate %>
+        <%= form.check_box :certificate, checked: @course.certificate %>
         <%= t("instructor.course_fields.certificate") %>
       </label>
 
@@ -59,7 +59,7 @@
   <div class="mt-6 border-t border-surface-3 pt-5">
     <p class="mb-3 text-13-5 text-muted-2"><%= t("instructor.course_transition_sub") %></p>
     <div class="flex flex-wrap gap-2.5">
-      <% course.available_transitions.each do |state| %>
+      <% @course.available_transitions.each do |state| %>
         <%= form_with url: instructor_course_transition_path, class: "inline" do %>
           <%= hidden_field_tag :state, state %>
           <%= submit_tag t("admin.courses.transition.#{state}"),

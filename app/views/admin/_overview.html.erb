@@ -14,4 +14,123 @@
     </div>
   <% end %>
 </div>
-<p class="text-13 text-muted-2"><%= t("admin.overview.live_note") %></p>
+<p class="mb-5 text-13 text-muted-2"><%= t("admin.overview.live_note") %></p>
+
+<%# The design's split: the wide column is what the institution is doing, the
+    rail is whether the machine under it is working. %>
+<div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+  <div class="flex flex-col gap-5">
+    <%# Adoption. "Active" is the union of the four things the app timestamps —
+        see AdminOverview.active_user_ids for why sessions alone would lie. %>
+    <section class="rounded-card border border-hairline bg-surface px-6 py-6 sm:px-6.5">
+      <h2 class="mb-1 text-19 font-bold tracking-[-0.02em]"><%= t("admin.overview.adoption_title") %></h2>
+      <p class="mb-5 text-12-5 text-muted-2"><%= t("admin.overview.adoption_sub") %></p>
+
+      <% bar = { good: "bg-success", warn: "bg-gold", low: "bg-brand" } %>
+      <div class="flex flex-col gap-4">
+        <% AdminOverview.adoption.each do |unit| %>
+          <div>
+            <div class="mb-1.75 flex justify-between gap-3">
+              <span class="text-14 font-medium"><%= unit.name %></span>
+              <span class="text-12-5 text-muted-2"><%= unit.meta %></span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-surface-2">
+              <div class="h-full rounded-full <%= bar[unit.severity] %>" style="width: <%= unit.pct %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <h2 class="px-6.5 pt-5.5 pb-3.5 text-19 font-bold tracking-[-0.02em]">
+        <%= t("admin.overview.activity_title") %>
+      </h2>
+      <% events = AdminOverview.activity %>
+      <% if events.empty? %>
+        <p class="border-t border-surface-5 px-6.5 py-6 text-14 text-muted-2">
+          <%= t("admin.overview.activity_empty") %>
+        </p>
+      <% end %>
+      <% events.each do |event| %>
+        <div class="flex items-center gap-3.5 border-t border-surface-5 px-6.5 py-3.5">
+          <span aria-hidden="true"
+                class="grid size-8 flex-none place-items-center rounded-[10px] text-11-5 font-semibold
+                       <%= event.level == :warn ? "bg-gold-tint text-gold-ink" : "bg-surface-2 text-muted-2" %>">
+            <%= AdminOverview.initials(event.user.name) %>
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="mb-0.5 text-14 font-medium"><%= event.text %></div>
+            <div class="text-12 text-muted-2"><%= event.user.name %></div>
+          </div>
+          <span class="flex-none font-mono text-12 text-muted-3">
+            <%= event.created_at.in_time_zone.strftime("%d/%m %H:%M") %>
+          </span>
+        </div>
+      <% end %>
+    </section>
+
+    <%# A finding, not a verdict, and deliberately without a merge button — see
+        AdminOverview for what merging two accounts would actually have to move. %>
+    <section class="rounded-card border border-hairline bg-surface px-6 py-6 sm:px-6.5">
+      <h2 class="mb-1 text-19 font-bold tracking-[-0.02em]"><%= t("admin.overview.duplicates_title") %></h2>
+      <p class="mb-4.5 text-12-5 text-balance text-muted-2"><%= t("admin.overview.duplicates_sub") %></p>
+
+      <%# A count and a way to the roster — never a name or an ID. See
+          AdminOverview.duplicates and SPEC-0012 invariant 5. %>
+      <% collisions = AdminOverview.duplicates %>
+      <% if collisions.any? %>
+        <div class="flex flex-wrap items-center gap-3 rounded-[12px] border border-surface-3 px-3.5 py-3">
+          <div class="min-w-0 flex-1 text-14">
+            <%= t("admin.overview.duplicates_count", names: collisions.names, accounts: collisions.accounts) %>
+          </div>
+          <%= link_to t("admin.overview.duplicates_open"), admin_path(tab: :users, sort: :name),
+                class: "flex-none rounded-[9px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
+                        text-12-5 text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
+        </div>
+      <% else %>
+        <p class="text-14 text-muted-2"><%= t("admin.overview.duplicates_empty") %></p>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <div class="px-6 pt-5.5 pb-3.5">
+        <h2 class="mb-0.75 text-17 font-bold tracking-[-0.02em]"><%= t("admin.overview.health.title") %></h2>
+        <p class="text-12 text-muted-2"><%= t("admin.overview.health.sub") %></p>
+      </div>
+      <% dot = { ok: "bg-success", warn: "bg-gold", down: "bg-brand", unknown: "bg-muted-4" } %>
+      <% AdminOverview.health.each do |check| %>
+        <div class="flex items-center gap-3 border-t border-surface-5 px-6 py-3.25">
+          <span aria-hidden="true" class="size-2 flex-none rounded-full <%= dot[check.state] %>"></span>
+          <div class="min-w-0 flex-1">
+            <div class="text-13-5 font-medium"><%= check.label %></div>
+            <% if check.note.present? %>
+              <div class="font-mono text-12 text-muted-2"><%= check.note %></div>
+            <% end %>
+          </div>
+          <span class="flex-none text-11-5 font-semibold text-muted-2"><%= check.state_name %></span>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="overflow-hidden rounded-card border border-hairline bg-surface">
+      <h2 class="px-6 pt-5.5 pb-3.5 text-17 font-bold tracking-[-0.02em]"><%= t("admin.overview.reports_title") %></h2>
+      <% AdminOverview.reports.each do |report| %>
+        <div class="flex items-center gap-3 border-t border-surface-5 px-6 py-3.25">
+          <div class="min-w-0 flex-1">
+            <div class="text-13-5 font-medium"><%= report.label %></div>
+            <div class="font-mono text-11-5 text-muted-3"><%= report.filename %></div>
+          </div>
+          <%# data-turbo false for the reason the grades export gives: Turbo
+              intercepting a file response swaps the body with CSV. %>
+          <%= link_to t("admin.overview.report_download"), admin_report_path(report.key),
+                data: { turbo: false },
+                class: "flex-none rounded-[9px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
+                        text-12-5 text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</div>

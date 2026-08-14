@@ -20,7 +20,7 @@
             </div>
             <div class="mb-1 text-16 font-semibold tracking-[-0.01em]"><%= request.title %></div>
             <div class="text-13-5 text-muted">
-              <%= t("admin.queue.request_meta", role: request.requester_role, from: t("admin.courses.state.#{request.from_state}"), to: t("admin.courses.state.#{request.to_state}")) %>
+              <%= request.meta_text %>
             </div>
             <% if request.note.present? %>
               <p class="mt-2 text-13 text-muted-2"><%= request.note %></p>

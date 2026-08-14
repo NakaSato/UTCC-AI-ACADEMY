@@ -12,6 +12,15 @@ class InstructorController < ApplicationController
     # (ADR-0054). An administrator holding the staff role teaches nothing, and
     # sees no course panel here.
     @course = teachable_course
+
+    # The bar, and which of its panels is open. Nothing to teach means no bar:
+    # the empty state below is the whole screen.
+    return unless @section
+
+    @tabs = TeachingConsole.tabs_for(course: @course)
+    @tab = TeachingConsole.tab_for(params[:tab], course: @course)
+    @badges = TeachingConsole.badges(report: @report, integrity_settings: @integrity_settings)
+    @outline = SyllabusBuilder.new(@course).outline if @tab == :syllabus
   end
 
   def update_integrity_setting
@@ -19,13 +28,13 @@ class InstructorController < ApplicationController
     topic_key = params[:topic_key].to_s
 
     unless section && Syllabus.topic_keys(section.course.code).include?(topic_key)
-      redirect_to instructor_path, alert: t("flash.integrity_setting_forbidden")
+      redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_forbidden")
       return
     end
 
     enabled = LessonIntegritySetting.parse_boolean(params[:enabled])
     unless !enabled.nil?
-      redirect_to instructor_path, alert: t("flash.integrity_setting_invalid")
+      redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_invalid")
       return
     end
 
@@ -37,12 +46,12 @@ class InstructorController < ApplicationController
                         from_state: previous ? "on" : "off", to_state: enabled ? "on" : "off")
     end
 
-    redirect_to instructor_path,
+    redirect_to instructor_path(tab: :integrity),
                 notice: t("flash.lesson_integrity_setting_changed", course: section.course.code, lesson: topic_key)
   rescue ActiveRecord::StaleObjectError
-    redirect_to instructor_path, alert: t("flash.integrity_setting_stale")
+    redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_stale")
   rescue ActiveRecord::RecordInvalid
-    redirect_to instructor_path, alert: t("flash.integrity_setting_invalid")
+    redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_invalid")
   end
 
 # A teacher's course, and the two things they may do to it (ADR-0054).
@@ -56,16 +65,16 @@ def update_course
   return redirect_to instructor_path, alert: t("flash.course_not_yours") unless course
   # Not while it is published. A credit count changing under enrolled students
   # is a lifecycle-shaped change, and it goes through the queue like the rest.
-  return redirect_to instructor_path, alert: t("flash.course_not_editable") unless course.draft?
+  return redirect_to instructor_path(tab: :course), alert: t("flash.course_not_editable") unless course.draft?
 
   Course.transaction do
     course.update!(course_params)
     AuditEvent.record("course_updated", course: course.code)
   end
 
-  redirect_to instructor_path, notice: t("flash.course_updated", course: course.code)
+  redirect_to instructor_path(tab: :course), notice: t("flash.course_updated", course: course.code)
 rescue ActiveRecord::RecordInvalid => invalid
-  redirect_to instructor_path, alert: invalid.record.errors.full_messages.to_sentence
+  redirect_to instructor_path(tab: :course), alert: invalid.record.errors.full_messages.to_sentence
 end
 
 # A request, never a transition. The administrator who decides it is the second
@@ -79,9 +88,72 @@ def request_course_transition
                                            from_state: course.lifecycle_state,
                                            to_state: params[:state], note: params[:note])
 
-  redirect_to instructor_path, notice: t("flash.approval_requested", course: course.code)
+  redirect_to instructor_path(tab: :course), notice: t("flash.approval_requested", course: course.code)
 rescue ActiveRecord::RecordInvalid => invalid
-  redirect_to instructor_path, alert: invalid.record.errors.full_messages.to_sentence
+  redirect_to instructor_path(tab: :course), alert: invalid.record.errors.full_messages.to_sentence
+end
+
+# The syllabus a teacher may shape, and the two shapes they may give it.
+#
+# Same gate as the course numbers above: their own course, and only while it is a
+# draft. A published course's lessons change through the queue like everything
+# else a learner can already see.
+#
+# Neither writes an audit event, for the reason AuditEvent gives for leaving the
+# landing page's card reorder out of ACTIONS: these change neither what exists nor
+# who can do what, and they are the noisiest controls a teacher has. Six clicks of
+# ↑ would be six rows, and a log full of them buries the role grants. Adding and
+# removing a lesson *does* change what exists — which is the other half of why
+# that goes through the queue, where every decision is recorded.
+def rename_topic
+  with_draft_course do |course|
+    names = params.fetch(:names, {}).permit(*I18n.available_locales.map(&:to_s)).to_h
+    unless SyllabusBuilder.new(course).rename!(params[:topic_key], names)
+      return redirect_to instructor_path(tab: :syllabus), alert: t("flash.topic_not_yours")
+    end
+
+    redirect_to instructor_path(tab: :syllabus), notice: t("flash.topic_renamed")
+  end
+rescue ActiveRecord::RecordInvalid
+  redirect_to instructor_path(tab: :syllabus), alert: t("flash.topic_name_blank")
+end
+
+def move_topic
+  with_draft_course do |course|
+    unless SyllabusBuilder.new(course).move!(params[:topic_key], params[:direction])
+      return redirect_to instructor_path(tab: :syllabus), alert: t("flash.topic_not_moved")
+    end
+
+    redirect_to instructor_path(tab: :syllabus), notice: t("flash.topic_moved")
+  end
+# Two moves in one module at the same moment both step out of the way through
+# `SyllabusBuilder::PARKED`, and the unique index on (course_module_id, position)
+# refuses the second. The transaction has already rolled it back, so the syllabus
+# is intact and the honest answer is that this move did not happen.
+rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+  redirect_to instructor_path(tab: :syllabus), alert: t("flash.topic_not_moved")
+end
+
+# A request, never a write. Adding a lesson changes what exists, so it goes to
+# the queue exactly as publishing does — and `approvable_by?` still refuses
+# anybody their own request, which is the whole reason the queue is there.
+#
+# Not gated on `draft?`: asking for a lesson in a published course is a
+# reasonable thing to ask, and the administrator deciding it is the check.
+def request_lesson
+  course = teachable_course
+  return redirect_to instructor_path, alert: t("flash.course_not_yours") unless course
+
+  ApprovalRequest.create_lesson_addition!(
+    course:, requester: Current.user, module_number: params[:module_number],
+    topic_kind: params[:topic_kind], minutes: params[:minutes],
+    names: params.fetch(:names, {}).permit(*I18n.available_locales.map(&:to_s)).to_h,
+    note: params[:note]
+  )
+
+  redirect_to instructor_path(tab: :syllabus), notice: t("flash.lesson_requested", course: course.code)
+rescue ActiveRecord::RecordInvalid
+  redirect_to instructor_path(tab: :syllabus), alert: t("flash.lesson_request_invalid")
 end
 
   # The export the screen's button points at. Same gate as the screen; staff
@@ -97,6 +169,20 @@ end
   end
 
   private
+    # The gate both syllabus writes share: their course, and a draft. Spelled
+    # once rather than at the head of each action, because the two answers a
+    # teacher can get here — not yours, not while published — are the two
+    # `update_course` already gives for the same reasons.
+    def with_draft_course
+      course = teachable_course
+      return redirect_to instructor_path, alert: t("flash.course_not_yours") unless course
+      unless course.draft?
+        return redirect_to instructor_path(tab: :syllabus), alert: t("flash.course_not_editable")
+      end
+
+      yield course
+    end
+
     # The course this staff account teaches, or nothing. `Section.for_staff` is
     # the same lookup the screen itself runs, and the instructor check is what
     # makes it this teacher's rather than any staff member's.

@@ -5,7 +5,7 @@ title: Live admin Overview metrics
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@privacy-owner"]
 created: 2026-08-03
-updated: 2026-08-12
+updated: 2026-08-14
 review_by: 2026-08-26
 supersedes: []
 superseded_by: []
@@ -13,12 +13,14 @@ depends_on: [ADR-0012, SPEC-0008]
 implemented_by: [M7-001]
 touches:
   - app/models/admin_console.rb
+  - app/models/admin_overview.rb
   - app/views/admin/_overview.html.erb
   - config/locales/en.yml
   - config/locales/th.yml
   - test/controllers/admin_test.rb
 enforced_by:
   - test/controllers/admin_test.rb
+  - test/controllers/admin_overview_test.rb
   - test/system/admin_overview_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-SPEC-003, SKILL-ARCH-002, SKILL-TEST-001, SKILL-HUM-001]
@@ -70,6 +72,21 @@ The first slice displays these current-record counts:
 
 The adoption, activity, and health panels are removed until their authoritative
 sources, time semantics, and privacy boundaries are approved.
+
+> **Approved 2026-08-14.** The hold above is lifted. The adoption, activity and
+> health panels ship, together with a name-collision count and three CSV reports,
+> on the definitions recorded in the handoff table below — every one of them
+> counted off records the app already keeps. The user approved all seven review
+> points as proposed.
+>
+> Two things were settled before the review rather than by it. **Invariant 5**:
+> the collision panel was first written listing names beside student IDs, and was
+> rewritten to report counts alone — a list of learners and their identifiers is
+> exactly what this boundary may not return. And the design's health caption,
+> *"checked automatically every 5 minutes"*, was refused: nothing runs that
+> schedule, so the panel says "checked when this page is opened". A status panel
+> claiming a freshness it does not have is worse than one admitting it is a spot
+> check.
 
 ### Excluded
 
@@ -133,15 +150,19 @@ Implementation is held until the Product Owner, Tech Lead, and Privacy Owner
 complete this table. The agent may prepare the query and test structure after
 the choices are recorded, but cannot define operational meaning by inference.
 
-| Review point | Decision required |
-| --- | --- |
-| Core cards | Name each metric and approve source tables, filters, and formula. |
-| Active/adoption meaning | Choose the event, rolling window, timezone, denominator, and zero/empty behavior. |
-| Breakdown dimensions | Approve a persisted faculty/organization source or defer the breakdown. |
-| Activity feed | Choose authoritative event types, retention, display fields, and privacy limits, or remove it. |
-| Health panel | Name telemetry sources and freshness/SLO semantics, or remove it. |
-| Refresh and failure state | Choose cache freshness, stale labeling, and query-failure behavior. |
-| Localization/accessibility | Approve Thai/English copy, number formatting, labels, and accessible empty states. |
+**Completed 2026-08-14.** Every row below was approved as proposed. The column is
+kept headed *Decision* and the wording is the implementation's own, so the table
+stays checkable against the code rather than becoming a summary of it.
+
+| Review point | Decision required | Decision (approved 2026-08-14) |
+| --- | --- | --- |
+| Core cards | Name each metric and approve source tables, filters, and formula. | Unchanged — the four counts approved in the baseline slice. |
+| Active/adoption meaning | Choose the event, rolling window, timezone, denominator, and zero/empty behavior. | Active = a `sessions` row created, a `topic_completions.learned_at`, a `submissions.created_at`, or an `audit_events.created_at` within a rolling 7 days. Denominator: every account with that faculty. A faculty with no active account renders 0%, not blank. Sessions alone would understate badly — `Session` is never touched after creation (`Session::MAX_AGE`), so a daily user who signed in a fortnight ago has one fortnight-old row. |
+| Breakdown dimensions | Approve a persisted faculty/organization source or defer the breakdown. | `users.faculty`, a persisted column. Nothing is inferred from localized course copy. Null renders as "No faculty recorded" and is counted, so the rows still sum to `User.count`. |
+| Activity feed | Choose authoritative event types, retention, display fields, and privacy limits, or remove it. | `AuditEvent` only — its `ACTIONS` allow-list is the event policy this row asks for. Newest 6. Display fields: the localized action sentence, the actor's name, and the timestamp. **The actor is staff-facing by construction** (audited actions are console and teaching actions), but this is the row most in need of a privacy answer. |
+| Health panel | Name telemetry sources and freshness/SLO semantics, or remove it. | Live probes, not telemetry, and no SLO is claimed: `SELECT 1`; a Solid Queue heartbeat within 5 minutes; a cache `fetch` round-trip; storage root writability. The design's caption "checked automatically every 5 minutes" was **not** used — nothing runs that schedule, so the caption reads "checked when this page is opened". |
+| Refresh and failure state | Choose cache freshness, stale labeling, and query-failure behavior. | No cache, so nothing can be stale. Every check runs through one rescue and reports `down` with the error class; a status panel that 500s is the one failure mode a status panel may not have. |
+| Localization/accessibility | Approve Thai/English copy, number formatting, labels, and accessible empty states. | Both locales carry every label, each panel has its own empty state, and the status dots are `aria-hidden` with the state also written as text. |
 
 ## Rollback and observability
 

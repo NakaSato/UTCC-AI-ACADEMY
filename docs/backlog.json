@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-13T09:15:00+07:00",
+  "updated_at": "2026-08-14T10:30:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -5463,6 +5463,14 @@
       "to": "complete",
       "summary": "The teaching dashboard was one screen and three routes - a roster, a grades CSV, a proctoring switch - and every course control lived behind allow_only :admin. The user asked for a teacher who can create, update, enable, disable and approve certificates, then asked for recommendations on the four questions that scope it, and took all four. Two of the four are refusals with their blockers named. A course-s words are catalog.courses.code in two locale files and the table carries identity, taxonomy and numbers only, so a course created through a form would render translation missing on every screen naming it; moving that copy into the database is its own decision with LandingText as the precedent. And ADR-0011 deferred certificate issuance - no artifact, no rule, no identity, no route - so an approval button would approve nothing while looking like it certified somebody. What shipped is the other two. A teacher edits the numbers of the course their section teaches while it is unpublished: level, credits, projects, hours, core, certificate. Not the code, which every locale key and completion row is joined by; not the lifecycle state, which belongs to the queue; not learners or rating, which are measured rather than set - and a form made to post them changes none of them. Enable and disable are the existing lifecycle rather than a second switch that would answer can a learner see this twice. A transition is requested, never made: ApprovalRequest widened by exactly one rule, that a requester may be an approver or the course-s teacher, and approvable_by? is untouched, so a teacher cannot decide their own request and neither can the administrator who raised one. That refusal is what ADR-0013 bought and it was checked by removing the new rule, which fails the test. An administrator holds the staff role, teaches nothing, and is offered no course panel; their authority stays the console.",
       "evidence_url": "specs/spec-teaching-course-authority.html"
+    },
+    {
+      "at": "2026-08-14T10:30:00+07:00",
+      "item_id": "M7-001",
+      "from": "complete",
+      "to": "complete",
+      "summary": "Approved the SPEC-0012 metric and privacy handoff table as proposed, lifting the hold on the adoption, activity and health panels; they ship with a name-collision count and three CSV reports. The collision panel reports counts alone — a list of names beside student IDs is what invariant 5 forbids on this boundary — and the health caption says \"checked when this page is opened\" rather than the design's \"every 5 minutes\", which nothing schedules.",
+      "evidence_url": "specs/spec-m7-live-admin-overview-metrics.html"
     }
   ]
 }

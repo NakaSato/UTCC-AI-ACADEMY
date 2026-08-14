@@ -16,6 +16,11 @@ class Current < ActiveSupport::CurrentAttributes
   attribute :syllabus
   attribute :syllabi
 
+  # And the syllabus's own copy overrides, held the same way — a course page names
+  # every topic in the syllabus and the builder names them twice. See
+  # SyllabusText.overrides.
+  attribute :syllabus_texts
+
   # The landing page's copy overrides, held the same way and for the same
   # reasons — one query for a page that reads a hundred strings, and a cache that
   # cannot outlive the database it was read from. See LandingText.overrides.

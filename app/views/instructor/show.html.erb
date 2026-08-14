@@ -1,4 +1,8 @@
-<% content_for :title, "#{t("instructor.title")} — UTCC AI Academy" %>
+<%# The Teaching console. The cohort figures and the export stay above the bar,
+    because they answer "how is the section doing?" whichever panel is open; the
+    four panels below are what a teacher came to do, one at a time. %>
+<% content_for :title,
+     "#{@section ? t("instructor.title", course: @section.course.code) : t("instructor.no_section.title")} — UTCC AI Academy" %>
 
 <main id="main" class="mx-auto max-w-page px-4 pt-11 pb-20 sm:px-8">
   <%# Staff with nothing to teach, and no section to fall back on. Every figure
@@ -24,9 +28,12 @@
                     transition-colors hover:bg-brand-deep" %>
     </div>
 
-    <div class="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <% @report.stats.each do |stat| %>
-        <div class="rounded-[16px] border border-hairline bg-surface px-6 py-5.5">
+    <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <%# Same card, same entrance as the console's overview tiles: the design
+          gives these an upward rise, staggered so the row reads left to right. %>
+      <% @report.stats.each_with_index do |stat, index| %>
+        <div class="animate-rise rounded-box border border-hairline bg-surface px-6 py-5.5"
+             style="animation-delay: <%= index * 45 %>ms">
           <div class="mb-2 text-12-5 font-medium text-muted-2"><%= stat[:label] %></div>
           <div class="text-30 leading-none font-bold tracking-[-0.03em]"><%= stat[:value] %></div>
           <div class="mt-1.75 text-12-5 text-muted-2"><%= stat[:note] %></div>
@@ -34,93 +41,30 @@
       <% end %>
     </div>
 
-    <%= render "course", course: @course if @course %>
-
-    <section class="mb-5 rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
-      <div class="mb-5">
-        <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.integrity_settings_title") %></h2>
-        <p class="text-13 text-balance text-muted-2"><%= t("instructor.integrity_settings_sub") %></p>
-      </div>
-
-      <div class="flex flex-col divide-y divide-surface-3">
-        <% @integrity_settings.each do |setting| %>
-          <div class="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
-            <div class="min-w-0 flex-1">
-              <div class="text-14-5 font-semibold"><%= Syllabus.topic_name(setting.topic_key, @section.course.code) %></div>
-              <div class="mt-0.5 font-mono text-12 text-muted-2"><%= setting.topic_key %> ·
-                <%= t("instructor.integrity_state.#{setting.enabled ? :enabled : :disabled}") %>
-              </div>
-            </div>
-            <%= form_with url: instructor_integrity_setting_path(setting.topic_key), method: :patch,
-                  class: "flex-none" do %>
-              <%= hidden_field_tag :enabled, (!setting.enabled).to_s %>
-              <%= hidden_field_tag :lock_version, setting.lock_version %>
-              <%= submit_tag t("instructor.integrity_actions.#{setting.enabled ? :disable : :enable}"),
-                    class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
-                            text-13-5 text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    </section>
-
-    <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[400px_minmax(0,1fr)]">
-      <section class="rounded-card border border-hairline bg-surface px-6 py-6.5 sm:px-7">
-        <h2 class="mb-1.5 text-19 font-bold tracking-[-0.02em]"><%= t("instructor.hardest_title") %></h2>
-        <p class="mb-5 text-13 text-muted-2"><%= t("instructor.hardest_sub") %></p>
-
-        <%# Spelled out rather than interpolated so Tailwind's scanner sees them. %>
-        <% severity = { alarm: "bg-brand", warn: "bg-brand-alert", notice: "bg-gold" } %>
-
-        <div class="flex flex-col gap-3.75">
-          <% @report.hard_topics.each do |topic| %>
-            <div>
-              <div class="mb-1.5 flex justify-between gap-3 text-13-5">
-                <span class="text-ink-2"><%= topic[:name] %></span>
-                <span class="font-semibold text-muted-2"><%= topic[:percent] %>%</span>
-              </div>
-              <div class="h-1.75 overflow-hidden rounded-full bg-surface-2">
-                <div class="h-full rounded-full <%= severity[topic[:severity]] %>"
-                     style="width: <%= topic[:percent] %>%"></div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </section>
-
-      <section class="overflow-hidden rounded-card border border-hairline bg-surface">
-        <div class="px-6 pt-5.5 pb-4">
-          <h2 class="text-19 font-bold tracking-[-0.02em]"><%= t("instructor.roster_title") %></h2>
-        </div>
-
-        <div class="grid grid-cols-[minmax(0,1fr)_80px] gap-2 border-y border-surface-3 bg-surface-4 px-4 py-3 text-12
-                    font-semibold tracking-[0.05em] text-muted-2 uppercase
-                    sm:grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] sm:px-6">
-          <span class="hidden sm:block"><%= t("instructor.th_id") %></span>
-          <span><%= t("instructor.th_name") %></span>
-          <span class="text-right"><%= t("instructor.th_progress") %></span>
-          <span class="hidden text-right sm:block"><%= t("instructor.th_projects") %></span>
-          <span class="hidden text-right sm:block"><%= t("instructor.th_seen") %></span>
-        </div>
-
-        <% @report.roster.each do |student| %>
-          <div class="grid grid-cols-[minmax(0,1fr)_80px] items-center gap-2 border-b border-surface-5 px-4 py-3.5
-                      sm:grid-cols-[116px_minmax(0,1fr)_100px_96px_130px] sm:px-6">
-            <span class="hidden font-mono text-12-5 text-muted sm:block"><%= student.id %></span>
-            <span class="truncate text-14-5"><%= student.name %></span>
-            <span class="text-right text-14 font-semibold
-                         <%= class_names(
-                               "text-success" => student.on_track?,
-                               "text-brand-ink" => student.behind?,
-                               "text-ink-2" => !student.on_track? && !student.behind?
-                             ) %>">
-              <%= student.percent %>%
+    <%# Tabs are links, like every other tabbed screen — the URL is the state. %>
+    <nav class="mb-6.5 flex gap-0.5 overflow-x-auto border-b border-hairline"
+         aria-label="<%= t("instructor.title", course: @section.course.code) %>">
+      <% @tabs.each do |tab| %>
+        <% current = tab == @tab %>
+        <% badge = @badges[tab] %>
+        <%= link_to instructor_path(tab: (tab unless tab == TeachingConsole::DEFAULT_TAB)),
+              "aria-current": ("page" if current),
+              class: class_names(
+                "-mb-px flex flex-none items-center gap-2 border-b-2 px-3.5 py-3 text-14 transition-colors",
+                "border-brand-ink font-semibold text-ink" => current,
+                "border-transparent text-muted hover:text-ink" => !current
+              ) do %>
+          <span><%= t("instructor.tabs.#{tab}") %></span>
+          <% if badge&.positive? %>
+            <span class="rounded-full px-1.75 py-0.5 text-11-5 font-semibold
+                         <%= current ? "bg-brand text-white" : "bg-surface-2 text-muted-2" %>">
+              <%= badge %>
             </span>
-            <span class="hidden text-right text-14 text-muted sm:block"><%= student.projects_text %></span>
-            <span class="hidden text-right text-13-5 text-muted-2 sm:block"><%= student.seen_text %></span>
-          </div>
+          <% end %>
         <% end %>
-      </section>
-    </div>
+      <% end %>
+    </nav>
+
+    <%= render "instructor/#{@tab}" %>
   <% end %>
 </main>

@@ -65,6 +65,13 @@ en:
     course_updated: "%{course} updated"
     course_not_yours: "That course is not one you teach"
     course_not_editable: "A published course changes through the approval queue, not here"
+    topic_renamed: "Lesson renamed"
+    topic_moved: "Lesson moved"
+    topic_not_yours: "That lesson is not in a course you teach"
+    topic_not_moved: "That lesson is already at the end of its module"
+    topic_name_blank: "A lesson needs a name in both languages"
+    lesson_requested: "Lesson requested for %{course} — an administrator decides it"
+    lesson_request_invalid: "That lesson needs a module, a kind, a duration, and a name in both languages"
     approval_requested: "The %{course} lifecycle change is waiting for review"
     approval_decided: "The approval decision was recorded"
     proposal_decided: "%{reference} was answered, and its author can read the reason"
@@ -1432,6 +1439,32 @@ en:
       certificate: "Offers a certificate"
     title: "Instructor view · %{course}"
     subtitle: "Section %{section} · %{count} students · semester %{term}"
+    tabs:
+      roster: "Roster"
+      topics: "Topics"
+      course: "Course"
+      syllabus: "Syllabus"
+      integrity: "Integrity"
+    syllabus_title: "Your syllabus"
+    syllabus_sub: "What each lesson is called, and what order the lessons come in. Adding or removing a lesson goes through the approval queue — a lesson has student work pointing at it."
+    syllabus_locked: "This course is published, so its syllabus changes through the approval queue rather than here."
+    syllabus_module: "Module %{number}"
+    syllabus_name: "Name (%{language})"
+    syllabus_save: "Save name"
+    syllabus_renamed: "renamed"
+    lesson_request_title: "Ask for a new lesson"
+    lesson_request_sub: "A lesson is something that exists, so adding one is a request. An administrator decides it in the same queue that decides publishing, and nobody decides their own."
+    lesson_request_submit: "Send request"
+    lesson_field:
+      module: "Module"
+      kind: "Kind"
+      minutes: "Minutes"
+    syllabus_move:
+      up: "↑"
+      down: "↓"
+    syllabus_move_label:
+      up: "Move %{lesson} up"
+      down: "Move %{lesson} down"
     export_csv: "Export grades (CSV)"
     hardest_title: "Topics students struggle with"
     on_time_note: "%{done} of %{total} submitted"
@@ -1551,6 +1584,7 @@ en:
     course_state_changed: "Changed %{course} from %{from} to %{to}"
     course_updated: "Updated %{course}"
     approval_decided: "%{outcome} the %{course} lifecycle request from %{from} to %{to}"
+    lesson_addition_decided: "%{outcome} a new %{course} lesson, %{lesson}"
     proposal_decided: "Answered proposal %{reference} as %{status}"
     feature_setting_changed: "Changed %{key} from %{from_state} to %{to_state}"
     section_created: "Created section %{label}"
@@ -1722,6 +1756,12 @@ en:
     users_search_ph: "Search name, ID, username, or email"
     courses_search_ph: "Search code or course name"
     filter_all: "All"
+    sort_label: "Sort"
+    sorts:
+      role: "Role"
+      name: "Name"
+      joined: "Newest"
+      faculty: "Faculty"
     features:
       impact_title: "Features live"
       impact_note: "approved settings currently on across the academy"
@@ -1757,7 +1797,43 @@ en:
               scope: "Ranking tab"
               desc: "Controls learner leaderboard visibility"
     overview:
-      live_note: "These figures are counted from current database records. Other operational views will appear when their data sources are defined."
+      live_note: "Every figure and every panel below is counted from current database records."
+      adoption_title: "Adoption by unit"
+      adoption_sub: "share of accounts active in the last 7 days"
+      adoption:
+        meta: "%{active} of %{total} active"
+        no_unit: "No faculty recorded"
+      activity_title: "Recent activity"
+      activity_empty: "Nothing recorded yet"
+      duplicates_title: "Accounts that look like the same person"
+      duplicates_sub: "Student ID, username and email are each unique, so a second account for one person shows up as a shared name and nothing else. Two students really can share a name — this is a finding, not a verdict."
+      duplicates_empty: "No two accounts share a name"
+      duplicates_count: "%{names} name(s) are shared by %{accounts} accounts"
+      duplicates_open: "Open the roster"
+      health:
+        title: "Service status"
+        sub: "Checked when this page is opened, not on a timer"
+        checks:
+          database: "Database"
+          jobs: "Background jobs"
+          cache: "Cache"
+          storage: "File storage"
+        state:
+          ok: "OK"
+          warn: "Degraded"
+          down: "Down"
+          unknown: "Unknown"
+        workers: "%{count} worker(s) alive"
+      reports_title: "Reports"
+      reports:
+        accounts: "Every account"
+        courses: "Courses, sections and enrolment"
+        audit: "The audit log"
+      report_download: "Download"
+      columns:
+        accounts: [ "ID", "Name", "Role", "Faculty", "Joined" ]
+        courses: [ "Code", "Course", "Visibility", "Sections", "Students" ]
+        audit: [ "When", "Who", "Level", "What" ]
       stats:
         - label: "Total accounts"
           note: "current database records"
@@ -1794,6 +1870,8 @@ en:
         rejected: "Rejected"
       course_transition_title: "Course lifecycle change · %{course}"
       request_meta: "%{role} · %{from} → %{to}"
+      lesson_addition_title: "New lesson · %{course} module %{module_number} · %{lesson}"
+      lesson_meta: "%{role} · %{kind} · %{minutes}"
       sla_title: "Open requests"
       sla_note: "items waiting on an administrator"
       sla:

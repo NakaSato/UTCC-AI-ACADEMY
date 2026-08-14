@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -116,12 +116,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_230000) do
     t.bigint "course_id", null: false
     t.datetime "created_at", null: false
     t.datetime "decided_at"
-    t.string "from_state", null: false
+    t.string "from_state"
     t.string "kind", null: false
     t.text "note"
+    t.json "payload", default: {}, null: false
     t.bigint "requester_id", null: false
     t.string "status", default: "pending", null: false
-    t.string "to_state", null: false
+    t.string "to_state"
     t.datetime "updated_at", null: false
     t.index ["course_id", "from_state", "to_state", "status"], name: "index_approval_requests_on_course_transition"
     t.index ["course_id"], name: "index_approval_requests_on_course_id"
@@ -1021,6 +1022,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_230000) do
     t.index ["topic_id"], name: "index_submissions_on_topic_id"
     t.index ["user_id", "topic_id", "kind"], name: "index_submissions_on_user_id_and_topic_id_and_kind"
     t.index ["user_id"], name: "index_submissions_on_user_id"
+  end
+
+  create_table "syllabus_texts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "locale", null: false
+    t.datetime "updated_at", null: false
+    t.text "value", null: false
+    t.index ["key", "locale"], name: "index_syllabus_texts_on_key_and_locale", unique: true
+    t.check_constraint "length(value) >= 1 AND length(value) <= 2000", name: "syllabus_texts_value"
   end
 
   create_table "topic_completions", force: :cascade do |t|
