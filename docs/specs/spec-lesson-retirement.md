@@ -78,6 +78,7 @@ that makes a retired lesson stop being offered.
 | Counts for a learner who already finished it | **Yes** |
 | Can still be named | **Yes** |
 | Keeps its completions, submissions, proctor events | **Yes** — untouched |
+| Appears in "topics students struggle with" | **No** — the panel asks what to fix in the syllabus as it stands |
 
 **One boundary enforces it.** Every screen reads its topic set through
 `Syllabus.topics`, `topic_keys` or `topic_count` — the catalogue's counts, the
@@ -118,6 +119,8 @@ printing 109%.
   and `topic_count`; `Syllabus.topic(key)` is nil; `topic_name(key)` is unchanged.
 - A learner who had finished it keeps a positive percentage, and that percentage
   is at most 100.
+- It leaves the Teaching console's hardest-topics panel while its submissions
+  stay in the table.
 - Opening it answers `flash.topic_missing`.
 - The decision is audited as `lesson_retirement_decided`, at `warn`, and the
   sentence contains no interpolated hash.

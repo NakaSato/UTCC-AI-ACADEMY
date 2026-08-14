@@ -130,6 +130,24 @@ class LessonRetirementTest < ActionDispatch::IntegrationTest
     assert_operator row.percent, :<=, 100, "and a numerator over its denominator is clamped, not printed"
   end
 
+  # The panel answers "what should I fix next?" about the syllabus as it stands.
+  # A lesson nobody is taught any more is not something to fix — its submissions
+  # stay, and still count for the learners who made them.
+  test "a retired lesson leaves the topics-students-struggle-with panel" do
+    section = Section.for_staff(@teacher)
+    section.students.each do
+      Submission.create!(user: it, course: @course, topic: @topic, kind: "quiz", passed: false, answer: "x")
+    end
+    Syllabus.reload!
+    assert_includes InstructorReport.new(section).hard_topics.map { it[:key] }, @topic.key
+
+    retire!
+
+    assert_not_includes InstructorReport.new(section).hard_topics.map { it[:key] }, @topic.key
+    assert_equal section.students.size, Submission.where(topic: @topic).count,
+                 "the submissions stay; only the panel stops asking about them"
+  end
+
   test "a retired lesson is still nameable, because its history still points at it" do
     name = Syllabus.topic_name(@topic.key, @course.code)
     retire!

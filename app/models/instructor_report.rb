@@ -203,11 +203,21 @@ class InstructorReport
     end
 
     # topic => the first submission each learner made against it.
+    #
+    # Retired lessons drop out (ADR-0055). Their submissions are still there and
+    # still count for the learners who made them, but this panel answers "what
+    # should I fix next?" about the syllabus as it stands — and a lesson nobody
+    # is taught any more is not something to fix. `Syllabus.topic_keys` is the
+    # one boundary that decides what is still in the syllabus, so the filter is
+    # taken from there rather than asking `topics.retired_at` a second time.
     def first_attempts
+      live = Syllabus.topic_keys(section.course.code).to_set
+
       Submission.where(user: students, course: section.course, kind: "quiz")
                 .includes(:topic)
                 .order(:created_at, :id)
                 .group_by(&:topic)
+                .select { |topic, _| live.include?(topic.key) }
                 .transform_values { it.group_by(&:user_id).values.map(&:first) }
     end
 
