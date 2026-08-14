@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -437,6 +437,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_130000) do
     t.datetime "updated_at", null: false
     t.text "value", null: false
     t.index ["key", "locale"], name: "index_landing_texts_on_key_and_locale", unique: true
+  end
+
+  create_table "lesson_ai_policies", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "stance", null: false
+    t.string "topic_key", null: false
+    t.datetime "updated_at", null: false
+    t.string "use_key", null: false
+    t.index ["course_id", "topic_key", "use_key"], name: "index_lesson_ai_policies_on_lesson_and_use", unique: true
+    t.check_constraint "stance::text = ANY (ARRAY['allowed'::character varying, 'disclose'::character varying, 'forbidden'::character varying]::text[])", name: "lesson_ai_policies_stance"
   end
 
   create_table "lesson_integrity_settings", force: :cascade do |t|
@@ -1129,6 +1141,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_130000) do
   add_foreign_key "internship_requests", "organizations"
   add_foreign_key "internship_requests", "users", column: "decided_by_id"
   add_foreign_key "internship_requests", "users", column: "student_id"
+  add_foreign_key "lesson_ai_policies", "courses"
   add_foreign_key "lesson_integrity_settings", "courses"
   add_foreign_key "notifications", "users"
   add_foreign_key "organization_invitations", "organizations"

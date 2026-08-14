@@ -21,6 +21,12 @@ class InstructorController < ApplicationController
     @tab = TeachingConsole.tab_for(params[:tab], course: @course)
     @badges = TeachingConsole.badges(report: @report, integrity_settings: @integrity_settings)
     @outline = SyllabusBuilder.new(@course).outline if @tab == :syllabus
+    # One query for the whole tab rather than one per lesson: the panel draws
+    # three stances for every topic in the syllabus.
+    if @tab == :integrity
+      @ai_policies = LessonAiPolicy.rows_for_all(course: @section.course,
+                                                 topic_keys: @integrity_settings.map(&:topic_key))
+    end
   end
 
   def update_integrity_setting
@@ -48,6 +54,37 @@ class InstructorController < ApplicationController
 
     redirect_to instructor_path(tab: :integrity),
                 notice: t("flash.lesson_integrity_setting_changed", course: section.course.code, lesson: topic_key)
+  rescue ActiveRecord::StaleObjectError
+    redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_stale")
+  rescue ActiveRecord::RecordInvalid
+    redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_invalid")
+  end
+
+  # The other half of a lesson's integrity settings: what a student may do with
+  # an AI assistant here. Audited, unlike a rename — this one changes what a
+  # learner is permitted to do, and being able to show when the rule changed is
+  # the point of writing it down.
+  def update_ai_policy
+    section = Section.for_staff(Current.user)
+    topic_key = params[:topic_key].to_s
+
+    unless section && Syllabus.topic_keys(section.course.code).include?(topic_key)
+      return redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_forbidden")
+    end
+
+    LessonAiPolicy.transaction do
+      policy = LessonAiPolicy.update!(course: section.course, topic_key:, use_key: params[:use_key].to_s,
+                                      stance: params[:stance].to_s,
+                                      expected_lock_version: params[:lock_version])
+      # `stance`, never `to_state`: AuditEvent#interpolations treats from_state
+      # and to_state as reserved and resolves them through
+      # `admin.features.state.*`, which is right for the on/off switch beside
+      # this one and nonsense for an already-localized stance.
+      AuditEvent.record("lesson_ai_policy_changed", course: section.course.code, topic: topic_key,
+                        use: policy.use_name, stance: policy.stance_name)
+    end
+
+    redirect_to instructor_path(tab: :integrity), notice: t("flash.ai_policy_changed")
   rescue ActiveRecord::StaleObjectError
     redirect_to instructor_path(tab: :integrity), alert: t("flash.integrity_setting_stale")
   rescue ActiveRecord::RecordInvalid

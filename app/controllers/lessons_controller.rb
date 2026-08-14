@@ -16,6 +16,9 @@ class LessonsController < ApplicationController
     @course_record = Course.find_by!(code: @course.code)
     @show_integrity_log = Current.user.student? && LessonIntegritySetting.enabled?(course: @course_record,
                                                                                      topic_key: @topic_key)
+    # Shown to everyone, staff included: a teacher reading their own lesson
+    # should see the rule their students are being held to.
+    @ai_policies = LessonAiPolicy.rows_for(course: @course_record, topic_key: @topic_key)
   end
 
   # Where the exercise and the coding task send what the student did. The server

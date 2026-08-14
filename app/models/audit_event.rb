@@ -23,7 +23,7 @@ class AuditEvent < ApplicationRecord
     approval_decided lesson_addition_decided lesson_retirement_decided
     proposal_decided
     feature_setting_changed
-    lesson_integrity_setting_changed
+    lesson_integrity_setting_changed lesson_ai_policy_changed
     section_created section_updated enrolled unenrolled
     recruitment_organization_created recruitment_membership_granted recruitment_membership_revoked
     recruitment_invitation_created recruitment_invitation_accepted recruitment_invitation_declined
@@ -72,7 +72,7 @@ class AuditEvent < ApplicationRecord
 
   # The ones worth noticing: a privilege change, or something that cannot be
   # undone from the screen that did it.
-  WARN = %w[ console_account_created console_password_reissued role_changed account_suspended account_restored course_state_changed approval_decided lesson_addition_decided lesson_retirement_decided proposal_decided feature_setting_changed lesson_integrity_setting_changed
+  WARN = %w[ console_account_created console_password_reissued role_changed account_suspended account_restored course_state_changed approval_decided lesson_addition_decided lesson_retirement_decided proposal_decided feature_setting_changed lesson_integrity_setting_changed lesson_ai_policy_changed
               unenrolled integrity_escalated card_removed recruitment_membership_revoked
               business_case_closed business_case_participant_revoked
               internship_requests_opened internship_request_rejected

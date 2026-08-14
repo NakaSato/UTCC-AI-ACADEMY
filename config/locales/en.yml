@@ -74,6 +74,7 @@ en:
     topic_moved: "Lesson moved"
     topic_not_yours: "That lesson is not in a course you teach"
     topic_not_moved: "That lesson is already at the end of its module"
+    ai_policy_changed: "Lesson AI rule updated"
     topic_name_blank: "A lesson needs a name in both languages"
     retirement_requested: "Retirement requested — an administrator decides it"
     retirement_request_invalid: "That lesson is not one this course still offers, or a retirement is already waiting on it"
@@ -537,6 +538,20 @@ en:
       title: "%{course} syllabus"
 
   lesson:
+    ai:
+      title: "Using AI in this lesson"
+      tag: "Academic integrity"
+      sub: "This course is about AI, so using it is not cheating by default — hiding it is. Each line below is this lesson's rule, set by your instructor. Proctoring records what happens either way; it is not what decides whether you did anything wrong."
+      uses:
+        explain: "Ask it to explain a concept"
+        draft: "Have it draft an answer for you"
+        review: "Ask it to review your own work"
+      stances:
+        allowed: "Allowed"
+        disclose: "Allowed, say so"
+        forbidden: "Not for this lesson"
+      settings_title: "AI use in this lesson"
+      settings_sub: "Three kinds of use, three stances. Unset means \"allowed, say so\" — the honest default for a lesson nobody has thought about yet."
     topics:
       topic_1_1:
         theory:
@@ -1459,6 +1474,7 @@ en:
     syllabus_name: "Name (%{language})"
     syllabus_save: "Save name"
     syllabus_renamed: "renamed"
+    ai_save: "Set"
     syllabus_retire: "Ask to retire"
     syllabus_retire_confirm: "Ask an administrator to retire this lesson? It leaves the syllabus but keeps counting for everyone who already finished it."
     lesson_request_title: "Ask for a new lesson"
@@ -1603,6 +1619,7 @@ en:
     section_updated: "Changed the instructor for %{label}"
     enrolled: "Enrolled %{name} in %{label}"
     unenrolled: "Removed %{name} from %{label}"
+    lesson_ai_policy_changed: "Set AI use \"%{use}\" to %{stance} for %{course} lesson %{topic}"
     lesson_integrity_setting_changed: "Changed the integrity log for %{course} lesson %{topic} from %{from_state} to %{to_state}"
     integrity_closed: "Closed the integrity case for %{name}"
     integrity_notified: "Notified %{name} about %{course}"

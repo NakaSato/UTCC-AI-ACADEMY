@@ -5,6 +5,7 @@
   <div class="mb-5">
     <h2 class="mb-1.5 text-19 font-bold tracking-[-0.01em]"><%= t("instructor.integrity_settings_title") %></h2>
     <p class="text-13 text-balance text-muted-2"><%= t("instructor.integrity_settings_sub") %></p>
+    <p class="mt-1.5 text-13 text-balance text-muted-2"><%= t("lesson.ai.settings_sub") %></p>
   </div>
 
   <div class="flex flex-col divide-y divide-surface-3">
@@ -24,6 +25,31 @@
                 class: "cursor-pointer rounded-[10px] border-[1.5px] border-hairline-2 bg-surface px-3.5 py-2
                         text-13-5 text-ink-4 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
         <% end %>
+
+        <%# What a student may do with an assistant here. The switch above decides
+            what the lesson *shows*; these decide what it *allows*, and neither
+            implies the other. Unset reads "allowed, say so". %>
+        <div class="flex w-full flex-wrap gap-2.5 pt-1">
+          <% @ai_policies.fetch(setting.topic_key, []).each do |policy| %>
+            <%= form_with url: instructor_ai_policy_path(setting.topic_key, policy.use_key), method: :patch,
+                  class: "flex flex-none items-center gap-2" do %>
+              <%= hidden_field_tag :lock_version, policy.lock_version %>
+              <span class="text-12-5 text-muted-2"><%= policy.use_name %></span>
+              <%# A select and a button, not a select that submits itself: script-src
+                  is `self` with a nonce and no unsafe-inline, so an inline
+                  onchange would be refused by the CSP and the control would
+                  silently do nothing. %>
+              <%= select_tag :stance,
+                    options_for_select(LessonAiPolicy::STANCES.map { [ t("lesson.ai.stances.#{it}"), it ] },
+                                       policy.stance),
+                    "aria-label": policy.use_name,
+                    class: "rounded-[9px] border-[1.5px] border-hairline-2 bg-surface px-2.5 py-1.5 text-12-5 text-ink" %>
+              <%= submit_tag t("instructor.ai_save"),
+                    class: "cursor-pointer rounded-[9px] border-[1.5px] border-hairline-2 bg-surface px-2.5 py-1.5
+                            text-12 text-muted-2 transition-colors hover:border-brand-ink hover:text-brand-ink" %>
+            <% end %>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

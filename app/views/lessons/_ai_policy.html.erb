@@ -1,0 +1,28 @@
+<%# What a student may do with an assistant in this lesson, said out loud.
+    The design places this card under the lesson body; the dots are the stance,
+    and the stance is also written next to them because a colour is not a
+    sentence and this is the one panel that must not be ambiguous. %>
+<section data-ai-skip="1"
+         class="mt-5 rounded-card border border-hairline bg-surface px-6 py-6 sm:px-6.5">
+  <div class="mb-1.5 flex flex-wrap items-baseline gap-2.5">
+    <h3 class="text-17 font-bold tracking-[-0.02em]"><%= t("lesson.ai.title") %></h3>
+    <span class="text-11 font-semibold tracking-[0.06em] text-muted-2 uppercase"><%= t("lesson.ai.tag") %></span>
+  </div>
+  <p class="mb-4 max-w-[62ch] text-13-5 leading-[1.65] text-balance text-muted"><%= t("lesson.ai.sub") %></p>
+
+  <% dot = { allowed: "bg-success", disclose: "bg-gold", forbidden: "bg-brand" } %>
+  <ul class="flex flex-col gap-2.5">
+    <% @ai_policies.each do |policy| %>
+      <li class="flex flex-wrap items-center gap-3 rounded-[12px] border-[1.5px] border-hairline-2 px-3.5 py-2.75">
+        <span aria-hidden="true" class="size-2 flex-none rounded-full <%= dot[policy.stance.to_sym] %>"></span>
+        <span class="min-w-0 flex-1 text-14 font-medium <%= "text-muted-2 line-through" if policy.forbidden? %>">
+          <%= policy.use_name %>
+        </span>
+        <span class="flex-none text-12-5 font-semibold
+                     <%= policy.forbidden? ? "text-brand-ink" : "text-muted-2" %>">
+          <%= policy.stance_name %>
+        </span>
+      </li>
+    <% end %>
+  </ul>
+</section>

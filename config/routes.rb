@@ -211,6 +211,11 @@ Rails.application.routes.draw do
   get "instructor/grades", to: "instructor#grades", as: :instructor_grades
   patch "instructor/integrity/:topic_key", to: "instructor#update_integrity_setting",
         as: :instructor_integrity_setting
+  # What a student may do with an assistant in one lesson. Beside the log switch
+  # because both are this lesson's integrity settings — one decides what is shown,
+  # the other what is allowed.
+  patch "instructor/ai/:topic_key/:use_key", to: "instructor#update_ai_policy",
+        as: :instructor_ai_policy
   # A teacher’s two writes over the course they teach (ADR-0054): its numbers,
   # while it is a draft, and a request to move its lifecycle — which an
   # administrator decides in the queue, exactly as one of their own.
