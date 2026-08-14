@@ -218,7 +218,10 @@ class InstructorReport
         percent: percent(failed, attempts.size), severity: severity_for(percent(failed, attempts.size)) }
     end
 
-    def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round
+    # Clamped: a learner keeps a completion for a lesson that has since been
+    # retired, and the denominator has lost it, so 12 of 11 is reachable.
+    # ADR-0055 keeps the numerator on purpose; 109% is just how it prints.
+    def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round.clamp(0, 100)
 
     def csv_field(value)
       text = value.to_s

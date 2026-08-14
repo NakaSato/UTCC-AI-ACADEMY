@@ -156,6 +156,21 @@ rescue ActiveRecord::RecordInvalid
   redirect_to instructor_path(tab: :syllabus), alert: t("flash.lesson_request_invalid")
 end
 
+# Retiring a lesson takes it out of the syllabus without taking it out of
+# anybody's history (ADR-0055), and like every other change to what exists, an
+# administrator decides it.
+def request_retirement
+  course = teachable_course
+  return redirect_to instructor_path, alert: t("flash.course_not_yours") unless course
+
+  ApprovalRequest.create_lesson_retirement!(course:, requester: Current.user,
+                                            topic_key: params[:topic_key], note: params[:note])
+
+  redirect_to instructor_path(tab: :syllabus), notice: t("flash.retirement_requested")
+rescue ActiveRecord::RecordInvalid
+  redirect_to instructor_path(tab: :syllabus), alert: t("flash.retirement_request_invalid")
+end
+
   # The export the screen's button points at. Same gate as the screen; staff
   # with no section have nothing to download and go back to the notice that
   # says so.

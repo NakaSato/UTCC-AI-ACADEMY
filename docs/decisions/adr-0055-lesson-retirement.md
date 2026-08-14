@@ -2,7 +2,7 @@
 id: ADR-0055
 type: adr
 title: Retire a lesson rather than delete it
-status: draft
+status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-14
 updated: 2026-08-14
@@ -10,14 +10,16 @@ review_by: 2026-08-28
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0054, ADR-0013]
-implemented_by: []
+implemented_by:
+  - SPEC-0055
 touches:
   - app/models/topic.rb
   - app/models/syllabus.rb
   - app/models/syllabus_builder.rb
   - app/models/approval_request.rb
   - db
-enforced_by: []
+enforced_by:
+  - test/controllers/lesson_retirement_test.rb
 agent_writable: true
 requires_skills: [SKILL-PROD-001, SKILL-ARCH-002, SKILL-SPEC-001]
 min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
@@ -25,12 +27,13 @@ min_reviewer_skills: [SKILL-ARCH-002, SKILL-SPEC-002]
 
 # Retire a Lesson Rather Than Delete It
 
-> **Decision state:** **Draft, and nothing is built.** SPEC-0054 gave a teacher
-> the syllabus of the course they teach — renaming and reordering directly,
-> adding through the approval queue — and stopped at removal, because removal has
-> no safe implementation and choosing one is not an inference an agent may make.
-> This records the problem, the two candidate shapes, and a recommendation. The
-> Product Owner, Tech Lead and Academic Owner decide.
+> **Decision state:** **Accepted by the user on 2026-08-14**, taking Option B as
+> drafted, including both halves of the semantic choice: a retired lesson leaves
+> every denominator and keeps counting for whoever already finished it. Built the
+> same day — see [SPEC-0055](../specs/spec-lesson-retirement.md).
+>
+> It was drafted rather than built first because removal has no safe
+> implementation and choosing one is not an inference an agent may make.
 
 > [Decision Records](README.md) ·
 > [Teaching course authority](adr-0054-teaching-course-authority.md) ·
@@ -108,9 +111,6 @@ Add `topics.retired_at`. A retired topic keeps every row that points at it and:
 
 ## Decision
 
-> **Proposed, not taken.** This section records the recommendation this draft
-> carries. It becomes the decision when the owners below accept it.
-
 **Option B**, with removal going through the approval queue exactly as addition
 does — a teacher asks, an administrator decides, and the decision is audited.
 `ApprovalRequest` already carries a `payload` and a per-kind `apply!` for this.
@@ -118,21 +118,28 @@ does — a teacher asks, an administrator decides, and the decision is audited.
 Option A is not a smaller version of B; it is a different feature that solves the
 mistake case only, and it would still leave "retire a taught lesson" unanswered.
 
-## What the decision must settle
+## What the decision settled
 
-1. Do retired lessons leave the denominator, or stay in it? (Recommended: leave.)
-2. Does a learner's finished-but-retired lesson still count for them?
-   (Recommended: yes.)
-3. Can a retirement be undone, and by whom?
-4. Does a retired lesson's name stay visible in the audit log, integrity cases and
-   a learner's own history? (Recommended: yes — that is the point of keeping the
-   row.)
-5. Does an administrator have a direct removal, or does the queue bind them too?
+1. **Retired lessons leave the denominator.** `Syllabus` is the single boundary
+   every screen reads a topic set through, so the filter lives there and nowhere
+   else.
+2. **A finished-but-retired lesson still counts for the learner who finished it.**
+   The numerator is their completions, which are untouched; the denominator has
+   lost the lesson. 12 of 11 is therefore reachable, and the three `percent`
+   helpers clamp to 100 rather than printing 109%.
+3. **Undoing a retirement is not built.** `retired_at` is nullable and nothing
+   sets it back; when somebody needs it, it is a second request kind and not a
+   button. Recorded here so its absence is a decision rather than an oversight.
+4. **A retired lesson stays nameable.** `Syllabus.topic_name` deliberately does
+   not filter retired lessons — keeping the row and then refusing to name it
+   would be the delete this app does not do.
+5. **The queue binds an administrator too.** There is no direct route; the only
+   caller of `retire_lesson!` is `ApprovalRequest#apply!`.
 
 ## Fitness Functions
 
-Written now so the decision arrives with the tests that would hold it, whichever
-option is taken. None exists yet; none can, until there is a decision to enforce.
+Written before the decision so it would arrive with the tests that hold it. All
+of them exist now, in `test/controllers/lesson_retirement_test.rb`.
 
 - **No route destroys a topic.** A test walks every route and asserts none calls
   `Topic#destroy` — the property that holds today and must survive either option.

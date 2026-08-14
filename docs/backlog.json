@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-14T10:30:00+07:00",
+  "updated_at": "2026-08-14T12:15:00+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -5471,6 +5471,14 @@
       "to": "complete",
       "summary": "Approved the SPEC-0012 metric and privacy handoff table as proposed, lifting the hold on the adoption, activity and health panels; they ship with a name-collision count and three CSV reports. The collision panel reports counts alone — a list of names beside student IDs is what invariant 5 forbids on this boundary — and the health caption says \"checked when this page is opened\" rather than the design's \"every 5 minutes\", which nothing schedules.",
       "evidence_url": "specs/spec-m7-live-admin-overview-metrics.html"
+    },
+    {
+      "at": "2026-08-14T12:15:00+07:00",
+      "item_id": "M7-001",
+      "from": "complete",
+      "to": "complete",
+      "summary": "Accepted ADR-0055 and shipped SPEC-0055: removing a lesson is a retirement, never a delete. topic.destroy either erased what learners finished or broke a foreign key, so topics.retired_at leaves every denominator, keeps counting for whoever already finished, and stays nameable. Retirement goes through the approval queue like an addition; un-retiring is deliberately not built.",
+      "evidence_url": "specs/spec-lesson-retirement.html"
     }
   ]
 }

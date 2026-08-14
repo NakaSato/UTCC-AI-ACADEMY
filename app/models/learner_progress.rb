@@ -274,7 +274,9 @@ class LearnerProgress
   end
 
   private
-    def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round
+    # Clamped for the reason InstructorReport gives: a retired lesson leaves the
+    # denominator and stays in whoever already finished it (ADR-0055).
+    def percent(part, whole) = whole.to_i.zero? ? 0 : (part * 100.0 / whole).round.clamp(0, 100)
 
     # ---- The award rules --------------------------------------------------
 

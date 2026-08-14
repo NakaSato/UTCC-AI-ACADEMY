@@ -81,6 +81,16 @@
                       <%= t("instructor.syllabus_renamed") %>
                     </span>
                   <% end %>
+
+                  <%# Retiring takes the lesson out of the syllabus and out of
+                      every denominator, and leaves it counting for whoever has
+                      already finished it (ADR-0055). Nothing is destroyed, which
+                      is why this is a request rather than a delete. %>
+                  <%= button_to t("instructor.syllabus_retire"), instructor_syllabus_retire_path(topic[:key]),
+                        form: { data: { turbo_confirm: t("instructor.syllabus_retire_confirm") },
+                                class: "contents" },
+                        class: "cursor-pointer font-sans text-11-5 text-muted-2 underline-offset-2
+                                transition-colors hover:text-brand-ink hover:underline" %>
                 </div>
               </div>
             </div>

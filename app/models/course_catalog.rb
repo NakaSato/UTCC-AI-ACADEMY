@@ -26,7 +26,9 @@ module CourseCatalog
     def started? = learned.positive?
     def completed? = learned >= topics
     def academy_completed? = academy_learned >= topics
-    def percent = (learned * 100.0 / topics).round
+    # Clamped, and zero-safe: a course whose lessons are all retired has no
+    # denominator left to divide by (ADR-0055).
+    def percent = topics.to_i.zero? ? 0 : (learned * 100.0 / topics).round.clamp(0, 100)
     def applied_percent = (applied * 100.0 / applied_topics).round
 
     # The card's avatar plate. Both locales spell the instructor as an academic

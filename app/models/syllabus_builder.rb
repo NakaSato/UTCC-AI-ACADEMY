@@ -78,13 +78,9 @@ class SyllabusBuilder
   # `ApprovalRequest#apply!`, inside that decision's transaction, and from
   # nowhere else. A teacher asks; the queue decides; this writes.
   #
-  # Removing a lesson has no counterpart here on purpose. `topic_completions` and
-  # `prior_knowledges` are `dependent: :destroy` and `submissions` and
-  # `proctor_events` hold a foreign key, so destroying a topic either erases what
-  # learners finished or fails on the constraint. Taking a lesson out of a
-  # syllabus is a *retirement* — the row stays, stops being offered, and stops
-  # counting toward a denominator — and that is a decision with reach into
-  # progress, the leaderboard and certificates. It is not this method.
+  # Removing a lesson is a *retirement*, never a delete (ADR-0055): the row stays,
+  # stops being offered, and stops counting toward a denominator, so a completion
+  # and an integrity case can still say which lesson they meant.
   def add_lesson!(module_number:, topic_kind:, minutes:, names:)
     mod = course.course_modules.find_by!(number: module_number.to_i)
     position = (mod.topics.maximum(:position) || 0) + 1
@@ -97,6 +93,21 @@ class SyllabusBuilder
     end
     Syllabus.reload!
     topic
+  end
+
+  # The other half of the same decision, and it destroys nothing.
+  #
+  # Called from `ApprovalRequest#apply!` inside the decision's transaction and
+  # lock, so the liveness check here closes the window the validation at request
+  # time cannot: a lesson retired by one decision cannot be retired again by a
+  # request raised before it.
+  def retire_lesson!(topic_key)
+    topic = topic_for(topic_key)
+    return false if topic.nil? || topic.retired?
+
+    topic.update!(retired_at: Time.current)
+    Syllabus.reload!
+    true
   end
 
   private

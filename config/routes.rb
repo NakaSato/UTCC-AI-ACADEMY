@@ -229,6 +229,10 @@ Rails.application.routes.draw do
   # same queue, the same second pair of eyes, as publishing the course.
   post "instructor/syllabus/lesson", to: "instructor#request_lesson",
        as: :instructor_syllabus_lesson
+  # And taking one out, which is a retirement rather than a delete (ADR-0055) and
+  # goes through the same queue.
+  post "instructor/syllabus/retire/:topic_key", to: "instructor#request_retirement",
+       as: :instructor_syllabus_retire
 
   # Public surface is /academic. Keep the internal resource name and helpers
   # stable so AcademicPost records, associations, and existing callers do not

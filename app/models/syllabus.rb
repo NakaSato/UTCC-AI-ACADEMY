@@ -41,7 +41,11 @@ module Syllabus
       SyllabusText.forget
     end
 
-    def topics(course = DEFAULT_COURSE) = entries(course).flat_map(&:topics)
+    # Every screen reads its topic set through here, so retirement is enforced
+    # here and nowhere else: the catalogue's counts, the lesson's next key, the
+    # knowledge map, the integrity switches and both progress models all go
+    # through `topics`, `topic_keys` or `topic_count`. ADR-0055.
+    def topics(course = DEFAULT_COURSE) = entries(course).flat_map { live(it) }
     def topic(key, course = DEFAULT_COURSE) = topics(course).find { it.key == key }
 
     def topic_key(module_number, position, course = DEFAULT_COURSE)
@@ -51,7 +55,9 @@ module Syllabus
     def topic_keys(course = DEFAULT_COURSE) = topics(course).map(&:key)
 
     def keys_in(module_number, course = DEFAULT_COURSE)
-      entries(course).find { it.number == module_number }&.topics.to_a.map(&:key)
+      mod = entries(course).find { it.number == module_number } or return []
+
+      live(mod).map(&:key)
     end
 
     def applied_topic_keys(course = DEFAULT_COURSE) = topics(course).select(&:applied?).map(&:key)
@@ -71,8 +77,12 @@ module Syllabus
 
     def topic_minutes(key, course = DEFAULT_COURSE) = topic(key, course)&.minutes.to_i
 
+    # Retired lessons included, deliberately. A completion, a submission and an
+    # integrity case all still point at a lesson that has left the syllabus, and
+    # every one of them has to be able to say which lesson it meant. Keeping the
+    # row and then refusing to name it would be the delete this app does not do.
     def topic_name(key, course = DEFAULT_COURSE)
-      topic = topic(key, course) or return ""
+      topic = any_topic(key, course) or return ""
       named_topic(topic, curriculum(course)[topic.course_module.number - 1] || {})
     end
 
@@ -100,7 +110,7 @@ module Syllabus
           status: module_status(mod.number, current),
           title: named_module(code, mod.number, :title, definition),
           desc: named_module(code, mod.number, :desc, definition),
-          topics: mod.topics.map do |record|
+          topics: live(mod).map do |record|
             Topic_.new(
               key: record.key,
               kind: record.kind.to_sym,
@@ -163,6 +173,14 @@ module Syllabus
           definition[field].to_s.presence ||
           SyllabusText.any(key).to_s
       end
+
+      # Every lesson a course has ever had, retired ones included — the lookup
+      # behind `topic_name`, and the only reader that wants them.
+      def any_topic(key, course) = entries(course).flat_map(&:topics).find { it.key == key }
+
+      # A module's lessons, minus the ones that have left the syllabus. Ordered
+      # by position already — `CourseModule#topics` carries that scope.
+      def live(mod) = mod.topics.reject(&:retired?)
 
       def curriculum(course)
         code = course_code(course)
