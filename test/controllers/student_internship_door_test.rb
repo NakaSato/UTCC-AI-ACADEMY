@@ -1,7 +1,7 @@
 require "test_helper"
 
 # INT-002 and INT-003 shipped the student's screens and no way to reach them:
-# nothing in the app linked to /internship-requests or to /internships/placements,
+# nothing in the app linked to /internship or to /internships/placements,
 # so a learner had to type the URL. The door is the navigation entry, the two
 # screens pointing at each other, and a running internship shown where the
 # student actually arrives.
@@ -12,6 +12,7 @@ class StudentInternshipDoorTest < ActionDispatch::IntegrationTest
                                          accepts_internship_requests: true)
     @decider = users(:one)
     @organization.memberships.create!(user: @decider, role: "owner")
+    @organization.memberships.create!(user: users(:instructor), role: "mentor")
   end
 
   def nav_labels
@@ -23,6 +24,7 @@ class StudentInternshipDoorTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_includes nav_labels, I18n.t("chrome.nav.internships")
+    assert_equal "/internship", internship_requests_path
     assert_select "a[href=?]", internship_requests_path
   end
 
@@ -32,6 +34,23 @@ class StudentInternshipDoorTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", I18n.t("internship_requests.title")
+  end
+
+  test "the student internship door lists published opportunities" do
+    program = @organization.internship_programs.create!(
+      creator: @decider, mentor: users(:instructor), name: "Open AI Internship", department: "Innovation",
+      description: "Build a reviewed prototype.", duration_weeks: 8, max_students: 3,
+      required_skills: "Communication", learning_outcomes: "Ship a prototype", working_days: "Weekdays",
+      remote_policy: "hybrid", certificate_policy: "Certificate", equipment_provided: "Laptop"
+    )
+    program.transition_to!("review")
+    program.transition_to!("published")
+
+    sign_in_as @student
+    get internship_requests_path
+
+    assert_response :success
+    assert_select "a[href=?]", recruitment_internship_path(program), text: "Open AI Internship"
   end
 
   # Ranking is inserted relative to the end of the list, so adding an entry
@@ -88,7 +107,7 @@ class StudentInternshipDoorTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", internship_requests_path
   end
 
-  # The company reaches its own queue from its work surface; /internship-requests
+  # The company reaches its own queue from its work surface; /internship
   # is student-only and would 404 for them.
   test "the placements screen offers a company member no student-only link" do
     active_placement

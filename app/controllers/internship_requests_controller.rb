@@ -6,6 +6,13 @@ class InternshipRequestsController < ApplicationController
   def index
     @requests = Current.user.internship_requests.includes(:organization).newest_first
     @can_request = Organization.accepting_internship_requests.exists?
+    # Published programs are the open, position-backed opportunities. Keep
+    # them on the student's internship door alongside position-less requests,
+    # but let the recruitment controller remain the owner of their detail and
+    # application actions.
+    @open_internships = Recruitment::InternshipProgram.published_for_candidates
+                                                       .includes(:organization)
+                                                       .order(published_at: :desc, id: :desc)
     # This screen is the student's door to the whole lifecycle, so an internship
     # that is already running belongs at the top of it: a request that was
     # approved months ago is not what a placed student came here for, and the

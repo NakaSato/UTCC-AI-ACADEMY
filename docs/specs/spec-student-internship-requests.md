@@ -5,7 +5,7 @@ title: Student-initiated internship requests, placements, and progress reporting
 status: accepted
 owners: ["@product-owner", "@tech-lead", "@security-owner", "@privacy-owner", "@academic-owner", "@recruitment-domain-owner", "@qa-owner"]
 created: 2026-08-09
-updated: 2026-08-12
+updated: 2026-08-16
 review_by: 2026-08-26
 supersedes: []
 superseded_by: []
@@ -512,3 +512,24 @@ expected to write. Three changes, no new record and no new decision:
 
 Visibility is unchanged. `open_placements` scopes the new section to the
 student's own placements, which ADR-0041 decision 6 already grants them.
+
+## Amendment, 2026-08-16: the door's address and what stands behind it
+
+The door from 2026-08-12 worked and read badly. Two changes, no new record and
+no new decision:
+
+- **The address is `/internship`.** The route's helper names are unchanged, so
+  every caller still says `internship_requests_path` and no view, test, or
+  redirect had to learn a new name — only the wording a student sees in the
+  address bar moved, from a screen named after the record it creates to one
+  named after the thing they came for. Every `/internship-requests` written
+  above this amendment refers to that same screen at its former address.
+- **Published programs stand beside position-less requests.** The index reads
+  `Recruitment::InternshipProgram.published_for_candidates`, newest first, and
+  links each one at the recruitment controller that already owns its detail and
+  application actions. A student arriving with nobody in mind now sees the open,
+  position-backed opportunities in the same place as the request they may make
+  without one; an empty list says so rather than showing nothing.
+
+Ownership is unchanged. This screen still creates and lists nothing but the
+student's own requests, and SPEC-0028 keeps every program action.

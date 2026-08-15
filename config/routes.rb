@@ -284,7 +284,10 @@ Rails.application.routes.draw do
   # internship routes above. The boundary test reads this delimited block to
   # prove no placement, progress-report, faculty, document, mailer, or API
   # surface ships before each has its own recorded decision.
-  resources :internship_requests, path: "internship-requests", only: %i[index new create edit update show] do
+  # Student-facing internship request lifecycle. The short `/internship`
+  # address is the canonical door; the helper names remain descriptive so
+  # callers do not have to change when the URL wording does.
+  resources :internship_requests, path: "internship", only: %i[index new create edit update show] do
     post :submit, on: :member
     post :withdraw, on: :member
     # The shared résumé (SPEC-0041, increment 4). No upload here: the file is

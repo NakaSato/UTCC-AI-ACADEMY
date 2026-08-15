@@ -7,7 +7,7 @@
     <p class="mt-2 max-w-[58ch] text-14 leading-[1.65] text-muted"><%= t("internship_placements.subtitle") %></p>
     <%# The way back to the other half of the lifecycle. Only for a learner: a
         company decider reaches its own queue from its work surface, and
-        /internship-requests is a student-only screen. %>
+        /internship is a student-only screen. %>
     <% if current_workspace == :student %>
       <%= link_to t("internship_placements.back_to_requests"), internship_requests_path,
             class: "mt-4 inline-flex text-13 font-semibold text-brand-ink hover:underline" %>
