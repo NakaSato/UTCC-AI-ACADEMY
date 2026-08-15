@@ -41,6 +41,13 @@ percentage does not replace explicit invariant tests.
 - Keep Thai and English positional structures aligned.
 - Make time, randomness, and external delivery deterministic at the boundary.
 - A test must fail for the intended reason before its implementation is trusted.
+- Every table the seeds write needs a fixture file, even an empty one. Rails
+  empties a table between tests only when a fixture names it, and CI replants
+  the seeds into the test database — so a seeded table the fixtures cannot empty
+  keeps its rows through the next fixture load and fails every test that loads
+  one. The parallel suite cannot see this, because each worker gets its own
+  database; `bin/rails seeds:fixture_coverage` asks the seeded database directly
+  and is a gate.
 
 ## Flaky-Test Policy
 

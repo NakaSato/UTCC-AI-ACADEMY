@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-16T02:14:03+07:00",
+  "updated_at": "2026-08-16T02:18:52+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4233,6 +4233,25 @@
         }
       ],
       "updated_at": "2026-08-16T02:10:05+07:00"
+    },
+    {
+      "id": "DEV-033",
+      "title": "Gate the fixture coverage the parallel suite cannot see",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and QA Owner",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-031",
+        "DEV-032"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-16T02:18:52+07:00"
     }
   ],
   "recently_completed": [
@@ -7567,6 +7586,30 @@
       "from": "verification",
       "to": "complete",
       "summary": "Verified by reproducing the exact sequence that broke: replant the seeds into the test database, then run the suites that had errored — 18 tests, 59 assertions, no errors. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,833 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:16:00+07:00",
+      "item_id": "DEV-033",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "The missing fixture was found by a test run, not by the gate, and the gate cannot find it: the Rails suite parallelizes into per-worker databases, so the seeded database is read only by a run small enough to stay in a single process. A green suite and a broken next run are the same state, which is the part worth closing.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:17:30+07:00",
+      "item_id": "DEV-033",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "bin/rails seeds:fixture_coverage asks the seeded database directly — every table holding rows must be one a fixture file can empty — and runs as a CI step immediately after the replant, the only moment the answer is visible. Proved it fails for the intended reason by removing the fixture that repaired the original break: the task names that table and exits non-zero.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:18:52+07:00",
+      "item_id": "DEV-033",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Recorded in the test strategy's Test Data rules alongside the gate that enforces it. Full local gate passed with the new step: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,835 assertions, seed replant, 22 seeded tables checked in 0.77s, and 74 system tests with 563 assertions.",
       "evidence_url": "test-strategy.html"
     }
   ]

@@ -20,6 +20,12 @@ CI.run do
   step "Assets: Vite island bundle", "bin/vite build"
   step "Tests: Rails", "bin/rails test"
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
+  # Asked immediately after the replant, because that is the only moment the
+  # answer is visible: a table the seeds write but the fixtures cannot empty
+  # keeps its rows through the next fixture load, and the suite above cannot
+  # see it — parallel workers each get their own database, so the seeded one is
+  # read only by a run small enough to stay in a single process.
+  step "Tests: Seed fixture coverage", "env RAILS_ENV=test bin/rails seeds:fixture_coverage"
 
   step "Tests: System", "bin/rails test:system"
 
