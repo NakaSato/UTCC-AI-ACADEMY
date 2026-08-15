@@ -26,6 +26,22 @@ class ProctorIncidentsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "incidents are accepted only from the exercise and coding task" do
+    %w[ theory summary ].each do |step|
+      assert_no_difference -> { ProctorEvent.count } do
+        report(kind: "blur", step:)
+      end
+      assert_response :unprocessable_entity
+    end
+
+    %w[ exercise code ].each do |step|
+      assert_difference -> { ProctorEvent.count }, 1 do
+        report(kind: "blur", step:)
+      end
+      assert_response :created
+    end
+  end
+
   test "an unknown course or topic is refused" do
     report(kind: "blur", course: "NOPE")
     assert_response :unprocessable_entity
@@ -56,7 +72,7 @@ class ProctorIncidentsTest < ActionDispatch::IntegrationTest
   end
 
   private
-    def report(kind:, course: "AI1101", topic: "1-1")
-      post lesson_incident_url, params: { kind:, course:, topic: }, as: :json
+    def report(kind:, course: "AI1101", topic: "1-1", step: "exercise")
+      post lesson_incident_url, params: { kind:, course:, topic:, step: }, as: :json
     end
 end

@@ -118,7 +118,7 @@
         <% Landing.tracks.each do |track| %>
           <article class="flex h-full flex-col gap-2 rounded-md bg-surface p-4 shadow-md transition duration-300
                           hover:-translate-y-0.5 hover:shadow-lg"
-                   data-tabs-target="item" data-level="<%= track.level %>">
+                   data-tabs-target="item" data-track-card data-level="<%= track.level %>">
             <div class="flex flex-wrap gap-2">
               <span class="inline-flex items-center rounded-full border border-brand-ink px-3 py-0.5 text-18 font-medium text-brand-ink-deep"><%= track.level_label %></span>
               <span class="inline-flex items-center rounded-full bg-surface-2 px-3 py-0.5 text-18 font-medium text-brand-ink-deep"><%= track.duration %></span>
@@ -200,12 +200,16 @@
         </h2>
       </div>
       <% Landing.faqs.each do |faq| %>
-        <details class="group border-b border-hairline">
+        <details class="group border-b border-hairline"
+                 data-controller="disclosure-motion"
+                 data-action="toggle->disclosure-motion#toggle"
+                 data-faq-disclosure>
           <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 py-4 text-24 font-medium
                           text-brand-ink-deep after:size-[0.6em] after:flex-none after:rotate-45 after:border-r-2
                           after:border-b-2 after:border-current after:transition-transform after:duration-300
                           after:content-[''] group-open:after:rotate-[-135deg]"><%= faq.question %></summary>
-          <div class="pb-4 text-18 text-muted"><%= faq.answer %></div>
+          <div class="pb-4 text-18 text-muted"
+               data-disclosure-motion-target="content" data-faq-answer><%= faq.answer %></div>
         </details>
       <% end %>
     </div>

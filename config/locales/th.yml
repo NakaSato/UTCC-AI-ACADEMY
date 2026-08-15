@@ -3,6 +3,7 @@
 # en.yml so a missing translation is always a structural mistake, not a gap.
 th:
   language_name: "ไทย"
+  language_full_name: "ไทย"
 
   # Without these, `l(date)` on a Thai page falls back to English and prints
   # "August 16, 2026" beside Thai copy. Years stay Common Era; switching to
@@ -261,11 +262,14 @@ th:
     notif_see_all: "ดูการแจ้งเตือนทั้งหมด"
     notif_toggle: "เปิดการแจ้งเตือน"
     toast_dismiss: "ปิดข้อความนี้"
+    language_label: "ภาษา"
+    language_toggle: "ภาษา: %{language}"
     theme_label: "ธีมสี"
+    theme_toggle: "ธีมสี: %{theme}"
     theme:
       light: "สว่าง"
-      system: "ตามอุปกรณ์"
       dark: "มืด"
+      system: "ตามระบบ"
     user_toggle: "เปิดเมนูผู้ใช้"
     nav_label: "เมนูหลัก"
     nav_toggle: "เปิดเมนูหลัก"
@@ -1244,11 +1248,11 @@ th:
       verdict_clean: "ปกติ"
       verdict_review: "ต้องตรวจสอบ"
       verdict_risk: "เสี่ยงสูง"
-      guard_title: "คุณออกจากหน้าต่างทำแบบฝึกหัด"
+      guard_title: "คุณออกจากหน้าต่างทำแบบประเมิน"
       guard_body: "เนื้อหาถูกเบลอไว้จนกว่าคุณจะกลับมาที่หน้าต่างนี้ เหตุการณ์ถูกบันทึกแล้ว"
       guard_btn: "กลับเข้าทำแบบฝึกหัด"
       events_title: "บันทึกเหตุการณ์"
-      events_empty: "ยังไม่พบเหตุการณ์ผิดปกติ"
+      events_empty: "ยังไม่พบเหตุการณ์ผิดปกติระหว่างทำแบบประเมิน"
       events:
         menu: "เปิดเมนูคลิกขวา"
         paste_small: "วางข้อความสั้น"

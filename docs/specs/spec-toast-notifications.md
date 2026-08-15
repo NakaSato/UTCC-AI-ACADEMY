@@ -5,7 +5,7 @@ title: Toast notifications and the two ways to raise one
 status: accepted
 owners: ["@tech-lead", "@product-owner"]
 created: 2026-08-09
-updated: 2026-08-10
+updated: 2026-08-15
 review_by: 2026-08-23
 supersedes: []
 superseded_by: []
@@ -28,11 +28,13 @@ touches:
   - config/importmap.rb
   - config/locales/en.yml
   - config/locales/th.yml
+  - test/system/toast_motion_walk_test.rb
 enforced_by:
   - test/controllers/toasts_test.rb
   - test/helpers/toast_stream_test.rb
   - test/controllers/notifications_test.rb
   - test/system/notification_bell_walk_test.rb
+  - test/system/toast_motion_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-PROD-001]
 min_reviewer_skills: [SKILL-SPEC-002]

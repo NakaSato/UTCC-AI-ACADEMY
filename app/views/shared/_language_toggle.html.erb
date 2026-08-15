@@ -1,22 +1,47 @@
 <%# POST, not GET: Turbo prefetches links on hover, and a GET would switch
-    language just by pointing at the button. `dark` picks the header styling;
-    the auth screens pass the same value because they sit on chrome too. %>
+    language just by pointing at an option. The selected language is visible on
+    the dropdown button; both language names remain autonyms in the list so a
+    reader can always recognise the other choice. %>
 <% dark = local_assigns.fetch(:dark, true) %>
+<% embedded = local_assigns.fetch(:embedded, false) %>
+<% current_name = t("language_full_name", locale: I18n.locale) %>
 
-<div class="flex flex-none gap-0 rounded-[10px] border p-[3px]
-            <%= dark ? "border-chrome-line bg-chrome-2" : "border-hairline-2 bg-surface-2" %>">
-  <% I18n.available_locales.each do |locale| %>
-    <% current = I18n.locale == locale %>
-    <%= button_to language_path(locale),
-          form_class: "contents",
-          "aria-current": ("true" if current),
-          class: class_names(
-            "rounded-[7px] px-2.5 py-[5px] text-12 font-semibold tracking-[0.03em] transition-colors",
-            "bg-brand text-white" => current,
-            "text-on-chrome-muted hover:text-on-chrome-bright" => !current && dark,
-            "text-muted hover:text-ink" => !current && !dark
-          ) do %>
-      <%= t("language_name", locale: locale) %>
+<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="language" data-controller="dropdown"
+     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+  <button type="button" aria-haspopup="true" aria-expanded="false"
+          aria-label="<%= t("chrome.language_toggle", language: current_name) %>"
+          data-dropdown-target="button" data-action="dropdown#toggle"
+          class="flex h-[38px] items-center gap-2 rounded-[10px] border px-2.5 text-12 font-semibold transition-colors
+                 <%= "w-full" if embedded %>
+                 <%= dark ? "border-chrome-line bg-chrome-2 text-on-chrome hover:border-chrome-edge hover:text-white" :
+                            "border-hairline-2 bg-surface-2 text-ink hover:border-brand-ink" %>">
+    <span aria-hidden="true">◎</span>
+    <% if embedded %>
+      <span><%= t("chrome.language_label") %></span>
+      <span class="ml-auto font-normal text-muted"><%= current_name %></span>
+    <% else %>
+      <span><%= current_name %></span>
     <% end %>
-  <% end %>
+    <span aria-hidden="true" data-dropdown-target="indicator"
+          class="text-9 <%= dark ? "text-on-chrome-dim" : "text-muted-2" %>">▾</span>
+  </button>
+
+  <div hidden data-state="closed"
+       class="<%= embedded ? "static mt-1 w-full" : "absolute top-[46px] right-0 z-50 w-[150px]" %> overflow-hidden rounded-[14px]
+              border border-hairline bg-surface p-1.5 shadow-menu"
+       data-dropdown-target="panel" role="group" aria-label="<%= t("chrome.language_label") %>">
+    <% I18n.available_locales.each do |locale| %>
+      <% current = I18n.locale == locale %>
+      <%= button_to language_path(locale), form_class: "block",
+            "aria-current": ("true" if current),
+            class: class_names(
+              "flex w-full items-center rounded-[9px] px-3 py-2.5 text-left text-13-5 transition-colors",
+              "bg-brand-tint font-semibold text-brand-ink-deep" => current,
+              "text-ink-2 hover:bg-canvas" => !current
+            ) do %>
+        <span><%= t("language_full_name", locale:) %></span>
+        <% if current %><span aria-hidden="true" class="ml-auto">✓</span><% end %>
+      <% end %>
+    <% end %>
+  </div>
 </div>

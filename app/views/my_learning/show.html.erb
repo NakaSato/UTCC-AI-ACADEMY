@@ -62,7 +62,8 @@
                   role: "tab", id: "enrollments-tab-#{tab}",
                   aria: { selected: @tab == tab, controls: "enrollments-panel-#{tab}" },
                   data: { panel: tab, path: my_learning_path(tab: tab),
-                          panels_target: "tab", action: "panels#select" },
+                          panels_target: "tab", tab_motion: true,
+                          index: MyLearningController::TABS.index(tab), action: "panels#select" },
                   class: "-mb-px border-b-[2.5px] border-transparent px-0.5 pt-5 pb-4 text-15-5 font-medium
                           text-muted transition-colors hover:text-ink aria-selected:border-brand-ink
                           aria-selected:font-semibold aria-selected:text-brand-ink" %>
@@ -74,13 +75,17 @@
           <% open_code = @open_code || enrollments.first&.code %>
           <%= tag.div role: "tabpanel", id: "enrollments-panel-#{tab}", hidden: @tab != tab,
                 aria: { labelledby: "enrollments-tab-#{tab}" },
-                data: { panel: tab, panels_target: "panel" },
+                data: { panel: tab, panels_target: "panel", motion: true },
                 class: "flex flex-col gap-1.5" do %>
             <% if enrollments.empty? %>
               <p class="px-1 py-6 text-14-5 text-muted-2"><%= t("my_learning.empty.#{tab}") %></p>
             <% end %>
             <% enrollments.each do |enrollment| %>
-              <details class="group border-b border-surface-5 pb-1.5" <%= "open" if enrollment.code == open_code %>>
+              <details class="group border-b border-surface-5 pb-1.5"
+                       data-controller="disclosure-motion"
+                       data-action="toggle->disclosure-motion#toggle"
+                       data-enrollment-course="<%= enrollment.code %>"
+                       <%= "open" if enrollment.code == open_code %>>
                 <summary class="marker-none flex cursor-pointer flex-wrap items-center gap-3 px-1 py-3.5">
                   <span aria-hidden="true" class="w-3 text-10-5 text-muted-2">
                     <span class="group-open:hidden">▸</span>
@@ -94,7 +99,8 @@
                   <span class="ml-auto font-mono text-12 text-muted-3"><%= enrollment.code %></span>
                 </summary>
 
-                <div class="px-1 pt-1 pb-4.5 sm:pl-7">
+                <div class="px-1 pt-1 pb-4.5 sm:pl-7"
+                     data-disclosure-motion-target="content" data-enrollment-content>
                   <p class="mb-5 max-w-[62ch] text-14-5 leading-[1.65] text-balance text-muted">
                     <%= enrollment.description %>
                   </p>

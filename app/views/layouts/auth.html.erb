@@ -12,7 +12,8 @@
 
   <%# The auth screens carry no app chrome: the ink panel on the left is the
       whole brand, and the form owns the right half. %>
-  <body class="bg-canvas font-sans text-16 leading-body text-ink antialiased">
+  <body data-controller="page-motion"
+        class="bg-canvas font-sans text-16 leading-body text-ink antialiased">
     <main id="main" class="grid min-h-screen lg:grid-cols-2">
       <%# @auth_scope is set only by the console screen; the student screens leave
           it nil and take the partial's default. %>

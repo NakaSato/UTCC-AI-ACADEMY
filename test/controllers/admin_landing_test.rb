@@ -14,6 +14,9 @@ class AdminLandingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", text: I18n.t("admin.landing.title")
+    assert_select "details[data-controller=disclosure-motion][data-admin-landing-group]", Landing.groups.size do
+      assert_select "[data-disclosure-motion-target=content][data-admin-landing-content]", Landing.groups.size
+    end
 
     Landing.editable_keys.each do |key|
       I18n.available_locales.each do |locale|

@@ -87,6 +87,7 @@ class ToastsTest < ActionDispatch::IntegrationTest
   test "the row template carries every slot a caller can fill" do
     get root_path
 
+    assert_select "template[data-toast-target=row] [data-toast-row]", 1
     %w[title message action close].each do |slot|
       assert_select "template[data-toast-target=row]", html: /data-slot="#{slot}"/,
                     count: 1, message: "the row template has no #{slot} slot"

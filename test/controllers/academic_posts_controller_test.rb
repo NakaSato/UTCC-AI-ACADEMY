@@ -79,6 +79,7 @@ class AcademicPostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-controller=?]", "reader"
     assert_select "[data-reader-target=?]", "toc"
+    assert_select "article[data-reader-target=surface]", 1
     assert_includes response.body, 'data-citation-key="smith-2026"'
     assert_includes response.body, 'data-reference-key="smith-2026"'
 

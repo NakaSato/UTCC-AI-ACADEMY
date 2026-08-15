@@ -12,11 +12,12 @@
     <%# The student ID, not the name: it is fixed-width, so the rail keeps the
         same shape whoever is signed in. The name is one line down, in the panel. %>
     <span class="hidden text-12 text-on-chrome-2 tabular-nums 2xl:block"><%= Current.user.identifier %></span>
-    <span aria-hidden="true" class="text-9 text-on-chrome-dim">▾</span>
+    <span aria-hidden="true" data-dropdown-target="indicator" class="text-9 text-on-chrome-dim">▾</span>
   </button>
 
-  <div class="absolute top-[46px] right-0 z-50 hidden w-[250px] overflow-hidden rounded-[14px] border border-hairline bg-surface shadow-menu"
-       data-dropdown-target="panel">
+  <div hidden data-state="closed"
+       class="absolute top-[46px] right-0 z-50 w-[280px] rounded-[14px] border border-hairline bg-surface shadow-menu"
+       data-menu="account" data-dropdown-target="panel">
     <div class="border-b border-surface-3 p-4">
       <div class="truncate text-14-5 font-semibold text-ink"><%= Current.user.name %></div>
       <%# The student ID, not the email — sign-up no longer collects one, so for
@@ -29,6 +30,15 @@
         <%= link_to label, path,
               class: "block rounded-[9px] px-3 py-2.5 text-13-5 text-ink-2 hover:bg-canvas" %>
       <% end %>
+    </div>
+
+    <%# Session-backed presentation preferences belong to the signed-in user,
+        so they sit in the profile menu rather than occupying the header rail.
+        Their embedded dropdowns expand in this panel and keep the same POST
+        behavior as the public-navbar controls. %>
+    <div class="flex flex-col gap-1 border-t border-surface-3 p-1.5">
+      <%= render "shared/language_toggle", dark: false, embedded: true %>
+      <%= render "shared/theme_toggle", dark: false, embedded: true %>
     </div>
 
     <div class="border-t border-surface-3 p-1.5">

@@ -28,6 +28,7 @@ class FooterTest < ActionDispatch::IntegrationTest
       assert_select "footer a[href=?]", contributors_path, 1
       assert_select "footer a[href=?]", new_proposal_request_path, 1
       assert_select "footer a[href='https://utcc.ac.th']", 1
+      assert_select "button[data-controller=to-top][data-action='to-top#scrollUp'][data-visible=false]", 1
 
       assert_footer_copy locale, "chrome.footer.columns.start.title"
     end

@@ -17,6 +17,7 @@ export default class extends Controller {
 
     this.consoleTarget.dataset.state = ""
     this.consoleTarget.textContent = `$ python split_customers.py\n${copy.running}`
+    this.dispatch("start", { detail: { target: this.consoleTarget } })
 
     const verdict = await grade({
       url: this.urlValue, course: this.courseValue, topic: this.topicValue,
@@ -42,15 +43,20 @@ export default class extends Controller {
     checks.forEach((ok, index) => {
       if (this.checkTargets[index]) this.checkTargets[index].dataset.state = ok ? "ok" : ""
     })
+    this.dispatch("criteria", { detail: { targets: this.checkTargets } })
 
     const copy = this.copyTarget.dataset
     this.consoleTarget.dataset.state = passed ? "pass" : "fail"
     this.consoleTarget.textContent = passed
       ? `$ python split_customers.py\n40000 10000\n\n${copy.pass}`
       : `$ python split_customers.py\nSyntaxError: invalid syntax\n\n${copy.fail}`
+    this.dispatch("result", { detail: { target: this.consoleTarget } })
 
     this.finishTarget.classList.toggle("hidden", !passed)
-    if (passed) this.dispatch("reward", { detail: { gems } })
+    if (passed) {
+      this.dispatch("action", { detail: { target: this.finishTarget } })
+      this.dispatch("reward", { detail: { gems } })
+    }
   }
 
   reset() {
@@ -59,5 +65,8 @@ export default class extends Controller {
     this.consoleTarget.textContent = `$ python split_customers.py\n${this.copyTarget.dataset.idle}`
     this.finishTarget.classList.add("hidden")
     this.checkTargets.forEach((check) => (check.dataset.state = ""))
+    this.dispatch("clear", { detail: { target: this.consoleTarget } })
+    this.dispatch("clear-criteria", { detail: { targets: this.checkTargets } })
+    this.dispatch("clear-action", { detail: { target: this.finishTarget } })
   }
 }

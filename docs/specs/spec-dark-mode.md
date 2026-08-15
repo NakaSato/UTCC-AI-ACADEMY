@@ -5,7 +5,7 @@ title: Dark mode, the palette toggle, and the fill/ink split
 status: accepted
 owners: ["@tech-lead", "@product-owner", "@design-owner"]
 created: 2026-08-11
-updated: 2026-08-11
+updated: 2026-08-15
 review_by: 2026-08-25
 supersedes: []
 superseded_by: []
@@ -94,9 +94,13 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
     layouts — application, auth, and error.
 14. `POST /theme/:theme` is the only way to set it, constrained to
     `light|dark|system`. There is no GET route: Turbo prefetches links on hover.
-15. The toggle renders on the marketing header, the app header, and the auth
-    hero, beside the language toggle, and marks the current choice with
-    `aria-current`.
+15. The theme selector renders on the marketing header and in the signed-in
+    account menu, beside the language selector, but not on authentication
+    screens. Its button names the current choice; its dropdown lists light,
+    dark, and system, with `aria-current` on the selected option. The language
+    selector uses the same dropdown shape. On the public navbar, both selectors
+    follow the sign-up action; in a signed-in session, both are removed from the
+    header rail and nested in the profile dropdown.
 16. Its labels are bilingual and its buttons carry an accessible name.
 17. The toggle's form submits with `data-turbo: false`. Turbo copies only `lang`
     and `dir` from the incoming page's `<html>`, so a Turbo visit would leave
@@ -119,8 +123,12 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
 - Choosing system while the system is dark gives no class and the dark canvas.
 - `GET /theme/dark` is a 404 and leaves the session untouched.
 - `POST /theme/sepia` is a 404 and leaves the session untouched.
-- The toggle appears on `/`, `/login`, and a signed-in screen, with three
-  buttons and `aria-current` on the chosen one.
+- The selector appears on `/` and inside the profile dropdown on a signed-in
+  screen, while `/login` shows neither preference selector. The signed-in
+  header rail carries no standalone preference controls. Its dropdown contains
+  three theme buttons and `aria-current` marks the chosen one.
+- The language selector's dropdown contains every available locale and names
+  each language in that language.
 - The two dark blocks in the stylesheet define exactly the same tokens.
 - Every pair in `PAIRS` clears its floor in both palettes.
 
@@ -150,12 +158,13 @@ allows. Getting the hierarchy back means darkening `muted` to make room, which
 moves supporting copy across 515 more occurrences and belongs to the design
 owner. See the amendment in ADR-0047.
 
-**The language toggle.** An earlier draft of this spec claimed it had the same
-staleness — it does not. Turbo copies exactly two attributes from the incoming
-page's `<html>`, `lang` and `dir`, and nothing else; verified in
-`turbo.min.js` and in a browser, where switching language over a Turbo visit
-updates `lang` correctly. That is precisely why the theme needs invariant 17:
-`class` is not in the copied set. The language toggle needs no change.
+**The language selector's submission behavior.** An earlier draft of this spec
+claimed it had the same staleness — it does not. Turbo copies exactly two
+attributes from the incoming page's `<html>`, `lang` and `dir`, and nothing
+else; verified in `turbo.min.js` and in a browser, where switching language over
+a Turbo visit updates `lang` correctly. That is precisely why the theme needs
+invariant 17: `class` is not in the copied set. The two selectors now share a
+dropdown presentation, while only the theme form opts out of Turbo.
 
 **Per-user persistence.** The preference is a session, so it does not follow an
 account to another browser. Matching the language toggle was the point; a column

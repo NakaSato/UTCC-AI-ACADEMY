@@ -2,6 +2,7 @@
 # Keys are shared 1:1 with th.yml — see that file for the structure.
 en:
   language_name: "EN"
+  language_full_name: "English"
 
   # Dates and times are spelled out here rather than inherited from Rails so the
   # two locales stay 1:1 and neither drifts silently. These values match Rails'
@@ -260,11 +261,14 @@ en:
     notif_see_all: "See all notifications"
     notif_toggle: "Open notifications"
     toast_dismiss: "Dismiss this message"
+    language_label: "Language"
+    language_toggle: "Language: %{language}"
     theme_label: "Colour theme"
+    theme_toggle: "Colour theme: %{theme}"
     theme:
       light: "Light"
-      system: "Match my device"
       dark: "Dark"
+      system: "System"
     user_toggle: "Open account menu"
     nav_label: "Main"
     nav_toggle: "Open main menu"
@@ -1237,11 +1241,11 @@ en:
       verdict_clean: "Clean"
       verdict_review: "Review needed"
       verdict_risk: "High risk"
-      guard_title: "You left the exercise window"
+      guard_title: "You left the assessment window"
       guard_body: "Content stays blurred until you return to this window. The event has been logged."
       guard_btn: "Resume exercise"
       events_title: "Integrity log"
-      events_empty: "No incidents recorded yet"
+      events_empty: "No assessment incidents recorded yet"
       events:
         menu: "Opened the context menu"
         paste_small: "Pasted a short snippet"

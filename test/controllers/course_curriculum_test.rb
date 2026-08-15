@@ -8,6 +8,9 @@ class CourseCurriculumControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "details", count: 2
+    assert_select "details[data-controller=disclosure-motion][data-course-module]", count: 2 do
+      assert_select "[data-disclosure-motion-target=content][data-course-module-content]", count: 2
+    end
     assert_select "main", text: /#{Regexp.escape(I18n.t("course.curricula.AI1102.modules")[0][:title])}/
     assert_select "a[href=?]", lesson_path(course: "AI1102", topic: "AI1102-1-1")
   end

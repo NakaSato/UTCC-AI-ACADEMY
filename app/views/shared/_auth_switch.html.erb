@@ -22,7 +22,8 @@
             id: "auth-tab-#{panel}",
             aria: { selected: active == panel, controls: "auth-panel-#{panel}" },
             data: { panel:, path: screen[:path], title: screen[:title],
-                    panels_target: "tab", action: "panels#select" },
+                    panels_target: "tab", action: "panels#select",
+                    auth_tab: true, tab_motion: true },
             class: "flex-1 cursor-pointer rounded-[9px] py-2.75 text-center text-14-5 font-medium text-muted
                     transition-colors hover:text-ink aria-selected:bg-surface aria-selected:font-semibold
                     aria-selected:text-ink" %>

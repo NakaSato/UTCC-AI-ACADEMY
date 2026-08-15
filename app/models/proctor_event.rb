@@ -4,6 +4,9 @@
 #
 # A "case" on the admin Integrity tab is not a row anywhere: it is a learner's
 # unreviewed events, scored on the fly. Closing the case stamps them reviewed.
+# New reports are accepted only while the browser says it is on one of
+# Proctoring::ACTIVE_STEPS; the step need not be stored because both allowed
+# values share the same incident taxonomy and scoring contract.
 class ProctorEvent < ApplicationRecord
   belongs_to :user
   belongs_to :course

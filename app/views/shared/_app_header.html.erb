@@ -1,5 +1,6 @@
-<%# The signed-in chrome: brand, primary nav, language, gamification
-    counters, notifications and the account menu, over the gamification strip. %>
+<%# The signed-in chrome: brand, primary nav, gamification counters,
+    notifications and the account menu, over the gamification strip. Language
+    and theme live inside that account menu rather than spending rail width. %>
 <header class="sticky top-0 z-40 bg-chrome">
   <div class="mx-auto flex h-header max-w-page items-center gap-4 px-4 sm:px-8 xl:gap-6">
     <%# The shield is the accessible name for the link; the two-line lockup
@@ -22,17 +23,12 @@
 
     <%# Straight after the brand: the mark and the way into the app read as one
         gesture at the left edge, and the rail on the right stays what it is —
-        preferences, notifications, and the account. %>
+        notifications and the account. %>
     <%= render "shared/app_nav_menu" %>
 
     <%# `ml-auto` keeps the rail against the right edge; the menubar beside it
         takes only the width its categories need and scrolls if it cannot. %>
-    <div class="ml-auto flex flex-none items-center gap-2">
-      <%= render "shared/language_toggle" %>
-      <%# Beside the language toggle because they are the same kind of thing: a
-          presentation preference the visitor owns, kept in the session. %>
-      <%= render "shared/theme_toggle" %>
-
+    <div class="ml-auto flex flex-none items-center gap-2" data-rail="session-actions">
       <%# Subscribed here rather than inside the bell, so a replacement cannot
           tear down the subscription that delivered it. The channel name still
           lives in exactly one place — the bell names it. %>

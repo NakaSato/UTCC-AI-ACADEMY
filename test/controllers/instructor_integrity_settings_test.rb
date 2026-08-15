@@ -29,7 +29,8 @@ class InstructorIntegritySettingsTest < ActionDispatch::IntegrationTest
     LessonIntegritySetting.update!(course: courses(:ai1101), topic_key: "1-1", enabled: false, expected_lock_version: 0)
 
     sign_in_as users(:one)
-    post lesson_incident_url, params: { kind: "blur", course: "AI1101", topic: "1-1" }
+    post lesson_incident_url,
+         params: { kind: "blur", course: "AI1101", topic: "1-1", step: "exercise" }
 
     assert_response :created
     assert_equal 1, ProctorEvent.count

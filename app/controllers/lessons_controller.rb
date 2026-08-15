@@ -14,6 +14,9 @@ class LessonsController < ApplicationController
     @step = LessonContent.step_for(params[:step])
     @lesson_content = LessonContent.for(@topic_key)
     @course_record = Course.find_by!(code: @course.code)
+    events = proctor_events
+    @proctor_score = Proctoring.score_for_counts(events.group(:kind).count)
+    @proctor_log_entries = Proctoring.log_entries(events.newest_first.limit(Proctoring::MAX_EVENTS))
     @show_integrity_log = Current.user.student? && LessonIntegritySetting.enabled?(course: @course_record,
                                                                                      topic_key: @topic_key)
     # Shown to everyone, staff included: a teacher reading their own lesson
@@ -53,6 +56,9 @@ class LessonsController < ApplicationController
     kind = params[:kind].to_s
     return head :unprocessable_entity unless ProctorEvent::KINDS.include?(kind)
 
+    step = params[:step].to_s
+    return head :unprocessable_entity unless Proctoring::ACTIVE_STEPS.include?(step)
+
     course = Course.find_by(code: params[:course].to_s)
     topic = course&.topics&.find_by(key: params[:topic].to_s)
     return head :unprocessable_entity unless course && topic
@@ -65,6 +71,15 @@ class LessonsController < ApplicationController
     def grade(kind, answer, topic_key)
       content = LessonContent.for(topic_key)
       kind == "quiz" ? content.grade_quiz(answer) : content.grade_code(answer)
+    end
+
+    def proctor_events
+      return ProctorEvent.none unless Current.user.student?
+
+      topic = @course_record.topics.find_by(key: @topic_key)
+      return ProctorEvent.none unless topic
+
+      ProctorEvent.where(user: Current.user, course: @course_record, topic:)
     end
 
     def set_course

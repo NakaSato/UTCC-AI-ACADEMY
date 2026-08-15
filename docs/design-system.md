@@ -31,7 +31,7 @@ The one hex outside the file is the `theme-color` meta tag in `shared/_head`, wh
 
 The design is *the rest of the app joins the chrome*. The chrome family and the `on-chrome-*` ramp are the one part that does not change — they were drawn for a near-black field already — so the header and footer look identical in both palettes. The canvas goes **below** chrome (`#0F0C0B` against `#17120F`) so the header still lifts off the page, and cards lift above both.
 
-Which palette a visitor gets is `session[:theme]`, rendered as a class on `<html>` and toggled by `shared/_theme_toggle` — the language toggle's twin, POST for the same reason. No preference at all means no class, and the media query answers, exactly as an unset locale falls through to `Accept-Language`. There is **no pre-paint script**: the server knows the answer when it renders, so there is no flash to prevent. See SPEC-0047.
+Which palette a visitor gets is `session[:theme]`, rendered as a class on `<html>` and selected from `shared/_theme_toggle` — the language selector's dropdown twin, POST for the same reason. Both controls follow Sign up on the public header and move inside the profile dropdown during a signed-in session. No preference at all means no class, and the media query answers, exactly as an unset locale falls through to `Accept-Language`. There is **no pre-paint script**: the server knows the answer when it renders, so there is no flash to prevent. See SPEC-0047.
 
 Two things to know before touching it:
 
@@ -160,6 +160,286 @@ All entrance animations share the easing `cubic-bezier(0.22, 0.9, 0.3, 1)` and a
 | `animate-top-bar` | the indeterminate slider pinned to the top of the viewport, 1s infinite |
 
 The `@layer base` reduced-motion block clamps every animation and transition to 0.01ms **and** forces `animation-iteration-count: 1` — without that the skeleton's infinite shimmer would restart every 0.01ms and repaint forever instead of settling.
+
+Shared dropdown panels use the Web Animations API through `dropdown_controller`:
+they enter over 170ms with a 6px rise and slight unscale, and leave over 120ms
+with the inverse movement. Top-level panel blocks follow with a capped 22ms
+stagger, and controls that carry a chevron rotate it toward the open panel.
+Every direction uses the same entrance easing above. The controller checks
+`prefers-reduced-motion` itself because the CSS duration clamp does not affect
+JavaScript-created animations; reduced-motion readers get the same immediate
+open/close state with no movement.
+
+An unread notification gets one 620ms bell swing from
+`notification_bell_controller`. The controller remembers the newest unread
+notification id in tab-scoped session storage, so Turbo navigation does not
+repeat the same attention cue; a later notification may ring once under its new
+id. It never loops, an empty/read bell never moves, and reduced motion bypasses
+the effect entirely.
+
+Primary page content uses `page_motion_controller` at the application and
+authentication layout boundary. On an initial render or ordinary Turbo advance,
+`main#main` settles upward by 7px while moving from 88% to full opacity over
+180ms. Cached previews do not animate, browser-history restoration puts content
+back without movement, and reduced-motion readers bypass the effect. There is no
+outgoing animation: navigation begins immediately rather than waiting on
+decoration.
+
+Redirect flash messages use `flash_motion_controller` once they arrive. Each
+message settles downward by 6px while moving from 35% to full opacity over
+220ms, with additional messages staggered by 35ms and capped at 105ms. The
+controller does not dismiss feedback on a timer; it only removes consumed flash
+markup before Turbo caches the page, preventing stale messages from returning
+through browser history. Reduced-motion readers receive the message immediately
+with no movement.
+
+Transient toast rows use `toast_controller` for both directions instead of CSS
+transition timing. A new row travels from the stack's configured 6px top or
+bottom offset while fading in over 200ms. Dismissal measures any unfinished
+entrance, cancels it, and continues toward that anchor over 160ms before removing
+the row. Reduced-motion readers receive immediate reveal and removal. Motion
+does not alter live-region urgency, timers, hover/focus pause, actions, ordering,
+or the three-row cap defined by SPEC-0046.
+
+The signed-out mobile navigation drawer also uses the Web Animations API through
+`header_controller`. Its backdrop fades in over 180ms while the panel travels
+from the right over 240ms. Dismissal measures any unfinished entrance, then
+continues the backdrop and panel toward their closed positions over 140ms and
+180ms respectively; reopening during that interval continues from the visible
+position. Open state, initial focus, and body scroll lock are applied before
+decoration, while dismissal updates the toggle and releases scroll immediately.
+Reduced-motion readers receive immediate open and close state with no animation.
+
+The public learning-track filter commits its selected tab and card `hidden`
+states through `tabs_controller` before the matching cards settle upward by 6px
+and unscale over 220ms. Visible results are staggered by 35ms and capped at
+105ms. A newer filter cancels the older card sequence, selecting the active
+filter again remains still, and reduced-motion readers receive the filtered
+result without a Web Animations API call. Track level, order, copy, and links do
+not depend on the decoration.
+
+Each public FAQ keeps native `details`/`summary` semantics and uses
+`disclosure_motion_controller` only after an answer is open. The answer settles
+4px downward while fading to rest over 190ms. Closing remains immediate and
+cancels unfinished movement; reopening may start a new acknowledgement, while
+reduced-motion readers use the native disclosure without a Web Animations API
+call. Question and answer copy, structured data, focus, and toggle behavior stay
+independent of decoration.
+
+Learner syllabus modules reuse that native disclosure controller for their
+topic area. The server-selected current module stays open without replaying
+motion on initial render. Opening another module settles its content 4px
+downward over 190ms; closing cancels immediately, and reduced-motion readers
+receive the same native disclosure state without animation. Module ordering,
+current/done/locked state, topic links, and progress remain server-owned.
+
+Expandable course rows on My Learning use the same native disclosure motion.
+The server-selected first row in each in-progress or completed list stays open
+and still on render. A learner-opened row settles its progress and action area
+4px downward over 190ms; closing cancels immediately, and reduced-motion readers
+receive native state without animation. Tab selection, course classification,
+completion counts, progress values, and destinations remain server-owned.
+
+Administrator landing-content sections reuse the native disclosure motion for
+their editor body. The `?group=`-selected section stays open and still on
+render. Manually opening another section settles its fields and card controls
+4px downward over 190ms; closing cancels immediately, and reduced motion uses
+native state without animation. Form ownership, bilingual copy, save/add/delete
+and reorder actions, card attributes, and the group return URL are unchanged.
+
+The shared back-to-top control uses `to_top_controller` to acknowledge threshold
+crossings without changing the 400px threshold or its smooth-scroll action. It
+rises 8px and unscales over 200ms when shown, then reverses over 150ms before
+becoming invisible. A newer crossing cancels and continues from the computed
+visual state; initial page position is committed without movement, and reduced
+motion changes visibility immediately without calling the Web Animations API.
+
+The signed-out sticky header uses `header_controller` to soften its existing
+shadow change after the 10px pin threshold. The class-backed pinned state is
+committed immediately, while its computed shadow interpolates over 200ms when
+pinned and 150ms when released. A newer crossing cancels and continues from the
+rendered shadow; initial/restored scroll position remains still, and reduced
+motion commits the same pinned state without calling the Web Animations API.
+Sticky positioning, drawer behavior, section spy, and navigation are unchanged.
+
+That header's section spy also acknowledges a newly current visible navigation
+link after committing `data-active` and `aria-current`. The rendered desktop or
+drawer link settles upward by 2px and unscales over 180ms; superseded movement
+is cancelled, the observer's initial pass remains still, and reduced motion
+bypasses the Web Animations API. Section visibility, ordering, translated copy,
+anchors, and the active-state decision remain owned by the existing observer.
+
+Academic-post reader preference changes use `reader_controller` to acknowledge
+the already-applied width, font-size, or theme setting on the reading surface.
+The surface settles upward by 3px and unscales over 180ms; a newer preference
+continues from the rendered position, while restored settings, repeated no-op
+choices, and reduced motion remain still. Local-storage scope, sanitized post
+content, server authorization, export, translated controls, and saved academic
+content are unchanged under SPEC-0007.
+
+The academic reader table of contents acknowledges a newly selected section link
+with a cancellable 160ms horizontal nudge after native anchor navigation begins.
+Repeated selection of the same link, initial rendering, and reduced-motion
+preferences remain still; heading IDs, browser scrolling, and content semantics
+remain native.
+
+The shared sign-in/sign-up switch keeps both compact auth panels still and uses
+an opt-in `panels_controller` cue only on the newly selected tab. After the
+panel, `aria-selected`, focus, URL, and document title are committed, the tab
+settles from 0.96 scale through a 1.03 overshoot over 200ms. Initial and repeated
+selection remain still, a newer selection cancels the older cue, and reduced
+motion switches immediately without calling the Web Animations API. Form
+actions, validation, authentication, registration, and browser history remain
+unchanged.
+
+Lesson content panels opt into the shared `panels_controller` movement with
+`data-motion`. Moving forward through Theory, Exercise, Coding Task, and Summary
+brings the next panel 12px from the right; moving backward brings it from the
+left. Both directions settle over 220ms with the shared entrance easing. Other
+consumers of `panels_controller` do not move, selecting the current step again
+does not replay movement, and reduced-motion readers switch immediately.
+
+The lesson progress fill uses the same controller instead of a CSS width
+transition. It measures its visible percentage before cancelling superseded
+movement, commits the new step percentage underneath, and interpolates to it
+over 300ms. This lets rapid forward or backward selections continue without a
+jump. Direct or repeated selections remain still, and reduced-motion readers
+receive the destination width immediately without a Web Animations API call.
+
+Each newly selected lesson-step circle confirms its already-applied current
+state with one 240ms scale settle: 0.84 to a 1.10 overshoot at 62%, then back to
+rest. A newer selection cancels the previous circle movement. Opening a step
+directly, selecting the current step again, and reduced-motion preferences all
+leave the semantic `aria-selected` and current/done states immediate and still.
+
+The compact translated step label beside the progress bar enters after its
+hidden state switches. Forward navigation brings it 4px from below; backward
+navigation brings it 4px from above, both fading to rest over 180ms. A newer
+selection cancels the older label entrance. Direct or repeated selections and
+reduced-motion preferences show the correct label immediately without movement.
+
+Assessment results use `assessment_motion_controller` after the quiz or coding
+controller has already rendered its semantic status. The feedback plate or
+console settles upward by 6px from 45% to full opacity over 240ms. A newer
+result cancels movement on the same surface, resetting the coding task cancels
+its console movement, and reduced-motion readers receive the updated status
+without a Web Animations API call. Grading never waits for decoration.
+
+The coding-task console also acknowledges a submitted run after its running
+state is committed with a cancellable 160ms horizontal nudge. A newer run or
+the graded result cancels the prior cue; reset, failed transport recovery, and
+reduced-motion readers keep the console state immediate without movement.
+
+The exercise check control uses the same 160ms acknowledgement after its
+disabled, submitted state commits and before server grading returns. A result or
+transport recovery supersedes the cue; answer selection, retry behavior, result
+feedback, and reduced-motion readers remain immediate and unchanged.
+
+Academic-post editor toolbar buttons acknowledge an executed Tiptap command with
+a cancellable 160ms scale settle. The command, prompt result, editor HTML sync,
+save behavior, and reduced-motion readers remain immediate; repeated presses on
+one button cancel and restart only its decorative cue.
+
+Academic-editor status messages acknowledge a changed validation or picture
+import result with a cancellable 180ms upward settle. The message text, error
+state, live-region announcement, and reduced-motion behavior remain immediate;
+repeating the same status does not replay movement.
+
+My Learning progress/completed tabs opt into the shared 200ms selection
+acknowledgement after their panel, URL, and aria state commit. The panels and
+course disclosures stay still; repeated selections and reduced-motion readers
+receive the same immediate tab state without movement.
+
+The newly selected My Learning panel also settles from the direction of the tab
+change over 220ms after its hidden state commits. Repeated selections, initial
+rendering, course disclosures, and reduced-motion readers remain still.
+
+The continuation link revealed by a passing exercise or coding task uses that
+controller only after server grading has made the action visible. It settles
+upward by 5px with a slight 0.98 unscale over 220ms. A newer pass replaces any
+movement on the same link, Coding Task Reset cancels its pending movement, and
+reduced-motion readers receive the immediately usable action without animation.
+The link destination and completion rules remain independent of decoration.
+
+Selecting a new exercise answer applies its `aria-checked` and visual picked
+state before the answer marker settles from 0.86 scale through a 1.12 overshoot
+and back to rest over 200ms. Selecting a different answer cancels superseded
+marker movement; selecting the current answer again remains still. Reduced-
+motion readers receive the same radio state immediately without animation, and
+the selection cue has no knowledge of the server-held answer key.
+
+When a new integrity incident is recorded on Exercise or Coding Task, the
+numeric score and its derived band update before the score settles from 2px
+above at 1.12 scale over 240ms. A newer incident cancels superseded score
+movement. Initial page loads, restored scores after refresh or language change,
+Theory and Summary interactions, and reduced-motion preferences remain still.
+Incident weights, persistence, the integrity meter, and log-row behavior are
+independent of this acknowledgement.
+
+The integrity meter uses the same controller instead of its former CSS width
+transition. After an assessed-step incident, it measures the currently visible
+percentage before cancelling superseded movement, commits the new score width,
+and interpolates to it over 300ms. Rapid incidents therefore continue without
+jumping to an older destination. Initial and restored widths, inactive lesson
+steps, an unchanged zero score, and reduced-motion preferences receive the
+committed width immediately without a Web Animations API call.
+
+The translated integrity verdict moves only when a new assessed-step incident
+crosses the clean, review, or risk score boundary. Its new copy, color band, and
+score are applied first; the label then settles 3px upward from 45% opacity over
+220ms. Deductions within one band remain still, and a newer boundary change
+cancels superseded verdict movement. Initial/restored state, inactive steps,
+and reduced-motion preferences receive the translated verdict immediately.
+
+The integrity log rebuilds its translated rows immediately after an assessed-
+step incident, then moves only the new first row 6px from the left over 260ms.
+Restored rows and older rows remain still instead of replaying when the list is
+rebuilt. A newer incident cancels superseded row movement; inactive steps and
+reduced-motion preferences update no row or show the new row without animation.
+
+The integrity guard is visible and blocks the assessed step before its backdrop
+fades in over 180ms and its dialog settles upward by 8px from 0.98 scale over
+260ms. A guarded incident while the guard is already open does not replay either
+layer. The resume button keeps blocking and focus state committed immediately,
+then the backdrop and dialog settle out over 150ms and 170ms; restored focus,
+superseding incidents, and reduced-motion preferences hide it immediately.
+Initial state and inactive steps receive no Web Animations API call. The guard's
+incident recording and resume behavior do not depend on this decoration.
+
+Coding Task criterion rows use the same controller after their server-returned
+states are applied. Each row settles 6px from the left over 260ms, staggered by
+45ms and capped at 135ms. A newer run or Reset cancels every remaining row
+animation. Reduced-motion readers receive all criterion states immediately,
+and the browser still never receives the grading patterns.
+
+The lesson's earned-gems counter responds only after the existing
+`quiz:reward` or `code-task:reward` event has updated its number. It rises 2px,
+scales to 1.16, and settles over 320ms. A newer reward cancels the older bump,
+disconnect cancels remaining movement, and reduced-motion readers receive the
+same cumulative number without animation. The counter remains optimistic
+browser state; persisted progress still comes exclusively from completions.
+
+Arriving at the lesson Summary schedules its reward cards together through
+`panels_controller`. Each card settles upward by 8px and unscales from 0.985
+over 280ms, with a 45ms stagger capped at 135ms. Leaving or selecting another
+step cancels every remaining card animation; opening directly on Summary and
+selecting the current step do not replay it. Reduced-motion readers receive all
+cards immediately without a Web Animations API call. The sequence is decorative
+and does not alter reward values, completion state, or destination links.
+
+The Summary completion mark starts with that arrival sequence and settles once
+over 360ms: it scales from 0.78 with a 5-degree counterclockwise turn, reaches
+1.08 at 68%, then returns to its resting size. Leaving the step cancels any
+unfinished mark movement. Opening Summary directly, selecting it again, and
+reduced-motion preferences all render the same completed mark immediately with
+no Web Animations API call; the icon remains decorative and `aria-hidden`.
+
+The two Summary action links follow the earlier completion cues while remaining
+usable throughout. They settle upward by 6px over 260ms, starting after 180ms
+and 220ms respectively. Leaving Summary cancels unfinished action movement;
+opening the step directly, selecting it again, or requesting reduced motion
+renders both links immediately without a Web Animations API call. Their hrefs,
+labels, focus behavior, and primary/secondary hierarchy do not change.
 
 The base layer also restores `cursor: pointer` on enabled buttons (Tailwind v4's preflight ships the default arrow), gives anchor targets `scroll-padding-top` that clears the sticky header, and draws the `:focus-visible` ring as a 2px `brand` outline offset by 2px.
 

@@ -21,7 +21,8 @@
                      data-[state=picked]:border-brand-ink data-[state=picked]:bg-brand-tint data-[state=picked]:text-ink
                      data-[state=correct]:border-success data-[state=correct]:bg-success-tint data-[state=correct]:text-success-ink
                      data-[state=wrong]:border-brand-alert data-[state=wrong]:bg-danger-tint">
-        <span class="grid size-6.5 flex-none place-items-center rounded-lg bg-surface-2 text-12-5 font-semibold
+        <span data-quiz-choice-indicator="<%= index %>"
+              class="grid size-6.5 flex-none place-items-center rounded-lg bg-surface-2 text-12-5 font-semibold
                      text-muted-2
                      group-data-[state=picked]:bg-brand group-data-[state=picked]:text-white
                      group-data-[state=correct]:bg-success group-data-[state=correct]:text-white
@@ -50,7 +51,8 @@
     </button>
 
     <%= link_to @lesson_content.translate("quiz.to_code"), lesson_step_path(:code),
-          data: { quiz_target: "next", panel: :code, action: "panels#select" },
+          data: { quiz_target: "next", assessment_action: "quiz",
+                  panel: :code, action: "panels#select" },
           class: "hidden rounded-field border-[1.5px] border-brand-ink px-6.5 py-2.75 text-15 font-semibold text-brand-ink
                   transition-colors hover:bg-brand-tint" %>
   </div>

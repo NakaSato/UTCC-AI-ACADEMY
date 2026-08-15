@@ -44,16 +44,21 @@ class ThemesTest < ActionDispatch::IntegrationTest
     assert_nil session[:theme]
   end
 
-  test "the toggle ships on the landing page, the app, and the auth screens" do
+  test "the selector ships on the landing page and the app, but not auth screens" do
     get root_path
     assert_theme_toggle
 
     get login_path
-    assert_theme_toggle
+    assert_response :success
+    assert_select "[data-preference=theme]", count: 0
+    assert_select "[data-preference=language]", count: 0
 
     sign_in_as users(:one)
     get progress_path
     assert_theme_toggle
+    assert_select "[data-rail=session-actions] > [data-preference=theme]", count: 0
+    assert_select "[data-menu=account] [data-preference=theme]", count: 1
+    assert_select "[data-menu=account] [data-preference=language]", count: 1
   end
 
   test "the toggle marks the current choice for a screen reader" do
@@ -81,8 +86,31 @@ class ThemesTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_select "[aria-label=?]", I18n.t("chrome.theme_label", locale: :th)
-    assert_select "form[action=?] .sr-only", theme_path("dark"),
-                  text: I18n.t("chrome.theme.dark", locale: :th)
+    assert_select "form[action=?] button", theme_path("dark"),
+                  text: /#{I18n.t("chrome.theme.dark", locale: :th)}/
+  end
+
+  test "the current theme opens a dropdown containing all three choices" do
+    get root_path
+
+    assert_select "[data-preference=theme][data-controller=dropdown]" do
+      assert_select "button[aria-haspopup=true][aria-expanded=false]",
+                    text: /#{I18n.t("chrome.theme.system")}/
+      assert_select "[data-dropdown-target=panel][hidden][data-state=closed]" do
+        assert_select "form", count: 3
+      end
+    end
+  end
+
+  test "the public navbar places both preferences after sign up" do
+    get root_path
+
+    signup = response.body.index(%(href="#{register_path}"))
+    language = response.body.index(%(data-preference="language"))
+    theme = response.body.index(%(data-preference="theme"))
+
+    assert signup < language, "language should follow sign up"
+    assert language < theme, "theme should follow language"
   end
 
   private

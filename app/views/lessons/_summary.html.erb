@@ -1,5 +1,7 @@
 <div class="rounded-card border border-hairline bg-surface px-7 py-12 text-center sm:px-11 sm:py-14">
   <div aria-hidden="true"
+       data-panels-target="summaryMark"
+       data-summary-mark
        class="mx-auto mb-5.5 grid size-[62px] place-items-center rounded-card bg-brand text-26 text-white">✓</div>
 
   <h1 class="mb-2.5 text-26 font-bold tracking-[-0.025em] sm:text-30"><%= t("lesson.done.title") %></h1>
@@ -7,7 +9,9 @@
 
   <div class="mb-8 flex flex-wrap justify-center gap-3.5">
     <% LessonContent.rewards.each do |reward| %>
-      <div class="rounded-[14px] border border-hairline bg-canvas px-6.5 py-4.5">
+      <div class="rounded-[14px] border border-hairline bg-canvas px-6.5 py-4.5"
+           data-panels-target="summaryReward"
+           data-summary-reward>
         <div class="mb-0.5 text-22 font-bold text-brand-ink"><%= reward[:value] %></div>
         <div class="text-12-5 text-muted-2"><%= reward[:label] %></div>
       </div>
@@ -21,9 +25,11 @@
     <% next_key = Syllabus.topic_after(@topic_key, @course.code) %>
     <%= link_to t(next_key ? "lesson.done.next_topic" : "lesson.done.back_course"),
           next_key ? lesson_path(course: @course.code, topic: next_key) : course_path(@course.code),
+          data: { panels_target: "summaryAction", summary_action: true },
           class: "rounded-field bg-brand px-6.5 py-3.25 text-15 font-semibold text-white transition-colors
                   hover:bg-brand-deep" %>
     <%= link_to t("lesson.done.see_progress"), progress_path,
+          data: { panels_target: "summaryAction", summary_action: true },
           class: "rounded-field border-[1.5px] border-hairline-2 px-6 py-2.75 text-15 font-medium text-ink-4
                   transition-colors hover:border-muted-3" %>
   </div>

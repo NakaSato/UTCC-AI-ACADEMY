@@ -7,6 +7,7 @@ class AuthSwitchTest < ActionDispatch::IntegrationTest
     assert_select "section[data-panel=register][hidden]", 1
     assert_select "button[role=tab][data-panel=login][aria-selected=true]", 1
     assert_select "button[role=tab][data-panel=register][aria-selected=false]", 1
+    assert_select "button[role=tab][data-auth-tab][data-tab-motion]", 2
     assert_select "section[data-panel=login] input[autofocus]", 1
     assert_select "section[data-panel=register] input[autofocus]", 0
     assert_select "form[action=?]", "/login", 1

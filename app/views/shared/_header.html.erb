@@ -8,6 +8,7 @@
     off the content), which is why it no longer moves the header out of flow. %>
 <header class="sticky top-0 z-40 w-full bg-chrome"
         data-controller="header"
+        data-pinned="false"
         data-header-pinned-class="shadow-lg"
         data-action="keydown@window->header#closeOnEscape">
   <nav class="mx-auto flex min-h-header w-full max-w-page items-center gap-4 px-4 xl:px-8"
@@ -40,6 +41,7 @@
         <% nav_links.each do |label, href| %>
           <a href="<%= href %>"
              data-header-target="navLink"
+             data-scroll-spy-link
              data-active="false"
              class="relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-white
                     after:absolute after:right-0 after:bottom-0 after:left-auto after:block after:h-0.5 after:w-0
@@ -53,11 +55,6 @@
     </div>
 
     <div class="ml-auto flex flex-none items-center gap-2">
-      <%# The landing page reads from `landing.*` in both locales now, so the
-          toggle belongs here as much as it does on the app header. %>
-      <%= render "shared/language_toggle", dark: true %>
-      <%= render "shared/theme_toggle", dark: true %>
-
       <div class="hidden items-center gap-2 lg:flex">
         <%= link_to t("landing.sign_in"), login_path,
               class: "relative mx-2 inline-block py-1 text-18 text-on-chrome transition-colors duration-300 hover:text-white
@@ -72,6 +69,12 @@
                       hover:bg-brand-deep hover:shadow-lg active:scale-97" %>
       </div>
 
+      <%# Presentation preferences follow the account actions on the public
+          rail: Sign in → Sign up → Language → Theme. They remain visible on
+          narrow screens where those two actions move into the drawer. %>
+      <%= render "shared/language_toggle", dark: true %>
+      <%= render "shared/theme_toggle", dark: true %>
+
       <button type="button"
               class="inline-flex rounded-full p-2 text-white transition duration-300 hover:bg-surface/12 lg:hidden"
               data-action="header#toggle" aria-label="<%= t("landing.menu_open") %>"
@@ -85,14 +88,16 @@
     </div>
   </nav>
 
-  <div class="group invisible fixed inset-0 z-40 data-[open=true]:visible"
-       data-header-target="drawer" data-open="false">
-    <div class="absolute inset-0 bg-ink/70 opacity-0 transition-opacity duration-300 group-data-[open=true]:opacity-100"
+  <div class="fixed inset-0 z-40"
+       data-header-target="drawer" data-mobile-drawer
+       data-open="false" data-state="closed" hidden>
+    <div class="absolute inset-0 bg-ink/70"
+         data-header-target="drawerBackdrop" data-mobile-drawer-backdrop
          data-action="click->header#close"></div>
 
     <div id="landing-menu"
-         class="absolute top-0 right-0 h-full w-[min(20rem,85vw)] translate-x-full overflow-y-auto bg-chrome p-4
-                shadow-2xl transition-transform duration-300 group-data-[open=true]:translate-x-0"
+         class="absolute top-0 right-0 h-full w-[min(20rem,85vw)] overflow-y-auto bg-chrome p-4 shadow-2xl"
+         data-header-target="drawerPanel" data-mobile-drawer-panel
          role="dialog" aria-modal="true" aria-label="<%= t("landing.menu_label") %>">
       <div class="mb-4 flex items-center justify-between gap-4 text-white">
         <span class="flex items-center gap-2">
@@ -113,6 +118,7 @@
         <% nav_links.each do |label, href| %>
           <a href="<%= href %>"
              data-header-target="navLink"
+             data-scroll-spy-link
              data-active="false"
              class="border-b border-chrome-line py-2 text-on-chrome transition-colors duration-300 hover:text-white
                     data-[active=true]:border-brand-ink data-[active=true]:text-white"

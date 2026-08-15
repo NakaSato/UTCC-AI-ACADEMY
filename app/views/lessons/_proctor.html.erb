@@ -18,18 +18,18 @@
 
   <div class="flex flex-none items-center gap-3">
     <div class="h-1.75 w-23 overflow-hidden rounded-full bg-surface-2">
-      <div data-proctor-target="meter"
-           class="h-full rounded-full transition-[width] duration-300
+      <div data-proctor-target="meter" data-integrity-meter
+           class="h-full rounded-full
                   group-data-[band=clean]:bg-success group-data-[band=review]:bg-gold
                   group-data-[band=risk]:bg-brand"
            style="width: <%= Proctoring::START_SCORE %>%"></div>
     </div>
-    <span data-proctor-target="score"
+    <span data-proctor-target="score" data-integrity-score
           class="text-13-5 font-bold group-data-[band=clean]:text-success-deep
                  group-data-[band=review]:text-gold group-data-[band=risk]:text-brand-ink">
       <%= Proctoring::START_SCORE %>
     </span>
-    <span data-proctor-target="verdict" class="text-13 text-muted-2">
+    <span data-proctor-target="verdict" data-integrity-verdict class="text-13 text-muted-2">
       <%= t("lesson.proctor.verdict_clean") %>
     </span>
   </div>
@@ -38,9 +38,11 @@
 <% if monitored %>
   <%# Shown purely by the data attribute the controller sets on <main>, so with
       no JS it never appears and the lesson stays readable. %>
-  <div class="fixed inset-0 z-90 hidden animate-fade place-items-center bg-chrome/72 p-8
+  <div data-proctor-target="guard" data-integrity-guard
+       class="fixed inset-0 z-90 hidden place-items-center bg-chrome/72 p-8
               group-data-[proctor-hidden=true]:grid">
-    <div class="max-w-[460px] animate-pop rounded-panel bg-surface px-10.5 py-9.5 text-center">
+    <div data-proctor-target="guardDialog" data-integrity-guard-dialog
+         class="max-w-[460px] rounded-panel bg-surface px-10.5 py-9.5 text-center">
       <span aria-hidden="true"
             class="mx-auto mb-5 grid size-13.5 place-items-center rounded-2xl bg-brand text-22 text-white">!</span>
       <h2 class="mb-2.5 text-22 leading-[1.3] font-bold tracking-[-0.02em]">

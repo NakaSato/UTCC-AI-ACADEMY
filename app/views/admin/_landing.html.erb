@@ -28,6 +28,9 @@
   <% form_id = "landing-#{group.key}" %>
 
   <details class="group mb-2.5 overflow-hidden rounded-card border border-hairline bg-surface"
+           data-controller="disclosure-motion"
+           data-action="toggle->disclosure-motion#toggle"
+           data-admin-landing-group="<%= group.key %>"
            <%= "open" if group.key == @group %>>
     <summary class="marker-none flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-15 font-bold
                     tracking-[-0.01em] transition-colors hover:bg-surface-4
@@ -37,7 +40,8 @@
       <%= t("admin.landing.sections.#{group.key}") %>
     </summary>
 
-    <div class="flex flex-col gap-5 border-t border-surface-3 px-6 py-5">
+    <div class="flex flex-col gap-5 border-t border-surface-3 px-6 py-5"
+         data-disclosure-motion-target="content" data-admin-landing-content>
       <%= form_with url: admin_landing_path, method: :patch, id: form_id, class: "contents" do %>
         <%# Which group came back, so the save reopens the one that was edited. %>
         <%= hidden_field_tag :group, group.key %>

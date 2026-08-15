@@ -66,6 +66,9 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     sign_in_as users(:two)
     get root_url
     assert_select "header", text: /#{Regexp.escape(users(:two).notifications.sole.text)}/
+    assert_select "[data-controller~=notification-bell][data-notification-bell-unread-value=true]" do
+      assert_select "svg[data-notification-bell-target=icon]", count: 1
+    end
 
     post read_notifications_url
     assert_equal 0, users(:two).notifications.unread.count
@@ -104,6 +107,9 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
     get root_url
 
+    assert_select "header button[aria-label=?] svg[data-icon=notification-bell]",
+                  I18n.t("chrome.notif_toggle"), count: 1
+    assert_select "[data-controller~=notification-bell][data-notification-bell-unread-value=false]", count: 1
     assert_select "header", text: /#{Regexp.escape(I18n.t("chrome.notif_empty"))}/
   end
 

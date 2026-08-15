@@ -49,4 +49,19 @@ class LanguagesControllerTest < ActionDispatch::IntegrationTest
     get login_url
     assert_select "h1", text: I18n.t("auth.login.title", locale: :en)
   end
+
+  test "the selected language opens a dropdown containing every locale" do
+    get root_url
+
+    assert_select "[data-menu=account] [data-preference=language][data-controller=dropdown]" do
+      assert_select "button[aria-haspopup=true][aria-expanded=false]",
+                    text: /#{I18n.t("language_full_name", locale: :th)}/
+      assert_select "[data-dropdown-target=panel][hidden][data-state=closed]" do
+        I18n.available_locales.each do |locale|
+          assert_select "form[action=?] button", language_path(locale),
+                        text: /#{I18n.t("language_full_name", locale:)}/
+        end
+      end
+    end
+  end
 end

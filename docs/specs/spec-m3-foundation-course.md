@@ -5,7 +5,7 @@ title: Complete the AI1101 foundation course content
 status: accepted
 owners: ["@product-owner", "@instructor"]
 created: 2026-08-01
-updated: 2026-08-01
+updated: 2026-08-15
 review_by: 2026-08-15
 supersedes: []
 superseded_by: []
@@ -19,11 +19,51 @@ touches:
   - config/locales/th.yml
   - test/models/placeholder_content_test.rb
   - test/controllers/lesson_completion_test.rb
+  - test/controllers/proctor_incidents_test.rb
+  - test/controllers/app_screens_test.rb
+  - test/system/assessment_action_motion_walk_test.rb
+  - test/system/assessment_feedback_motion_walk_test.rb
+  - test/system/coding_criteria_motion_walk_test.rb
+  - test/system/integrity_log_walk_test.rb
+  - test/system/integrity_guard_motion_walk_test.rb
+  - test/system/integrity_log_motion_walk_test.rb
+  - test/system/integrity_meter_motion_walk_test.rb
+  - test/system/integrity_score_motion_walk_test.rb
+  - test/system/integrity_verdict_motion_walk_test.rb
+  - test/system/lesson_panel_motion_walk_test.rb
+  - test/system/lesson_progress_motion_walk_test.rb
+  - test/system/lesson_step_indicator_motion_walk_test.rb
+  - test/system/lesson_step_label_motion_walk_test.rb
   - test/system/learning_walk_test.rb
+  - test/system/quiz_selection_motion_walk_test.rb
+  - test/system/reward_motion_walk_test.rb
+  - test/system/summary_reward_motion_walk_test.rb
+  - test/system/summary_completion_motion_walk_test.rb
+  - test/system/summary_action_motion_walk_test.rb
 enforced_by:
   - test/models/placeholder_content_test.rb
   - test/controllers/lesson_completion_test.rb
+  - test/controllers/proctor_incidents_test.rb
+  - test/controllers/app_screens_test.rb
+  - test/system/assessment_action_motion_walk_test.rb
+  - test/system/assessment_feedback_motion_walk_test.rb
+  - test/system/coding_criteria_motion_walk_test.rb
+  - test/system/integrity_log_walk_test.rb
+  - test/system/integrity_guard_motion_walk_test.rb
+  - test/system/integrity_log_motion_walk_test.rb
+  - test/system/integrity_meter_motion_walk_test.rb
+  - test/system/integrity_score_motion_walk_test.rb
+  - test/system/integrity_verdict_motion_walk_test.rb
+  - test/system/lesson_panel_motion_walk_test.rb
+  - test/system/lesson_progress_motion_walk_test.rb
+  - test/system/lesson_step_indicator_motion_walk_test.rb
+  - test/system/lesson_step_label_motion_walk_test.rb
   - test/system/learning_walk_test.rb
+  - test/system/quiz_selection_motion_walk_test.rb
+  - test/system/reward_motion_walk_test.rb
+  - test/system/summary_reward_motion_walk_test.rb
+  - test/system/summary_completion_motion_walk_test.rb
+  - test/system/summary_action_motion_walk_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-TEST-001, SKILL-HUM-001]
 min_reviewer_skills: [SKILL-SPEC-002, SKILL-TEST-001]
@@ -73,6 +113,11 @@ objectives, and summary content for these remaining topics:
 Preserve the existing four-step lesson flow, server-side grading boundary,
 progress/unlocking model, and Thai/English locale parity.
 
+Integrity monitoring is limited to the two assessed steps — exercise and coding
+task. A learner's stored topic incidents and derived score must return after a
+refresh, and stored incident copy must be translated again when the learner
+changes language.
+
 ### Excluded
 
 - Changing course taxonomy or adding new AI1101 topics.
@@ -90,6 +135,10 @@ progress/unlocking model, and Thai/English locale parity.
 4. A passing assessment records the topic key in the URL and unlocks only the
    syllabus-defined next topic.
 5. A content change cannot alter progress denominators or completion semantics.
+6. Theory and summary activity creates no integrity incident; only exercise and
+   coding-task activity may be accepted by the incident endpoint.
+7. A learner sees only their own current-topic integrity events, rebuilt from
+   durable records in the request's active locale.
 
 ## Acceptance Criteria
 
@@ -103,6 +152,11 @@ progress/unlocking model, and Thai/English locale parity.
       path (`test/system/learning_walk_test.rb`).
 - [ ] Terminology and positional locale structures remain aligned
       (`test/models/placeholder_content_test.rb`).
+- [ ] Integrity incidents are accepted only from exercise and coding-task steps,
+      and stored learner events survive refresh and language changes
+      (`test/controllers/proctor_incidents_test.rb`,
+      `test/controllers/app_screens_test.rb`,
+      `test/system/integrity_log_walk_test.rb`).
 - [ ] Each module has instructor review and small learner-test evidence recorded
       before the backlog item is completed (`docs/backlog.json`).
 

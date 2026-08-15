@@ -106,6 +106,25 @@ class AppScreensTest < ActionDispatch::IntegrationTest
       assert_select "[role=tabpanel]:not([hidden])", 1
       assert_select "[role=tabpanel][data-panel=#{step}]:not([hidden])", 1
       assert_select "[role=tabpanel]", LessonContent::STEPS.size
+      assert_select "[role=tabpanel][data-motion]", LessonContent::STEPS.size
+      assert_select "[data-panels-target~=progress][style*='width:']", 1
+      assert_select "[data-panels-target~=stepLabel][data-lesson-step-label]", LessonContent::STEPS.size
+      assert_select "[data-proctor-target~=score][data-integrity-score]", 1
+      assert_select "[data-proctor-target~=meter][data-integrity-meter]", 1
+      assert_select "[data-proctor-target~=verdict][data-integrity-verdict]", 1
+      assert_select "[data-proctor-target~=guard][data-integrity-guard]", 1
+      assert_select "[data-proctor-target~=guardDialog][data-integrity-guard-dialog]", 1
+      assert_select "template[data-proctor-target~=row] [data-integrity-event-row]", 1
+      assert_select "[role=tab] [data-panels-target~=stepIndicator][data-lesson-step-indicator]",
+                    LessonContent::STEPS.size
+      assert_select "[data-panel=summary] [data-panels-target~=summaryMark][data-summary-mark]", 1
+      assert_select "[data-panel=summary] [data-panels-target~=summaryReward][data-summary-reward]",
+                    LessonContent.rewards.size
+      assert_select "[data-panel=summary] a[data-panels-target~=summaryAction][data-summary-action]", 2
+      assert_select "a[data-assessment-action][data-quiz-target~=next]", 1
+      assert_select "a[data-assessment-action][data-code-task-target~=finish]", 1
+      assert_select "[data-quiz-target~=option] [data-quiz-choice-indicator]",
+                    LessonContent.for(Syllabus.topic_keys.first).options.size
     end
   end
 
@@ -165,6 +184,29 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main[data-controller*=proctor]", count: 0
     assert_select "main", text: /#{I18n.t("lesson.proctor.label_exempt")}/
+  end
+
+  test "the integrity log restores stored assessment events in the selected language" do
+    event = ProctorEvent.create!(user: users(:one), course: courses(:ai1101), topic: topics(:topic_1_1),
+                                 kind: "blur", occurred_at: Time.zone.parse("2026-08-15 08:05:04"))
+    ProctorEvent.create!(user: users(:two), course: courses(:ai1101), topic: topics(:topic_1_1),
+                         kind: "capture", occurred_at: event.occurred_at)
+    ProctorEvent.create!(user: users(:one), course: courses(:ai1101), topic: topics(:topic_1_2),
+                         kind: "print", occurred_at: event.occurred_at)
+    lesson = lesson_url(course: "AI1101", topic: "1-1", step: :exercise)
+
+    get lesson
+
+    assert_response :success
+    assert_integrity_state(event:, locale: :th, score: 92)
+
+    # The language write redirects back to this lesson. The event is read from
+    # the database again and its sentence is rendered in the new locale.
+    post language_url(:en), headers: { "HTTP_REFERER" => lesson }
+    follow_redirect!
+
+    assert_select "html[lang=en]"
+    assert_integrity_state(event:, locale: :en, score: 92)
   end
 
   # A lesson is a position in a syllabus, and without a `?topic=` that position
@@ -249,6 +291,9 @@ class AppScreensTest < ActionDispatch::IntegrationTest
     # The completed list is in the page too, just hidden until the tab is used.
     assert_select "#{completed}", text: /#{Regexp.escape(I18n.t("catalog.courses.AI1102.title"))}/
     assert_select "[role=tabpanel][data-panel=done][hidden]", 1
+    assert_select "details[data-controller=disclosure-motion][data-enrollment-course]", 2 do
+      assert_select "[data-disclosure-motion-target=content][data-enrollment-content]", 2
+    end
 
     get my_learning_url(tab: "done")
 
@@ -401,5 +446,36 @@ class AppScreensTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: I18n.t("catalog.title"), count: 0
+    assert_select "#tracks[data-controller=tabs]" do
+      assert_select "[role=tab][data-tabs-target=tab][aria-selected]", Landing.track_filters.size
+      assert_select "[data-tabs-target=item][data-track-card][data-level]", Landing.tracks.size
+    end
+    assert_select "#faq details[data-controller=disclosure-motion][data-faq-disclosure]", Landing.faqs.size do
+      assert_select "[data-disclosure-motion-target=content][data-faq-answer]", Landing.faqs.size
+    end
+    assert_select "header[data-controller=header][data-pinned=false][data-header-pinned-class]", 1
+    assert_select "a[data-header-target=navLink][data-scroll-spy-link][data-active=false]", 10
+    assert_select "button[data-header-target=toggle][aria-controls=landing-menu][aria-expanded=false]", 1
+    assert_select "[data-mobile-drawer][data-state=closed][data-open=false][hidden]", 1 do
+      assert_select "[data-header-target=drawerBackdrop][data-mobile-drawer-backdrop]", 1
+      assert_select "#landing-menu[data-header-target=drawerPanel][data-mobile-drawer-panel]", 1
+    end
   end
+
+  private
+    def assert_integrity_state(event:, locale:, score:)
+      main = css_select("main[data-proctor-initial-events-value][data-proctor-score-value]").sole
+      entries = JSON.parse(main["data-proctor-initial-events-value"])
+
+      assert_equal score.to_s, main["data-proctor-score-value"]
+      assert_equal Proctoring::ACTIVE_STEPS.to_json, main["data-proctor-active-steps-value"]
+      assert_equal 1, entries.size
+      assert_equal event.kind, entries.first.fetch("kind")
+      assert_equal I18n.t("lesson.proctor.events.#{event.kind}", locale:), entries.first.fetch("text")
+      assert_equal "08:05:04", entries.first.fetch("stamp")
+
+      log = css_select("[data-integrity-log]").sole
+      assert_includes log["class"], "group-data-[panel=exercise]:block"
+      assert_includes log["class"], "group-data-[panel=code]:block"
+    end
 end

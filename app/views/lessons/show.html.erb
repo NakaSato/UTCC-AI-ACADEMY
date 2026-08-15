@@ -7,9 +7,18 @@
 <% monitored = Current.user.student? %>
 
 <main id="main" class="group mx-auto max-w-page px-4 pt-7 pb-20 sm:px-8"
-      data-controller="rewards panels<%= " proctor" if monitored %>" data-panel="<%= @step %>"
+      data-controller="rewards panels assessment-motion<%= " proctor" if monitored %>" data-panel="<%= @step %>"
       data-proctor="on" data-band="clean" data-proctor-hidden="false"
-      data-action="quiz:reward->rewards#add code-task:reward->rewards#add"
+      data-action="quiz:reward->rewards#add code-task:reward->rewards#add
+                   quiz:result->assessment-motion#show code-task:result->assessment-motion#show
+                   code-task:start->assessment-motion#showStart
+                   quiz:start->assessment-motion#showStart
+                   code-task:criteria->assessment-motion#showRows
+                   quiz:selection->assessment-motion#showSelection
+                   quiz:action->assessment-motion#showAction code-task:action->assessment-motion#showAction
+                   code-task:clear->assessment-motion#clear
+                   code-task:clear-criteria->assessment-motion#clearRows
+                   code-task:clear-action->assessment-motion#clearAction"
       <%# Which position in the syllabus is open. Identity rather than a Stimulus
           value — the graded steps carry their own, but they only exist on their
           own step, and every step is about the same topic. %>
@@ -18,9 +27,11 @@
         data-proctor-url-value="<%= lesson_incident_path %>"
         data-proctor-course-value="<%= @course.code %>"
         data-proctor-topic-value="<%= @topic_key %>"
-        data-proctor-score-value="<%= Proctoring::START_SCORE %>"
+        data-proctor-score-value="<%= @proctor_score %>"
         data-proctor-paste-limit-value="<%= Proctoring::PASTE_LIMIT %>"
         data-proctor-max-events-value="<%= Proctoring::MAX_EVENTS %>"
+        data-proctor-active-steps-value="<%= Proctoring::ACTIVE_STEPS.to_json %>"
+        data-proctor-initial-events-value="<%= @proctor_log_entries.to_json %>"
         data-proctor-bands-value="<%= Proctoring::BANDS.to_json %>"
         data-proctor-events-value="<%= Proctoring.event_copy.index_by { it[:kind] }.to_json %>"
         data-proctor-copy-value="<%= t("lesson.proctor").except(:events).to_json %>"
@@ -29,14 +40,14 @@
     <%= link_to t("lesson.back_module"), course_path(@course.code),
           class: "flex-none text-13-5 whitespace-nowrap text-muted hover:text-ink" %>
     <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-hairline">
-      <div class="h-full rounded-full bg-brand transition-[width] duration-300"
+      <div class="h-full rounded-full bg-brand"
            data-panels-target="progress" style="width: <%= @lesson_content.percent_for(@step) %>%"></div>
     </div>
     <%# One label per step, swapped with the panels rather than rewritten. %>
     <% LessonContent::STEPS.each do |step| %>
       <%= tag.span @lesson_content.step_label(step),
             hidden: step != @step,
-            data: { panel: step, panels_target: "panel" },
+            data: { panel: step, panels_target: "panel stepLabel", lesson_step_label: step },
             class: "flex-none text-13 font-medium whitespace-nowrap text-muted-2" %>
     <% end %>
   </div>
@@ -63,7 +74,8 @@
                         data-[state=current]:bg-brand-tint data-[state=current]:font-semibold
                         data-[state=current]:text-brand-ink-deep data-[state=done]:text-muted-2
                         data-[state=todo]:text-ink-4 data-[state=todo]:hover:bg-canvas" do %>
-            <span class="grid size-5 flex-none place-items-center rounded-full text-11 text-muted-2
+            <span data-panels-target="stepIndicator" data-lesson-step-indicator="<%= step %>"
+                  class="grid size-5 flex-none place-items-center rounded-full text-11 text-muted-2
                          group-data-[state=current]:bg-brand group-data-[state=current]:text-white
                          group-data-[state=done]:bg-hairline-2 group-data-[state=todo]:bg-surface-2">
               <span class="hidden group-data-[state=done]:inline">✓</span>
@@ -86,7 +98,9 @@
       </div>
 
       <% if @show_integrity_log %>
-        <div class="mt-5 border-t border-surface-3 pt-4.5">
+        <div data-integrity-log
+             class="mt-5 hidden border-t border-surface-3 pt-4.5
+                    group-data-[panel=exercise]:block group-data-[panel=code]:block">
           <div class="mb-3 text-12 font-semibold tracking-[0.06em] text-muted-2 uppercase">
             <%= t("lesson.proctor.events_title") %>
           </div>
@@ -102,7 +116,7 @@
           <template data-proctor-target="row">
             <%# A named group: the row carries data-weight, and <main> is also a
                 group, so an unnamed variant would resolve to the wrong one. %>
-            <div class="group/event flex animate-row-in items-start gap-2.25">
+            <div data-integrity-event-row class="group/event flex items-start gap-2.25">
               <span aria-hidden="true"
                     class="mt-1.5 size-1.25 flex-none rounded-full
                            group-data-[weight=high]/event:bg-brand
@@ -122,7 +136,7 @@
       <% LessonContent::STEPS.each do |step| %>
         <%= tag.div role: "tabpanel", id: "lesson-panel-#{step}", hidden: step != @step,
               aria: { labelledby: "lesson-tab-#{step}" },
-              data: { panel: step, panels_target: "panel" } do %>
+              data: { panel: step, motion: true, panels_target: "panel" } do %>
           <%= render "lessons/#{step}" %>
         <% end %>
       <% end %>

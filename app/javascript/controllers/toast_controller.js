@@ -27,6 +27,7 @@ export default class extends Controller {
 
   connect() {
     this.timers = new Set()
+    this.animations = new Map()
     // row -> { remaining, startedAt, timer }. A toast being read is a toast
     // whose clock is stopped, so each one keeps its own.
     this.clocks = new Map()
@@ -65,10 +66,7 @@ export default class extends Controller {
 
     this.listFor(kind).appendChild(toast)
     this.live.push(toast)
-
-    // A frame between the insert and the flip, or the transition has no start
-    // state to move from and the toast simply appears.
-    requestAnimationFrame(() => { toast.dataset.visible = "true" })
+    this.reveal(toast)
 
     // Oldest first, and only once the new one is in: what a reader loses to a
     // burst should be the message they have already had time to read.
@@ -107,21 +105,81 @@ export default class extends Controller {
   }
 
   dismiss(toast) {
-    if (!toast) return
+    if (!toast || toast.dataset.dismissed === "true") return
 
+    toast.dataset.dismissed = "true"
+    const clock = this.clocks.get(toast)
+    if (clock && clock.timer !== null) {
+      clearTimeout(clock.timer)
+      this.timers.delete(clock.timer)
+    }
     this.clocks.delete(toast)
     // Out of the order now rather than on removal: the row lingers for the
-    // length of its transition, and a dismissed row still counted against the
+    // length of its movement, and a dismissed row still counted against the
     // limit would drop a second one behind it.
     this.live = this.live.filter(row => row !== toast)
-    toast.dataset.visible = "false"
+    this.hide(toast)
+  }
 
-    const remove = () => toast.remove()
-    toast.addEventListener("transitionend", remove, { once: true })
-    // transitionend does not fire if the element is already off screen or the
-    // transition is skipped, and an invisible row left in the list would still
-    // take up space in it. Removing twice is harmless.
-    this.schedule(remove, 400)
+  reveal(toast) {
+    this.play(toast, [
+      { opacity: 0, transform: `translateY(${this.entryOffset})` },
+      { opacity: 1, transform: "translateY(0)" }
+    ], 200)
+  }
+
+  // Read before cancelling so a close during entrance continues from the
+  // position and opacity the reader can actually see.
+  hide(toast) {
+    const style = getComputedStyle(toast)
+    const opacity = Number.parseFloat(style.opacity)
+    const transform = style.transform === "none" ? "translateY(0)" : style.transform
+
+    this.stopAnimation(toast)
+    this.play(toast, [
+      { opacity: Number.isFinite(opacity) ? opacity : 1, transform },
+      { opacity: 0, transform: `translateY(${this.entryOffset})` }
+    ], 160, () => toast.remove())
+  }
+
+  play(toast, keyframes, duration, after = () => {}) {
+    this.stopAnimation(toast)
+    if (this.reducedMotion || typeof toast.animate !== "function") {
+      after()
+      return
+    }
+
+    const animation = toast.animate(keyframes, {
+      duration,
+      easing: "cubic-bezier(0.22, 0.9, 0.3, 1)",
+      fill: "both"
+    })
+    this.animations.set(toast, animation)
+
+    animation.addEventListener("finish", () => {
+      if (this.animations.get(toast) !== animation) return
+
+      this.animations.delete(toast)
+      after()
+      animation.cancel()
+    }, { once: true })
+  }
+
+  stopAnimation(toast) {
+    const animation = this.animations.get(toast)
+    if (!animation) return
+
+    this.animations.delete(toast)
+    animation.cancel()
+  }
+
+  get entryOffset() {
+    const offset = getComputedStyle(this.element).getPropertyValue("--toast-enter").trim()
+    return offset || (this.anchorValue === "bottom" ? "0.375rem" : "-0.375rem")
+  }
+
+  get reducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches
   }
 
   // Urgency is not a style: a screen reader interrupts for the assertive region
@@ -171,6 +229,8 @@ export default class extends Controller {
   disconnect() {
     this.timers.forEach(clearTimeout)
     this.timers.clear()
+    this.animations.forEach((animation) => animation.cancel())
+    this.animations.clear()
     this.clocks.clear()
     this.live = []
   }

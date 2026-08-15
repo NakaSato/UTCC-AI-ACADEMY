@@ -50,6 +50,14 @@ export default class extends Controller {
 
   connect() {
     this.readonly = this.hasReadonlyValue && this.readonlyValue
+    this.toolbarAnimations = new Map()
+    this.statusAnimation = null
+    this.statusMessage = ""
+    this.onToolbarClick = (event) => {
+      const button = event.target.closest("button[data-action*='tiptap#']")
+      if (button && this.element.contains(button)) this.acknowledgeToolbar(button)
+    }
+    this.element.addEventListener("click", this.onToolbarClick)
     const initialContent = this.hasInputTarget ? this.inputTarget.value : this.editorTarget.innerHTML
 
     try {
@@ -68,7 +76,34 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.element.removeEventListener("click", this.onToolbarClick)
+    this.toolbarAnimations?.forEach((animation) => animation.cancel())
+    this.toolbarAnimations?.clear()
+    this.statusAnimation?.cancel()
+    this.statusAnimation = null
     this.editor?.destroy()
+  }
+
+  acknowledgeToolbar(button) {
+    this.toolbarAnimations.get(button)?.cancel()
+    this.toolbarAnimations.delete(button)
+    if (this.reducedMotion || typeof button.animate !== "function") return
+
+    const animation = button.animate([
+      { transform: "scale(0.94)" },
+      { transform: "scale(1.04)", offset: 0.55 },
+      { transform: "scale(1)" }
+    ], {
+      duration: 160,
+      easing: "cubic-bezier(0.22, 0.9, 0.3, 1)"
+    })
+    this.toolbarAnimations.set(button, animation)
+    animation.addEventListener("finish", () => {
+      if (this.toolbarAnimations.get(button) !== animation) return
+
+      this.toolbarAnimations.delete(button)
+      animation.cancel()
+    }, { once: true })
   }
 
   sync(event) {
@@ -179,12 +214,38 @@ export default class extends Controller {
 
   showStatus(message, error = false) {
     if (!this.hasStatusTarget) return
+    const changed = message !== this.statusMessage || this.statusTarget.dataset.state !== (error ? "error" : "success")
+    this.statusMessage = message
     this.statusTarget.textContent = message
     this.statusTarget.dataset.state = error ? "error" : "success"
+    if (!changed) return
+
+    this.statusAnimation?.cancel()
+    this.statusAnimation = null
+    if (this.reducedMotion || typeof this.statusTarget.animate !== "function") return
+
+    const animation = this.statusTarget.animate([
+      { opacity: 0.45, transform: "translateY(3px)" },
+      { opacity: 1, transform: "translateY(0)" }
+    ], {
+      duration: 180,
+      easing: "cubic-bezier(0.22, 0.9, 0.3, 1)"
+    })
+    this.statusAnimation = animation
+    animation.addEventListener("finish", () => {
+      if (this.statusAnimation !== animation) return
+
+      this.statusAnimation = null
+      animation.cancel()
+    }, { once: true })
   }
 
   get csrfToken() {
     return document.querySelector("meta[name='csrf-token']")?.content
+  }
+
+  get reducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches
   }
 
   promptForKey(label) {

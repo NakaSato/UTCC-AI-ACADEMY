@@ -19,7 +19,10 @@ export default class extends Controller {
   pick(event) {
     if (this.checked) return
 
-    this.picked = Number(event.currentTarget.dataset.index)
+    const picked = Number(event.currentTarget.dataset.index)
+    if (picked === this.picked) return
+
+    this.picked = picked
 
     this.optionTargets.forEach((option, index) => {
       const isPicked = index === this.picked
@@ -28,6 +31,9 @@ export default class extends Controller {
     })
 
     this.checkTarget.disabled = false
+    this.dispatch("selection", {
+      detail: { target: event.currentTarget.querySelector("[data-quiz-choice-indicator]") }
+    })
   }
 
   async check() {
@@ -35,6 +41,7 @@ export default class extends Controller {
 
     this.checked = true
     this.checkTarget.disabled = true
+    this.dispatch("start", { detail: { target: this.checkTarget } })
 
     const verdict = await grade({
       url: this.urlValue, course: this.courseValue, topic: this.topicValue,
@@ -70,9 +77,11 @@ export default class extends Controller {
     this.feedbackTitleTarget.textContent = passed ? copy.correctTitle : copy.wrongTitle
     this.feedbackBodyTarget.textContent = passed ? copy.correctBody : copy.wrongBody
     this.feedbackTarget.classList.remove("hidden")
+    this.dispatch("result", { detail: { target: this.feedbackTarget } })
 
     if (passed) {
       this.nextTarget.classList.remove("hidden")
+      this.dispatch("action", { detail: { target: this.nextTarget } })
       this.dispatch("reward", { detail: { gems } })
     }
   }

@@ -42,6 +42,18 @@ class ThemeWalkTest < ApplicationSystemTestCase
     assert_no_selector "html.light"
   end
 
+  test "a signed-in user changes theme from the profile menu" do
+    sign_in_through_the_form users(:one)
+
+    find("button[aria-label='#{I18n.t("chrome.user_toggle")}']").click
+    within("[data-menu=account]") do
+      find("[data-preference=theme] > button").click
+      find("form[action='#{theme_path(:dark)}'] button").click
+    end
+
+    assert_selector "html.dark"
+  end
+
   # The reason the theme toggle is the odd one out. If a future Turbo starts
   # copying `class`, this still passes and the `data-turbo: false` above becomes
   # removable; if it stops copying `lang`, this fails and the language toggle
@@ -50,6 +62,7 @@ class ThemeWalkTest < ApplicationSystemTestCase
     visit "/"
     assert_selector "html[lang=th]"
 
+    find("[data-preference=language] > button").click
     find("form[action='#{language_path(:en)}'] button").click
 
     assert_selector "html[lang=en]"
@@ -57,6 +70,7 @@ class ThemeWalkTest < ApplicationSystemTestCase
 
   private
     def click_theme(theme)
+      find("[data-preference=theme] > button").click
       find("form[action='#{theme_path(theme)}'] button").click
     end
 

@@ -2,11 +2,15 @@
 #
 # The watching still happens in the browser (see the `proctor` Stimulus
 # controller), but each incident is now posted to `lesson/incident` and kept in
-# `proctor_events` — the sidebar's score is still per-page theatre, while the
-# admin Integrity tab reads the record. This module owns the taxonomy, the
-# weights and the case derivation; every word a learner reads is in
-# `lesson.proctor.*` in the locale files.
+# `proctor_events`. The learner sidebar and admin Integrity tab both read that
+# record; this module owns the assessment-step boundary, taxonomy, weights and
+# presentation rows. Every word a learner reads is in `lesson.proctor.*` in the
+# locale files, so a fresh request can translate a stored incident.
 module Proctoring
+  # Theory and summary are for reading. Monitoring begins only in the two steps
+  # where the learner submits assessed work.
+  ACTIVE_STEPS = %w[ exercise code ].freeze
+
   # What each kind of incident costs the integrity score.
   WEIGHTS = {
     menu: 2, paste_small: 3, copy: 5, blur: 8, print: 10, paste: 15, capture: 20
@@ -50,6 +54,19 @@ module Proctoring
       WEIGHTS.map { |kind, weight| { kind:, weight:, text: I18n.t("lesson.proctor.events.#{kind}") } }
     end
 
+    # The sidebar payload is rebuilt on every request: timestamps and weights
+    # come from the kept record, while text follows the request's current locale.
+    def log_entries(events)
+      events.first(MAX_EVENTS).map do |event|
+        {
+          kind: event.kind,
+          weight: event.weight,
+          text: event.text,
+          stamp: event.occurred_at.in_time_zone.strftime("%H:%M:%S")
+        }
+      end
+    end
+
     # ---- The admin Integrity tab -------------------------------------------
     # Reads records, like AdminConsole.head_stats and for the same reason: the
     # events are real now, and a tab of sample cases above a real roster would
@@ -63,6 +80,11 @@ module Proctoring
     end
 
     def score_for(events) = [ START_SCORE - events.sum(&:weight), 0 ].max
+
+    def score_for_counts(counts)
+      deductions = counts.sum { |kind, count| WEIGHTS.fetch(kind.to_sym) * count }
+      [ START_SCORE - deductions, 0 ].max
+    end
 
     def open_case_count = ProctorEvent.unreviewed.distinct.count(:user_id)
   end

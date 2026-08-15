@@ -71,9 +71,10 @@
 
 <button type="button"
         class="invisible fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-brand
-               text-white opacity-0 shadow-lg transition duration-300
+               text-white opacity-0 shadow-lg
                data-[visible=true]:visible data-[visible=true]:opacity-100"
-        data-controller="to-top" data-action="to-top#scrollUp" aria-label="<%= t("chrome.to_top") %>">
+        data-controller="to-top" data-action="to-top#scrollUp" data-visible="false"
+        aria-label="<%= t("chrome.to_top") %>">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
        stroke-width="2" aria-hidden="true">
     <path d="M12 19V5M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/>

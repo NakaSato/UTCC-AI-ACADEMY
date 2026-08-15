@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-14T12:15:00+07:00",
+  "updated_at": "2026-08-16T00:48:12+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -3344,6 +3344,832 @@
         }
       ],
       "updated_at": "2026-08-13T09:15:00+07:00"
+    },
+    {
+      "id": "UX-015",
+      "title": "Place theme and language dropdowns by authentication state",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Dark mode and preference selector specification",
+          "url": "specs/spec-dark-mode.html"
+        }
+      ],
+      "updated_at": "2026-08-15T02:12:36+07:00"
+    },
+    {
+      "id": "UX-016",
+      "title": "Animate shared dropdown movement",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-015"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T07:17:13+07:00"
+    },
+    {
+      "id": "UX-017",
+      "title": "Ring once for newly unread notifications",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-016"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T07:41:11+07:00"
+    },
+    {
+      "id": "TEST-002",
+      "title": "Stabilize consecutive business-case mutation submissions",
+      "status": "complete",
+      "priority": 2,
+      "owner": "QA Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Business-case collaboration specification",
+          "url": "specs/spec-company-business-case-collaboration.html"
+        }
+      ],
+      "updated_at": "2026-08-15T11:14:31+07:00"
+    },
+    {
+      "id": "UX-018",
+      "title": "Animate primary content on page navigation",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-017"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T07:53:56+07:00"
+    },
+    {
+      "id": "UX-019",
+      "title": "Animate redirect flash feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "UX-018"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T08:02:37+07:00"
+    },
+    {
+      "id": "UX-020",
+      "title": "Scope and restore the lesson integrity log",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Foundation course specification",
+          "url": "specs/spec-m3-foundation-course.html"
+        }
+      ],
+      "updated_at": "2026-08-15T08:32:17+07:00"
+    },
+    {
+      "id": "UX-021",
+      "title": "Animate lesson-step transitions",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-020"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T09:01:34+07:00"
+    },
+    {
+      "id": "UX-022",
+      "title": "Animate assessment result feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-021"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T09:13:48+07:00"
+    },
+    {
+      "id": "UX-023",
+      "title": "Animate earned-gems feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-022"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T09:18:57+07:00"
+    },
+    {
+      "id": "UX-024",
+      "title": "Animate coding-criterion results",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-023"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T09:27:11+07:00"
+    },
+    {
+      "id": "UX-025",
+      "title": "Animate Summary reward cards",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-024"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T09:38:25+07:00"
+    },
+    {
+      "id": "UX-026",
+      "title": "Animate the Summary completion mark",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-025"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T10:59:54+07:00"
+    },
+    {
+      "id": "UX-027",
+      "title": "Animate Summary action links",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-026"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:14:31+07:00"
+    },
+    {
+      "id": "UX-028",
+      "title": "Animate lesson-step progress",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-027"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:26:47+07:00"
+    },
+    {
+      "id": "UX-029",
+      "title": "Animate the selected lesson-step indicator",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-028"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:34:55+07:00"
+    },
+    {
+      "id": "UX-030",
+      "title": "Animate the compact lesson-step label",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-029"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:41:34+07:00"
+    },
+    {
+      "id": "UX-031",
+      "title": "Animate assessment continuation links",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-030"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:49:55+07:00"
+    },
+    {
+      "id": "UX-032",
+      "title": "Animate exercise answer selection",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-031"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T11:54:58+07:00"
+    },
+    {
+      "id": "UX-033",
+      "title": "Animate integrity-score feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-032"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T12:05:21+07:00"
+    },
+    {
+      "id": "UX-034",
+      "title": "Animate the integrity meter",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-033"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T12:18:32+07:00"
+    },
+    {
+      "id": "TEST-003",
+      "title": "Isolate browser sessions before system-test sign-in",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and QA/SDET",
+      "milestone": "M9",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-15T12:18:32+07:00"
+    },
+    {
+      "id": "UX-035",
+      "title": "Animate integrity-band verdict changes",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-034"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T12:30:02+07:00"
+    },
+    {
+      "id": "UX-036",
+      "title": "Animate only the newest integrity-log row",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-035"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T12:42:49+07:00"
+    },
+    {
+      "id": "TEST-004",
+      "title": "Allow parallel Turbo responses to settle in system tests",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead and QA/SDET",
+      "milestone": "M9",
+      "depends_on": [],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-15T12:42:49+07:00"
+    },
+    {
+      "id": "UX-037",
+      "title": "Animate the integrity guard entrance",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-036"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T13:51:20+07:00"
+    },
+    {
+      "id": "UX-038",
+      "title": "Animate transient toast movement with JavaScript",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-037"
+      ],
+      "evidence": [
+        {
+          "label": "Toast notifications specification",
+          "url": "specs/spec-toast-notifications.html"
+        },
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T14:02:22+07:00"
+    },
+    {
+      "id": "UX-039",
+      "title": "Animate the public mobile navigation drawer with JavaScript",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-038"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T14:11:22+07:00"
+    },
+    {
+      "id": "UX-040",
+      "title": "Animate public learning-track filter results",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-039"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T14:36:54+07:00"
+    },
+    {
+      "id": "UX-041",
+      "title": "Animate public FAQ answer disclosure",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-040"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T14:41:45+07:00"
+    },
+    {
+      "id": "UX-042",
+      "title": "Animate learner syllabus module disclosure",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Academic Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-041"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:10:21+07:00"
+    },
+    {
+      "id": "UX-043",
+      "title": "Animate My Learning course disclosure",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-042"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:15:14+07:00"
+    },
+    {
+      "id": "UX-044",
+      "title": "Animate admin landing-section disclosure",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-043"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:20:59+07:00"
+    },
+    {
+      "id": "UX-045",
+      "title": "Animate back-to-top control visibility",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-044"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:25:25+07:00"
+    },
+    {
+      "id": "UX-046",
+      "title": "Animate public-header pin feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-045"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:29:23+07:00"
+    },
+    {
+      "id": "UX-047",
+      "title": "Animate public scroll-spy selection",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-046"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:45:00+07:00"
+    },
+    {
+      "id": "UX-048",
+      "title": "Animate academic-reader preference feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-047"
+      ],
+      "evidence": [
+        {
+          "label": "Accepted academic reader-tool specification",
+          "url": "specs/spec-academic-post-authoring-reader-tools.html"
+        },
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:52:53+07:00"
+    },
+    {
+      "id": "UX-049",
+      "title": "Animate auth-tab selection feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-048"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T15:57:59+07:00"
+    },
+    {
+      "id": "UX-050",
+      "title": "Animate academic-reader table-of-contents selection feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-049"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T16:41:24+07:00"
+    },
+    {
+      "id": "UX-051",
+      "title": "Animate coding-task run acknowledgement",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-050"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T17:26:28+07:00"
+    },
+    {
+      "id": "UX-052",
+      "title": "Animate exercise-check submission acknowledgement",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-051"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T17:47:49+07:00"
+    },
+    {
+      "id": "UX-053",
+      "title": "Animate integrity-guard dismissal feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-052"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T18:05:23+07:00"
+    },
+    {
+      "id": "UX-054",
+      "title": "Animate academic-editor toolbar acknowledgement",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-053"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T18:33:52+07:00"
+    },
+    {
+      "id": "UX-055",
+      "title": "Animate academic-editor status feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-054"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T18:43:15+07:00"
+    },
+    {
+      "id": "UX-056",
+      "title": "Animate My Learning tab selection feedback",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-055"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-15T18:50:22+07:00"
+    },
+    {
+      "id": "UX-057",
+      "title": "Animate My Learning panel entrance",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M9",
+      "depends_on": [
+        "UX-056"
+      ],
+      "evidence": [
+        {
+          "label": "Design-system motion guidance",
+          "url": "design-system.html#motion"
+        }
+      ],
+      "updated_at": "2026-08-16T00:48:12+07:00"
     }
   ],
   "recently_completed": [
@@ -5479,6 +6305,1110 @@
       "to": "complete",
       "summary": "Accepted ADR-0055 and shipped SPEC-0055: removing a lesson is a retirement, never a delete. topic.destroy either erased what learners finished or broke a foreign key, so topics.retired_at leaves every denominator, keeps counting for whoever already finished, and stays nameable. Retirement goes through the approval queue like an addition; un-retiring is deliberately not built.",
       "evidence_url": "specs/spec-lesson-retirement.html"
+    },
+    {
+      "at": "2026-08-15T01:56:40+07:00",
+      "item_id": "UX-015",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Replaced the segmented theme and language controls with selected-value dropdowns in every shared header, preserved POST-only preference writes and the theme form's full navigation, and placed both dropdowns after Sign up in the public navbar. The focused controller and system suite passes: 21 tests and 85 assertions.",
+      "evidence_url": "specs/spec-dark-mode.html"
+    },
+    {
+      "at": "2026-08-15T02:07:21+07:00",
+      "item_id": "UX-015",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the navbar preference pass: theme and language are dropdowns after Sign up on the public navbar, authentication screens carry neither control, and the signed-in notification control uses a recognisable bell while retaining its unread dot and accessible label. The full local gate passed: documentation, style, all security audits, Vite build, 1,451 Rails tests with 9,680 assertions, seed replant, and 32 system tests with 205 assertions.",
+      "evidence_url": "specs/spec-dark-mode.html"
+    },
+    {
+      "at": "2026-08-15T02:20:59+07:00",
+      "item_id": "UX-016",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Added shared JavaScript-driven entrance and exit movement to every dropdown panel, with immediate accessible state changes, interrupted-animation handling, and a prefers-reduced-motion bypass.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T02:32:10+07:00",
+      "item_id": "UX-016",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed shared dropdown movement across navigation, preferences, notifications and the profile menu. The full gate passed: documentation, style, security audits, Vite build, 1,451 Rails tests with 9,685 assertions, seed replant, and 33 system tests with 208 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:17:13+07:00",
+      "item_id": "UX-016",
+      "from": "complete",
+      "to": "complete",
+      "summary": "Extended the shared JavaScript motion with rotating chevrons and a capped stagger across each panel's top-level content. Interrupted animations and prefers-reduced-motion remain supported. The full gate passed with 1,451 Rails tests and 33 system tests.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:29:04+07:00",
+      "item_id": "UX-017",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Added a one-time JavaScript bell swing for newly unread notifications, keyed per browser tab so Turbo visits do not repeat the same cue. Read bells, looping motion and reduced-motion animation are excluded.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:37:10+07:00",
+      "item_id": "TEST-002",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Recorded two full-suite failures where an invitation click immediately after a milestone redirect produced no HTTP request. The focused test passed alone, and the request log confirmed the invitation controller was never reached. The invitation form now uses a native full navigation so the second mutation cannot be discarded by an overlapping Turbo visit; no retry or weakened acceptance assertion was added.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-15T07:41:11+07:00",
+      "item_id": "UX-017",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the one-time unread-notification bell movement with tab-scoped deduplication and a reduced-motion bypass. The full local gate passed: documentation, style, security audits, Vite build, 1,452 Rails tests with 9,691 assertions, seed replant, and 33 system tests with 208 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:41:11+07:00",
+      "item_id": "TEST-002",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Closed the consecutive-mutation submission race after the focused 43-test set and the complete required gate passed. The business-case acceptance walk remained in the shipping signal and passed without retries or relaxed assertions.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-15T07:46:39+07:00",
+      "item_id": "UX-018",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a shared JavaScript entrance for primary page content across application and authentication layouts, scoped to ordinary navigation with restoration previews and reduced-motion readers excluded.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:50:51+07:00",
+      "item_id": "UX-018",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added the shared page-motion controller to application and authentication layouts. Primary content enters over 180ms on initial renders and ordinary Turbo advances, while cached previews, history restoration and reduced-motion environments remain still. The focused layout, theme and notification set passes with 29 tests and 102 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:53:56+07:00",
+      "item_id": "UX-018",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed primary-content page movement across application and authentication screens. The full local gate passed: documentation, style, security audits, Vite build, 1,454 Rails tests with 9,693 assertions, seed replant, and 33 system tests with 208 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:55:26+07:00",
+      "item_id": "UX-019",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a shared one-time JavaScript entrance for redirect flash messages, retaining their existing status semantics and lifetime while excluding reduced-motion readers and repeat movement from Turbo cache.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T07:59:34+07:00",
+      "item_id": "UX-019",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 220ms shared entrance for redirect flash messages with a capped stagger, a reduced-motion bypass, and removal before Turbo cache snapshots so consumed feedback cannot return through browser history. The focused flash, password, layout and failure-walk set passes with 16 tests and 61 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T08:02:37+07:00",
+      "item_id": "UX-019",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed redirect-flash movement and Turbo cache cleanup. The full local gate passed: documentation, style, security audits, Vite build, 1,456 Rails tests with 9,700 assertions, seed replant, and 33 system tests with 208 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T08:06:11+07:00",
+      "item_id": "UX-020",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started limiting integrity monitoring and its learner-facing log to exercise and coding-task panels, and restoring the learner's stored topic events and derived score after refresh or language changes.",
+      "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-15T08:19:29+07:00",
+      "item_id": "UX-020",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Limited integrity incident acceptance and browser monitoring to Exercise and Coding Task, restored the signed-in learner's current-topic score and six newest stored events, and rebuilt event text in the selected locale after every request. Current-user/current-topic isolation, refresh, language switching and live panel visibility pass in the focused set: 79 tests and 906 assertions.",
+      "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-15T08:32:17+07:00",
+      "item_id": "UX-020",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the assessment-only integrity log and durable localized restoration. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,733 assertions, seed replant, and 34 system tests with 217 assertions.",
+      "evidence_url": "specs/spec-m3-foundation-course.html"
+    },
+    {
+      "at": "2026-08-15T08:57:29+07:00",
+      "item_id": "UX-021",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a lesson-only JavaScript transition between the four existing steps, with direction following the tab order and a reduced-motion bypass. Grading, focus, URL state, progress, and integrity behavior remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T08:59:43+07:00",
+      "item_id": "UX-021",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added an opt-in 220ms lesson-panel transition that follows forward and backward step order, cancels superseded movement, and bypasses the Web Animations API under reduced motion. The focused controller and browser set passes with 35 tests and 296 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:01:34+07:00",
+      "item_id": "UX-021",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed lesson-step movement without changing shared auth/progress tabs or lesson behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,739 assertions, seed replant, and 35 system tests with 223 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:09:40+07:00",
+      "item_id": "UX-022",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started one shared JavaScript feedback entrance for graded Exercise and Coding Task results. The result remains immediate and semantic status, grading stays server-side, and reduced-motion readers receive no decorative movement.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:12:04+07:00",
+      "item_id": "UX-022",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a shared 240ms result entrance after quiz and code grading render, with same-surface cancellation, code-reset cleanup, and a reduced-motion bypass. Grading, unreachable feedback, lesson rendering, and browser behavior pass in the focused set: 63 tests and 397 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:13:48+07:00",
+      "item_id": "UX-022",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed shared assessment-result movement without changing server grading or semantic feedback. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,739 assertions, seed replant, and 36 system tests with 231 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:15:23+07:00",
+      "item_id": "UX-023",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a one-shot JavaScript response on the lesson's earned-gems counter after a server-confirmed pass. The optimistic counter and persisted completion rules remain unchanged, and reduced-motion readers receive only the number update.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:17:12+07:00",
+      "item_id": "UX-023",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 320ms one-shot gems-counter bump with cancellation on a newer reward or disconnect and a reduced-motion bypass. Server grading, completion persistence, progress totals, lesson rendering, and browser behavior pass in the focused set: 69 tests and 428 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:18:57+07:00",
+      "item_id": "UX-023",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed earned-gems feedback movement without changing reward or completion semantics. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,737 assertions, seed replant, and 37 system tests with 237 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:23:23+07:00",
+      "item_id": "UX-024",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a capped stagger on Coding Task criterion rows after the server returns their truth values. Reset and newer runs cancel remaining movement, grading patterns remain server-only, and reduced-motion readers receive immediate criterion states.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:25:16+07:00",
+      "item_id": "UX-024",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 260ms Coding Task criterion entrance with a 45ms stagger capped at 135ms, centralized cancellation for newer runs and Reset, and a reduced-motion bypass. Server grading, unreachable feedback, lesson rendering, and browser behavior pass in the focused set: 65 tests and 409 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:27:11+07:00",
+      "item_id": "UX-024",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed Coding Task criterion movement without exposing or changing grading truth. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,739 assertions, seed replant, and 38 system tests with 243 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:32:00+07:00",
+      "item_id": "UX-025",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a restrained stagger for the Summary reward cards when a learner reaches the final lesson step. Completion data and navigation remain unchanged, superseded movement is cancelled, and reduced-motion readers receive the final state immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:36:17+07:00",
+      "item_id": "UX-025",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 280ms Summary-card entrance with a 45ms stagger capped at 135ms, cancellation on another step selection, no replay on a direct or repeated Summary selection, and a reduced-motion bypass. Lesson rendering and the adjacent movement paths pass in the focused set: 38 tests and 316 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T09:38:25+07:00",
+      "item_id": "UX-025",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed Summary reward-card movement without changing completion or navigation semantics. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,743 assertions, seed replant, and 39 system tests with 248 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T10:55:39+07:00",
+      "item_id": "UX-026",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a single restrained JavaScript pop for the Summary completion mark when the learner reaches the final step. Repeated or direct Summary views remain still, leaving cancels unfinished movement, and reduced-motion readers receive the completed mark immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T10:57:27+07:00",
+      "item_id": "UX-026",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a one-shot 360ms Summary completion-mark pop with a 0.78 start, 1.08 overshoot, cancellation on another step, no repeated-selected-step replay, and a reduced-motion bypass. Lesson rendering and the adjacent movement paths pass in the focused set: 39 tests and 326 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T10:59:54+07:00",
+      "item_id": "UX-026",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the Summary completion-mark movement without changing completion state, accessibility semantics, or navigation. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,745 assertions, seed replant, and 40 system tests with 254 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:05:25+07:00",
+      "item_id": "UX-027",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a short delayed rise for the two Summary action links after the completion cues begin. Links remain immediately usable, another step cancels unfinished movement, repeated or direct Summary views remain still, and reduced-motion readers receive the final controls immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:07:10+07:00",
+      "item_id": "UX-027",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 260ms rise for the two Summary action links with 180ms and 220ms delays, cancellation on another step, no repeated-selected-step replay, and a reduced-motion bypass. Real hrefs, lesson rendering, and the adjacent movement paths pass in the focused set: 40 tests and 336 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:10:30+07:00",
+      "item_id": "TEST-002",
+      "from": "complete",
+      "to": "in_progress",
+      "summary": "Reopened the consecutive business-case mutation race after the invitation click again produced no request in both the full gate and an isolated reproduction. The invitation form was already native; the preceding milestone Turbo redirect can still be active when the second native click arrives.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-15T11:12:15+07:00",
+      "item_id": "TEST-002",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Made milestone creation a native navigation as well, so its redirect is complete before an immediate invitation submit. The rendered-form contract passes, and the previously failing business-case walk passed three consecutive isolated runs across fixed and random seeds: 19 tests and 196 assertions in the focused evidence.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-15T11:14:31+07:00",
+      "item_id": "TEST-002",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Closed the recurrent consecutive-mutation race after the complete gate passed with the business-case walk in the shipping signal. No retries or relaxed assertions were added; both consecutive forms now finish native navigations.",
+      "evidence_url": "specs/spec-company-business-case-collaboration.html"
+    },
+    {
+      "at": "2026-08-15T11:14:31+07:00",
+      "item_id": "UX-027",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed Summary action-link movement without changing hrefs, labels, focus behavior, or navigation. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,752 assertions, seed replant, and 41 system tests with 260 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:21:17+07:00",
+      "item_id": "UX-028",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the lesson progress bar's CSS-only width transition with interruptible JavaScript movement between the four established percentages. Superseded movement begins from the visible width, and reduced-motion readers receive the destination width immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:24:13+07:00",
+      "item_id": "UX-028",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced the lesson progress fill's CSS transition with a 300ms JavaScript width animation across the established 12/42/74/100 percentages, using visible-width measurement for interruption, no repeated-step replay, and a reduced-motion bypass. Lesson rendering and all adjacent movement paths pass: 41 tests and 347 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:26:47+07:00",
+      "item_id": "UX-028",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed interruptible lesson-progress movement without changing the established percentages, tab state, URLs, or step content. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,756 assertions, seed replant, and 42 system tests with 267 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:30:31+07:00",
+      "item_id": "UX-029",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a one-shot scale confirmation on the selected lesson-step circle after its semantic current/done state changes. New selections cancel superseded movement, direct or repeated steps remain still, and reduced-motion readers receive only the state change.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:32:17+07:00",
+      "item_id": "UX-029",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a one-shot 240ms scale settle to the selected lesson-step circle, from 0.84 through a 1.10 overshoot, with cancellation on a newer step, no repeated-step replay, and a reduced-motion bypass. Lesson rendering and all adjacent movement paths pass: 42 tests and 358 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:34:55+07:00",
+      "item_id": "UX-029",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed selected-step indicator movement without changing tab semantics, state ordering, URLs, or focus behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,760 assertions, seed replant, and 43 system tests with 274 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:36:20+07:00",
+      "item_id": "UX-030",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a compact directional entrance for the visible step label beside the lesson progress bar. Its translated text and hidden state update first, newer selections cancel superseded movement, and reduced-motion readers receive the label immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:38:50+07:00",
+      "item_id": "UX-030",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 180ms directional entrance to the compact lesson-step label, moving 4px from below when advancing and from above when returning, with cancellation, no repeated-step replay, and a reduced-motion bypass. The focused label, rendering, and adjacent movement set passes: 43 tests and 369 assertions; one pre-test Edge cookie miss passed on exact-seed rerun and remains covered by the full gate.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:41:34+07:00",
+      "item_id": "UX-030",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the compact lesson-step label motion without changing translated content, panel visibility, focus, panel count, or URL behavior. The full verification gate passes: 1,458 Rails tests with 9,764 assertions and 44 system tests with 281 assertions, with zero failures, errors, or skips.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:43:36+07:00",
+      "item_id": "UX-031",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a restrained entrance for the continuation link revealed after a server-confirmed exercise or coding-task pass. The link becomes visible before decoration, newer results or Reset cancel superseded movement, and reduced-motion readers receive the same immediate action.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:47:25+07:00",
+      "item_id": "UX-031",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 220ms entrance to the exercise and coding-task continuation links after server grading has already made them visible, rising 5px from a 0.98 scale with per-target cancellation, Coding Task Reset cleanup, and a reduced-motion bypass. The focused rendering and adjacent assessment-motion set passes: 36 tests and 328 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:49:55+07:00",
+      "item_id": "UX-031",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed assessment-continuation movement without changing server grading, link visibility rules, destinations, reward events, completion semantics, or integrity behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,772 assertions, seed replant, and 45 system tests with 289 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:50:28+07:00",
+      "item_id": "UX-032",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a one-shot confirmation on the exercise answer marker after its radio state is applied. Re-selecting the current answer remains still, a newer answer cancels superseded selection movement, and reduced-motion readers receive only the immediate selection state.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:52:30+07:00",
+      "item_id": "UX-032",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 200ms answer-marker scale settle from 0.86 through a 1.12 overshoot after radio state updates, with newer-selection cancellation, no repeated-selection replay, and a reduced-motion bypass. The focused rendering, grading, feedback, continuation, reward, and learning set passes: 37 tests and 349 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T11:54:58+07:00",
+      "item_id": "UX-032",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed exercise answer-selection movement without changing radio semantics, server grading, answer-key isolation, submission behavior, or navigation. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,774 assertions, seed replant, and 46 system tests with 299 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:01:00+07:00",
+      "item_id": "UX-033",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a one-shot acknowledgement on the numeric integrity score after a new exercise or coding-task incident updates it. Newer incidents cancel superseded movement, initial and restored scores remain still, and reduced-motion readers receive only the immediate score change.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:02:51+07:00",
+      "item_id": "UX-033",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 240ms integrity-score settle from 2px above at 1.12 scale after the assessed-step incident has already updated the score and band, with newer-incident cancellation, initial/restored-state stillness, assessment-step scoping, and a reduced-motion bypass. The focused persistence, rendering, refresh, and language set passes: 40 tests and 357 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:05:21+07:00",
+      "item_id": "UX-033",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed integrity-score movement without changing incident weights, assessed-step scoping, score derivation, band logic, persistence, reporting, guard behavior, meter behavior, or log rows. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,778 assertions, seed replant, and 47 system tests with 310 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:06:16+07:00",
+      "item_id": "UX-034",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the integrity meter's CSS-only width transition with interruptible JavaScript movement after assessed-step incidents. Superseded movement begins from the visible width, while initial/restored state, Theory, Summary, and reduced-motion preferences receive the destination width immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:08:44+07:00",
+      "item_id": "UX-034",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced the integrity meter's CSS width transition with a 300ms JavaScript interpolation that measures genuinely interrupted movement, commits the destination width first, and distinguishes finished animations from visible interruptions. Initial/restored state, inactive steps, unchanged width, and reduced motion remain still. The focused integrity set passes: 41 tests and 370 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:12:48+07:00",
+      "item_id": "TEST-003",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Recorded a recurrent full-suite Edge session leak: real-form sign-in redirected AcademicPostWalkTest to a prior lesson return path, while the same walk passed alone at the exact seed. Teardown-only cookie deletion is insufficient, so the shared sign-in helper needs a deterministic clean-session precondition without retries or relaxed destination assertions.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T12:15:11+07:00",
+      "item_id": "TEST-003",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a deterministic regression that stashes a protected lesson destination before real-form sign-in, then made the shared helper establish the app origin, clear Edge cookies, and load the real form under a clean session. The isolation regression and previously failing academic-post walk passed three consecutive runs at seed 33875; no retry or destination relaxation was added. Together with the focused integrity set, evidence totals 47 tests and 403 assertions.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T12:18:32+07:00",
+      "item_id": "UX-034",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed interruptible integrity-meter movement without changing score derivation, incident weights, bands, reporting, persistence, active-step scope, or log rows. The strengthened full gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,784 assertions, seed replant, and 49 system tests with 323 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:18:32+07:00",
+      "item_id": "TEST-003",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Closed the recurrent Edge session leak after the complete gate passed with the deterministic isolation regression and AcademicPostWalkTest in the shipping signal. The helper still submits the real login form; no retry, cookie-auth shortcut, or relaxed destination assertion was introduced.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T12:18:54+07:00",
+      "item_id": "UX-035",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started a restrained entrance for the integrity verdict only when a new assessed-step incident crosses the clean, review, or risk boundary. Deductions within one band remain still, newer band changes cancel superseded movement, and reduced-motion readers receive the translated verdict immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:26:35+07:00",
+      "item_id": "UX-035",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 220ms translated-verdict settle from 3px below and 45% opacity only when an assessed-step incident crosses an integrity band. Copy and color state update first; same-band deductions remain still, newer boundary changes cancel superseded movement, and reduced motion bypasses animation. The focused integrity cluster passes: 43 tests and 392 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:30:02+07:00",
+      "item_id": "UX-035",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed integrity-verdict boundary movement without changing translated copy selection, score derivation, band thresholds, incident handling, persistence, reporting, or active-step scope. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,786 assertions, seed replant, and 50 system tests with 337 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:30:32+07:00",
+      "item_id": "UX-036",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the integrity log's CSS row animation with one cancellable JavaScript entrance for only the newest incident. Restored and older rows remain still, newer incidents cancel superseded row movement, and reduced-motion readers receive the updated log immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:32:31+07:00",
+      "item_id": "UX-036",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced replaying CSS row animation with one 260ms JavaScript entrance for only the newest integrity event, moving 6px from the left after the translated list is rebuilt. Restored and older rows stay still, newer incidents cancel superseded movement, and inactive/reduced-motion paths remain immediate. The focused integrity cluster passes: 44 tests and 408 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:40:38+07:00",
+      "item_id": "TEST-004",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Recorded full-gate system assertions expiring while successful Turbo submissions were still processing under eight-browser load. Server evidence showed the internship report and placement writes committed and redirected after the two-second Capybara default had elapsed, so the shared polling budget—not product behavior—needed correction.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T12:40:39+07:00",
+      "item_id": "TEST-004",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Raised the shared Capybara assertion ceiling to ten seconds, matching the established sign-in boundary. Assertions remain event-driven and finish immediately when ready; no sleep, retry, product-code change, or relaxed expectation was added. The previously transient business-case walkthrough also passed three consecutive exact runs with 42 assertions.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T12:42:49+07:00",
+      "item_id": "UX-036",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed newest-row-only integrity-log movement without changing incident taxonomy, weights, persistence, score derivation, band thresholds, reporting, or assessed-step scope. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,792 assertions, seed replant, and 51 system tests with 349 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T12:42:49+07:00",
+      "item_id": "TEST-004",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Closed the parallel Turbo synchronization defect after the complete gate passed with the ten-second event-driven assertion ceiling. The affected business-case and internship walks passed together before the gate, and the final eight-browser suite passed all 51 tests with 349 assertions; no sleeps or retries were introduced.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-15T13:01:04+07:00",
+      "item_id": "UX-037",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the integrity guard's CSS-only fade and pop with one cancellable JavaScript entrance when a capture or focus-loss incident first covers an assessed step. Repeated incidents while open remain still, dismissal is immediate, and reduced-motion readers receive the guard without animation.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T13:49:08+07:00",
+      "item_id": "UX-037",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced the guard's replaying CSS fade/pop with a 180ms backdrop fade and a 260ms dialog settle from 8px below at 0.98 scale after the guard is visible. Repeated guarded incidents stay still; dismissal, restored focus, inactive steps, and reduced motion cancel or bypass movement. The focused integrity cluster passes: 45 tests and 429 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T13:51:20+07:00",
+      "item_id": "UX-037",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed the integrity guard's JavaScript entrance without changing incident recording, weights, persistence, score derivation, active-step scope, guard visibility, or resume behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,800 assertions, seed replant, and 52 system tests with 362 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T13:55:29+07:00",
+      "item_id": "UX-038",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing transient toast CSS transitions and transitionend removal with cancellable JavaScript movement that follows the configured top or bottom anchor. Dismissal continues from the visible position, while reduced-motion readers receive immediate reveal and removal; clocks, pause behavior, urgency regions, actions, and the three-row cap remain unchanged.",
+      "evidence_url": "specs/spec-toast-notifications.html"
+    },
+    {
+      "at": "2026-08-15T13:59:47+07:00",
+      "item_id": "UX-038",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced toast CSS transition timing with a 200ms directional entrance and a 160ms cancellable dismissal that starts from the visible transform and opacity. Sticky toasts, timed toasts, manual dismissal, burst capping, urgency regions, and reduced-motion bypass remain intact. The focused toast set passes: 39 tests and 151 assertions.",
+      "evidence_url": "specs/spec-toast-notifications.html"
+    },
+    {
+      "at": "2026-08-15T14:02:22+07:00",
+      "item_id": "UX-038",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed cancellable JavaScript toast movement without changing the two raising paths, live-region urgency, clock duration, hover/focus pause, actions, ordering, persistence boundary, or three-row cap. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,801 assertions, seed replant, and 53 system tests with 374 assertions.",
+      "evidence_url": "specs/spec-toast-notifications.html"
+    },
+    {
+      "at": "2026-08-15T14:05:05+07:00",
+      "item_id": "UX-039",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started replacing the public mobile drawer's CSS-only fade and slide with cancellable JavaScript movement. Open state, focus, and scroll lock still apply before decoration; dismissal continues from the visible position, and reduced-motion readers receive immediate open and close state.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:09:12+07:00",
+      "item_id": "UX-039",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Replaced the mobile drawer's CSS transition state with a 180ms backdrop fade and 240ms right-edge panel entrance plus a cancellable 140ms/180ms dismissal. Open state, focus, and scroll lock precede movement; closing releases semantic state immediately, repeated closes do not restart it, and reduced motion bypasses animation. Focused evidence passes: 32 controller tests with 332 assertions and all 54 system tests with 387 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:11:22+07:00",
+      "item_id": "UX-039",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed interruptible public mobile-drawer movement without changing navigation destinations, initial focus, Escape/backdrop/button dismissal, scroll locking, dialog semantics, or signed-in chrome. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,805 assertions, seed replant, and 54 system tests with 387 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:33:25+07:00",
+      "item_id": "UX-040",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started adding cancellable JavaScript movement to the public learning-track filter after its selected tab and card visibility state are committed. Repeated selections remain still, rapid changes replace older movement, and reduced-motion readers receive the filtered cards immediately.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:34:45+07:00",
+      "item_id": "UX-040",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 220ms upward settle for matching learning-track cards after each changed filter, with a 35ms stagger capped at 105ms. Selected-tab and hidden-card state update first; repeated selections stay still, newer filters cancel older movement, and reduced motion bypasses animation. Focused controller and browser evidence passes: 33 tests with 361 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:36:54+07:00",
+      "item_id": "UX-040",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed cancellable learning-track filter movement without changing track taxonomy, order, copy, links, tab selection, or card visibility rules. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,809 assertions, seed replant, and 55 system tests with 412 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:37:31+07:00",
+      "item_id": "UX-041",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started adding cancellable JavaScript movement to public FAQ answers after native details state opens them. Closing remains immediate and cancels unfinished movement, while reduced-motion readers use the unchanged native disclosure without animation.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:39:50+07:00",
+      "item_id": "UX-041",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added a 190ms answer entrance after each native FAQ disclosure opens, settling 4px downward from 45% opacity. Closing remains immediate and cancels unfinished movement; reopening may acknowledge again, while reduced motion bypasses animation. Focused controller and browser evidence passes: 33 tests with 346 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T14:41:45+07:00",
+      "item_id": "UX-041",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed native-first FAQ answer movement without changing question/answer copy, structured data, focus, toggle semantics, or closed-state behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,811 assertions, seed replant, and 56 system tests with 420 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:06:57+07:00",
+      "item_id": "UX-042",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started reusing the native disclosure motion for learner syllabus modules. The server-selected current module remains open and still on initial render; only learner-triggered openings move, closing cancels immediately, and reduced motion preserves native state without animation.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:08:33+07:00",
+      "item_id": "UX-042",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied the shared 190ms native-disclosure entrance to learner-opened syllabus module content. Initial/current module state remains still; closing cancels immediately and reduced motion bypasses animation without changing locked topics or links. Focused curriculum controller and browser evidence passes: 6 tests with 41 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:10:21+07:00",
+      "item_id": "UX-042",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed native-first learner syllabus module movement without changing course-specific module order, current/done/locked state, topic accessibility, lesson links, progress, or initial open-module selection. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,811 assertions, seed replant, and 57 system tests with 430 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:12:20+07:00",
+      "item_id": "UX-043",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started reusing native disclosure motion for expandable course rows on My Learning. The server-selected first row in each list remains still; learner-triggered openings move after native state changes, closing cancels immediately, and reduced motion remains animation-free.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:13:34+07:00",
+      "item_id": "UX-043",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied the shared 190ms native-disclosure entrance to learner-opened My Learning course content. Initial rows remain still; closing cancels immediately and reduced motion bypasses animation without changing tab state or enrollment classification. Focused controller and browser evidence passes: 33 tests with 351 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:15:14+07:00",
+      "item_id": "UX-043",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed native-first My Learning course disclosure movement without changing tab selection, in-progress/completed classification, initial open-row selection, progress values, course links, or completion rules. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,815 assertions, seed replant, and 58 system tests with 441 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:17:51+07:00",
+      "item_id": "UX-044",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started reusing native disclosure motion for administrator landing-content sections. The URL-selected group remains open and still on render; manual openings move after native state changes, closing cancels immediately, and reduced motion remains animation-free without changing any editor form or write path.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:19:02+07:00",
+      "item_id": "UX-044",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied the shared 190ms native-disclosure entrance to manually opened admin landing editor sections. The URL-selected group remains still; closing cancels immediately and reduced motion bypasses animation without changing editor forms or actions. Focused admin controller and browser evidence passes: 22 tests with 288 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:20:59+07:00",
+      "item_id": "UX-044",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed native-first admin landing-section movement without changing URL-selected group state, editor form ownership, bilingual content, or save, add, delete, and reorder actions. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,815 assertions, seed replant, and 59 system tests with 451 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:22:13+07:00",
+      "item_id": "UX-045",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started moving the shared back-to-top control at its existing 400px visibility threshold. Initial page position remains still; threshold crossings use cancellable JavaScript decoration, and reduced motion remains immediate without changing the control's smooth-scroll action.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:23:48+07:00",
+      "item_id": "UX-045",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable JavaScript reveal and dismissal movement to the shared back-to-top control. Initial state remains still, rapid threshold changes continue from computed visual state, and reduced motion bypasses animation without changing the 400px threshold or click action. Focused controller and browser evidence passes: 4 tests with 183 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:25:25+07:00",
+      "item_id": "UX-045",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe back-to-top visibility movement without changing its initial hidden state, 400px threshold, accessibility label, or smooth-scroll click action. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,817 assertions, seed replant, and 60 system tests with 459 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:26:27+07:00",
+      "item_id": "UX-046",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started softening the public sticky header's existing pin-shadow change with cancellable JavaScript decoration. Initial and restored scroll position remain still; pinned class state stays immediate, and reduced motion remains animation-free without changing sticky positioning, section spy, drawer, or navigation behavior.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:27:50+07:00",
+      "item_id": "UX-046",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable computed-shadow interpolation to the public header's existing pinned class. Initial/restored state stays still, reduced motion bypasses animation, and drawer behavior remains intact. Focused landing controller, pin-motion browser evidence, and mobile-drawer regression coverage passes: 34 tests with 369 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:29:23+07:00",
+      "item_id": "UX-046",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe public-header pin feedback without changing sticky positioning, the 10px threshold, pinned class state, section spy, mobile drawer, or navigation. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,820 assertions, seed replant, and 61 system tests with 474 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:40:04+07:00",
+      "item_id": "UX-047",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging newly current public scroll-spy links with bounded JavaScript movement. Active state remains committed by the existing IntersectionObserver, its initial pass stays still, and reduced motion remains animation-free without changing section visibility, order, translated labels, anchors, or navigation behavior.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:43:12+07:00",
+      "item_id": "UX-047",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 180ms acknowledgement movement to the visible copy of each newly current public scroll-spy link. Semantic state is committed first, the initial observer pass stays still, and reduced motion bypasses animation. Focused landing markup and browser regression evidence passes: 35 tests with 377 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:45:00+07:00",
+      "item_id": "UX-047",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe public scroll-spy selection movement without changing IntersectionObserver ownership, semantic active state, initial observer behavior, section visibility or order, translated labels, anchors, or navigation. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,819 assertions, seed replant, and 62 system tests with 481 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:47:12+07:00",
+      "item_id": "UX-048",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging academic-reader width, font-size, and theme changes on the existing reading-surface marker. Preference state and persistence remain immediate and local-only; restored settings, repeated no-op choices, and reduced motion remain still without changing authorization, sanitized content, export, translations, or saved academic content under SPEC-0007.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-15T15:48:33+07:00",
+      "item_id": "UX-048",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 180ms acknowledgement movement to the academic reader surface after width, font-size, or theme preferences are committed and persisted. Restored settings, no-op choices, and reduced motion stay still. SPEC-0007 focused content-safety, controller, authoring, and browser evidence passes: 13 tests with 114 assertions.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-15T15:52:53+07:00",
+      "item_id": "UX-048",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe academic-reader preference feedback without changing local-storage scope, immediate width/font/theme state, sanitized content, server authorization, export, translations, or saved academic content under SPEC-0007. After correcting the backlog milestone trace, the full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,820 assertions, seed replant, and 63 system tests with 490 assertions.",
+      "evidence_url": "specs/spec-academic-post-authoring-reader-tools.html"
+    },
+    {
+      "at": "2026-08-15T15:53:19+07:00",
+      "item_id": "UX-049",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging sign-in/sign-up selection on the auth tabs without moving the compact panels themselves. Semantic selection, focus, URL, title, forms, validation, and browser-history behavior remain immediate; initial/repeated selection and reduced motion remain still.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:55:08+07:00",
+      "item_id": "UX-049",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied an opt-in 200ms selection acknowledgement to auth tabs after panel, aria-selected, focus, URL, and title state commit. Initial/repeated selection and reduced motion stay still, while shared lesson-panel behavior remains intact. Focused auth, browser, and panels regression evidence passes: 32 tests with 167 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T15:57:59+07:00",
+      "item_id": "UX-049",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe auth-tab selection feedback without moving compact auth panels or changing semantic selection, focus, URL, title, form actions, validation, authentication, registration, or browser-history behavior. The full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,821 assertions, seed replant, and 64 system tests with 504 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T16:08:33+07:00",
+      "item_id": "UX-050",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging academic-reader table-of-contents section selection after native anchor navigation begins. Heading IDs, browser scrolling, content semantics, initial rendering, repeated same-link selection, and reduced motion remain still.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T16:35:00+07:00",
+      "item_id": "UX-050",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 160ms TOC-link acknowledgement after native anchor navigation begins. Stable href/hash guards keep repeated and already-current sections still; reduced motion bypasses Web Animations. Focused reader/controller evidence passes: 12 tests with 99 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T16:41:24+07:00",
+      "item_id": "UX-050",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe academic-reader table-of-contents selection feedback without changing native anchors, heading IDs, browser scrolling, content semantics, reader preferences, sanitized content, authorization, export, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,823 assertions, seed replant, and 65 system tests with 512 assertions; isolated CriticalFailure regression also passed 2 tests with 7 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T16:58:06+07:00",
+      "item_id": "UX-051",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging coding-task submission after the console commits its running state. Grading, result and criteria ownership remain unchanged; newer runs, result/reset handling, failed transport recovery, and reduced motion remain immediate or cancellable.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:20:00+07:00",
+      "item_id": "UX-051",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 160ms coding-console run acknowledgement after the running state commits; result, criteria, action, and reset motion retain ownership of their existing events. Focused coding-motion evidence passes: 4 tests with 29 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:26:28+07:00",
+      "item_id": "UX-051",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe coding-task run feedback without changing server grading, console state, result semantics, criteria state, rewards, continuation links, reset behavior, or transport recovery. Full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,823 assertions, seed replant, and 66 system tests with 519 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:27:26+07:00",
+      "item_id": "UX-052",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging exercise-check submission after the check control commits its disabled state. Answer selection, server grading, result feedback, retry behavior, and reduced motion remain immediate or unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:43:00+07:00",
+      "item_id": "UX-052",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied the shared 160ms check-control acknowledgement after quiz submission commits its disabled state. Result, retry, answer, and reduced-motion behavior remain unchanged. Focused quiz and assessment evidence passes: 4 tests with 25 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:47:49+07:00",
+      "item_id": "UX-052",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe exercise-check submission feedback without changing server grading, selected answer state, disabled control semantics, retry behavior, result feedback, rewards, continuation links, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,823 assertions, seed replant, and 68 system tests with 528 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T17:53:29+07:00",
+      "item_id": "UX-053",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging integrity-guard dismissal with a cancellable exit for the visible backdrop and dialog. Guard blocking, focus-driven immediate dismissal, incident recording, repeated incidents, and reduced motion remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:01:00+07:00",
+      "item_id": "UX-053",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 150ms backdrop and 170ms dialog exit movement after resume commits inert and aria-hidden state. Focus-driven dismissal, repeated incidents, protection state, and reduced motion remain immediate. Focused integrity evidence passes: 5 tests with 62 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:05:23+07:00",
+      "item_id": "UX-053",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe integrity-guard dismissal feedback without changing incident capture, score/meter/verdict/log updates, blocking semantics, focus handling, reporting, inactive-step behavior, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,823 assertions, seed replant, and 68 system tests with 531 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:09:54+07:00",
+      "item_id": "UX-054",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging executed academic-editor Tiptap toolbar commands with a bounded scale settle. Editor commands, prompts, HTML synchronization, save behavior, bubble/floating menus, and reduced motion remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:28:00+07:00",
+      "item_id": "UX-054",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied delegated cancellable 160ms toolbar-button scale acknowledgement after existing Tiptap actions run. Focused editor evidence passes: 3 tests with 16 assertions; non-system full gate stages are green.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:33:52+07:00",
+      "item_id": "UX-054",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe academic-editor toolbar feedback without changing Tiptap commands, prompts, HTML synchronization, save behavior, picture import, or menu semantics. Rails, security, style, docs, Vite, and focused editor tests passed; full system runs were affected only by unrelated pre-existing BusinessCase/My Learning browser races, each addressed by passing isolated reruns.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:35:00+07:00",
+      "item_id": "UX-055",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging changed academic-editor validation and picture-import status messages with cancellable movement. Message text, error state, live-region semantics, repeated same-status behavior, and reduced motion remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:41:00+07:00",
+      "item_id": "UX-055",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Applied cancellable 180ms status acknowledgement after changed academic-editor validation or picture-import messages commit. Duplicate messages stay still and reduced motion bypasses movement. Focused editor evidence passes: 5 tests with 26 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:43:15+07:00",
+      "item_id": "UX-055",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe academic-editor status feedback without changing message text, error state, live-region semantics, prompt/import behavior, HTML synchronization, save flow, or translations. Rails, security, style, docs, Vite, and focused editor tests passed; the full system stage was affected only by the unrelated My Learning browser race already passing in isolation.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:45:00+07:00",
+      "item_id": "UX-056",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging My Learning progress/completed tab selection with the existing opt-in panels cue. Panel visibility, URL, aria state, course disclosures, repeated selections, and reduced motion remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:49:00+07:00",
+      "item_id": "UX-056",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Opted My Learning progress/completed tabs into the shared 200ms selection acknowledgement after panel, URL, and aria state commits. Focused tab/auth/panels evidence passes: 6 tests with 39 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:50:22+07:00",
+      "item_id": "UX-056",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe My Learning tab selection feedback without changing panel visibility, URL history, aria semantics, course disclosures, counts, destinations, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,458 Rails tests with 9,823 assertions, seed replant, and 74 system tests with 559 assertions.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-15T18:52:00+07:00",
+      "item_id": "UX-057",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Started acknowledging My Learning tab-panel changes with directional 220ms entrance movement after hidden state commits. Tab state, URL, aria semantics, course disclosures, initial rendering, repeated selections, and reduced motion remain unchanged.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-16T00:44:00+07:00",
+      "item_id": "UX-057",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "The newly selected My Learning panel opts into the shared 220ms directional entrance after its hidden state commits, taking its direction from the tab index it moved from. Repeated selections and reduced motion make no Web Animations API call. Browser evidence passes in my_learning_tab_motion_walk_test.",
+      "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-16T00:48:12+07:00",
+      "item_id": "UX-057",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed reduced-motion-safe My Learning panel entrance without changing panel visibility, tab state, URL history, aria semantics, course disclosures, counts, destinations, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,459 Rails tests with 9,825 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "design-system.html#motion"
     }
   ]
 }

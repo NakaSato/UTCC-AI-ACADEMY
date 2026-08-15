@@ -1,40 +1,52 @@
-<%# The palette toggle, built as the twin of shared/_language_toggle: same
-    segmented shell, same POST-not-GET reasoning, same `dark:` local for the two
-    fields it sits on. Three states rather than two, because "follow my system"
-    is a real answer and not the absence of one — it is stored as no session
-    value, which is what lets the media query answer instead.
-
-    Icons rather than words: three labels would be wider than the header's
-    utility rail affords, and the accessible name carries the meaning. %>
+<%# The palette chooser, built as the twin of shared/_language_toggle. It stays
+    a set of POST forms — never links — because Turbo prefetches links on hover.
+    Three choices live in a dropdown now, so each placement names the current
+    preference without spending the width of three permanently visible buttons. %>
 <% dark = local_assigns.fetch(:dark, true) %>
+<% embedded = local_assigns.fetch(:embedded, false) %>
 <% chosen = session[:theme].in?(%w[ light dark ]) ? session[:theme] : "system" %>
+<% themes = { "light" => "☀", "dark" => "☾", "system" => "◐" } %>
 
-<div role="group" aria-label="<%= t("chrome.theme_label") %>"
-     class="flex flex-none gap-0 rounded-[10px] border p-[3px]
-            <%= dark ? "border-chrome-line bg-chrome-2" : "border-hairline-2 bg-surface-2" %>">
-  <% { "light" => "☀", "system" => "◐", "dark" => "☾" }.each do |theme, glyph| %>
-    <% current = chosen == theme %>
-    <%# A real navigation, not a Turbo visit. Turbo copies exactly two
-        attributes off the incoming page's <html> — `lang` and `dir` — and
-        `class` is not one of them. Measured, not assumed: after a Turbo submit
-        the class stayed empty and only appeared on a full reload, so the
-        palette would not change until the visitor happened to reload. One full
-        load on an action taken once in a while is the cheaper side of that
-        trade, and it is why the language toggle beside this one needs no such
-        treatment. %>
-    <%= button_to theme_path(theme),
-          form: { data: { turbo: false } },
-          form_class: "contents",
-          "aria-current": ("true" if current),
-          title: t("chrome.theme.#{theme}"),
-          class: class_names(
-            "rounded-[7px] px-2 py-[5px] text-12 leading-none transition-colors",
-            "bg-brand text-white" => current,
-            "text-on-chrome-muted hover:text-on-chrome-bright" => !current && dark,
-            "text-muted hover:text-ink" => !current && !dark
-          ) do %>
-      <span aria-hidden="true"><%= glyph %></span>
-      <span class="sr-only"><%= t("chrome.theme.#{theme}") %></span>
+<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="theme" data-controller="dropdown"
+     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+  <button type="button" aria-haspopup="true" aria-expanded="false"
+          aria-label="<%= t("chrome.theme_toggle", theme: t("chrome.theme.#{chosen}")) %>"
+          data-dropdown-target="button" data-action="dropdown#toggle"
+          class="flex h-[38px] items-center gap-2 rounded-[10px] border px-2.5 text-12 font-semibold transition-colors
+                 <%= "w-full" if embedded %>
+                 <%= dark ? "border-chrome-line bg-chrome-2 text-on-chrome hover:border-chrome-edge hover:text-white" :
+                            "border-hairline-2 bg-surface-2 text-ink hover:border-brand-ink" %>">
+    <span aria-hidden="true"><%= themes.fetch(chosen) %></span>
+    <% if embedded %>
+      <span><%= t("chrome.theme_label") %></span>
+      <span class="ml-auto font-normal text-muted"><%= t("chrome.theme.#{chosen}") %></span>
+    <% else %>
+      <span><%= t("chrome.theme.#{chosen}") %></span>
     <% end %>
-  <% end %>
+    <span aria-hidden="true" data-dropdown-target="indicator"
+          class="text-9 <%= dark ? "text-on-chrome-dim" : "text-muted-2" %>">▾</span>
+  </button>
+
+  <div hidden data-state="closed"
+       class="<%= embedded ? "static mt-1 w-full" : "absolute top-[46px] right-0 z-50 w-[170px]" %> overflow-hidden rounded-[14px]
+              border border-hairline bg-surface p-1.5 shadow-menu"
+       data-dropdown-target="panel" role="group" aria-label="<%= t("chrome.theme_label") %>">
+    <% themes.each do |theme, glyph| %>
+      <% current = chosen == theme %>
+      <%# A real navigation, not a Turbo visit. Turbo copies `lang` and `dir`
+          from <html>, but not its theme class, so this form still opts out. %>
+      <%= button_to theme_path(theme),
+            form: { data: { turbo: false } }, form_class: "block",
+            "aria-current": ("true" if current),
+            class: class_names(
+              "flex w-full items-center gap-2.5 rounded-[9px] px-3 py-2.5 text-left text-13-5 transition-colors",
+              "bg-brand-tint font-semibold text-brand-ink-deep" => current,
+              "text-ink-2 hover:bg-canvas" => !current
+            ) do %>
+        <span aria-hidden="true" class="w-4 text-center"><%= glyph %></span>
+        <span><%= t("chrome.theme.#{theme}") %></span>
+        <% if current %><span aria-hidden="true" class="ml-auto">✓</span><% end %>
+      <% end %>
+    <% end %>
+  </div>
 </div>

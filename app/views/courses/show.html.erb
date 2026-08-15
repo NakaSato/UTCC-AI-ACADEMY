@@ -41,6 +41,9 @@
         <% @modules.each_with_index do |mod, index| %>
           <details class="group animate-rise overflow-hidden rounded-[16px] border border-hairline bg-surface"
                    style="animation-delay: <%= index * 55 %>ms"
+                   data-controller="disclosure-motion"
+                   data-action="toggle->disclosure-motion#toggle"
+                   data-course-module="<%= mod.number %>"
                    <%= "open" if mod.number == @open_module %>>
             <summary class="marker-none flex cursor-pointer items-center gap-4 px-5.5 py-4.5">
               <span class="grid size-8.5 flex-none place-items-center rounded-[10px] text-13 font-bold
@@ -64,7 +67,8 @@
               <span aria-hidden="true" class="hidden text-11 text-muted-3 group-open:inline">▲</span>
             </summary>
 
-            <div class="border-t border-surface-3 px-5.5 pt-1.5 pb-3.5">
+            <div class="border-t border-surface-3 px-5.5 pt-1.5 pb-3.5"
+                 data-disclosure-motion-target="content" data-course-module-content>
               <% if mod.desc? %>
                 <p class="mx-2 mt-2.5 mb-1.5 text-13-5 leading-[1.6] text-balance text-muted"><%= mod.desc %></p>
               <% end %>

@@ -60,7 +60,8 @@
         </button>
 
         <%= link_to @lesson_content.translate("code.finish"), lesson_step_path(:summary),
-              data: { code_task_target: "finish", panel: :summary, action: "panels#select" },
+              data: { code_task_target: "finish", assessment_action: "code",
+                      panel: :summary, action: "panels#select" },
               class: "ml-auto hidden rounded-[9px] border-[1.5px] border-brand-ink px-4.5 py-2 text-14 font-semibold
                       text-danger-soft" %>
       </div>

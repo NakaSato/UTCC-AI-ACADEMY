@@ -30,10 +30,11 @@
                        "text-on-chrome-soft hover:bg-chrome-hover hover:text-white" => !open_here
                      ) %>">
         <%= group[:label] %>
-        <span aria-hidden="true" class="text-9-5">▾</span>
+        <span aria-hidden="true" data-dropdown-target="indicator" class="text-9-5">▾</span>
       </button>
 
-      <div class="absolute top-[46px] left-0 z-50 hidden w-[220px] rounded-[14px] border border-chrome-line
+      <div hidden data-state="closed"
+           class="absolute top-[46px] left-0 z-50 w-[220px] rounded-[14px] border border-chrome-line
                   bg-chrome p-1.5 shadow-menu-dark"
            data-menu="nav" data-dropdown-target="panel">
         <% group[:items].each do |label, path| %>
@@ -58,7 +59,8 @@
       </span>
     </button>
 
-    <div class="absolute top-[46px] left-0 z-50 hidden w-[248px] rounded-[14px] border border-chrome-line
+    <div hidden data-state="closed"
+         class="absolute top-[46px] left-0 z-50 w-[248px] rounded-[14px] border border-chrome-line
                 bg-chrome p-1.5 shadow-menu-dark"
          data-menu="nav-compact" data-dropdown-target="panel">
       <% app_nav_groups.each_with_index do |group, index| %>
