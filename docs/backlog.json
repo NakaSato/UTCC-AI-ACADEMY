@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-16T00:48:12+07:00",
+  "updated_at": "2026-08-16T01:29:23+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4170,6 +4170,28 @@
         }
       ],
       "updated_at": "2026-08-16T00:48:12+07:00"
+    },
+    {
+      "id": "INT-007",
+      "title": "Name the student internship door after what they came for",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "INT-004"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Shipped internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        }
+      ],
+      "updated_at": "2026-08-16T01:29:23+07:00"
     }
   ],
   "recently_completed": [
@@ -7409,6 +7431,22 @@
       "to": "complete",
       "summary": "Completed reduced-motion-safe My Learning panel entrance without changing panel visibility, tab state, URL history, aria semantics, course disclosures, counts, destinations, or translations. Full local gate passed: documentation, style, security audits, Vite build, 1,459 Rails tests with 9,825 assertions, seed replant, and 74 system tests with 563 assertions.",
       "evidence_url": "design-system.html#motion"
+    },
+    {
+      "at": "2026-08-16T01:29:23+07:00",
+      "item_id": "INT-007",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Recorded after the fact: the student internship door was already serving /internship instead of /internship-requests and listing published, position-backed programs beside the position-less request path, with no backlog entry naming the work. Route helper names, request ownership, and every program action are unchanged; SPEC-0028 still owns program detail and application.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T01:29:23+07:00",
+      "item_id": "INT-007",
+      "from": "verification",
+      "to": "complete",
+      "summary": "SPEC-0041 carries an amendment dated 2026-08-16 recording both the address and the published-program section, so the specification and the shipped screen agree again. Evidence is test/controllers/student_internship_door_test.rb, already named in the specification's enforced_by. Full local gate passed: documentation, style, security audits, Vite build, 1,459 Rails tests with 9,825 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
     }
   ]
 }
