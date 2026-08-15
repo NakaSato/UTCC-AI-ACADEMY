@@ -60,6 +60,17 @@ class BusinessCasesControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, I18n.t("business_cases.show.invitations_draft")
   end
 
+  test "consecutive milestone and invitation forms use complete navigations" do
+    sign_in_as users(:one)
+    @business_case.transition_to!("published", actor: users(:one))
+
+    get business_case_path(@business_case)
+
+    assert_response :success
+    assert_select "form[action=?][data-turbo=false]", milestones_business_case_path(@business_case), count: 1
+    assert_select "form[action=?][data-turbo=false]", invitations_business_case_path(@business_case), count: 1
+  end
+
   test "a closed case cannot be edited through the request path" do
     sign_in_as users(:one)
     @business_case.transition_to!("published", actor: users(:one))

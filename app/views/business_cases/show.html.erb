@@ -87,7 +87,11 @@
           <% end %>
         </ol>
         <% if @manageable && !@business_case.closed? %>
-          <%= form_with url: milestones_business_case_path(@business_case), scope: :milestone, class: "mt-5 space-y-2 border-t border-hairline pt-5" do |form| %>
+          <%# Milestone creation may be followed immediately by another mutation.
+              Complete its redirect as a native navigation so the next submit
+              cannot land inside an unfinished Turbo visit. %>
+          <%= form_with url: milestones_business_case_path(@business_case), scope: :milestone,
+                data: { turbo: false }, class: "mt-5 space-y-2 border-t border-hairline pt-5" do |form| %>
             <%= form.label :title, t("business_cases.show.milestone_title_label"), class: "block text-12 font-semibold text-ink" %>
             <%= form.text_field :title, size: nil, required: true, maxlength: 160,
                   class: "w-full rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-13 text-ink" %>
@@ -179,7 +183,11 @@
         <section class="rounded-card border border-hairline bg-surface-1 p-6">
           <h2 class="text-16 font-semibold text-ink"><%= t("business_cases.show.invitations_heading") %></h2>
           <% if @business_case.open_for_invitations? %>
-            <%= form_with url: invitations_business_case_path(@business_case), scope: :invitation, class: "mt-4 space-y-2" do %>
+            <%# Invitation creation can immediately follow another case mutation.
+                A native navigation keeps that second submit from being discarded
+                while Turbo is still completing the preceding redirect visit. %>
+            <%= form_with url: invitations_business_case_path(@business_case), scope: :invitation,
+                  data: { turbo: false }, class: "mt-4 space-y-2" do %>
               <%= select_tag "invitation[user_id]",
                     options_from_collection_for_select(@invitees, :id, :name),
                     include_blank: t("business_cases.show.invite_blank"),

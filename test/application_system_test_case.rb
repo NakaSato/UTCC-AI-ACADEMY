@@ -21,8 +21,24 @@ Capybara.register_driver :headless_edge do |app|
   Capybara::Selenium::Driver.new(app, browser: :edge, options: options)
 end
 
+# Parallel browser runs can make an otherwise successful Turbo response take
+# longer than Capybara's two-second default. Keep every assertion event-driven,
+# but give it the same ten-second ceiling already used by the sign-in boundary.
+Capybara.default_max_wait_time = 10
+
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :headless_edge
+
+  # Capybara 3.40 asks Edge to clear cookies through CDP only after navigating
+  # to about:blank. Edge accepts that request but can leave the encrypted Rails
+  # session cookie behind, allowing a selected locale (or an authenticated
+  # session) to cross into the next test. Clear cookies while the app origin is
+  # still active; Rails' normal teardown then resets the rest of the browser.
+  def after_teardown
+    page.driver.browser.manage.delete_all_cookies
+  ensure
+    super
+  end
 
   # Reaching a destination costs two clicks now: the header is a menubar of
   # categories, each opening its own dropdown, so a test that walks the app the
@@ -44,6 +60,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # a system test exists to walk the app the way a student does, so no cookie
   # shortcuts here.
   def sign_in_through_the_form(user, password: "password")
+    # Teardown cleanup is best effort in Edge. Establish the app origin and
+    # clear again before an explicit sign-in so a prior test's return path or
+    # authenticated session cannot decide this test's destination. The second
+    # visit and everything after it still exercise the real form and session.
+    visit "/login"
+    page.driver.browser.manage.delete_all_cookies
     visit "/login"
     fill_in "student_id", with: user.student_id
     fill_in "password", with: password
