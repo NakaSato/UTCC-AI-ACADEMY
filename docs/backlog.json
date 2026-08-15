@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-16T01:29:23+07:00",
+  "updated_at": "2026-08-16T02:14:03+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4191,7 +4191,48 @@
           "url": "specs/spec-recruitment-internship-management.html"
         }
       ],
-      "updated_at": "2026-08-16T01:29:23+07:00"
+      "updated_at": "2026-08-16T02:10:05+07:00"
+    },
+    {
+      "id": "DEV-031",
+      "title": "Seed the open positions the internship door lists",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Tech Lead",
+      "milestone": "M11-SIR",
+      "depends_on": [
+        "DEV-003",
+        "INT-007"
+      ],
+      "evidence": [
+        {
+          "label": "Student internship requests specification",
+          "url": "specs/spec-student-internship-requests.html"
+        },
+        {
+          "label": "Shipped internship management specification",
+          "url": "specs/spec-recruitment-internship-management.html"
+        }
+      ],
+      "updated_at": "2026-08-16T02:14:03+07:00"
+    },
+    {
+      "id": "DEV-032",
+      "title": "Let the seeds survive a syllabus that has been reordered",
+      "status": "complete",
+      "priority": 2,
+      "owner": "Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-031"
+      ],
+      "evidence": [
+        {
+          "label": "Test strategy",
+          "url": "test-strategy.html"
+        }
+      ],
+      "updated_at": "2026-08-16T02:10:05+07:00"
     }
   ],
   "recently_completed": [
@@ -7447,6 +7488,86 @@
       "to": "complete",
       "summary": "SPEC-0041 carries an amendment dated 2026-08-16 recording both the address and the published-program section, so the specification and the shipped screen agree again. Evidence is test/controllers/student_internship_door_test.rb, already named in the specification's enforced_by. Full local gate passed: documentation, style, security audits, Vite build, 1,459 Rails tests with 9,825 assertions, seed replant, and 74 system tests with 563 assertions.",
       "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T01:52:00+07:00",
+      "item_id": "INT-007",
+      "from": "complete",
+      "to": "in_progress",
+      "summary": "Reopened: the rename reached the application and nothing else. A bookmark, an open tab, or a link made against /internship-requests answered with a routing error, which is what the first person to open the app after the rename received. Closing the item did not make the former address stop being somebody's way in.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T01:55:00+07:00",
+      "item_id": "INT-007",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "The former address answers 301 to /internship and carries any deeper path across with it, so a saved link to a particular request still opens that request. The three company decision endpoints keep their own wording: they are POST targets reached from the work surface, never an address a person types. Two tests cover the redirect and its deep link.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T02:10:05+07:00",
+      "item_id": "INT-007",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Completed with the redirect recorded in the same SPEC-0041 amendment as the rename it repairs, so the specification says both what the address became and what became of the old one. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,833 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T02:10:05+07:00",
+      "item_id": "DEV-031",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Recorded after the fact: the internship door lists what companies have published, and a fresh database published nothing, so half the screen was an empty state and the SPEC-0028 side of it could not be demonstrated. Three positions now seed at the demo company, each walked through the real draft-review-published transitions rather than written straight to status, so every row passes the same ready_for_publication? gate the company screens enforce.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T02:10:05+07:00",
+      "item_id": "DEV-031",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Verified in the running application signed in as the seeded student: the door lists all three positions, each naming its company and linking at the recruitment controller that owns applying. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,835 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "specs/spec-student-internship-requests.html"
+    },
+    {
+      "at": "2026-08-16T02:10:05+07:00",
+      "item_id": "DEV-032",
+      "from": "queued",
+      "to": "verification",
+      "summary": "Recorded after the fact: a topic's position is unique within its module and the seeds wrote the curriculum one row at a time, so any order overlapping the stored one collided. A development database with two AI1101 topics swapped could no longer be seeded at all, and because the failure arrived at the first module, nothing after it ran. Each module now parks its rows before the loop claims their slots, and a topic the curriculum no longer lists follows the listed ones rather than being deleted.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:10:05+07:00",
+      "item_id": "DEV-032",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Verified against a database that reproduced the original failure: the swap seeds clean and returns to syllabus order, an unlisted topic survives the run at the end of its module, and an unchanged re-run still works. No test enforces it, deliberately: a seeds test would run the whole file twice to cover a case db:seed:replant can never reach, since a replant always starts clean. Full local gate passed: 1,461 Rails tests with 9,835 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:12:00+07:00",
+      "item_id": "DEV-031",
+      "from": "complete",
+      "to": "in_progress",
+      "summary": "Reopened: seeding positions broke the test database. Rails truncates a table only when a fixture file names it, and recruitment_internship_programs had none, because until these seeds nothing wrote it. CI replants into that database, so the seeded rows survived the next fixture load still pointing at an organization the fixtures had deleted, and every test that loads fixtures died on the foreign key before its first assertion. The gate did not catch it because the replant runs after the Rails suite: the run that pays is the next one.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:13:00+07:00",
+      "item_id": "DEV-031",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Added the empty fixture file the table was missing, which is the whole fix: an empty fixture truncates. Every other table the seeds write already had one. Tests that need a program still build their own.",
+      "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T02:14:03+07:00",
+      "item_id": "DEV-031",
+      "from": "verification",
+      "to": "complete",
+      "summary": "Verified by reproducing the exact sequence that broke: replant the seeds into the test database, then run the suites that had errored — 18 tests, 59 assertions, no errors. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,833 assertions, seed replant, and 74 system tests with 563 assertions.",
+      "evidence_url": "test-strategy.html"
     }
   ]
 }

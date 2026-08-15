@@ -1,0 +1,11 @@
+# Deliberately empty, and it has to exist to be empty.
+#
+# Rails truncates a table only when a fixture file names it. Every other table
+# the seeds write has one; this table had none, because until the seeds began
+# publishing internship positions nothing seeded it. CI replants the seeds into
+# this database, so those rows survived the next fixture load, still pointing at
+# an organization the fixtures had just deleted — and every test that loads
+# fixtures died on the foreign key before reaching its first assertion.
+#
+# Tests that need a program build their own; what this file buys is an empty
+# table to build it in.
