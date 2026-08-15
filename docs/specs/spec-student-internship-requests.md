@@ -524,6 +524,13 @@ no new decision:
   address bar moved, from a screen named after the record it creates to one
   named after the thing they came for. Every `/internship-requests` written
   above this amendment refers to that same screen at its former address.
+- **The former address still arrives.** Renaming reaches the application; it
+  does not reach the bookmarks and links already made, and the first thing the
+  rename produced was a routing error for somebody who had the old one open.
+  `/internship-requests` now answers 301 to `/internship` and carries any deeper
+  path across with it, so a saved link to a particular request still opens that
+  request. The three company decision endpoints keep their own wording: they are
+  POST targets reached from the work surface, never an address a person types.
 - **Published programs stand beside position-less requests.** The index reads
   `Recruitment::InternshipProgram.published_for_candidates`, newest first, and
   links each one at the recruitment controller that already owns its detail and

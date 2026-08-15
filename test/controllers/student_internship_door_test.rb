@@ -53,6 +53,29 @@ class StudentInternshipDoorTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", recruitment_internship_path(program), text: "Open AI Internship"
   end
 
+  # The screen moved from /internship-requests to /internship on 2026-08-16.
+  # A bookmark made before that is still somebody's way in.
+  test "the door's former address still arrives at the door" do
+    sign_in_as @student
+
+    get "/internship-requests"
+
+    assert_response :moved_permanently
+    assert_redirected_to internship_requests_path
+  end
+
+  test "the former address carries a deeper path across with it" do
+    request = @student.internship_requests.create!(organization: @organization,
+                                                   motivation: "I want to learn.",
+                                                   learning_goals: "Ship something real.")
+    sign_in_as @student
+
+    get "/internship-requests/#{request.id}"
+
+    assert_response :moved_permanently
+    assert_redirected_to internship_request_path(request)
+  end
+
   # Ranking is inserted relative to the end of the list, so adding an entry
   # there is exactly the kind of change that moves it silently.
   test "the ranking entry keeps its place after progress" do

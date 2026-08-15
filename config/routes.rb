@@ -284,9 +284,10 @@ Rails.application.routes.draw do
   # internship routes above. The boundary test reads this delimited block to
   # prove no placement, progress-report, faculty, document, mailer, or API
   # surface ships before each has its own recorded decision.
-  # Student-facing internship request lifecycle. The short `/internship`
-  # address is the canonical door; the helper names remain descriptive so
-  # callers do not have to change when the URL wording does.
+  #
+  # The short `/internship` address is the canonical door; the helper names
+  # remain descriptive so callers do not have to change when the URL wording
+  # does.
   resources :internship_requests, path: "internship", only: %i[index new create edit update show] do
     post :submit, on: :member
     post :withdraw, on: :member
@@ -297,6 +298,13 @@ Rails.application.routes.draw do
     delete :resume, on: :member, to: "internship_request_resumes#destroy", as: :unshare_resume
     get :resume, on: :member, to: "internship_request_resumes#show", as: :download_resume
   end
+  # The door answered at `/internship-requests` until 2026-08-16. Renaming an
+  # address does not reach the bookmarks and links already made against it, so
+  # the old one still arrives — permanently, at the same screen, carrying any
+  # deeper path with it.
+  get "internship-requests(/*rest)", to: redirect(status: 301) { |params, _request|
+    [ "/internship", params[:rest].presence ].compact.join("/")
+  }
   post "internship-requests/:id/review", to: "internship_request_decisions#review", as: :review_internship_request
   post "internship-requests/:id/approve", to: "internship_request_decisions#approve", as: :approve_internship_request
   post "internship-requests/:id/reject", to: "internship_request_decisions#reject", as: :reject_internship_request
