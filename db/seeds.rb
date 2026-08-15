@@ -63,11 +63,27 @@ curricula.each do |course_code, course_modules|
     course_module = CourseModule.find_or_initialize_by(course:, number:)
     course_module.update!(units:)
 
+    # A topic's position is unique within its module, so writing this order one
+    # row at a time only works while it does not overlap the order already
+    # stored. Reorder two topics and the first one to move lands on a slot the
+    # second has not left yet, and the replant dies on the index — which is not
+    # a hypothetical: a development database that had reordered a module could
+    # no longer be seeded at all. Park the module's rows out of the way first,
+    # so every position this loop is about to claim is free before it claims it.
+    course_module.topics.where("position > 0").update_all("position = -position")
+
     topics.each_with_index do |(kind, minutes), position|
       key = Topic.key_for(number, position + 1, course_code:)
       Topic.find_or_initialize_by(key:)
            .update!(course_module:, position: position + 1, kind:, minutes:)
     end
+
+    # A topic the curriculum above no longer lists is not deleted — a
+    # completion, a submission, or a proctor event may still point at it — but
+    # it does not keep a slot the new order wants either. It follows the ones
+    # that are still listed, in the order it already had.
+    parked = course_module.topics.where("position < 0").order("position DESC").to_a
+    parked.each_with_index { |topic, offset| topic.update!(position: topics.size + offset + 1) }
   end
 end
 
