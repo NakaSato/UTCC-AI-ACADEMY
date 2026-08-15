@@ -360,6 +360,55 @@ if Rails.env.local?
        "#{placement.progress_reports.count} weekly report, supervisor #{placement.supervisor&.name}, " \
        "#{placement.deliverables.count} deliverable"
 
+  # ---- Open positions a student can actually see -----------------------------
+  # The request above is the position-less path: a student approaching a company
+  # that advertised nothing. The other half of the student's door lists what
+  # companies *have* published, and a fresh database had none — so the door
+  # showed its empty state and the whole SPEC-0028 side of the screen was
+  # invisible. Walked through the real transitions (draft → review → published)
+  # rather than written straight to `status`, so each row passes the same
+  # `ready_for_publication?` gate the company screens enforce.
+  #
+  # The owner mentors them: `mentor` is required before a program may be
+  # published, and an owner is already allowed to review, so the demo needs no
+  # further membership to stand up.
+  open_positions = [
+    { name: "นักศึกษาฝึกงานวิเคราะห์ข้อมูลปฏิบัติการ", department: "Operations Intelligence",
+      description: "อ่านข้อมูลรอบส่งของจริง หาเส้นทางที่ช้าผิดปกติ และเสนอการวัดผลที่ทีมใช้ตัดสินใจได้",
+      required_skills: "SQL เบื้องต้น การเล่าเรื่องด้วยข้อมูล ความละเอียดรอบคอบ",
+      learning_outcomes: "อ่านข้อมูลปฏิบัติการเป็น และสรุปให้คนที่ต้องตัดสินใจใช้ได้จริง",
+      working_days: "จันทร์ถึงศุกร์ 09:00-17:00", duration_weeks: 12, max_students: 3,
+      remote_policy: "hybrid", certificate_policy: "มีหนังสือรับรองการฝึกงานเมื่อผ่านเกณฑ์",
+      equipment_provided: "โน้ตบุ๊กและบัญชีเครื่องมือภายใน" },
+    { name: "นักศึกษาฝึกงานพัฒนาเว็บแอปพลิเคชัน", department: "Product Engineering",
+      description: "ร่วมทีมพัฒนาโมดูลที่ผู้ใช้จริงเปิดใช้งาน ตั้งแต่การออกแบบหน้าจอจนถึงการทดสอบ",
+      required_skills: "HTML CSS JavaScript พื้นฐาน และความเข้าใจเรื่องการทดสอบ",
+      learning_outcomes: "ส่งงานที่มีคนใช้จริงได้หนึ่งชิ้น พร้อมการทดสอบที่อธิบายพฤติกรรมของมัน",
+      working_days: "จันทร์ถึงศุกร์ 09:30-17:30", duration_weeks: 16, max_students: 2,
+      remote_policy: "onsite", certificate_policy: "มีหนังสือรับรองและหนังสือประเมินผลรายบุคคล",
+      equipment_provided: "เครื่องพัฒนาและสิทธิ์เข้าถึงระบบทดสอบ" },
+    { name: "นักศึกษาฝึกงานผู้ช่วยนักวิจัยปัญญาประดิษฐ์", department: "AI Research",
+      description: "ทดลองแนวทางที่ทีมยังไม่แน่ใจ บันทึกผลอย่างซื่อตรง และสรุปสิ่งที่ได้เรียนรู้",
+      required_skills: "Python พื้นฐานสถิติ และการอ่านงานวิชาการภาษาอังกฤษ",
+      learning_outcomes: "ออกแบบการทดลองที่ตอบคำถามได้ และรายงานผลที่คนอื่นทำซ้ำได้",
+      working_days: "จันทร์ พุธ ศุกร์ 10:00-18:00", duration_weeks: 8, max_students: 4,
+      remote_policy: "remote", certificate_policy: "มีหนังสือรับรองเมื่อส่งรายงานฉบับสมบูรณ์",
+      equipment_provided: "สิทธิ์ใช้งานคลัสเตอร์คำนวณและชุดข้อมูลภายใน" }
+  ]
+
+  open_positions.each do |attributes|
+    program = company.internship_programs.find_or_initialize_by(name: attributes[:name])
+    next if program.persisted? && program.published?
+
+    program.assign_attributes(attributes.merge(creator: recruiter, mentor: recruiter))
+    program.save!
+    program.transition_to!("review") if program.draft?
+    program.transition_to!("published") if program.review?
+  end
+
+  puts "Seeded #{company.internship_programs.published_for_candidates.count} open internship positions at " \
+       "#{company.name} — listed for every student at /internship"
+
   puts "Seeded #{User.count} users — student 2011071730001 at /login; " \
        "instructor wichai, admin utcc-admin, company northstar at /console; password utcc2026 for all"
   puts "Seeded #{TopicCompletion.count} topic completions"
