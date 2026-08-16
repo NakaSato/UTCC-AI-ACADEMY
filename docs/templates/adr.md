@@ -6,7 +6,7 @@ status: draft
 owners: ["@human-owner"]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-review_by: YYYY-MM-DD
+review_by: YYYY-MM-DD  # created + 90 days, unless you have a reason
 supersedes: []
 superseded_by: []
 depends_on: []

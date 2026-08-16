@@ -6,7 +6,7 @@ status: draft
 owners: ["@human-on-call-owner"]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-review_by: YYYY-MM-DD
+review_by: YYYY-MM-DD  # created + 180 days, unless you have a reason
 depends_on: []
 touches: []
 enforced_by: []

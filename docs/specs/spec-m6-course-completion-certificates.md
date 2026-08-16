@@ -6,7 +6,7 @@ status: accepted
 owners: ["@product-owner", "@tech-lead", "@academic-owner"]
 created: 2026-08-02
 updated: 2026-08-08
-review_by: 2026-08-15
+review_by: 2026-10-31
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0011, SPEC-0003]

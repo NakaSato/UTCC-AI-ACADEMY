@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-16T02:18:52+07:00",
+  "updated_at": "2026-08-16T09:42:32+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4252,6 +4252,28 @@
         }
       ],
       "updated_at": "2026-08-16T02:18:52+07:00"
+    },
+    {
+      "id": "DOCS-015",
+      "title": "Give the review clock a cadence somebody chose",
+      "status": "complete",
+      "priority": 3,
+      "owner": "Product Owner and Tech Lead",
+      "milestone": "M1",
+      "depends_on": [
+        "DEV-007"
+      ],
+      "evidence": [
+        {
+          "label": "Documentation templates",
+          "url": "templates/README.html"
+        },
+        {
+          "label": "Development flow",
+          "url": "development-flow.html"
+        }
+      ],
+      "updated_at": "2026-08-16T09:42:32+07:00"
     }
   ],
   "recently_completed": [
@@ -7611,6 +7633,30 @@
       "to": "complete",
       "summary": "Recorded in the test strategy's Test Data rules alongside the gate that enforces it. Full local gate passed with the new step: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,835 assertions, seed replant, 22 seeded tables checked in 0.77s, and 74 system tests with 563 assertions.",
       "evidence_url": "test-strategy.html"
+    },
+    {
+      "at": "2026-08-16T09:30:00+07:00",
+      "item_id": "DOCS-015",
+      "from": "queued",
+      "to": "in_progress",
+      "summary": "Twenty-six documents reported as due for re-review, and the number was an artifact rather than a debt. Of the 116 documents carrying review_by, 92 held a flat created+7 or created+14 stamp; the templates said only YYYY-MM-DD, so the interval was habit, not a rule, and every document went overdue a week or two after it was written. One author had once chosen roughly six months and that document has never reported.",
+      "evidence_url": "templates/README.html"
+    },
+    {
+      "at": "2026-08-16T09:38:00+07:00",
+      "item_id": "DOCS-015",
+      "from": "in_progress",
+      "to": "verification",
+      "summary": "Accepted decisions and specifications now review 90 days after creation and runbooks 180, with the interval written into the three templates so the next author follows a rule instead of a habit. A document whose owners had already chosen a longer clock keeps it: the pass never shortens one. Drafts are untouched on purpose — a draft's date is a prompt to a named person and must keep nagging, while an accepted document's is a calendar cadence. Content was not edited, so no document's updated field moved.",
+      "evidence_url": "templates/README.html"
+    },
+    {
+      "at": "2026-08-16T09:42:32+07:00",
+      "item_id": "DOCS-015",
+      "from": "verification",
+      "to": "complete",
+      "summary": "102 accepted documents re-dated. bin/docs now reports 117 checked, 9 stalled, 0 due for re-review: the nine stalled drafts still name the owners they wait on, which is the signal DEV-007 separated out and the one worth keeping. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,835 assertions, seed replant, seed fixture coverage, and 74 system tests with 563 assertions.",
+      "evidence_url": "templates/README.html"
     }
   ]
 }

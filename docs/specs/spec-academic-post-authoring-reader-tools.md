@@ -6,7 +6,7 @@ status: accepted
 owners: ["@product-owner", "@tech-lead"]
 created: 2026-08-02
 updated: 2026-08-02
-review_by: 2026-08-16
+review_by: 2026-10-31
 supersedes: []
 superseded_by: []
 depends_on: [SPEC-0004, SPEC-0005, SPEC-0006]

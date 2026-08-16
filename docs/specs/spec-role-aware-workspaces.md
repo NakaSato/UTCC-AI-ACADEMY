@@ -6,7 +6,7 @@ status: accepted
 owners: ["@product-owner", "@tech-lead", "@recruitment-domain-owner"]
 created: 2026-08-09
 updated: 2026-08-13
-review_by: 2026-08-27
+review_by: 2026-11-07
 supersedes: []
 superseded_by: []
 depends_on: [ADR-0044, ADR-0042, ADR-0043, ADR-0024, SPEC-0042, SPEC-0043]
