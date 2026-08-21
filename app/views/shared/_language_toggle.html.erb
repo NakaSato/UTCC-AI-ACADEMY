@@ -1,13 +1,27 @@
 <%# POST, not GET: Turbo prefetches links on hover, and a GET would switch
-    language just by pointing at an option. The selected language is visible on
-    the dropdown button; both language names remain autonyms in the list so a
-    reader can always recognise the other choice. %>
+    language just by pointing at a control. The public header has exactly two
+    locales, so its control submits directly to the other one. The signed-in
+    account menu retains the full dropdown, which continues to name every
+    language in that language. %>
 <% dark = local_assigns.fetch(:dark, true) %>
 <% embedded = local_assigns.fetch(:embedded, false) %>
+<% direct = local_assigns.fetch(:direct, false) %>
 <% current_name = t("language_full_name", locale: I18n.locale) %>
+<% switch_locale = (I18n.available_locales - [I18n.locale]).sole if direct %>
+<% switch_name = t("language_full_name", locale: switch_locale) if direct %>
 
-<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="language" data-controller="dropdown"
-     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="language"
+     <% unless direct %>data-controller="dropdown"
+       data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape"<% end %>>
+  <% if direct %>
+    <%= button_to language_path(switch_locale),
+          form_class: "block",
+          class: "flex h-[38px] items-center gap-2 rounded-[10px] border px-2.5 text-12 font-semibold transition-colors #{dark ? "border-chrome-line bg-chrome-2 text-on-chrome hover:border-chrome-edge hover:text-white" : "border-hairline-2 bg-surface-2 text-ink hover:border-brand-ink"}",
+          aria: { label: t("chrome.language_switch", language: switch_name) } do %>
+      <span aria-hidden="true">◎</span>
+      <span><%= t("language_name", locale: switch_locale) %></span>
+    <% end %>
+  <% else %>
   <button type="button" aria-haspopup="true" aria-expanded="false"
           aria-label="<%= t("chrome.language_toggle", language: current_name) %>"
           data-dropdown-target="button" data-action="dropdown#toggle"
@@ -44,4 +58,5 @@
       <% end %>
     <% end %>
   </div>
+  <% end %>
 </div>

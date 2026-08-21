@@ -88,6 +88,7 @@ the outcome column would credit the platform with capabilities nobody built.
 | 27 | AI M13 | Analytics and Reporting | Recruitment, internship, and AI-effectiveness outcomes are measurable | AI M8, M9 | First slice — one workflow report, no outcome or fairness measure |
 | 28 | AI M14 | Notifications and Communication | Participants receive timely, consented communication and history | AI M9 | First slice — an in-app conversation, no external delivery |
 | 29 | AI M15 | Enterprise and Integration | The platform supports governed enterprise adoption and integrations | AI M1, M9, M13, M14 | First slice — a control contract, no provider implementation |
+| 30 | UTCC M11 | Community Project Sharing | Students and instructors can share work, form owner-approved project teams, and interact safely within the academy | UTCC M8 policy, moderation review, ADR-0056, SPEC-0056 | Next — Plan approved; design and specification review pending |
 
 ### Cross-cutting lane
 
@@ -135,6 +136,7 @@ track-level decisions below.
 | 8 | Community and pedagogy decisions | Social awards and heart behavior have real rules | Complete |
 | 9 | Production hardening | Session control, delivery monitoring, and deployment are strengthened | Continuous |
 | 10 | Academic writing | Students and teachers can create, review, and collaboratively publish academic posts | Complete |
+| 11 | Community project sharing | Students and instructors can share work and collaborate in a moderated academy community | Next |
 
 ## Milestone 0 — Successful platform baseline
 
@@ -468,6 +470,43 @@ font-size and reading-width controls, section navigation, citation details,
 KaTeX equations, code and table presentation, text highlighting, comments,
 translation, copy-source, and library filtering. These should be validated
 against the authoring workflow before becoming implementation requirements.
+
+## Milestone 11 — Community project sharing
+
+**Status: Next**
+
+### Goal
+
+Let authenticated students and instructors share project work, form
+owner-approved teams, and interact safely inside the academy.
+
+### Plan
+
+- **Accountable Product Owner:** WiT (`@product-owner`)
+- **Priority:** High
+- **Baseline:** Community projects, owner-managed project teams, project
+  comments, and project moderation do not exist.
+- **Success target:** Within one semester, 30 public projects and 15
+  owner-approved collaborator joins, with no report unreviewed beyond 48 hours.
+- **Opportunity cost:** Defer public tags, ranking, attachments, chat, and
+  ownership transfer until after the pilot.
+
+### Scope
+
+- Private-by-default projects that an owner can publish directly to the
+  authenticated student/instructor academy audience.
+- Owner-managed invitations and join requests, with active collaborators able
+  to edit only the title and description.
+- Plain-text comments, like/dislike reactions, and author soft-deletion.
+- Administrator-only reporting, moderation, hide/restore, audit, and appeal
+  workflows.
+
+### Delivery gate
+
+[ADR-0056](decisions/adr-0056-community-project-sharing.md) and
+[SPEC-0056](specs/spec-community-project-sharing.md) remain drafts. No code
+starts until their accountable reviewers accept the documented invariants and
+moderation/privacy boundaries.
 
 ## Product decisions required before scheduling
 

@@ -50,6 +50,18 @@ class LanguagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: I18n.t("auth.login.title", locale: :en)
   end
 
+  test "the public navbar switches directly to the other locale" do
+    sign_out
+    get root_url
+
+    assert_select "header [data-preference=language]" do
+      assert_select "[data-controller=dropdown]", 0
+      assert_select "form[action=?] button[aria-label=?]", language_path(:en),
+                    I18n.t("chrome.language_switch", language: I18n.t("language_full_name", locale: :en))
+      assert_select "[data-dropdown-target=panel]", 0
+    end
+  end
+
   test "the selected language opens a dropdown containing every locale" do
     get root_url
 

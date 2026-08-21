@@ -46,7 +46,7 @@ class ThemesTest < ActionDispatch::IntegrationTest
 
   test "the selector ships on the landing page and the app, but not auth screens" do
     get root_path
-    assert_theme_toggle
+    assert_public_theme_switch(:dark)
 
     get login_path
     assert_response :success
@@ -62,17 +62,19 @@ class ThemesTest < ActionDispatch::IntegrationTest
   end
 
   test "the toggle marks the current choice for a screen reader" do
+    sign_in_as users(:one)
     post theme_path("dark")
-    get root_path
+    get progress_path
 
-    assert_select "form[action=?] button[aria-current=true]", theme_path("dark")
-    assert_select "form[action=?] button[aria-current=true]", theme_path("light"), 0
+    assert_select "[data-menu=account] form[action=?] button[aria-current=true]", theme_path("dark")
+    assert_select "[data-menu=account] form[action=?] button[aria-current=true]", theme_path("light"), 0
   end
 
-  test "an untouched visitor has system selected" do
-    get root_path
+  test "an untouched signed-in user has system selected" do
+    sign_in_as users(:one)
+    get progress_path
 
-    assert_select "form[action=?] button[aria-current=true]", theme_path("system")
+    assert_select "[data-menu=account] form[action=?] button[aria-current=true]", theme_path("system")
   end
 
   test "the choice is a POST, so hovering a prefetched link cannot repaint the app" do
@@ -85,15 +87,27 @@ class ThemesTest < ActionDispatch::IntegrationTest
   test "the toggle is labelled in the reader's language" do
     get root_path
 
-    assert_select "[aria-label=?]", I18n.t("chrome.theme_label", locale: :th)
+    assert_select "[aria-label=?]", I18n.t("chrome.theme_switch", theme: I18n.t("chrome.theme.dark", locale: :th), locale: :th)
     assert_select "form[action=?] button", theme_path("dark"),
                   text: /#{I18n.t("chrome.theme.dark", locale: :th)}/
   end
 
-  test "the current theme opens a dropdown containing all three choices" do
+  test "the public navbar switches directly between dark and light" do
     get root_path
 
-    assert_select "[data-preference=theme][data-controller=dropdown]" do
+    assert_public_theme_switch(:dark)
+
+    post theme_path(:dark)
+    get root_path
+
+    assert_public_theme_switch(:light)
+  end
+
+  test "the signed-in theme menu opens a dropdown containing all three choices" do
+    sign_in_as users(:one)
+    get progress_path
+
+    assert_select "[data-menu=account] [data-preference=theme][data-controller=dropdown]" do
       assert_select "button[aria-haspopup=true][aria-expanded=false]",
                     text: /#{I18n.t("chrome.theme.system")}/
       assert_select "[data-dropdown-target=panel][hidden][data-state=closed]" do
@@ -114,6 +128,15 @@ class ThemesTest < ActionDispatch::IntegrationTest
   end
 
   private
+    def assert_public_theme_switch(theme)
+      assert_select "header [data-preference=theme]" do
+        assert_select "[data-controller=dropdown]", 0
+        assert_select "form[action=?] button[aria-label=?]", theme_path(theme),
+                      I18n.t("chrome.theme_switch", theme: I18n.t("chrome.theme.#{theme}"))
+        assert_select "[data-dropdown-target=panel]", 0
+      end
+    end
+
     def assert_theme_toggle
       assert_response :success
       assert_select "form[action=?]", theme_path("dark"), 1

@@ -72,8 +72,8 @@
       <%# Presentation preferences follow the account actions on the public
           rail: Sign in → Sign up → Language → Theme. They remain visible on
           narrow screens where those two actions move into the drawer. %>
-      <%= render "shared/language_toggle", dark: true %>
-      <%= render "shared/theme_toggle", dark: true %>
+      <%= render "shared/language_toggle", dark: true, direct: true %>
+      <%= render "shared/theme_toggle", dark: true, direct: true %>
 
       <button type="button"
               class="inline-flex rounded-full p-2 text-white transition duration-300 hover:bg-surface/12 lg:hidden"

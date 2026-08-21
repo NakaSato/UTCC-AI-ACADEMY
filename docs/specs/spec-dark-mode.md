@@ -5,7 +5,7 @@ title: Dark mode, the palette toggle, and the fill/ink split
 status: accepted
 owners: ["@tech-lead", "@product-owner", "@design-owner"]
 created: 2026-08-11
-updated: 2026-08-15
+updated: 2026-08-20
 review_by: 2026-11-09
 supersedes: []
 superseded_by: []
@@ -32,6 +32,7 @@ touches:
 enforced_by:
   - test/assets/dark_palette_test.rb
   - test/controllers/themes_test.rb
+  - test/controllers/languages_controller_test.rb
 agent_writable: true
 requires_skills: [SKILL-SPEC-001, SKILL-SPEC-002, SKILL-PROD-001]
 min_reviewer_skills: [SKILL-SPEC-002]
@@ -94,13 +95,15 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
     layouts — application, auth, and error.
 14. `POST /theme/:theme` is the only way to set it, constrained to
     `light|dark|system`. There is no GET route: Turbo prefetches links on hover.
-15. The theme selector renders on the marketing header and in the signed-in
-    account menu, beside the language selector, but not on authentication
-    screens. Its button names the current choice; its dropdown lists light,
-    dark, and system, with `aria-current` on the selected option. The language
-    selector uses the same dropdown shape. On the public navbar, both selectors
-    follow the sign-up action; in a signed-in session, both are removed from the
-    header rail and nested in the profile dropdown.
+15. The preference selectors render on the marketing header and in the
+    signed-in account menu, but not on authentication screens. On the public
+    navbar, language is a direct POST switch to the other available locale and
+    theme is a direct POST switch between light and dark. Inside the signed-in
+    account menu, language remains a dropdown that lists every available locale
+    in its own language, and theme remains a dropdown listing light, dark, and
+    system, with `aria-current` on the selected option. On the public navbar,
+    both selectors follow the sign-up action; in a signed-in session, both are
+    removed from the header rail and nested in the profile dropdown.
 16. Its labels are bilingual and its buttons carry an accessible name.
 17. The toggle's form submits with `data-turbo: false`. Turbo copies only `lang`
     and `dir` from the incoming page's `<html>`, so a Turbo visit would leave
@@ -127,8 +130,11 @@ flipped at all — crimson does two jobs, and no single value does both at AA.
   screen, while `/login` shows neither preference selector. The signed-in
   header rail carries no standalone preference controls. Its dropdown contains
   three theme buttons and `aria-current` marks the chosen one.
-- The language selector's dropdown contains every available locale and names
-  each language in that language.
+- The public navbar switches language and theme in one POST with no preference
+  dropdowns; language selects the other available locale and theme selects the
+  other light/dark palette. The signed-in account-menu language dropdown
+  contains every available locale and names each language in that language;
+  its theme dropdown includes light, dark, and system.
 - The two dark blocks in the stylesheet define exactly the same tokens.
 - Every pair in `PAIRS` clears its floor in both palettes.
 

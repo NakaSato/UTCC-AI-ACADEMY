@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-16T09:42:32+07:00",
+  "updated_at": "2026-08-21T23:38:42+07:00",
   "timezone": "Asia/Bangkok",
   "tags": [
     "development",
@@ -4274,6 +4274,35 @@
         }
       ],
       "updated_at": "2026-08-16T09:42:32+07:00"
+    },
+    {
+      "id": "COMM-001",
+      "title": "Deliver the community project-sharing pilot",
+      "status": "blocked",
+      "priority": 1,
+      "owner": "WiT (@product-owner)",
+      "milestone": "M11",
+      "depends_on": [],
+      "blocker": {
+        "summary": "Plan triage is approved. Design and specification remain draft while the named Product, Academic, Privacy, Security, Administration, and QA owners review the public-content, moderation, retention, and acceptance boundaries.",
+        "decision_owner": "WiT (@product-owner), Academic Owner, Privacy Owner, Security Owner, Admin Owner, and QA Owner",
+        "next_action": "Complete accountable review of ADR-0056 and SPEC-0056, resolve their remaining handoff decisions, then move COMM-001 to in_progress before implementation."
+      },
+      "evidence": [
+        {
+          "label": "UTCC M11 community project-sharing plan",
+          "url": "roadmap.html#milestone-11--community-project-sharing"
+        },
+        {
+          "label": "Community project-sharing decision draft",
+          "url": "decisions/adr-0056-community-project-sharing.html"
+        },
+        {
+          "label": "Community project-sharing specification draft",
+          "url": "specs/spec-community-project-sharing.html"
+        }
+      ],
+      "updated_at": "2026-08-21T23:38:42+07:00"
     }
   ],
   "recently_completed": [
@@ -7657,6 +7686,14 @@
       "to": "complete",
       "summary": "102 accepted documents re-dated. bin/docs now reports 117 checked, 9 stalled, 0 due for re-review: the nine stalled drafts still name the owners they wait on, which is the signal DEV-007 separated out and the one worth keeping. Full local gate passed: documentation, style, security audits, Vite build, 1,461 Rails tests with 9,835 assertions, seed replant, seed fixture coverage, and 74 system tests with 563 assertions.",
       "evidence_url": "templates/README.html"
+    },
+    {
+      "at": "2026-08-21T23:38:42+07:00",
+      "item_id": "COMM-001",
+      "from": null,
+      "to": "blocked",
+      "summary": "WiT (@product-owner) approved the Community Project Sharing pilot Plan: High priority; baseline of no community-project, team, comment, or moderation workflow; one-semester target of 30 public projects, 15 owner-approved collaborator joins, and no report unreviewed beyond 48 hours; defer tags, ranking, attachments, chat, and ownership transfer until after the pilot. COMM-001 is blocked only on the named design/specification reviews; no implementation is authorized while ADR-0056 and SPEC-0056 remain draft.",
+      "evidence_url": "roadmap.html#milestone-11--community-project-sharing"
     }
   ]
 }

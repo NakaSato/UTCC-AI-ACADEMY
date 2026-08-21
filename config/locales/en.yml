@@ -263,8 +263,10 @@ en:
     toast_dismiss: "Dismiss this message"
     language_label: "Language"
     language_toggle: "Language: %{language}"
+    language_switch: "Switch language to %{language}"
     theme_label: "Colour theme"
     theme_toggle: "Colour theme: %{theme}"
+    theme_switch: "Switch colour theme to %{theme}"
     theme:
       light: "Light"
       dark: "Dark"

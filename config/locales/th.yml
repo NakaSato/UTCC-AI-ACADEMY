@@ -264,8 +264,10 @@ th:
     toast_dismiss: "ปิดข้อความนี้"
     language_label: "ภาษา"
     language_toggle: "ภาษา: %{language}"
+    language_switch: "เปลี่ยนภาษาเป็น %{language}"
     theme_label: "ธีมสี"
     theme_toggle: "ธีมสี: %{theme}"
+    theme_switch: "เปลี่ยนธีมสีเป็น %{theme}"
     theme:
       light: "สว่าง"
       dark: "มืด"

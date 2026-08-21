@@ -1,14 +1,26 @@
-<%# The palette chooser, built as the twin of shared/_language_toggle. It stays
-    a set of POST forms — never links — because Turbo prefetches links on hover.
-    Three choices live in a dropdown now, so each placement names the current
-    preference without spending the width of three permanently visible buttons. %>
+<%# The palette chooser stays a set of POST forms — never links — because Turbo
+    prefetches links on hover. The public header switches directly between light
+    and dark; the signed-in account menu retains its full three-choice dropdown,
+    including the system preference. %>
 <% dark = local_assigns.fetch(:dark, true) %>
 <% embedded = local_assigns.fetch(:embedded, false) %>
+<% direct = local_assigns.fetch(:direct, false) %>
 <% chosen = session[:theme].in?(%w[ light dark ]) ? session[:theme] : "system" %>
 <% themes = { "light" => "☀", "dark" => "☾", "system" => "◐" } %>
+<% switch_theme = chosen == "dark" ? "light" : "dark" if direct %>
 
-<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="theme" data-controller="dropdown"
-     data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape">
+<div class="relative <%= embedded ? "w-full" : "flex-none" %>" data-preference="theme"
+     <% unless direct %>data-controller="dropdown"
+       data-action="click@window->dropdown#closeOnOutsideClick keydown@window->dropdown#closeOnEscape"<% end %>>
+  <% if direct %>
+    <%= button_to theme_path(switch_theme),
+          form: { data: { turbo: false } }, form_class: "block",
+          class: "flex h-[38px] items-center gap-2 rounded-[10px] border px-2.5 text-12 font-semibold transition-colors #{dark ? "border-chrome-line bg-chrome-2 text-on-chrome hover:border-chrome-edge hover:text-white" : "border-hairline-2 bg-surface-2 text-ink hover:border-brand-ink"}",
+          aria: { label: t("chrome.theme_switch", theme: t("chrome.theme.#{switch_theme}")) } do %>
+      <span aria-hidden="true"><%= themes.fetch(switch_theme) %></span>
+      <span><%= t("chrome.theme.#{switch_theme}") %></span>
+    <% end %>
+  <% else %>
   <button type="button" aria-haspopup="true" aria-expanded="false"
           aria-label="<%= t("chrome.theme_toggle", theme: t("chrome.theme.#{chosen}")) %>"
           data-dropdown-target="button" data-action="dropdown#toggle"
@@ -49,4 +61,5 @@
       <% end %>
     <% end %>
   </div>
+  <% end %>
 </div>

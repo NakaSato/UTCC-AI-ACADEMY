@@ -12,7 +12,7 @@ class ThemeWalkTest < ApplicationSystemTestCase
     assert_no_selector "html.dark"
     assert_no_selector "html.light"
 
-    click_theme "dark"
+    click_public_theme "dark"
 
     assert_selector "html.dark"
     assert_equal "rgb(15, 12, 11)", body_background
@@ -25,18 +25,27 @@ class ThemeWalkTest < ApplicationSystemTestCase
 
   test "an explicit light choice beats the browser's own preference" do
     visit "/"
-    click_theme "light"
+    click_public_theme "dark"
+    click_public_theme "light"
 
     assert_selector "html.light"
     assert_equal "rgb(247, 244, 241)", body_background
   end
 
-  test "system returns the answer to the browser" do
-    visit "/"
-    click_theme "dark"
+  test "system returns the answer to the browser from the account menu" do
+    sign_in_through_the_form users(:one)
+    find("button[aria-label='#{I18n.t("chrome.user_toggle")}']").click
+    within("[data-menu=account]") do
+      find("[data-preference=theme] > button").click
+      find("form[action='#{theme_path("dark")}'] button").click
+    end
     assert_selector "html.dark"
 
-    click_theme "system"
+    find("button[aria-label='#{I18n.t("chrome.user_toggle")}']").click
+    within("[data-menu=account]") do
+      find("[data-preference=theme] > button").click
+      find("form[action='#{theme_path("system")}'] button").click
+    end
 
     assert_no_selector "html.dark"
     assert_no_selector "html.light"
@@ -62,13 +71,16 @@ class ThemeWalkTest < ApplicationSystemTestCase
     visit "/"
     assert_selector "html[lang=th]"
 
-    find("[data-preference=language] > button").click
-    find("form[action='#{language_path(:en)}'] button").click
+    find("header [data-preference=language] form[action='#{language_path(:en)}'] button").click
 
     assert_selector "html[lang=en]"
   end
 
   private
+    def click_public_theme(theme)
+      find("header [data-preference=theme] form[action='#{theme_path(theme)}'] button").click
+    end
+
     def click_theme(theme)
       find("[data-preference=theme] > button").click
       find("form[action='#{theme_path(theme)}'] button").click
