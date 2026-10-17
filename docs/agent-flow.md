@@ -17,7 +17,7 @@
 | Work item size | 1–8 files, 50–250 lines a commit, one stated purpose each |
 | Review | one person reads the diff; there is no second reviewer to escalate to |
 | Gate 1 (self-verify) | `bin/verify` — documentation checks, RuboCop, Brakeman, `bundler-audit`, `importmap audit`, the suite, the seed replant, and system tests |
-| Gate 2 (policy) | `.github/workflows/ci.yml`, the same steps on a clean runner. Independent of whoever wrote the change — but it runs **after** the commit is pushed, not before |
+| Gate 2 (policy) | **absent** since ADR-0057 removed the GitHub Actions workflows. The reviewer running `bin/verify` themselves is the only stand-in |
 | Gate 3 (human) | reading the diff, and it is the **last** gate |
 | Gate 4 (progressive delivery) | **absent** — no canary, no feature flags, no monitoring, no rollback path |
 | Spec | the checked format is active under `docs/specs/`; no behavior spec has been required yet |
@@ -47,16 +47,16 @@ Three rules hold this shape, and only the third is currently automatic:
 2. **`AGENT_BLOCKED` never times out into a guess.** See §6.
 3. **Repeated Gate 1 failure is a spec problem, not a code problem.** An agent that cannot get `bin/verify` green in a few passes is usually being asked for something under-specified — the fix is upstream, in what was asked for, not another attempt.
 
-## 3. Gate 2 is independent now, but it runs late
+## 3. Gate 2 is gone
 
-`bin/verify` (which delegates to `bin/ci`) and `.github/workflows/ci.yml` enforce the same policy, and the difference between them is the whole point: an agent that runs the local one is reporting on itself, and the workflow is a machine that did not write the code checking the code on a clean runner. That closes the hole where an agent could decide not to run the local gate, or run it and paraphrase the result.
+`bin/verify` (which delegates to `bin/ci`) is the only policy gate. Until ADR-0057 a GitHub Actions workflow ran the same steps on a clean runner, which was the only check written by something other than whoever wrote the code. It had been refused for an account billing lock since August, and the workflows were then deleted.
 
-**What it does not close is the ordering.** With no branches and no pull requests, the workflow fires on `push` — so it verifies a commit that is already on `main`. It catches a red build; it cannot prevent one. Two things follow:
+An agent that runs `bin/verify` is reporting on itself. So:
 
-- **The human still runs `bin/verify` themselves before committing anything in Tier B or C.** One command, and it is what keeps `main` green rather than merely observed.
-- **A red run on `main` is owned by whoever pushed it**, immediately — there is no branch to leave it on. `docs/slack.md` is why one message goes to a channel when that happens, and why nothing is posted when a run is green.
+- **The human runs `bin/verify` themselves before pushing anything, in every tier.** It is the only thing that keeps `main` green.
+- **A red `bin/verify` on `main` is owned by whoever pushed it**, immediately. Nothing announces it, so the next person to run the gate finds it.
 
-This is the strongest argument in this document for eventually working on a branch: a workflow that runs on a pull request is a gate, and the same workflow on `push` is a smoke alarm.
+Bringing back an independent gate, on a pull request rather than after the push, is the strongest single improvement available to this flow. It needs its own ADR.
 
 ## 4. The fitness functions this repo already has
 

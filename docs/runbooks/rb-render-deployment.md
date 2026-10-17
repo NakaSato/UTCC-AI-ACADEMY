@@ -10,8 +10,6 @@ review_by: 2026-08-13
 depends_on: [ADR-0020, ADR-0021, ADR-0022, SPEC-0022]
 touches:
   - render.yaml
-  - .github/workflows/release-artifact.yml
-  - .github/workflows/render-deploy.yml
   - docs/releases
   - config/database.yml
 enforced_by:
@@ -28,6 +26,10 @@ agent_writable: true
 > dashboard has been configured.
 
 ## Preconditions
+
+> **ADR-0057:** the GitHub Actions workflows this describes were removed on
+> 2026-10-17. Nothing builds, signs, or promotes the image now; the steps below
+> stay as the requirement a replacement must meet.
 
 - The CI workflow for the exact source commit is green.
 - The Release Owner has reviewed the planned release record and migration

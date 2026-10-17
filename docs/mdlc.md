@@ -110,7 +110,7 @@ stateDiagram-v2
 
 ## 6. Gates — what runs, and where
 
-The documentation checks are part of `config/ci.rb`, the independent GitHub Actions workflow, the Pages build, and the Vercel/local dashboard build:
+The documentation checks are part of `config/ci.rb` and the Vercel/local dashboard build (ADR-0057 removed the GitHub Actions and Pages workflows):
 
 ```ruby
 step "Docs: Backlog, schema, and references", "bin/docs"

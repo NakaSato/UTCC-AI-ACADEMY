@@ -13,8 +13,6 @@ depends_on: [ADR-0020, ADR-0021, ADR-0022]
 touches:
   - render.yaml
   - config/deploy.yml
-  - .github/workflows/release-artifact.yml
-  - .github/workflows/render-deploy.yml
   - docs/runbooks/rb-render-deployment.md
 enforced_by:
   - test/release/artifact_provenance_test.rb
@@ -33,6 +31,10 @@ verify_after_deploy:
 # Render production deployment boundary
 
 ## Changes
+
+> **ADR-0057:** the GitHub Actions workflows this describes were removed on
+> 2026-10-17. Nothing builds, signs, or promotes the image now; the steps below
+> stay as the requirement a replacement must meet.
 
 This is a deployment-boundary record, not an application release. The
 production target is the Singapore Render web service at

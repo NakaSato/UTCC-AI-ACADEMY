@@ -47,7 +47,7 @@ flowchart LR
 | Spec | `docs/specs/spec-*.md` for Tier B/C behavior | Product or Spec Owner | Invariants and acceptance criteria map to tests |
 | Code | `AGENTS.md`, `CLAUDE.md`, `docs/coding-standard.md` | Implementing Developer | Focused tests pass and the diff respects its risk tier |
 | Test | `docs/test-strategy.md` and test suites | Human Reviewer / QA | Acceptance intent is human-owned; automated suites pass |
-| Build | `config/ci.rb`, `.github/workflows/ci.yml` | Platform Owner | `bin/verify` and independent CI pass |
+| Build | `config/ci.rb` (ADR-0057) | Platform Owner | `bin/verify` passes, run by the reviewer as well as the author |
 | Release | `docs/releases/release-*.md` | Release Owner | Approval, rollback, migration order, and post-release checks are ready |
 | Operate | `docs/runbooks/rb-*.md` | On-call Owner | Runbook is executable; SLO/health evidence is reviewed |
 | Measure | `docs/outcomes/outcome-*.md` | Product Owner | Actual outcome is compared with its target and creates a decision |
@@ -62,7 +62,7 @@ owner remain authoritative.
 | Phase | Current or Planned Slack Use | Repository Authority |
 | --- | --- | --- |
 | Plan–Test | Use a `squad-academy` thread for an async question, blocker, review handoff, artifact link, or lifecycle status update such as `proposed → accepted`; keep ceremonies live as defined in `docs/process.md` | `docs/backlog.json`, ADR/spec files, the diff, and test evidence |
-| Build | The independent GitHub Actions workflow may post one failed run on `main` to `academy-alerts`; do not post local `bin/verify` results or successful runs | GitHub Actions run, `config/ci.rb`, and `.github/workflows/ci.yml` |
+| Build | Nothing posts. ADR-0057 removed the workflow that could; do not post local `bin/verify` results | `config/ci.rb` |
 | Release | Post a release link or failed-deploy P1 only after a real target and owner exist; never use Slack as the approval or deploy command surface | `docs/releases/release-*.md` and platform deployment record |
 | Operate | Route actionable P0/P1 signals to `academy-alerts`; open `inc-YYYYMMDD-NN` for an active incident and export the durable timeline before archiving | `docs/runbooks/`, `docs/postmortems/`, monitoring/tracing evidence |
 | Measure | Use at most a P2 digest linking an outcome report; product interpretation stays human-owned | `docs/outcomes/` and the resulting backlog decision |

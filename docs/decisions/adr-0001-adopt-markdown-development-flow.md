@@ -16,7 +16,6 @@ touches:
   - docs/development-flow.md
   - docs/mdlc.md
   - config/ci.rb
-  - .github/workflows/ci.yml
 enforced_by:
   - bin/docs
   - bin/verify

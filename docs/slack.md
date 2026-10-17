@@ -13,9 +13,10 @@
 
 The test: **if the workspace vanished tomorrow, the development system still works.** That is trivially true of this project today, and the purpose of this file is to keep it true as things get wired up.
 
-> **Implementation state:** GitHub Actions has two outbound Slack senders: one
-> failed-`main` CI alert and one validated lifecycle-status mirror. Each remains
-> dormant until its repository channel variable and `SLACK_BOT_TOKEN` exist.
+> **Implementation state:** nothing posts to Slack. The two senders, a
+> failed-`main` CI alert and a lifecycle-status mirror, lived in
+> `.github/workflows/ci.yml`, which ADR-0057 removed. `script/slack-status-update`
+> still exists and is tested, but nothing invokes it.
 > Everything else in this document is policy or a blocked adoption step.
 > Section 1 is the honest inventory; section 7 is the order to unlock the rest.
 
@@ -23,8 +24,8 @@ The test: **if the workspace vanished tomorrow, the development system still wor
 
 | Would notify about | Source in this repo | State today |
 | --- | --- | --- |
-| Test/lint/security failures | `.github/workflows/ci.yml` | **Wired but credential-gated.** One message per failed run on `main`, from a `notify` job that needs all six verification jobs |
-| Lifecycle status transitions | `script/slack-status-update`, `.github/workflows/ci.yml` | **Wired but credential-gated.** After all six verification jobs pass on `main`, one non-blocking message mirrors validated backlog and lifecycle transitions to `SLACK_STATUS_CHANNEL` |
+| Test/lint/security failures | — | **None.** The workflow that posted failed runs on `main` was removed (ADR-0057) |
+| Lifecycle status transitions | `script/slack-status-update` | **Unwired.** The script still builds the payload; the workflow job that ran it was removed (ADR-0057) |
 | Dependency CVEs | Dependabot | Available, and needs no code — GitHub's own Slack app delivers it. Read the note below on why its `github-actions` half used to be noise |
 | Deploys | Kamal (`config/deploy.yml`) or Render (`render.yaml`) | Kamal's server is still the placeholder `192.168.0.1`; Render can post natively once it is the chosen target |
 | Site down | — | No monitor. `/up` exists and is excluded from both the https redirect and host authorization precisely so something outside can reach it |
@@ -32,9 +33,9 @@ The test: **if the workspace vanished tomorrow, the development system still wor
 | Incidents | — | No on-call, no pager, and no production incident has happened |
 | Work items | `docs/backlog.json` | The JSON backlog is the record; human handoff links may be posted to `squad-academy`, but no work-item bot is wired |
 
-**Dependabot was a partly false source until the workflow came back.** `.github/dependabot.yml` declares a `github-actions` ecosystem, and the workflow it was written for was deleted in `5b510e6` — so three of the four pull requests this repo has ever received bumped the versions of actions that nothing here ran, and the fourth bumped a gem that is no longer in the Gemfile. All four were closed unmerged, correctly. Restoring `.github/workflows/ci.yml` makes that ecosystem entry honest again: the actions it watches are now actions this repo really runs. **The `bundler` half is the one worth routing** — a gem CVE is a P1 nobody would otherwise see until they next ran `bin/ci`.
+**Dependabot was a partly false source until the workflow came back.** `.github/dependabot.yml` declares a `github-actions` ecosystem, and the workflow it was written for was deleted in `5b510e6` — so three of the four pull requests this repo has ever received bumped the versions of actions that nothing here ran, and the fourth bumped a gem that is no longer in the Gemfile. All four were closed unmerged, correctly. ADR-0057 removed the workflows again, and the `github-actions` entry went with them, so Dependabot now watches `bundler` only. **The `bundler` half is the one worth routing** — a gem CVE is a P1 nobody would otherwise see until they next ran `bin/ci`.
 
-**A local `bin/ci` result still must not be posted, and that is not a "not yet".** `docs/process.md` makes "green on your machine" the definition of done on purpose, but a message posted *from* that run proves only that somebody ran something on their own machine — a green tick with no independent authority behind it is worse than silence, because it reads as a gate. The workflow is the authority; the laptop is not, and adding a webhook to `config/ci.rb` would blur exactly that line.
+**A local `bin/ci` result still must not be posted, and that is not a "not yet".** `docs/process.md` makes "green on your machine" the definition of done on purpose, but a message posted *from* that run proves only that somebody ran something on their own machine — a green tick with no independent authority behind it is worse than silence, because it reads as a gate. With the workflow gone there is no independent authority to post from, and adding a webhook to `config/ci.rb` would not create one.
 
 **The app's own notifications have nothing to do with this.** `Notification.notify` and `NotificationBell` push a frame to a signed-in browser and deliberately store a *kind* rather than a sentence, so a line reads in the language of whoever reads it. Slack has no reader locale, so bridging that table to a webhook would mean choosing one language for everyone and writing copy outside the locale files — the exact thing `CLAUDE.md` forbids in two separate places. If a student's award ever needs to reach Slack, it is a new message written for Slack, not a re-render of a bell.
 

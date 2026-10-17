@@ -15,8 +15,6 @@ touches:
   - config/deploy.yml
   - render.yaml
   - Dockerfile
-  - .github/workflows/release-artifact.yml
-  - .github/workflows/render-deploy.yml
   - bin/kamal
   - config/database.yml
   - config/environments/production.rb

@@ -26,7 +26,6 @@ touches:
   - test/models/query_budget_test.rb
   - docs/performance.md
   - docs/test-strategy.md
-  - .github/workflows/ci.yml
   - lib
 enforced_by:
   - test/quality/critical_journey_matrix_test.rb

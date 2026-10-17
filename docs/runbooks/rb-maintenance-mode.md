@@ -58,10 +58,8 @@ otherwise, and are not reachable through Render today. Do not promise a branded
       a stale deploy each fail with the reason. It appears one deploy after the
       page is generated and merged: the documentation site builds on push to
       `main`, from this repository, on Vercel.
-      The GitHub Pages workflow in `.github/workflows/pages.yml` is a second,
-      currently failing publisher: its runs are refused for an account billing
-      lock. It is **not** what serves this page, and the `github.io` address
-      does not resolve. Do not point the `uri` at it.
+      There is no GitHub Pages publisher (ADR-0057 removed `pages.yml`), and
+      the `github.io` address does not resolve. Do not point the `uri` at it.
 - [ ] `bin/rails error_pages:check` passes, so the published page matches the
       copy in `config/locales`.
 - [ ] The downtime is announced to whoever is teaching that day.

@@ -16,9 +16,9 @@ config/ci.rb. It performs setup, documentation validation, Ruby style checks,
 dependency audits, static security analysis, application tests, deterministic
 seed replanting, and system tests.
 
-.github/workflows/ci.yml independently performs the same policy categories on
-a clean runner. A local pass is self-verification; the remote pass is the
-independent gate.
+There is no independent hosted gate: ADR-0057 removed the GitHub Actions
+workflows. A local pass is self-verification, so the person reviewing a change
+runs bin/verify as well.
 
 ## Artifact Rules
 

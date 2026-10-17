@@ -15,8 +15,6 @@ touches:
   - config/deploy.yml
   - render.yaml
   - Dockerfile
-  - .github/workflows/release-artifact.yml
-  - .github/workflows/render-deploy.yml
   - bin/kamal
   - config/database.yml
   - config/environments/production.rb
@@ -141,6 +139,10 @@ post-deploy verification.
   security verification.
 
 ## Render baseline
+
+> **ADR-0057:** the GitHub Actions workflows this describes were removed on
+> 2026-10-17. Nothing builds, signs, or promotes the image now; the steps below
+> stay as the requirement a replacement must meet.
 
 The approved target boundary is the Singapore Render web service at
 academy.boring9.dev. It pulls a prebuilt linux/amd64 image from GHCR, runs one
