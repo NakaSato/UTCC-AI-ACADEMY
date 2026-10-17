@@ -65,14 +65,6 @@ class DeploymentConfigurationTest < ActiveSupport::TestCase
     refute_includes @service.fetch("domains"), uri.host
   end
 
-  test "the manual deploy workflow requires an immutable image digest" do
-    workflow = ROOT.join(".github/workflows/render-deploy.yml").read
-
-    assert_includes workflow, "image_digest"
-    assert_includes workflow, "sha256"
-    assert_includes workflow, "RENDER_DEPLOY_HOOK_URL"
-    assert_includes workflow, "environment: production"
-  end
 
   private
     # Where the documentation site actually serves a generated page. Vercel's

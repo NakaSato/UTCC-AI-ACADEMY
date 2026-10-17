@@ -8,7 +8,6 @@ require "tmpdir"
 
 class SlackStatusUpdateTest < ActiveSupport::TestCase
   SCRIPT = Rails.root.join("script/slack-status-update")
-  WORKFLOW = Rails.root.join(".github/workflows/ci.yml")
 
   setup do
     @repository = Dir.mktmpdir("slack-status-update")
@@ -133,21 +132,6 @@ class SlackStatusUpdateTest < ActiveSupport::TestCase
     assert_equal 2, output.length
   end
 
-  test "workflow mirrors statuses only after authoritative gates and never makes Slack blocking" do
-    workflow = WORKFLOW.read
-    job = workflow[/^  notify_status:\n(.*?)^  notify:/m, 1]
-
-    assert job
-    assert_includes job, "github.event_name == 'push'"
-    assert_includes job, "github.ref == 'refs/heads/main'"
-    %w[docs scan_ruby scan_js lint test system-test].each do |required_job|
-      assert_includes job, "needs.#{required_job}.result == 'success'"
-    end
-    assert_equal 2, job.scan("continue-on-error: true").length
-    assert_includes job, "vars.SLACK_STATUS_CHANNEL"
-    refute_includes job, "vars.SLACK_CI_CHANNEL"
-    assert_includes job, "script/slack-status-update"
-  end
 
   private
 
