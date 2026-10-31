@@ -66,7 +66,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "tailwindcss-rails", "~> 4.6"
+gem "tailwindcss-rails", "~> 4.7"
 # Pure-Ruby PDF generation for localized course documents; Thai text uses the
 # bundled Noto Sans Thai font rather than a host-specific system font.
 gem "prawn", "~> 2.5"
